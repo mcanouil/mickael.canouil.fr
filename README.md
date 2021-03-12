@@ -3,5 +3,5 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Repository for [mickael.canouil.fr](http://mickael.canouil.fr/).
+Repository for [mickael.canouil.fr](http://mickael.canouil.fr).
 
