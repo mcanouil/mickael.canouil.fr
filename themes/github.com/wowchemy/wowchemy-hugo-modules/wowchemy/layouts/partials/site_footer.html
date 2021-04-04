@@ -10,7 +10,7 @@
     </div>
   {{ end }}
 
-  {{ if or (site.GetPage "terms.md") (site.GetPage "privacy.md") }}
+  <!--{{ if or (site.GetPage "terms.md") (site.GetPage "privacy.md") }}
   <p class="powered-by">
     {{ with site.GetPage "privacy.md" }}
       {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
@@ -20,29 +20,24 @@
       {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
     {{ end }}
   </p>
-  {{ end }}
-
-  <p class="powered-by">
-    {{ with site.Copyright }}{{ replace . "{year}" now.Year | markdownify}}{{ end }}
-  </p>
-
-  {{/* Display copyright license. */}}
+  {{ end }}-->
+  
   {{ partial "site_footer_license" . }}
 
-  <p class="powered-by">
-    {{ $is_sponsor := site.Params.i_am_a_sponsor | default false }}
-    {{ $hide_published_with_footer := site.Params.power_ups.hide_published_with | default true }}
-    {{ if not (and $is_sponsor $hide_published_with_footer) }}
-      {{ $default := "Published with {wowchemy} — the free, {repo_link}open source{/repo_link} website builder that empowers creators." }}
-      {{ $i18n_published_with := i18n "published_with" | default $default }}
-      {{ if not (findRE "{wowchemy}" $i18n_published_with) }}
-        {{ warnf "Please attribute Wowchemy using `{wowchemy}` in the `published_with` text." }}
-        {{ $i18n_published_with = $default }}
-      {{ end }}
-      {{ $i18n_published_with = replace $i18n_published_with "{wowchemy}" "<a href=\"https://wowchemy.com/?utm_campaign=poweredby\" target=\"_blank\" rel=\"noopener\">Wowchemy</a>" | safeHTML }}
-      {{ $i18n_published_with = replace $i18n_published_with "{repo_link}" "<a href=\"https://github.com/wowchemy/wowchemy-hugo-modules\" target=\"_blank\" rel=\"noopener\">" | safeHTML }}
-      {{ $i18n_published_with = replace $i18n_published_with "{/repo_link}" "</a>" | safeHTML }}
-      {{ $i18n_published_with | markdownify | emojify }}
+  <p class="powered-by" style="margin-bottom: 0;">
+    {{ with site.Copyright }}{{ replace . "{year}" now.Year | markdownify}} &middot; {{ end }}
+    Made with <a href="https://github.com/mcanouil/mickael.canouil.fr" target="_blank" rel="noopener"><i class="fas fa-code-branch"></i></a>, the <a href="https://cran.r-project.org/" target="_blank" rel="noopener"><i class="fab fa-r-project"></i> </a><a href="https://github.com/rstudio/blogdown" target="_blank" rel="noopener">blogdown</a> package, and the 
+    <a href="https://wowchemy.com/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    {{ if ne .Type "docs" }}
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
     {{ end }}
   </p>
 </footer>
