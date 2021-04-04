@@ -1,4 +1,4 @@
-# mickael.canouil.fr <img src="static/logo.svg" align="right" width="120" />
+# mickael.canouil.fr <img src="assets/media/icon.png" align="right" width="120" />
 
 <!-- badges: start -->
 <!-- badges: end -->
