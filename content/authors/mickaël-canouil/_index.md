@@ -4,7 +4,7 @@ title: Mickaël Canouil
 email: "mickael.canouil@cnrs.fr"
 highlight_name: false
 
-bio: My research interests include distributed robotics, mobile computing and programmable matter.
+bio: Biostatiscian, cinephile and [<i class = "fab fa-twitter"></i>@rlille_rug](https://twitter.com/rlille_rug) organiser.
 education:
   courses:
   - course: Ph.D. in Biostatistics
@@ -22,9 +22,9 @@ interests:
 - Longitudinal Data
 - Data Analysis
 - Data Visualisation
-- Knowledge SHaring
+- Knowledge Sharing
 - Learning New Skills
-- Movies
+- Watching Movies
 
 role: Head of the Biostatistics Team
 organizations:
