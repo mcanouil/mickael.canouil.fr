@@ -28,8 +28,10 @@ interests:
 
 role: Head of the Biostatistics Team
 organizations:
-- name: Inserm U1283 / CNRS UMR8199 / Université de Lille / Institut Pasteur de Lille / CHU Lille
+- name: Inserm U1283 / CNRS UMR8199
   url: http://http://www.good.cnrs.fr/
+- name: Institut Pasteur de Lille
+  url: https://www.pasteur-lille.fr/en/
   
 social:
 - icon: envelope
