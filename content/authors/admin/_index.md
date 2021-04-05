@@ -20,6 +20,11 @@ education:
 interests:
 - Multi-omics
 - Longitudinal Data
+- Data Analysis
+- Data Visualisation
+- Knowledge SHaring
+- Learning New Skills
+- Movies
 
 role: Head of the Biostatistics Team
 organizations:
@@ -50,8 +55,10 @@ social:
   link: 'https://github.com/mcanouil/'
 ---
 
-Nelson Bighetti is a professor of artificial intelligence at the Stanford AI Lab. His research interests include distributed robotics, mobile computing and programmable matter. He leads the Robotic Neurobiology group, which develops self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
+I am a biostatistician (Ph.D.) and the head of a small team within a research laboratory, working primarily on the genetics of diabetes and obesity.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.
+I have developed a few {{< icon name="r-project" pack="fab" >}} packages (_e.g._, [insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._, [ggpacman](https://cran.r-project.org/package=insane)).
 
-{{< icon name="download" pack="fas" >}} Download my {{< staticref "media/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.
+I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} (https://m.canouil.fr/imdb_ratings/).
+
+{{< icon name="file-alt" pack="far" >}} Have a look at my [_curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
