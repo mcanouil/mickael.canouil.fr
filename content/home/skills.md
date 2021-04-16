@@ -3,13 +3,14 @@
 # Documentation: https://wowchemy.com/docs/page-builder/
 widget: featurette
 
+# Activate this widget? true/false
 active: false
+
+# Order that this section appears on the page.
+weight: 130
 
 # This file represents a page section.
 headless: true
-
-# Order that this section appears on the page.
-weight: 30
 
 title: Skills
 subtitle:

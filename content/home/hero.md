@@ -1,8 +1,17 @@
 ---
+# An instance of the Featured widget.
+# Documentation: https://wowchemy.com/docs/page-builder/
 widget: hero
+
+# Activate this widget? true/false
 active: false
+
+# Order that this section appears on the page.
+weight: 90
+
+# This file represents a page section.
 headless: true
-weight: 10
+
 title: Hugo Academic Starter
 hero_media: hero-academic.png
 cta:

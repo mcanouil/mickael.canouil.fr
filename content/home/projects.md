@@ -3,13 +3,14 @@
 # Documentation: https://wowchemy.com/docs/page-builder/
 widget: portfolio
 
+# Activate this widget? true/false
 active: false
+
+# Order that this section appears on the page.
+weight: 110
 
 # This file represents a page section.
 headless: true
-
-# Order that this section appears on the page.
-weight: 65
 
 title: Projects
 subtitle: ''
