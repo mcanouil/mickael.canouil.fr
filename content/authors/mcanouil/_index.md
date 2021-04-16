@@ -1,8 +1,8 @@
 ---
 superuser: true
-title: Mickaël Canouil
+title: 'Mickaël Canouil'
 email: "mickael.canouil@cnrs.fr"
-highlight_name: false
+highlight_name: true
 
 bio: Biostatiscian, cinephile and [<i class = "fab fa-twitter"></i>@rlille_rug](https://twitter.com/rlille_rug) organiser.
 education:
