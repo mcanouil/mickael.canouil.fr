@@ -1,4 +1,4 @@
-module github.com/wowchemy/starter-academic
+module github.com/wowchemy/starter-academic/exampleSite
 
 go 1.15
 
