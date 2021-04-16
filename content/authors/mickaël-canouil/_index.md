@@ -41,26 +41,24 @@ social:
   icon_pack: fab
   link: 'https://orcid.org/0000-0002-3396-4549'
 - display:
-    header: true
+    header: false
   icon: twitter
   icon_pack: fab
   link: 'https://twitter.com/mickaelcanouil'
 - display:
-    header: true
+    header: false
   icon: linkedin
   icon_pack: fab
   link: 'https://www.linkedin.com/in/mickaelcanouil/'
 - display:
-    header: true
+    header: false
   icon: github
   icon_pack: fab
   link: 'https://github.com/mcanouil/'
 ---
 
-I am a biostatistician (Ph.D.) and the head of a small team within a research laboratory, working primarily on the genetics of diabetes and obesity.
+I am a biostatistician (Ph.D.) and the head of a small team within a research laboratory, working primarily on the genetics of diabetes and obesity.  
+I have developed a few {{< icon name="r-project" pack="fab" >}}&nbsp;packages (_e.g._,&nbsp;[insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._,&nbsp;[ggpacman](https://cran.r-project.org/package=insane)).  
+I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} ([m.canouil.fr/imdb_ratings](https://m.canouil.fr/imdb_ratings/)).
 
-I have developed a few {{< icon name="r-project" pack="fab" >}} packages (_e.g._, [insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._, [ggpacman](https://cran.r-project.org/package=insane)).
-
-I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} (https://m.canouil.fr/imdb_ratings/).
-
-{{< icon name="file-alt" pack="far" >}} Have a look at my [_curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
+Have a look at my [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
