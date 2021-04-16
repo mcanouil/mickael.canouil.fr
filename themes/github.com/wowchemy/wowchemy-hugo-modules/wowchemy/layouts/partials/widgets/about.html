@@ -19,6 +19,54 @@
 
 <!-- About widget -->
 <div class="row">
+  <div class="col-12 col-lg-4">
+    <div id="profile">
+
+      {{ if site.Params.avatar.gravatar }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=270')" alt="{{$person_page.Title}}">
+      {{ else if $avatar }}
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
+      {{ end }}
+
+      <div class="portrait-title">
+        <h2>{{ $person_page.Title }}</h2>
+        {{ with $person.role }}<h3>{{ . | markdownify | emojify }}</h3>{{ end }}
+
+        {{ range $person.organizations }}
+        <h3>
+          {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
+          <span>{{ .name }}</span>
+          {{ if .url }}</a>{{ end }}
+        </h3>
+        {{ end }}
+      </div>
+
+      <ul class="network-icon" aria-hidden="true">
+        {{ range $person.social }}
+        {{ $pack := or .icon_pack "fas" }}
+        {{ $pack_prefix := $pack }}
+        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+          {{ $pack_prefix = "fa" }}
+        {{ end }}
+        {{ $link := .link }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ $target := "" }}
+        {{ if not $scheme }}
+          {{ $link = .link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        <li>
+          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
+            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
+          </a>
+        </li>
+        {{ end }}
+      </ul>
+
+    </div>
+  </div>
   <div class="col-12 col-lg-8">
 
     {{/* Only display widget title in explicit instances of about widget, not in author pages. */}}
@@ -57,54 +105,6 @@
         </ul>
       </div>
       {{ end }}
-
-    </div>
-  </div>
-  <div class="col-12 col-lg-4">
-    <div id="profile">
-
-      {{ if site.Params.avatar.gravatar }}
-      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=270')" alt="{{$person_page.Title}}">
-      {{ else if $avatar }}
-      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
-      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
-      {{ end }}
-
-      <div class="portrait-title">
-        <h2>{{ $person_page.Title }}</h2>
-        {{ with $person.role }}<h3><i>{{ . | markdownify | emojify }}</i></h3>{{ end }}
-
-        {{ range $person.organizations }}
-        <h3>
-          {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
-          <span>{{ .name }}</span>
-          {{ if .url }}</a>{{ end }}
-        </h3>
-        {{ end }}
-      </div>
-
-      <ul class="network-icon" aria-hidden="true">
-        {{ range $person.social }}
-        {{ $pack := or .icon_pack "fas" }}
-        {{ $pack_prefix := $pack }}
-        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
-          {{ $pack_prefix = "fa" }}
-        {{ end }}
-        {{ $link := .link }}
-        {{ $scheme := (urls.Parse $link).Scheme }}
-        {{ $target := "" }}
-        {{ if not $scheme }}
-          {{ $link = .link | relLangURL }}
-        {{ else if in (slice "http" "https") $scheme }}
-          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
-        {{ end }}
-        <li>
-          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
-            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
-          </a>
-        </li>
-        {{ end }}
-      </ul>
 
     </div>
   </div>
