@@ -2,6 +2,7 @@
 authors:
 - admin
 - 吳恩達
+- mcanouil
 categories:
 - Demo
 - 教程

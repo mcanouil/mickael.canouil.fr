@@ -1,5 +1,6 @@
 ---
 date: "2019-07-12"
+author: mcanouil
 diagram: true
 highlight: true
 image:
