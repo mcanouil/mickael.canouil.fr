@@ -4,15 +4,15 @@
 widget: pages
 
 # Activate this widget? true/false
-active: false
+active: true
 
 # Order that this section appears on the page.
-weight: 150
+weight: 40
 
 # This file represents a page section.
 headless: true
 
-title: 'Recent & Upcoming Talks'
+title: 'Last Talk'
 subtitle:
 
 content:
@@ -41,4 +41,6 @@ design:
   #   3 = Card
   #   4 = Citation (publication only)
   view: 2
+  spacing:
+    padding: ["20px", "0", "20px", "0"]
 ---

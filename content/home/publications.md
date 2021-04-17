@@ -4,10 +4,10 @@
 widget: pages
 
 # Activate this widget? true/false
-active: false
+active: true
 
 # Order that this section appears on the page.
-weight: 120
+weight: 50
 
 # This file represents a page section.
 headless: true
@@ -38,10 +38,6 @@ design:
   #   3 = Card
   #   4 = Citation (publication only)
   view: 4
+  spacing:
+    padding: ["20px", "0", "20px", "0"]
 ---
-
-<!--
-{{% callout note %}}
-Quickly discover relevant content by [filtering publications](./publication/).
-{{% /callout %}}
--->
