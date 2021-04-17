@@ -7,16 +7,18 @@ widget: contact
 active: true
 
 # Order that this section appears on the page.
-weight: 40
+weight: 200
 
 # This file represents a page section.
 headless: true
 
-title: Contact
+title:
 subtitle:
 
 content:
   
 design:
-  columns: '2'
+  columns: '1'
+  spacing:
+    padding: ["20px", "0", "20px", "0"]
 ---
