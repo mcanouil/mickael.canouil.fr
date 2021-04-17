@@ -1,0 +1,1065 @@
+---
+title: A 'ggplot2' and 'gganimate' Version of Pac-Man
+author: mickael-canouil
+date: '2020-05-06'
+slug: ggpacman
+categories:
+  - R
+  - Visualisation
+tags:
+  - R
+  - ggplot2
+  - gganimate
+  - R Package
+subtitle: ''
+summary: 'The story of `ggpacman`. Or how to build a useless but fun R package to build a GIF of the game Pac-Man.'
+authors: []
+lastmod: '2021-04-17T16:02:41+02:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: [ "r package" ]
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="the-story-of-ggpacman" class="section level2">
+<h2>The Story of <code>ggpacman</code></h2>
+<p>It started on a Saturday evening …</p>
+<p>It was the 21<sup>st</sup> of March (<em>for the sake of precision</em>),
+around 10 pm CET (<em>also for the sake of precision and mostly because it is not relevant</em>).
+I was playing around with my data on ‘all’ the movies I have seen so far (<a href="https://github.com/mcanouil/IMDbRating">mcanouil/IMDbRating</a>) and looking on possibly new ideas of visualisation on twitter using <code>#ggplot2</code> and <code>#gganimate</code> (by the way the first time I played with <a href="https://gganimate.com/"><code>gganimate</code></a> was at <a href="https://www.r-project.org/conferences/useR-2018/">useR-2018 (Brisbane, Australia)</a>, just before and when <span class="citation">@thomasp85</span> released the actual framework).
+The only thing on the feed was “contaminated/deaths and covid-19” curves made with <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> and a few with <a href="https://gganimate.com/"><code>gganimate</code></a> …
+Let’s say, it was not as funny and interesting as I was hoping for …
+Then, I’ve got an idea, what if I can do something funny and not expected with <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> and <a href="https://gganimate.com/"><code>gganimate</code></a>?
+My first thought, was let’s draw and animate Pac-Man, that should not be that hard!</p>
+<p>Well, it was not that easy after-all …
+But, I am going to go through my code here (you might be interested to actually look at the <a href="https://github.com/mcanouil/ggpacman/commits/master">commits history</a>.</p>
+<blockquote class="twitter-tweet">
+<p lang="en" dir="ltr">
+Maybe I went too far with <a href="https://twitter.com/hashtag/ggplot2?src=hash&amp;ref_src=twsrc%5Etfw">#ggplot2</a> and <a href="https://twitter.com/hashtag/gganimate?src=hash&amp;ref_src=twsrc%5Etfw">#gganimate</a> …😅<br>What do you think <a href="https://twitter.com/hadleywickham?ref_src=twsrc%5Etfw"><span class="citation">@hadleywickham</span></a> &amp; <a href="https://twitter.com/thomasp85?ref_src=twsrc%5Etfw"><span class="citation">@thomasp85</span></a> , did I go too far or not enough ? (I am planning to add the ghosts 😎) <a href="https://t.co/nkfbti1Etd">pic.twitter.com/nkfbti1Etd</a>
+</p>
+— Mickaël CANOUIL (<span class="citation">@mickaelcanouil</span>) <a href="https://twitter.com/mickaelcanouil/status/1241760925499170824?ref_src=twsrc%5Etfw">March 22, 2020</a>
+</blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<ol style="list-style-type: decimal">
+<li><a href="#the-packages">The packages</a></li>
+<li><a href="#the-maze-layer">The maze layer</a>
+<ol style="list-style-type: decimal">
+<li><a href="#the-base-layer">The base layer</a></li>
+<li><a href="#the-grid-layer">The grid layer</a></li>
+<li><a href="#the-bonus-points-layer">The bonus points layer</a></li>
+</ol></li>
+<li><a href="#pac-man-character">Pac-Man character</a></li>
+<li><a href="#the-ghosts-characters">The Ghosts characters</a>
+<ol style="list-style-type: decimal">
+<li><a href="#body">Body</a></li>
+<li><a href="#eyes">Eyes</a></li>
+<li><a href="#ghost-shape">Ghost shape</a></li>
+</ol></li>
+<li><a href="#how-pac-man-interacts-with-the-maze">How Pac-Man interacts with the maze?</a>
+<ol style="list-style-type: decimal">
+<li><a href="#bonus-points">Bonus points</a></li>
+<li><a href="#ghost-weak-and-eaten-states">Ghost <code>"weak"</code> and <code>"eaten"</code> states</a></li>
+</ol></li>
+<li><a href="#plot-time-to-summarise-a-little-or-a-lot">Plot time</a></li>
+</ol>
+</div>
+<div id="the-packages" class="section level2">
+<h2>The packages</h2>
+<pre class="r"><code>library(&quot;stats&quot;)
+library(&quot;utils&quot;)
+library(&quot;rlang&quot;)
+library(&quot;magrittr&quot;)
+library(&quot;dplyr&quot;)
+library(&quot;tidyr&quot;)
+library(&quot;purrr&quot;)
+library(&quot;ggplot2&quot;)
+library(&quot;ggforce&quot;)
+library(&quot;gganimate&quot;)
+library(&quot;ggtext&quot;)</code></pre>
+</div>
+<div id="the-maze-layer" class="section level2">
+<h2>The maze layer</h2>
+<div id="the-base-layer" class="section level3">
+<h3>The base layer</h3>
+<p>First thing first, I needed to set-up the base layer, meaning, the maze from Pac-Man.
+I did start by setting the coordinates of the maze.</p>
+<pre class="r"><code>base_layer &lt;- ggplot() +
+  theme_void() +
+  theme(
+    legend.position = &quot;none&quot;,
+    plot.background = element_rect(fill = &quot;black&quot;, colour = &quot;black&quot;),
+    panel.background = element_rect(fill = &quot;black&quot;, colour = &quot;black&quot;),
+  ) +
+  coord_fixed(xlim = c(0, 20), ylim = c(0, 26))</code></pre>
+<p>For later use, I defined some scales (actually those scales, where defined way after chronologically speaking).
+I am using those to define sizes and colours for all the geometries I am going to use to achieve the Pac-Man GIF.</p>
+<pre class="r"><code>map_colours &lt;- c(
+  &quot;READY!&quot; = &quot;goldenrod1&quot;,
+  &quot;wall&quot; = &quot;dodgerblue3&quot;, &quot;door&quot; = &quot;dodgerblue3&quot;,
+  &quot;normal&quot; = &quot;goldenrod1&quot;, &quot;big&quot; = &quot;goldenrod1&quot;, &quot;eaten&quot; = &quot;black&quot;,
+  &quot;Pac-Man&quot; = &quot;yellow&quot;,
+  &quot;eye&quot; = &quot;white&quot;, &quot;iris&quot; = &quot;black&quot;,
+  &quot;Blinky&quot; = &quot;red&quot;, &quot;Blinky_weak&quot; = &quot;blue&quot;, &quot;Blinky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Pinky&quot; = &quot;pink&quot;, &quot;Pinky_weak&quot; = &quot;blue&quot;, &quot;Pinky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Inky&quot; = &quot;cyan&quot;, &quot;Inky_weak&quot; = &quot;blue&quot;, &quot;Inky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Clyde&quot; = &quot;orange&quot;, &quot;Clyde_weak&quot; = &quot;blue&quot;, &quot;Clyde_eaten&quot; = &quot;transparent&quot;
+)</code></pre>
+<pre class="r"><code>base_layer &lt;- base_layer +
+  scale_size_manual(values = c(&quot;wall&quot; = 2.5, &quot;door&quot; = 1, &quot;big&quot; = 2.5, &quot;normal&quot; = 0.5, &quot;eaten&quot; = 3)) +
+  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+  scale_colour_manual(breaks = names(map_colours), values = map_colours)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-layer-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>My <code>base_layer</code> here is not really helpful, so I temporarily added some elements to help me draw everything on it.
+<em>Note</em>: I won’t use it in the following.</p>
+<pre class="r"><code>base_layer +
+  scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
+  scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
+  theme(
+    panel.grid.major = element_line(colour = &quot;white&quot;),
+    axis.text = element_text(colour = &quot;white&quot;)
+  ) +
+  annotate(&quot;rect&quot;, xmin = 0, xmax = 21, ymin = 0, ymax = 26, fill = NA)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-layer-dev-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Quite better, isn’t it?!</p>
+</div>
+<div id="the-grid-layer" class="section level3">
+<h3>The grid layer</h3>
+<p>Here, I am calling “grid”, the walls of the maze.
+For this grid, I started drawing the vertical lines on the left side of the maze (as you may have noticed, the first level is symmetrical).</p>
+<pre class="r"><code>left_vertical_segments &lt;- tribble(
+  ~x, ~y, ~xend, ~yend,
+  0, 0, 0, 9,
+  0, 17, 0, 26,
+  2, 4, 2, 5,
+  2, 19, 2, 20,
+  2, 22, 2, 24,
+  4, 4, 4, 7,
+  4, 9, 4, 12,
+  4, 14, 4, 17,
+  4, 19, 4, 20,
+  4, 22, 4, 24,
+  6, 2, 6, 5,
+  6, 9, 6, 12,
+  6, 14, 6, 20,
+  6, 22, 6, 24,
+  8, 4, 8, 5,
+  8, 9, 8, 10,
+  8, 12, 8, 15,
+  8, 19, 8, 20,
+  8, 22, 8, 24
+)</code></pre>
+<pre class="r"><code>base_layer +
+  geom_segment(
+    data = left_vertical_segments,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE,
+    colour = &quot;white&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/left-vertical-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Then, I added the horizontal lines (still only on the left side of the maze)!</p>
+<pre class="r"><code>left_horizontal_segments &lt;- tribble(
+  ~x, ~y, ~xend, ~yend,
+  0, 0, 10, 0,
+  2, 2, 8, 2,
+  0, 4, 2, 4,
+  8, 4, 10, 4,
+  0, 5, 2, 5,
+  8, 5, 10, 5,
+  2, 7, 4, 7,
+  6, 7, 8, 7,
+  0, 9, 4, 9,
+  8, 9, 10, 9,
+  8, 10, 10, 10,
+  0, 12, 4, 12,
+  8, 12, 10, 12,
+  0, 14, 4, 14,
+  8, 15, 9, 15,
+  0, 17, 4, 17,
+  6, 17, 8, 17,
+  2, 19, 4, 19,
+  8, 19, 10, 19,
+  2, 20, 4, 20,
+  8, 20, 10, 20,
+  2, 22, 4, 22,
+  6, 22, 8, 22,
+  2, 24, 4, 24,
+  6, 24, 8, 24,
+  0, 26, 10, 26
+)
+
+left_segments &lt;- bind_rows(left_vertical_segments, left_horizontal_segments)</code></pre>
+<pre class="r"><code>base_layer +
+  geom_segment(
+    data = left_segments,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE,
+    colour = &quot;white&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/left-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The maze is slowly appearing, but surely.
+As I wrote earlier, the first level is symmetrical, so I used my left lines <code>left_segments</code> to compute all the lignes on the right <code>right_segments</code>.</p>
+<pre class="r"><code>right_segments &lt;-  mutate(
+  .data = left_segments,
+  x = abs(x - 20),
+  xend = abs(xend - 20)
+)</code></pre>
+<pre class="r"><code>base_layer +
+  geom_segment(
+    data = bind_rows(left_segments, right_segments),
+    mapping = aes(x = x, y = y, xend = xend, yend = yend),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE,
+    colour = &quot;white&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/right-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The middle vertical lines were missing, <em>i.e.</em>, I did not want to plot them twice, which would have happen, if I added these in <code>left_segments</code>.
+Also, the “door” of the ghost spawn area is missing.
+I added the door and the missing vertical walls in the end.</p>
+<pre class="r"><code>centre_vertical_segments &lt;- tribble(
+  ~x, ~y, ~xend, ~yend,
+  10, 2, 10, 4,
+  10, 7, 10, 9,
+  10, 17, 10, 19,
+  10, 22, 10, 26
+)
+door_segment &lt;- tibble(x = 9, y = 15, xend = 11, yend = 15, type = &quot;door&quot;)</code></pre>
+<p>Finally, I combined all the segments and drew them all.</p>
+<pre class="r"><code>maze_walls &lt;- bind_rows(
+  left_segments,
+  centre_vertical_segments,
+  right_segments
+) %&gt;%
+  mutate(type = &quot;wall&quot;) %&gt;%
+  bind_rows(door_segment)</code></pre>
+<pre class="r"><code>base_layer +
+  geom_segment(
+    data = maze_walls,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE,
+    colour = &quot;white&quot;
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/maze-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The maze is now complete, but no-one can actually see the door, since it appears the same way as the walls.
+You may have noticed, I added a column named <code>type</code>.
+<code>type</code> can currently hold two values: <code>"wall"</code> and <code>"door"</code>.
+I am going to use <code>type</code> as values for two aesthetics, you may already have guessed which ones.
+The answer is the <code>colour</code> and <code>size</code> aesthetics.</p>
+<pre class="r"><code>base_layer +
+  geom_segment(
+    data = maze_walls,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend, colour = type, size = type),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/maze-plot-colour-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>Note: <code>maze_walls</code> is a dataset of <code>ggpacman</code> (<code>data("maze_walls", package = "ggpacman")</code>).</em></p>
+</div>
+<div id="the-bonus-points-layer" class="section level3">
+<h3>The bonus points layer</h3>
+<p>The strategy was quite the same as for the grid layer:</p>
+<ul>
+<li>Setting up the point coordinates for the left side and the middle.</li>
+<li>Compute the coordinates for the right side.</li>
+<li>Use a column <code>type</code> for the two types of bonus points, <em>i.e.</em>, <code>"normal"</code> and <code>"big"</code> (the one who weaken the ghosts).</li>
+</ul>
+<pre class="r"><code>bonus_points_coord &lt;- function() {
+  left_bonus_points &lt;- tribble(
+    ~x, ~y, ~type,
+    1, c(1:3, 7:8, 18:22, 24:25), &quot;normal&quot;,
+    1, c(6, 23), &quot;big&quot;,
+    2, c(1, 3, 6, 8, 18, 21, 25), &quot;normal&quot;,
+    3, c(1, 3:6, 8, 18, 21, 25), &quot;normal&quot;,
+    4, c(1, 3, 8, 18, 21, 25), &quot;normal&quot;,
+    5, c(1, 3:25), &quot;normal&quot;,
+    6, c(1, 6, 8, 21, 25), &quot;normal&quot;,
+    7, c(1, 3:6, 8, 18:21, 25), &quot;normal&quot;,
+    8, c(1, 3, 6, 8, 18, 21, 25), &quot;normal&quot;,
+    9, c(1:3, 6:8, 18, 21:25), &quot;normal&quot;
+  )
+
+  bind_rows(
+    left_bonus_points,
+    tribble(
+      ~x, ~y, ~type,
+      10, c(1, 21), &quot;normal&quot;
+    ),
+    mutate(left_bonus_points, x = abs(x - 20))
+  ) %&gt;%
+    unnest(&quot;y&quot;)
+}
+maze_points &lt;- bonus_points_coord()</code></pre>
+<pre class="r"><code>maze_layer &lt;- base_layer +
+  geom_segment(
+    data = maze_walls,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend, colour = type, size = type),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = maze_points,
+    mapping = aes(x = x, y = y, size = type, colour = type),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/maze-layer-show-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>Note: <code>maze_points</code> is a dataset of <code>ggpacman</code> (<code>data("maze_points", package = "ggpacman")</code>).</em></p>
+</div>
+</div>
+<div id="pac-man-character" class="section level2">
+<h2>Pac-Man character</h2>
+<p>It is now time to draw the main character.
+To draw Pac-Man, I needed few things:</p>
+<ul>
+<li><p>The Pac-Man moves, <em>i.e.</em>, all the coordinates where Pac-Man is supposed to be at every <code>step</code>.</p>
+<pre class="r"><code>data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)
+unnest(pacman, c(&quot;x&quot;, &quot;y&quot;))
+#&gt; # A tibble: 150 x 3
+#&gt;        x     y colour 
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
+#&gt;  1    10     6 Pac-Man
+#&gt;  2    10     6 Pac-Man
+#&gt;  3    10     6 Pac-Man
+#&gt;  4    10     6 Pac-Man
+#&gt;  5    10     6 Pac-Man
+#&gt;  6    10     6 Pac-Man
+#&gt;  7    10     6 Pac-Man
+#&gt;  8    10     6 Pac-Man
+#&gt;  9    10     6 Pac-Man
+#&gt; 10    10     6 Pac-Man
+#&gt; # ... with 140 more rows</code></pre>
+<pre class="r"><code>maze_layer +
+  geom_point(
+    data = unnest(pacman, c(&quot;x&quot;, &quot;y&quot;)),
+    mapping = aes(x = x, y = y, colour = colour),
+    size = 4
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/pacman-position-plot-1.png" width="672" style="display: block; margin: auto;" /></p></li>
+<li><p>The Pac-Man shape (open and closed mouth). Since, Pac-Man is not a complete circle shape, I used <code>geom_arc_bar()</code> (from <a href="https://ggforce.data-imaginist.com/"><code>ggforce</code></a>), and defined the properties of each state of Pac-Man based on the aesthetics required by this function.
+<em>Note</em>: At first, I wanted a smooth animation/transition of Pac-Man opening and closing its mouth, this is why there are four <code>"close_"</code> states.</p>
+<pre class="r"><code>pacman_state &lt;- tribble(
+  ~state, ~start, ~end,
+  &quot;open_right&quot;, 14 / 6 * pi, 4 / 6 * pi,
+  &quot;close_right&quot;, 15 / 6 * pi, 3 / 6 * pi,
+  &quot;open_up&quot;, 11 / 6 * pi, 1 / 6 * pi,
+  &quot;close_up&quot;, 12 / 3 * pi, 0 / 6 * pi,
+  &quot;open_left&quot;, 8 / 6 * pi, - 2 / 6 * pi,
+  &quot;close_left&quot;, 9 / 6 * pi, - 3 / 6 * pi,
+  &quot;open_down&quot;, 5 / 6 * pi, - 5 / 6 * pi,
+  &quot;close_down&quot;, pi, - pi
+)</code></pre>
+<pre class="r"><code>ggplot() +
+  geom_arc_bar(
+    data = pacman_state,
+    mapping = aes(x0 = 0, y0 = 0, r0 = 0, r = 0.5, start = start, end = end),
+    fill = &quot;yellow&quot;,
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(vars(state), ncol = 4)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/pacman-state-plot-1.png" width="672" style="display: block; margin: auto;" /></p></li>
+</ul>
+<blockquote class="twitter-tweet">
+<p lang="en" dir="ltr">
+Next mission, should you choose to accept, is to make Pac-Man face the direction of movement🎖
+</p>
+— Thomas Lin Pedersen (<span class="citation">@thomasp85</span>) <a href="https://twitter.com/thomasp85/status/1241767912370774020?ref_src=twsrc%5Etfw">March 22, 2020</a>
+</blockquote>
+<p>Once those things available, how to make Pac-Man look where he is headed?
+Short answer, I just computed the differences between two successive positions of Pac-Man and added both open/close state to a new column <code>state</code>.</p>
+<pre class="r"><code>pacman %&gt;%
+  unnest(c(&quot;x&quot;, &quot;y&quot;)) %&gt;%
+  mutate(
+    state_x = sign(x - lag(x)),
+    state_y = sign(y - lag(y)),
+    state = case_when(
+      (is.na(state_x) | state_x %in% 0) &amp; (is.na(state_y) | state_y %in% 0) ~ list(c(&quot;open_right&quot;, &quot;close_right&quot;)),
+      state_x == 1 &amp; state_y == 0 ~ list(c(&quot;open_right&quot;, &quot;close_right&quot;)),
+      state_x == -1 &amp; state_y == 0 ~ list(c(&quot;open_left&quot;, &quot;close_left&quot;)),
+      state_x == 0 &amp; state_y == -1 ~ list(c(&quot;open_down&quot;, &quot;close_down&quot;)),
+      state_x == 0 &amp; state_y == 1 ~ list(c(&quot;open_up&quot;, &quot;close_up&quot;))
+    )
+  )  %&gt;%
+  unnest(&quot;state&quot;)
+#&gt; # A tibble: 300 x 6
+#&gt;        x     y colour  state_x state_y state      
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;      
+#&gt;  1    10     6 Pac-Man      NA      NA open_right 
+#&gt;  2    10     6 Pac-Man      NA      NA close_right
+#&gt;  3    10     6 Pac-Man       0       0 open_right 
+#&gt;  4    10     6 Pac-Man       0       0 close_right
+#&gt;  5    10     6 Pac-Man       0       0 open_right 
+#&gt;  6    10     6 Pac-Man       0       0 close_right
+#&gt;  7    10     6 Pac-Man       0       0 open_right 
+#&gt;  8    10     6 Pac-Man       0       0 close_right
+#&gt;  9    10     6 Pac-Man       0       0 open_right 
+#&gt; 10    10     6 Pac-Man       0       0 close_right
+#&gt; # ... with 290 more rows</code></pre>
+<p>Here, in preparation for <a href="https://gganimate.com/"><code>gganimate</code></a>, I also added a column <code>step</code> before merging the new upgraded <code>pacman</code> (<em>i.e.</em>, with the Pac-Man <code>state</code> column) with the <code>pacman_state</code> defined earlier.</p>
+<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(pacman)
+pacman_moves
+#&gt; # A tibble: 300 x 9
+#&gt;        x     y colour  state_x state_y state        step start   end
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;       &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1    10     6 Pac-Man      NA      NA open_right      1  7.33  2.09
+#&gt;  2    10     6 Pac-Man      NA      NA close_right     2  7.85  1.57
+#&gt;  3    10     6 Pac-Man       0       0 open_right      3  7.33  2.09
+#&gt;  4    10     6 Pac-Man       0       0 close_right     4  7.85  1.57
+#&gt;  5    10     6 Pac-Man       0       0 open_right      5  7.33  2.09
+#&gt;  6    10     6 Pac-Man       0       0 close_right     6  7.85  1.57
+#&gt;  7    10     6 Pac-Man       0       0 open_right      7  7.33  2.09
+#&gt;  8    10     6 Pac-Man       0       0 close_right     8  7.85  1.57
+#&gt;  9    10     6 Pac-Man       0       0 open_right      9  7.33  2.09
+#&gt; 10    10     6 Pac-Man       0       0 close_right    10  7.85  1.57
+#&gt; # ... with 290 more rows</code></pre>
+<pre class="r"><code>maze_layer +
+  geom_arc_bar(
+    data = pacman_moves,
+    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/pacman-moves-plots-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>You can’t see much?!
+Ok, perhaps it’s time to use <a href="https://gganimate.com/"><code>gganimate</code></a>.
+I am going to animate Pac-Man based on the column <code>step</code>, which is, if you looked at the code above, just the line number of <code>pacman_moves</code>.</p>
+<pre class="r"><code>animated_pacman &lt;- maze_layer +
+  geom_arc_bar(
+    data = pacman_moves,
+    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
+    inherit.aes = FALSE
+  ) +
+  transition_manual(step)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/pacman-plot-animated-1.gif" style="display: block; margin: auto;" /></p>
+<p><em>Note: <code>pacman</code> is a dataset of <code>ggpacman</code> (<code>data("pacman", package = "ggpacman")</code>).</em></p>
+</div>
+<div id="the-ghosts-characters" class="section level2">
+<h2>The Ghosts characters</h2>
+<p>Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.</p>
+<div id="body" class="section level3">
+<h3>Body</h3>
+<p>I started with the body, especially the top and the bottom part of the ghost which are half circle (or at least I chose this) and use again <code>geom_arc_bar()</code>.</p>
+<pre class="r"><code>ghost_arc &lt;- tribble(
+  ~x0, ~y0, ~r, ~start, ~end, ~part,
+  0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, &quot;top&quot;,
+  -0.5, -0.5 + 1/6, 1 / 6,  pi / 2, 2 * pi / 2, &quot;bottom&quot;,
+  -1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, &quot;bottom&quot;,
+  1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, &quot;bottom&quot;,
+  0.5, -0.5 + 1/6, 1 / 6,  3 * pi / 2,  2 * pi / 2, &quot;bottom&quot;
+)</code></pre>
+<pre class="r"><code>top &lt;- ggplot() +
+  geom_arc_bar(
+    data = ghost_arc[1, ],
+    mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = r, start = start, end = end)
+  ) +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/ghost-top-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I retrieved the coordinates of the created polygon, using <code>ggplot_build()</code>.</p>
+<pre class="r"><code>top_polygon &lt;- ggplot_build(top)$data[[1]][, c(&quot;x&quot;, &quot;y&quot;)]</code></pre>
+<p>And I proceeded the same way for the bottom part of the ghost.</p>
+<pre class="r"><code>bottom &lt;- ggplot() +
+  geom_arc_bar(
+    data = ghost_arc[-1, ],
+        mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = r, start = start, end = end)
+  ) +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/ghost-bottom-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>bottom_polygon &lt;- ggplot_build(bottom)$data[[1]][, c(&quot;x&quot;, &quot;y&quot;)]</code></pre>
+<p>Then, I just added one point to “properly” link the top and the bottom part.</p>
+<pre class="r"><code>ghost_body &lt;- dplyr::bind_rows(
+  top_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    0.5, 0,
+    0.5, -0.5 + 1/6
+  ),
+  bottom_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    -0.5, -0.5 + 1/6,
+    -0.5, 0
+  )
+)</code></pre>
+<p>I finally got the whole ghost shape I was looking for.</p>
+<pre class="r"><code>ggplot() +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+  geom_polygon(
+    data = ghost_body,
+    mapping = aes(x = x, y = y),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/ghost-body-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>Note: <code>ghost_body</code> is a dataset of <code>ggpacman</code> (<code>data("ghost_body", package = "ggpacman")</code>).</em>
+<em>Note: <code>ghost_body</code> definitely needs some code refactoring.</em></p>
+</div>
+<div id="eyes" class="section level3">
+<h3>Eyes</h3>
+<p>The eyes are quite easy to draw, they are just circles, but …
+As for Pac-Man before, I wanted the ghosts to look where they are headed.
+This implies moving the iris one way or the other, and so I defined five states for the iris: right, down, left, up and middle.</p>
+<pre class="r"><code>ghost_eyes &lt;- tribble(
+  ~x0, ~y0, ~r, ~part, ~direction,
+  1/5, 1/8, 1/8, &quot;eye&quot;, c(&quot;up&quot;, &quot;down&quot;, &quot;right&quot;, &quot;left&quot;, &quot;middle&quot;),
+  -1/5, 1/8, 1/8, &quot;eye&quot;, c(&quot;up&quot;, &quot;down&quot;, &quot;right&quot;, &quot;left&quot;, &quot;middle&quot;),
+  5/20, 1/8, 1/20, &quot;iris&quot;, &quot;right&quot;,
+  -3/20, 1/8, 1/20, &quot;iris&quot;, &quot;right&quot;,
+  1/5, 1/16, 1/20, &quot;iris&quot;, &quot;down&quot;,
+  -1/5, 1/16, 1/20, &quot;iris&quot;, &quot;down&quot;,
+  3/20, 1/8, 1/20, &quot;iris&quot;, &quot;left&quot;,
+  -5/20, 1/8, 1/20, &quot;iris&quot;, &quot;left&quot;,
+  1/5, 3/16, 1/20, &quot;iris&quot;, &quot;up&quot;,
+  -1/5, 3/16, 1/20, &quot;iris&quot;, &quot;up&quot;,
+  1/5, 1/8, 1/20, &quot;iris&quot;, &quot;middle&quot;,
+  -1/5, 1/8, 1/20, &quot;iris&quot;, &quot;middle&quot;
+) %&gt;%
+  unnest(&quot;direction&quot;)</code></pre>
+<pre class="r"><code>map_eyes &lt;- c(&quot;eye&quot; = &quot;white&quot;, &quot;iris&quot; = &quot;black&quot;)
+ggplot() +
+  coord_fixed(xlim = c(-0.5, 0.5), ylim = c(-0.5, 0.5)) +
+  scale_fill_manual(breaks = names(map_eyes), values = map_eyes) +
+  scale_colour_manual(breaks = names(map_eyes), values = map_eyes) +
+  geom_circle(
+    data = ghost_eyes,
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part),
+    inherit.aes = FALSE,
+    show.legend = FALSE
+  ) +
+  facet_wrap(vars(direction), ncol = 3)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/ghost-eyes-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>Note: <code>ghost_eyes</code> is a dataset of <code>ggpacman</code> (<code>data("ghost_eyes", package = "ggpacman")</code>).</em></p>
+</div>
+<div id="ghost-shape" class="section level3">
+<h3>Ghost shape</h3>
+<p>I had the whole ghost shape and the eyes.</p>
+<pre class="r"><code>ggplot() +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+  scale_colour_manual(breaks = names(map_colours), values = map_colours) +
+  geom_polygon(
+    data = get(data(&quot;ghost_body&quot;, package = &quot;ggpacman&quot;)),
+    mapping = aes(x = x, y = y),
+    inherit.aes = FALSE
+  ) +
+  geom_circle(
+    data = get(data(&quot;ghost_eyes&quot;, package = &quot;ggpacman&quot;)),
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part),
+    inherit.aes = FALSE,
+    show.legend = FALSE
+  ) +
+  facet_wrap(vars(direction), ncol = 3)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/ghost-shape-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, same as for Pac-Man, in order to know where the ghosts are supposed to look, I computed the differences of each successive positions of the ghosts and I added the corresponding directions.</p>
+<pre class="r"><code>blinky_ghost &lt;- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = &quot;Blinky&quot;) %&gt;%
+  unnest(c(&quot;x&quot;, &quot;y&quot;)) %&gt;%
+  mutate(
+    X0 = x,
+    Y0 = y,
+    state_x = sign(round(x) - lag(round(x))),
+    state_y = sign(round(y) - lag(round(y))),
+    direction = case_when(
+      (is.na(state_x) | state_x %in% 0) &amp; (is.na(state_y) | state_y %in% 0) ~ &quot;middle&quot;,
+      state_x == 1 &amp; state_y == 0 ~ &quot;right&quot;,
+      state_x == -1 &amp; state_y == 0 ~ &quot;left&quot;,
+      state_x == 0 &amp; state_y == -1 ~ &quot;down&quot;,
+      state_x == 0 &amp; state_y == 1 ~ &quot;up&quot;
+    )
+  ) %&gt;%
+  unnest(&quot;direction&quot;)</code></pre>
+<pre><code>#&gt; # A tibble: 5 x 8
+#&gt;       x     y colour    X0    Y0 state_x state_y direction
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;    
+#&gt; 1     0     0 Blinky     0     0      NA      NA middle   
+#&gt; 2     1     0 Blinky     1     0       1       0 right    
+#&gt; 3     1     1 Blinky     1     1       0       1 up       
+#&gt; 4     0     1 Blinky     0     1      -1       0 left     
+#&gt; 5     0     0 Blinky     0     0       0      -1 down</code></pre>
+<p>I also added some noise around the position, <em>i.e.</em>, four noised position at each actual position of a ghost.</p>
+<pre class="r"><code>blinky_ghost &lt;- blinky_ghost %&gt;%
+  mutate(state = list(1:4)) %&gt;%
+  unnest(&quot;state&quot;) %&gt;%
+  mutate(
+    step = 1:n(),
+    noise_x = rnorm(n(), mean = 0, sd = 0.05),
+    noise_y = rnorm(n(), mean = 0, sd = 0.05)
+  )</code></pre>
+<pre><code>#&gt; # A tibble: 20 x 12
+#&gt;        x     y colour    X0    Y0 state_x state_y direction state  step noise_x
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;
+#&gt;  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0691
+#&gt;  2     0     0 Blinky     0     0      NA      NA middle        2     2 -0.0435
+#&gt;  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0915
+#&gt;  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0153
+#&gt;  5     1     0 Blinky     1     0       1       0 right         1     5  0.0258
+#&gt;  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0277
+#&gt;  7     1     0 Blinky     1     0       1       0 right         3     7  0.118 
+#&gt;  8     1     0 Blinky     1     0       1       0 right         4     8  0.0622
+#&gt;  9     1     1 Blinky     1     1       0       1 up            1     9  0.0587
+#&gt; 10     1     1 Blinky     1     1       0       1 up            2    10  0.104 
+#&gt; 11     1     1 Blinky     1     1       0       1 up            3    11  0.105 
+#&gt; 12     1     1 Blinky     1     1       0       1 up            4    12 -0.0395
+#&gt; 13     0     1 Blinky     0     1      -1       0 left          1    13  0.0386
+#&gt; 14     0     1 Blinky     0     1      -1       0 left          2    14  0.0774
+#&gt; 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0319
+#&gt; 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0530
+#&gt; 17     0     0 Blinky     0     0       0      -1 down          1    17 -0.0680
+#&gt; 18     0     0 Blinky     0     0       0      -1 down          2    18  0.0660
+#&gt; 19     0     0 Blinky     0     0       0      -1 down          3    19 -0.0371
+#&gt; 20     0     0 Blinky     0     0       0      -1 down          4    20  0.0917
+#&gt; # ... with 1 more variable: noise_y &lt;dbl&gt;</code></pre>
+<p>Then, I added (<em>in a weird way I might say</em>) the polygons coordinates for the body and the eyes.</p>
+<pre class="r"><code>blinky_ghost &lt;- blinky_ghost %&gt;%
+  mutate(
+    body = pmap(
+      .l = list(x, y, noise_x, noise_y),
+      .f = function(.x, .y, .noise_x, .noise_y) {
+        mutate(
+          .data = get(data(&quot;ghost_body&quot;)),
+          x = x + .x + .noise_x,
+          y = y + .y + .noise_y
+        )
+      }
+    ),
+    eyes = pmap(
+      .l = list(x, y, noise_x, noise_y, direction),
+      .f = function(.x, .y, .noise_x, .noise_y, .direction) {
+        mutate(
+          .data = filter(get(data(&quot;ghost_eyes&quot;)), direction == .direction),
+          x0 = x0 + .x + .noise_x,
+          y0 = y0 + .y + .noise_y,
+          direction = NULL
+        )
+      }
+    ),
+    x = NULL,
+    y = NULL
+  )</code></pre>
+<pre><code>#&gt; # A tibble: 20 x 12
+#&gt;    colour    X0    Y0 state_x state_y direction state  step noise_x  noise_y
+#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 Blinky     0     0      NA      NA middle        1     1  0.0691  0.0203 
+#&gt;  2 Blinky     0     0      NA      NA middle        2     2 -0.0435 -0.0439 
+#&gt;  3 Blinky     0     0      NA      NA middle        3     3  0.0915 -0.0498 
+#&gt;  4 Blinky     0     0      NA      NA middle        4     4  0.0153  0.0280 
+#&gt;  5 Blinky     1     0       1       0 right         1     5  0.0258 -0.0252 
+#&gt;  6 Blinky     1     0       1       0 right         2     6 -0.0277  0.0767 
+#&gt;  7 Blinky     1     0       1       0 right         3     7  0.118  -0.0437 
+#&gt;  8 Blinky     1     0       1       0 right         4     8  0.0622  0.00602
+#&gt;  9 Blinky     1     1       0       1 up            1     9  0.0587 -0.00895
+#&gt; 10 Blinky     1     1       0       1 up            2    10  0.104   0.0109 
+#&gt; 11 Blinky     1     1       0       1 up            3    11  0.105   0.0307 
+#&gt; 12 Blinky     1     1       0       1 up            4    12 -0.0395 -0.0189 
+#&gt; 13 Blinky     0     1      -1       0 left          1    13  0.0386 -0.0302 
+#&gt; 14 Blinky     0     1      -1       0 left          2    14  0.0774 -0.0438 
+#&gt; 15 Blinky     0     1      -1       0 left          3    15  0.0319 -0.0584 
+#&gt; 16 Blinky     0     1      -1       0 left          4    16  0.0530 -0.0741 
+#&gt; 17 Blinky     0     0       0      -1 down          1    17 -0.0680  0.0186 
+#&gt; 18 Blinky     0     0       0      -1 down          2    18  0.0660 -0.0443 
+#&gt; 19 Blinky     0     0       0      -1 down          3    19 -0.0371  0.0306 
+#&gt; 20 Blinky     0     0       0      -1 down          4    20  0.0917 -0.00568
+#&gt; # ... with 2 more variables: body &lt;list&gt;, eyes &lt;list&gt;</code></pre>
+<p>For ease, it is now a call to one function directly on the poition matrix of a ghost.</p>
+<pre class="r"><code>blinky_ghost &lt;- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = &quot;Blinky&quot;)
+blinky_moves &lt;- ggpacman::compute_ghost_coord(blinky_ghost)</code></pre>
+<pre class="r"><code>blinky_plot &lt;- base_layer +
+  coord_fixed(xlim = c(-1, 2), ylim = c(-1, 2)) +
+  geom_polygon(
+    data = unnest(blinky_moves, &quot;body&quot;),
+    mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+    inherit.aes = FALSE
+  ) +
+  geom_circle(
+    data = unnest(blinky_moves, &quot;eyes&quot;),
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/blinky-plot-static-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Again, it is better with an animated GIF.</p>
+<pre class="r"><code>animated_blinky &lt;- blinky_plot + transition_manual(step)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/blinky-plot-animated-1.gif" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="how-pac-man-interacts-with-the-maze" class="section level2">
+<h2>How Pac-Man interacts with the maze?</h2>
+<div id="bonus-points" class="section level3">
+<h3>Bonus points</h3>
+<p>For ease, I am using some functions I defined to go quickly to the results of the first part of this readme.
+The idea here is to look at all the position in common between Pac-Man (<code>pacman_moves</code>) and the bonus points (<code>maze_points</code>).
+Each time Pac-Man was at the same place as a bonus point, I defined a status <code>"eaten"</code> for all values of <code>step</code> after.
+I ended up with a big table with position and the state of the bonus points.</p>
+<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(get(data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)))
+right_join(get(data(&quot;maze_points&quot;)), pacman_moves, by = c(&quot;x&quot;, &quot;y&quot;)) %&gt;%
+  distinct(step, x, y, type) %&gt;%
+  mutate(
+    step = map2(step, max(step), ~ seq(.x, .y, 1)),
+    colour = &quot;eaten&quot;
+  ) %&gt;%
+  unnest(&quot;step&quot;)
+#&gt; # A tibble: 45,150 x 5
+#&gt;        x     y type    step colour
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; 
+#&gt;  1     1     1 normal    61 eaten 
+#&gt;  2     1     1 normal    62 eaten 
+#&gt;  3     1     1 normal    63 eaten 
+#&gt;  4     1     1 normal    64 eaten 
+#&gt;  5     1     1 normal    65 eaten 
+#&gt;  6     1     1 normal    66 eaten 
+#&gt;  7     1     1 normal    67 eaten 
+#&gt;  8     1     1 normal    68 eaten 
+#&gt;  9     1     1 normal    69 eaten 
+#&gt; 10     1     1 normal    70 eaten 
+#&gt; # ... with 45,140 more rows</code></pre>
+<p>Again, for ease, I am using a function I defined to compute everything.</p>
+<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(get(data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)))
+bonus_points_eaten &lt;- ggpacman::compute_points_eaten(get(data(&quot;maze_points&quot;)), pacman_moves)</code></pre>
+<p>If you don’t recall, <code>maze_layer</code> already includes a geometry with the bonus points.</p>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/reminder-maze-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I could have change this geometry (<em>i.e.</em>, <code>geom_point()</code>), but I did not, and draw a new geometry on top of the previous ones.
+Do you remember the values of the scale for the size aesthetic?</p>
+<pre class="r"><code>scale_size_manual(values = c(&quot;wall&quot; = 2.5, &quot;door&quot; = 1, &quot;big&quot; = 2.5, &quot;normal&quot; = 0.5, &quot;eaten&quot; = 3))</code></pre>
+<pre class="r"><code>maze_layer_points &lt;- maze_layer +
+  geom_point(
+    data = bonus_points_eaten,
+    mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/points-eaten-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>A new animation to see, how the new geometry is overlpping the previous one as <code>step</code> increases.</p>
+<pre class="r"><code>animated_points &lt;- maze_layer_points + transition_manual(step)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/points-eaten-plot-animated-1.gif" style="display: block; margin: auto;" /></p>
+</div>
+<div id="ghost-weak-and-eaten-states" class="section level3">
+<h3>Ghost <code>"weak"</code> and <code>"eaten"</code> states</h3>
+<p>The ghosts were more tricky (I know, they are ghosts …).</p>
+<p>I first retrieved all the positions wereh a <code>"big"</code> bonus point was eaten by Pac-Man.</p>
+<pre class="r"><code>ghosts_vulnerability &lt;- bonus_points_eaten %&gt;%
+  filter(type == &quot;big&quot;) %&gt;%
+  group_by(x, y) %&gt;%
+  summarise(step_init = min(step)) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    step = map(step_init, ~ seq(.x, .x + 30, 1)),
+    vulnerability = TRUE,
+    x = NULL,
+    y = NULL
+  ) %&gt;%
+  unnest(&quot;step&quot;)</code></pre>
+<pre><code>#&gt; # A tibble: 93 x 3
+#&gt;    step_init  step vulnerability
+#&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;        
+#&gt;  1        79    79 TRUE         
+#&gt;  2        79    80 TRUE         
+#&gt;  3        79    81 TRUE         
+#&gt;  4        79    82 TRUE         
+#&gt;  5        79    83 TRUE         
+#&gt;  6        79    84 TRUE         
+#&gt;  7        79    85 TRUE         
+#&gt;  8        79    86 TRUE         
+#&gt;  9        79    87 TRUE         
+#&gt; 10        79    88 TRUE         
+#&gt; # ... with 83 more rows</code></pre>
+<p>This is part of a bigger function (I won’t dive too deep into it).</p>
+<pre class="r"><code>ggpacman::compute_ghost_status
+#&gt; function (ghost, pacman_moves, bonus_points_eaten) 
+#&gt; {
+#&gt;     ghosts_vulnerability &lt;- bonus_points_eaten %&gt;% dplyr::filter(.data[[&quot;type&quot;]] == 
+#&gt;         &quot;big&quot;) %&gt;% dplyr::group_by(.data[[&quot;x&quot;]], .data[[&quot;y&quot;]]) %&gt;% 
+#&gt;         dplyr::summarise(step_init = min(.data[[&quot;step&quot;]])) %&gt;% 
+#&gt;         dplyr::ungroup() %&gt;% dplyr::mutate(step = purrr::map(.data[[&quot;step_init&quot;]], 
+#&gt;         ~seq(.x, .x + 30, 1)), vulnerability = TRUE, x = NULL, 
+#&gt;         y = NULL) %&gt;% tidyr::unnest(&quot;step&quot;)
+#&gt;     ghost_out &lt;- dplyr::left_join(x = compute_ghost_coord(ghost), 
+#&gt;         y = pacman_moves %&gt;% dplyr::mutate(ghost_eaten = TRUE) %&gt;% 
+#&gt;             dplyr::select(c(X0 = &quot;x&quot;, Y0 = &quot;y&quot;, &quot;step&quot;, &quot;ghost_eaten&quot;)), 
+#&gt;         by = c(&quot;X0&quot;, &quot;Y0&quot;, &quot;step&quot;)) %&gt;% dplyr::left_join(y = ghosts_vulnerability, 
+#&gt;         by = &quot;step&quot;) %&gt;% dplyr::mutate(vulnerability = tidyr::replace_na(.data[[&quot;vulnerability&quot;]], 
+#&gt;         FALSE), ghost_name = .data[[&quot;colour&quot;]], ghost_eaten = .data[[&quot;ghost_eaten&quot;]] &amp; 
+#&gt;         .data[[&quot;vulnerability&quot;]], colour = ifelse(.data[[&quot;vulnerability&quot;]], 
+#&gt;         paste0(.data[[&quot;ghost_name&quot;]], &quot;_weak&quot;), .data[[&quot;colour&quot;]]))
+#&gt;     pos_eaten_start &lt;- which(ghost_out[[&quot;ghost_eaten&quot;]])
+#&gt;     ghosts_home &lt;- which(ghost_out[[&quot;X0&quot;]] == 10 &amp; ghost_out[[&quot;Y0&quot;]] == 
+#&gt;         14)
+#&gt;     for (ipos in pos_eaten_start) {
+#&gt;         pos_eaten_end &lt;- min(ghosts_home[ghosts_home &gt;= ipos])
+#&gt;         ghost_out[[&quot;colour&quot;]][ipos:pos_eaten_end] &lt;- paste0(unique(ghost_out[[&quot;ghost_name&quot;]]), 
+#&gt;             &quot;_eaten&quot;)
+#&gt;     }
+#&gt;     dplyr::left_join(x = ghost_out, y = ghost_out %&gt;% dplyr::filter(.data[[&quot;step&quot;]] == 
+#&gt;         .data[[&quot;step_init&quot;]] &amp; grepl(&quot;eaten&quot;, .data[[&quot;colour&quot;]])) %&gt;% 
+#&gt;         dplyr::mutate(already_eaten = TRUE) %&gt;% dplyr::select(c(&quot;step_init&quot;, 
+#&gt;         &quot;already_eaten&quot;)), by = &quot;step_init&quot;) %&gt;% dplyr::mutate(colour = dplyr::case_when(.data[[&quot;already_eaten&quot;]] &amp; 
+#&gt;         .data[[&quot;X0&quot;]] == 10 &amp; .data[[&quot;Y0&quot;]] == 14 ~ paste0(.data[[&quot;ghost_name&quot;]], 
+#&gt;         &quot;_eaten&quot;), grepl(&quot;weak&quot;, .data[[&quot;colour&quot;]]) &amp; .data[[&quot;already_eaten&quot;]] ~ 
+#&gt;         .data[[&quot;ghost_name&quot;]], TRUE ~ .data[[&quot;colour&quot;]]))
+#&gt; }
+#&gt; &lt;bytecode: 0x0000000027816690&gt;
+#&gt; &lt;environment: namespace:ggpacman&gt;</code></pre>
+<p>The goal of this function, is to compute the different states of a ghost, according to the bonus points eaten and, of course, the current Pac-Man position at a determined <code>step</code>.</p>
+<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(get(data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)))
+bonus_points_eaten &lt;- ggpacman::compute_points_eaten(get(data(&quot;maze_points&quot;)), pacman_moves)
+ghost_moves &lt;- ggpacman::compute_ghost_status(
+  ghost = get(data(&quot;blinky&quot;, package = &quot;ggpacman&quot;)),
+  pacman_moves = pacman_moves,
+  bonus_points_eaten = bonus_points_eaten
+)
+ghost_moves %&gt;%
+  filter(state == 1) %&gt;%
+  distinct(step, direction, colour, vulnerability) %&gt;%
+  as.data.frame()
+#&gt;          colour direction step vulnerability
+#&gt; 1        Blinky    middle    1         FALSE
+#&gt; 2        Blinky    middle    5         FALSE
+#&gt; 3        Blinky    middle    9         FALSE
+#&gt; 4        Blinky    middle   13         FALSE
+#&gt; 5        Blinky    middle   17         FALSE
+#&gt; 6        Blinky    middle   21         FALSE
+#&gt; 7        Blinky    middle   25         FALSE
+#&gt; 8        Blinky    middle   29         FALSE
+#&gt; 9        Blinky    middle   33         FALSE
+#&gt; 10       Blinky      left   37         FALSE
+#&gt; 11       Blinky      left   41         FALSE
+#&gt; 12       Blinky      left   45         FALSE
+#&gt; 13       Blinky      down   49         FALSE
+#&gt; 14       Blinky      down   53         FALSE
+#&gt; 15       Blinky      down   57         FALSE
+#&gt; 16       Blinky      left   61         FALSE
+#&gt; 17       Blinky      left   65         FALSE
+#&gt; 18       Blinky      down   69         FALSE
+#&gt; 19       Blinky      down   73         FALSE
+#&gt; 20       Blinky      down   77         FALSE
+#&gt; 21  Blinky_weak      down   81          TRUE
+#&gt; 22  Blinky_weak      down   85          TRUE
+#&gt; 23 Blinky_eaten      left   89          TRUE
+#&gt; 24 Blinky_eaten     right   93          TRUE
+#&gt; 25 Blinky_eaten    middle   97          TRUE
+#&gt; 26 Blinky_eaten    middle  101          TRUE
+#&gt; 27 Blinky_eaten     right  105          TRUE
+#&gt; 28 Blinky_eaten        up  109          TRUE
+#&gt; 29 Blinky_eaten     right  113         FALSE
+#&gt; 30 Blinky_eaten        up  117         FALSE
+#&gt; 31 Blinky_eaten     right  121         FALSE
+#&gt; 32 Blinky_eaten        up  125         FALSE
+#&gt; 33 Blinky_eaten     right  129         FALSE
+#&gt; 34 Blinky_eaten        up  133         FALSE
+#&gt; 35 Blinky_eaten     right  137         FALSE
+#&gt; 36 Blinky_eaten        up  141          TRUE
+#&gt; 37 Blinky_eaten        up  145          TRUE
+#&gt; 38 Blinky_eaten    middle  149          TRUE
+#&gt; 39 Blinky_eaten    middle  153          TRUE
+#&gt; 40 Blinky_eaten    middle  157          TRUE
+#&gt; 41       Blinky        up  161          TRUE
+#&gt; 42       Blinky        up  165          TRUE
+#&gt; 43       Blinky     right  169          TRUE
+#&gt; 44       Blinky     right  173         FALSE
+#&gt; 45       Blinky     right  177         FALSE
+#&gt; 46       Blinky      down  181         FALSE
+#&gt; 47       Blinky      down  185         FALSE
+#&gt; 48       Blinky      down  189         FALSE
+#&gt; 49       Blinky      down  193         FALSE
+#&gt; 50       Blinky      down  197         FALSE
+#&gt; 51       Blinky      down  201         FALSE
+#&gt; 52       Blinky      down  205         FALSE
+#&gt; 53       Blinky      down  209         FALSE
+#&gt; 54       Blinky      left  213         FALSE
+#&gt; 55  Blinky_weak      left  217          TRUE
+#&gt; 56  Blinky_weak      down  221          TRUE
+#&gt; 57  Blinky_weak      down  225          TRUE
+#&gt; 58  Blinky_weak     right  229          TRUE
+#&gt; 59  Blinky_weak     right  233          TRUE
+#&gt; 60  Blinky_weak     right  237          TRUE
+#&gt; 61  Blinky_weak     right  241          TRUE
+#&gt; 62  Blinky_weak    middle  245          TRUE
+#&gt; 63       Blinky      down  249         FALSE
+#&gt; 64       Blinky      down  253         FALSE
+#&gt; 65       Blinky      down  257         FALSE
+#&gt; 66       Blinky     right  261         FALSE
+#&gt; 67       Blinky     right  265         FALSE
+#&gt; 68       Blinky        up  269         FALSE
+#&gt; 69       Blinky        up  273         FALSE
+#&gt; 70       Blinky        up  277         FALSE
+#&gt; 71       Blinky    middle  281         FALSE
+#&gt; 72       Blinky     right  285         FALSE
+#&gt; 73       Blinky     right  289         FALSE
+#&gt; 74       Blinky        up  293         FALSE
+#&gt; 75       Blinky        up  297         FALSE</code></pre>
+<p>To simplify a little, below a small example of a ghost moving in one direction with predetermined states.</p>
+<pre class="r"><code>blinky_ghost &lt;- bind_rows(
+  tibble(x = 1:4, y = 0, colour = &quot;Blinky&quot;),
+  tibble(x = 5:8, y = 0, colour = &quot;Blinky_weak&quot;),
+  tibble(x = 9:12, y = 0, colour = &quot;Blinky_eaten&quot;)
+)
+blinky_moves &lt;- ggpacman::compute_ghost_coord(blinky_ghost)</code></pre>
+<pre><code>#&gt; # A tibble: 48 x 12
+#&gt;    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+#&gt;    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 Blinky     1     0      NA      NA middle        1     1 -0.0505   0.00100
+#&gt;  2 Blinky     1     0      NA      NA middle        2     2 -0.0359   0.0425 
+#&gt;  3 Blinky     1     0      NA      NA middle        3     3 -0.0860  -0.0115 
+#&gt;  4 Blinky     1     0      NA      NA middle        4     4  0.0139  -0.0534 
+#&gt;  5 Blinky     2     0       1       0 right         1     5 -0.0879  -0.105  
+#&gt;  6 Blinky     2     0       1       0 right         2     6  0.00765  0.0364 
+#&gt;  7 Blinky     2     0       1       0 right         3     7 -0.0307   0.00500
+#&gt;  8 Blinky     2     0       1       0 right         4     8 -0.0949   0.0196 
+#&gt;  9 Blinky     3     0       1       0 right         1     9 -0.00982 -0.00595
+#&gt; 10 Blinky     3     0       1       0 right         2    10  0.0196  -0.0171 
+#&gt; # ... with 38 more rows, and 2 more variables: body &lt;list&gt;, eyes &lt;list&gt;</code></pre>
+<pre class="r"><code>blinky_plot &lt;- base_layer +
+  coord_fixed(xlim = c(0, 13), ylim = c(-1, 1)) +
+  geom_polygon(
+    data = unnest(blinky_moves, &quot;body&quot;),
+    mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+    inherit.aes = FALSE
+  ) +
+  geom_circle(
+    data = unnest(blinky_moves, &quot;eyes&quot;),
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+    inherit.aes = FALSE
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/blinky-plot-line-1.png" width="355.2" style="display: block; margin: auto;" /></p>
+<p>I am sure, you remember all the colours and their mapped values from the beginning, so you probably won’t need the following to understand of the ghost disappaered.</p>
+<pre class="r"><code>&quot;Blinky&quot; = &quot;red&quot;, &quot;Blinky_weak&quot; = &quot;blue&quot;, &quot;Blinky_eaten&quot; = &quot;transparent&quot;,</code></pre>
+<p><em>Note: yes, <code>"transparent"</code> is a colour and a very handy one.</em></p>
+<p>A new animation to see our little Blinky in action?</p>
+<pre class="r"><code>animated_blinky &lt;- blinky_plot + transition_manual(step)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/blinky-state-plot-animated-1.gif" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="plot-time-to-summarise-a-little-or-a-lot." class="section level2">
+<h2>Plot time (to summarise a little (or a lot)).</h2>
+<p>In the current version, nearly everything is either a dataset or a function and could be used like this.</p>
+<ol style="list-style-type: decimal">
+<li>Load and compute the data.</li>
+</ol>
+<pre class="r"><code>data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)
+data(&quot;maze_points&quot;, package = &quot;ggpacman&quot;)
+data(&quot;maze_walls&quot;, package = &quot;ggpacman&quot;)
+data(&quot;blinky&quot;, package = &quot;ggpacman&quot;)
+data(&quot;pinky&quot;, package = &quot;ggpacman&quot;)
+data(&quot;inky&quot;, package = &quot;ggpacman&quot;)
+data(&quot;clyde&quot;, package = &quot;ggpacman&quot;)
+ghosts &lt;- list(blinky, pinky, inky, clyde)
+pacman_moves &lt;- ggpacman::compute_pacman_coord(pacman)
+bonus_points_eaten &lt;- ggpacman::compute_points_eaten(maze_points, pacman_moves)
+map_colours &lt;- c(
+  &quot;READY!&quot; = &quot;goldenrod1&quot;,
+  &quot;wall&quot; = &quot;dodgerblue3&quot;, &quot;door&quot; = &quot;dodgerblue3&quot;,
+  &quot;normal&quot; = &quot;goldenrod1&quot;, &quot;big&quot; = &quot;goldenrod1&quot;, &quot;eaten&quot; = &quot;black&quot;,
+  &quot;Pac-Man&quot; = &quot;yellow&quot;,
+  &quot;eye&quot; = &quot;white&quot;, &quot;iris&quot; = &quot;black&quot;,
+  &quot;Blinky&quot; = &quot;red&quot;, &quot;Blinky_weak&quot; = &quot;blue&quot;, &quot;Blinky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Pinky&quot; = &quot;pink&quot;, &quot;Pinky_weak&quot; = &quot;blue&quot;, &quot;Pinky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Inky&quot; = &quot;cyan&quot;, &quot;Inky_weak&quot; = &quot;blue&quot;, &quot;Inky_eaten&quot; = &quot;transparent&quot;,
+  &quot;Clyde&quot; = &quot;orange&quot;, &quot;Clyde_weak&quot; = &quot;blue&quot;, &quot;Clyde_eaten&quot; = &quot;transparent&quot;
+)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Build the base layer with the maze.</li>
+</ol>
+<pre class="r"><code>base_grid &lt;- ggplot() +
+  theme_void() +
+  theme(
+    legend.position = &quot;none&quot;,
+    plot.caption = element_textbox_simple(halign = 0.5, colour = &quot;white&quot;),
+    plot.caption.position = &quot;plot&quot;,
+    plot.background = element_rect(fill = &quot;black&quot;, colour = &quot;black&quot;),
+    panel.background = element_rect(fill = &quot;black&quot;, colour = &quot;black&quot;)
+  ) +
+  labs(caption = &quot;&amp;copy; Micka&amp;euml;l &#39;&lt;i style=&#39;color:#21908CFF;&#39;&gt;Coeos&lt;/i&gt;&#39; Canouil&quot;) +
+  scale_size_manual(values = c(&quot;wall&quot; = 2.5, &quot;door&quot; = 1, &quot;big&quot; = 2.5, &quot;normal&quot; = 0.5, &quot;eaten&quot; = 3)) +
+  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+  scale_colour_manual(breaks = names(map_colours), values = map_colours) +
+  coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
+  geom_segment(
+    data = maze_walls,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend, size = type, colour = type),
+    lineend = &quot;round&quot;,
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = maze_points,
+    mapping = aes(x = x, y = y, size = type, colour = type),
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = tibble(x = 10, y = 11, label = &quot;READY!&quot;, step = 1:20),
+    mapping = aes(x = x, y = y, label = label, colour = label, group = step),
+    size = 6
+  )</code></pre>
+<pre class="r"><code>base_grid</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-grid-final-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Draw the <code>"eaten"</code> bonus points geometry.</li>
+</ol>
+<pre class="r"><code>p_points &lt;- list(
+  geom_point(
+    data = bonus_points_eaten,
+    mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
+    inherit.aes = FALSE
+  )
+)</code></pre>
+<pre class="r"><code>base_grid + p_points</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-grid-points-final-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ol start="4" style="list-style-type: decimal">
+<li>Draw the main character (I am talking about Pac-Man …)</li>
+</ol>
+<pre class="r"><code>p_pacman &lt;- list(
+  geom_arc_bar(
+    data = pacman_moves,
+    mapping = aes(
+      x0 = x, y0 = y,
+      r0 = 0, r = 0.5,
+      start = start, end = end,
+      colour = colour, fill = colour,
+      group = step
+    ),
+    inherit.aes = FALSE
+  )
+)</code></pre>
+<pre class="r"><code>base_grid + p_pacman</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-grid-pacman-final-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ol start="5" style="list-style-type: decimal">
+<li>Draw the ghosts, using the trick that <code>+</code> works also on a list of geometries.</li>
+</ol>
+<pre class="r"><code>p_ghosts &lt;- map(.x = ghosts, .f = function(data) {
+  ghost_moves &lt;- compute_ghost_status(
+    ghost = data,
+    pacman_moves = pacman_moves,
+    bonus_points_eaten = bonus_points_eaten
+  )
+  list(
+    geom_polygon(
+      data = unnest(ghost_moves, &quot;body&quot;),
+      mapping = aes(
+        x = x, y = y,
+        fill = colour, colour = colour,
+        group = step
+      ),
+      inherit.aes = FALSE
+    ),
+    geom_circle(
+      data = unnest(ghost_moves, &quot;eyes&quot;),
+      mapping = aes(
+        x0 = x0, y0 = y0,
+        r = r,
+        colour = part, fill = part,
+        group = step
+      ),
+      inherit.aes = FALSE
+    )
+  )
+})</code></pre>
+<pre class="r"><code>base_grid + p_ghosts</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-grid-ghosts-final-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ol start="6" style="list-style-type: decimal">
+<li>Draw everything.</li>
+</ol>
+<pre class="r"><code>base_grid + p_points + p_pacman + p_ghosts</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/plot-time-all-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ol start="7" style="list-style-type: decimal">
+<li>Animate everything.</li>
+</ol>
+<pre class="r"><code>PacMan &lt;- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/plot-time-all-animated-1.gif" style="display: block; margin: auto;" /></p>
+</div>
