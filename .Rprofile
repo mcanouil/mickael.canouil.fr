@@ -23,24 +23,7 @@ if (interactive()) {
       update_hugo = TRUE
     )
   }
-  
-  snapshot <- function(pkgs = NULL, lockfile = "renv.lock") {
-    if (is.null(pkgs)) {
-      pkgs <- unique(renv::dependencies()[["Package"]])
-    }
-    if (!file.exists(lockfile)) {
-      renv:::renv_lockfile_write(renv:::renv_lockfile_init_r("."), file = lockfile)
-    }
-    renv::record(
-      records = lapply(
-        X = structure(pkgs, names = pkgs), 
-        FUN = function(x) as.character(utils::packageVersion(x))
-      ),
-      lockfile = lockfile
-    )
-    unlink("renv", recursive = TRUE)
-  }
-  
+
   # python3 -m pip install academic==0.5.1
   # academic import --bibtex content/publications/publications.bib
 }
