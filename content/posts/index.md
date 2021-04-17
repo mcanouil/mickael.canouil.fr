@@ -1,4 +1,4 @@
 ---
-title: Posts
+title: Blog
 type: widget_page
 ---
