@@ -5,7 +5,7 @@ if (interactive()) {
     blogdown.serve_site.startup = FALSE,
     # to disable knitting Rmd files on save, set this option to FALSE
     blogdown.knit.on_save = FALSE,
-    blogdown.author = "mcanouil",
+    blogdown.author = "mickael-canouil",
     blogdown.ext = ".Rmd",
     blogdown.subdir = "post"
   )
@@ -40,6 +40,9 @@ if (interactive()) {
     )
     unlink("renv", recursive = TRUE)
   }
+  
+  # python3 -m pip install academic==0.5.1
+  # academic import --bibtex content/publications/publications.bib
 }
 
 
