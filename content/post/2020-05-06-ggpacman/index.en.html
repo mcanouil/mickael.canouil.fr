@@ -113,7 +113,7 @@ I am using those to define sizes and colours for all the geometries I am going t
   scale_size_manual(values = c(&quot;wall&quot; = 2.5, &quot;door&quot; = 1, &quot;big&quot; = 2.5, &quot;normal&quot; = 0.5, &quot;eaten&quot; = 3)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-layer-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/base-layer-colours-print-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>My <code>base_layer</code> here is not really helpful, so I temporarily added some elements to help me draw everything on it.
 <em>Note</em>: I won’t use it in the following.</p>
 <pre class="r"><code>base_layer +
@@ -308,7 +308,7 @@ maze_points &lt;- bonus_points_coord()</code></pre>
     mapping = aes(x = x, y = y, size = type, colour = type),
     inherit.aes = FALSE
   )</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/maze-layer-show-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/maze-point-plot-print-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><em>Note: <code>maze_points</code> is a dataset of <code>ggpacman</code> (<code>data("maze_points", package = "ggpacman")</code>).</em></p>
 </div>
 </div>
@@ -401,9 +401,8 @@ Short answer, I just computed the differences between two successive positions o
 #&gt; 10    10     6 Pac-Man       0       0 close_right
 #&gt; # ... with 290 more rows</code></pre>
 <p>Here, in preparation for <a href="https://gganimate.com/"><code>gganimate</code></a>, I also added a column <code>step</code> before merging the new upgraded <code>pacman</code> (<em>i.e.</em>, with the Pac-Man <code>state</code> column) with the <code>pacman_state</code> defined earlier.</p>
-<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(pacman)
-pacman_moves
-#&gt; # A tibble: 300 x 9
+<pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(pacman)</code></pre>
+<pre><code>#&gt; # A tibble: 300 x 9
 #&gt;        x     y colour  state_x state_y state        step start   end
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;       &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt;  1    10     6 Pac-Man      NA      NA open_right      1  7.33  2.09
@@ -589,26 +588,26 @@ ggplot() +
 <pre><code>#&gt; # A tibble: 20 x 12
 #&gt;        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;
-#&gt;  1     0     0 Blinky     0     0      NA      NA middle        1     1  3.05e-3
-#&gt;  2     0     0 Blinky     0     0      NA      NA middle        2     2 -7.05e-2
-#&gt;  3     0     0 Blinky     0     0      NA      NA middle        3     3 -1.68e-2
-#&gt;  4     0     0 Blinky     0     0      NA      NA middle        4     4 -5.58e-2
-#&gt;  5     1     0 Blinky     1     0       1       0 right         1     5 -4.08e-2
-#&gt;  6     1     0 Blinky     1     0       1       0 right         2     6  9.56e-2
-#&gt;  7     1     0 Blinky     1     0       1       0 right         3     7 -3.51e-2
-#&gt;  8     1     0 Blinky     1     0       1       0 right         4     8  3.10e-3
-#&gt;  9     1     1 Blinky     1     1       0       1 up            1     9 -3.21e-2
-#&gt; 10     1     1 Blinky     1     1       0       1 up            2    10  5.68e-2
-#&gt; 11     1     1 Blinky     1     1       0       1 up            3    11  6.10e-2
-#&gt; 12     1     1 Blinky     1     1       0       1 up            4    12 -1.84e-2
-#&gt; 13     0     1 Blinky     0     1      -1       0 left          1    13 -5.14e-2
-#&gt; 14     0     1 Blinky     0     1      -1       0 left          2    14  7.43e-2
-#&gt; 15     0     1 Blinky     0     1      -1       0 left          3    15  7.53e-3
-#&gt; 16     0     1 Blinky     0     1      -1       0 left          4    16  1.20e-2
-#&gt; 17     0     0 Blinky     0     0       0      -1 down          1    17  1.43e-4
-#&gt; 18     0     0 Blinky     0     0       0      -1 down          2    18 -7.12e-2
-#&gt; 19     0     0 Blinky     0     0       0      -1 down          3    19  1.01e-2
-#&gt; 20     0     0 Blinky     0     0       0      -1 down          4    20 -2.52e-2
+#&gt;  1     0     0 Blinky     0     0      NA      NA middle        1     1 -0.0133 
+#&gt;  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0456 
+#&gt;  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.0158 
+#&gt;  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0573 
+#&gt;  5     1     0 Blinky     1     0       1       0 right         1     5 -0.0218 
+#&gt;  6     1     0 Blinky     1     0       1       0 right         2     6 -0.00900
+#&gt;  7     1     0 Blinky     1     0       1       0 right         3     7  0.0366 
+#&gt;  8     1     0 Blinky     1     0       1       0 right         4     8  0.0333 
+#&gt;  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0268 
+#&gt; 10     1     1 Blinky     1     1       0       1 up            2    10 -0.0646 
+#&gt; 11     1     1 Blinky     1     1       0       1 up            3    11  0.0596 
+#&gt; 12     1     1 Blinky     1     1       0       1 up            4    12  0.0332 
+#&gt; 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0903 
+#&gt; 14     0     1 Blinky     0     1      -1       0 left          2    14 -0.0647 
+#&gt; 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0960 
+#&gt; 16     0     1 Blinky     0     1      -1       0 left          4    16  0.105  
+#&gt; 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0408 
+#&gt; 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0466 
+#&gt; 19     0     0 Blinky     0     0       0      -1 down          3    19  0.00835
+#&gt; 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0281 
 #&gt; # ... with 1 more variable: noise_y &lt;dbl&gt;</code></pre>
 <p>Then, I added (<em>in a weird way I might say</em>) the polygons coordinates for the body and the eyes.</p>
 <pre class="r"><code>blinky_ghost &lt;- blinky_ghost %&gt;%
@@ -638,28 +637,28 @@ ggplot() +
     y = NULL
   )</code></pre>
 <pre><code>#&gt; # A tibble: 20 x 12
-#&gt;    colour    X0    Y0 state_x state_y direction state  step   noise_x  noise_y
-#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-#&gt;  1 Blinky     0     0      NA      NA middle        1     1  0.00305   0.0241 
-#&gt;  2 Blinky     0     0      NA      NA middle        2     2 -0.0705   -0.0844 
-#&gt;  3 Blinky     0     0      NA      NA middle        3     3 -0.0168   -0.0818 
-#&gt;  4 Blinky     0     0      NA      NA middle        4     4 -0.0558   -0.142  
-#&gt;  5 Blinky     1     0       1       0 right         1     5 -0.0408    0.0126 
-#&gt;  6 Blinky     1     0       1       0 right         2     6  0.0956    0.0164 
-#&gt;  7 Blinky     1     0       1       0 right         3     7 -0.0351    0.0375 
-#&gt;  8 Blinky     1     0       1       0 right         4     8  0.00310  -0.0230 
-#&gt;  9 Blinky     1     1       0       1 up            1     9 -0.0321   -0.0234 
-#&gt; 10 Blinky     1     1       0       1 up            2    10  0.0568   -0.0690 
-#&gt; 11 Blinky     1     1       0       1 up            3    11  0.0610    0.0116 
-#&gt; 12 Blinky     1     1       0       1 up            4    12 -0.0184   -0.0194 
-#&gt; 13 Blinky     0     1      -1       0 left          1    13 -0.0514    0.106  
-#&gt; 14 Blinky     0     1      -1       0 left          2    14  0.0743    0.0681 
-#&gt; 15 Blinky     0     1      -1       0 left          3    15  0.00753  -0.0217 
-#&gt; 16 Blinky     0     1      -1       0 left          4    16  0.0120    0.0223 
-#&gt; 17 Blinky     0     0       0      -1 down          1    17  0.000143 -0.0432 
-#&gt; 18 Blinky     0     0       0      -1 down          2    18 -0.0712   -0.0304 
-#&gt; 19 Blinky     0     0       0      -1 down          3    19  0.0101    0.00449
-#&gt; 20 Blinky     0     0       0      -1 down          4    20 -0.0252    0.0365 
+#&gt;    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 Blinky     0     0      NA      NA middle        1     1 -0.0133  -0.0813 
+#&gt;  2 Blinky     0     0      NA      NA middle        2     2  0.0456   0.0418 
+#&gt;  3 Blinky     0     0      NA      NA middle        3     3 -0.0158  -0.00794
+#&gt;  4 Blinky     0     0      NA      NA middle        4     4  0.0573   0.0854 
+#&gt;  5 Blinky     1     0       1       0 right         1     5 -0.0218  -0.115  
+#&gt;  6 Blinky     1     0       1       0 right         2     6 -0.00900 -0.00523
+#&gt;  7 Blinky     1     0       1       0 right         3     7  0.0366   0.0438 
+#&gt;  8 Blinky     1     0       1       0 right         4     8  0.0333  -0.0734 
+#&gt;  9 Blinky     1     1       0       1 up            1     9 -0.0268   0.0196 
+#&gt; 10 Blinky     1     1       0       1 up            2    10 -0.0646  -0.00856
+#&gt; 11 Blinky     1     1       0       1 up            3    11  0.0596  -0.0144 
+#&gt; 12 Blinky     1     1       0       1 up            4    12  0.0332  -0.00397
+#&gt; 13 Blinky     0     1      -1       0 left          1    13 -0.0903  -0.0243 
+#&gt; 14 Blinky     0     1      -1       0 left          2    14 -0.0647  -0.0419 
+#&gt; 15 Blinky     0     1      -1       0 left          3    15  0.0960  -0.0351 
+#&gt; 16 Blinky     0     1      -1       0 left          4    16  0.105   -0.0292 
+#&gt; 17 Blinky     0     0       0      -1 down          1    17  0.0408  -0.00888
+#&gt; 18 Blinky     0     0       0      -1 down          2    18 -0.0466  -0.0907 
+#&gt; 19 Blinky     0     0       0      -1 down          3    19  0.00835  0.0261 
+#&gt; 20 Blinky     0     0       0      -1 down          4    20 -0.0281   0.0187 
 #&gt; # ... with 2 more variables: body &lt;list&gt;, eyes &lt;list&gt;</code></pre>
 <p>For ease, it is now a call to one function directly on the poition matrix of a ghost.</p>
 <pre class="r"><code>blinky_ghost &lt;- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = &quot;Blinky&quot;)
@@ -795,7 +794,7 @@ Do you remember the values of the scale for the size aesthetic?</p>
 #&gt;         &quot;_eaten&quot;), grepl(&quot;weak&quot;, .data[[&quot;colour&quot;]]) &amp; .data[[&quot;already_eaten&quot;]] ~ 
 #&gt;         .data[[&quot;ghost_name&quot;]], TRUE ~ .data[[&quot;colour&quot;]]))
 #&gt; }
-#&gt; &lt;bytecode: 0x00000000145d1be0&gt;
+#&gt; &lt;bytecode: 0x000000002481c2d0&gt;
 #&gt; &lt;environment: namespace:ggpacman&gt;</code></pre>
 <p>The goal of this function, is to compute the different states of a ghost, according to the bonus points eaten and, of course, the current Pac-Man position at a determined <code>step</code>.</p>
 <pre class="r"><code>pacman_moves &lt;- ggpacman::compute_pacman_coord(get(data(&quot;pacman&quot;, package = &quot;ggpacman&quot;)))
@@ -893,18 +892,18 @@ ghost_moves %&gt;%
 )
 blinky_moves &lt;- ggpacman::compute_ghost_coord(blinky_ghost)</code></pre>
 <pre><code>#&gt; # A tibble: 48 x 12
-#&gt;    colour    X0    Y0 state_x state_y direction state  step noise_x   noise_y
-#&gt;    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;     &lt;dbl&gt;
-#&gt;  1 Blinky     1     0      NA      NA middle        1     1 -0.0602 -0.00441 
-#&gt;  2 Blinky     1     0      NA      NA middle        2     2 -0.0462  0.0411  
-#&gt;  3 Blinky     1     0      NA      NA middle        3     3  0.0304 -0.0426  
-#&gt;  4 Blinky     1     0      NA      NA middle        4     4 -0.0367  0.00193 
-#&gt;  5 Blinky     2     0       1       0 right         1     5  0.0434 -0.00368 
-#&gt;  6 Blinky     2     0       1       0 right         2     6 -0.0837  0.000124
-#&gt;  7 Blinky     2     0       1       0 right         3     7  0.0353 -0.0907  
-#&gt;  8 Blinky     2     0       1       0 right         4     8  0.0739 -0.0200  
-#&gt;  9 Blinky     3     0       1       0 right         1     9  0.108   0.00960 
-#&gt; 10 Blinky     3     0       1       0 right         2    10 -0.0545 -0.0630  
+#&gt;    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+#&gt;    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 Blinky     1     0      NA      NA middle        1     1  0.0541  -0.0389 
+#&gt;  2 Blinky     1     0      NA      NA middle        2     2 -0.0621   0.0698 
+#&gt;  3 Blinky     1     0      NA      NA middle        3     3  0.0334  -0.0221 
+#&gt;  4 Blinky     1     0      NA      NA middle        4     4  0.0174   0.0408 
+#&gt;  5 Blinky     2     0       1       0 right         1     5  0.0776   0.0569 
+#&gt;  6 Blinky     2     0       1       0 right         2     6  0.0421   0.0252 
+#&gt;  7 Blinky     2     0       1       0 right         3     7  0.00683 -0.0562 
+#&gt;  8 Blinky     2     0       1       0 right         4     8  0.0179  -0.0113 
+#&gt;  9 Blinky     3     0       1       0 right         1     9 -0.0289  -0.00288
+#&gt; 10 Blinky     3     0       1       0 right         2    10  0.0878   0.0257 
 #&gt; # ... with 38 more rows, and 2 more variables: body &lt;list&gt;, eyes &lt;list&gt;</code></pre>
 <pre class="r"><code>blinky_plot &lt;- base_layer +
   coord_fixed(xlim = c(0, 13), ylim = c(-1, 1)) +
