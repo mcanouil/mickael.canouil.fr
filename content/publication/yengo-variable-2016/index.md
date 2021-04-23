@@ -1,7 +1,7 @@
 ---
-title: "Variable Clustering in High-Dimensional Linear Regression: The R Package clere"
+title: "Variable Clustering in High-Dimensional Linear Regression: The R Package"
 date: 2016-04-01
-publishDate: 2021-04-17T13:49:43.378507Z
+publishDate: 2021-04-23T10:12:44.702687Z
 authors: ["Loïc Yengo", "Julien Jacques", "Christophe Biernacki", "Mickaël Canouil"]
 publication_types: ["2"]
 abstract: ""
