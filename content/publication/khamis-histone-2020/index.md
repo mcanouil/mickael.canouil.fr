@@ -1,7 +1,7 @@
 ---
-title: "Histone deacetylase 9 promoter hypomethylation associated with adipocyte dysfunction is a statin-related metabolic effect"
+title: "Histone Deacetylase 9 Promoter Hypomethylation Associated with Adipocyte Dysfunction is a Statin-Related Metabolic Effect"
 date: 2020-05-01
-publishDate: 2021-04-17T13:49:43.353058Z
+publishDate: 2021-04-23T10:12:44.673583Z
 authors: ["Amna Khamis", "Raphael Boutry", "Mickaël Canouil", "Sumi Mathew", "Stephane Lobbens", "Hutokshi Crouch", "Toby Andrew", "Amar Abderrahmani", "Filippo Tamanini", "Philippe Froguel"]
 publication_types: ["2"]
 abstract: ""
