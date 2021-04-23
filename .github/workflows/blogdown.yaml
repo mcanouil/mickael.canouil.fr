@@ -20,17 +20,11 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - name: Install pak and query dependencies
+      - name: Install pak and blogdown
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
           pak::pkg_install("blogdown")
-        shell: Rscript {0}
-
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          pak::local_system_requirements(execute = TRUE)
-          pak::pkg_system_requirements("blogdown", execute = TRUE)
+          blogdown::install_hugo("0.82.0")
         shell: Rscript {0}
 
       - name: Build and deploy blogdown site
