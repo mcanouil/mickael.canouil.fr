@@ -1,0 +1,92 @@
+---
+title: "R Advanced (French)"
+summary: "A half-day workshop on objects and types in R."
+
+date: "2020-11-09T00:00:00Z"
+
+image:
+  # caption: ""
+  focal_point: Smart
+  
+links:
+- icon: file-alt
+  icon_pack: far
+  name: Slides
+  url: https://m.canouil.fr/radvanced
+- icon: github
+  icon_pack: fab
+  name: Code
+  url: https://github.com/mcanouil/radvanced
+
+# slides: example
+
+tags:
+- workshop
+- course
+- R
+- R advanced
+- types
+- objects
+- french
+
+# url_code: ""
+# url_pdf: ""
+# url_slides: ""
+# url_video: ""
+# 
+external_link: "https://github.com/mcanouil/radvanced"
+---
+
+```{r setup, include = FALSE}
+url_slides <- "https://m.canouil.fr/radvanced"
+```
+
+```{r, include = FALSE}
+library(magick)
+library(here)
+library(chromote)
+library(glue)
+
+thumb <- "featured.png"
+index_html <- url_slides
+
+if (!file.exists(thumb)) {
+  web_browser <- suppressMessages(try(chromote::ChromoteSession$new(), silent = TRUE))
+  if (inherits(web_browser, "try-error") && Sys.info()[["sysname"]] == "Windows") {
+    edge_path <- "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+    if (file.exists(edge_path)) {
+      Sys.setenv(CHROMOTE_CHROME = edge_path)
+      web_browser <- chromote::ChromoteSession$new()
+    } else {
+      stop('Please set Sys.setenv(CHROMOTE_CHROME = "Path/To/Chrome")')
+    }
+  }
+  web_browser$Page$navigate(index_html, wait_ = FALSE)
+  page_browser <- web_browser$Page$loadEventFired()
+  web_browser$screenshot(
+    filename = thumb,
+    selector = "div.remark-slide-scaler",
+    scale = 2
+  )
+  web_browser$close()
+  
+  resize <- function(path_in, path_out) {
+    image <- image_read(path_in)
+    image <- image_resize(image, "1920x")
+    image_write(image, path_out)
+  }
+  resize(thumb, thumb)
+}
+```
+
+```{r, eval = !is.null(url_slides), results = "asis", echo = FALSE, include = TRUE}
+cat(
+'<center>
+<div class="xaringanslides" style="min-width:300px;margin:1em auto;">
+  <iframe src="', url_slides, '" width="560" height="315" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
+  <script>fitvids(".xaringanslides", {players: "iframe"});</script>
+</div>
+</center>',
+sep = ""
+)
+```
