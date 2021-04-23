@@ -27,12 +27,12 @@ content:
   filter_button:
   - name: All
     tag: '*'
-  - name:  "R Package"
-    tag:  "r package"
-  - name:  "Workshop"
-    tag:  "workshop"
-  - name:  "Course"
-    tag:  "course"
+  - name: "R Package"
+    tag: "r package"
+  - name: "Workshop"
+    tag: "workshop"
+  - name: "Course"
+    tag: "course"
 
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
