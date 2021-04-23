@@ -58,7 +58,7 @@ social:
 ---
 
 I am a biostatistician (Ph.D.) and the head of a small team within a research laboratory, working primarily on the genetics of diabetes and obesity.  
-I have developed a few {{< icon name="r-project" pack="fab" >}}&nbsp;packages (_e.g._,&nbsp;[insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._,&nbsp;[ggpacman](https://cran.r-project.org/package=insane)).  
+I have developed a few {{< icon name="r-project" pack="fab" >}}&nbsp;packages (_e.g._,&nbsp;[insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._,&nbsp;[ggpacman](https://cran.r-project.org/package=ggpacman)).  
 I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} ([m.canouil.fr/imdb_ratings](https://m.canouil.fr/imdb_ratings/)).
 
 Have a look at my [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
