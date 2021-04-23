@@ -29,6 +29,7 @@ jobs:
 
       - name: Build and deploy blogdown site
         run: |
+          mkdir www
           Rscript -e 'blogdown::build_site(local = TRUE)'
           cd www && find . -type f -exec curl --fail --silent --max-time 10 --retry 4 --user ${{secrets.FTP_USER}}:${{secrets.FTP_PASSWORD}} --ftp-create-dirs -T {} ftp://${{secrets.FTP_URL}}/www/dev/{} \;
 
