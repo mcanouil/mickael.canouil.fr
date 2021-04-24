@@ -227,7 +227,7 @@ base_layer +
 <img src="{{< blogdown/postref >}}index_files/figure-html/left-plot-1.png" width="672" style="display: block; margin: auto;" />
 
 The maze is slowly appearing, but surely.
-As I wrote earlier, the first level is symmetrical, so I used my left lines `left_segments` to compute all the lignes on the right `right_segments`.
+As I wrote earlier, the first level is symmetrical, so I used my left lines `left_segments` to compute all the lines on the right `right_segments`.
 
 
 ```r
@@ -625,7 +625,7 @@ ggplot() +
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/ghost-body-plot-1.png" width="672" style="display: block; margin: auto;" />
 
-*Note: `ghost_body` is a dataset of `ggpacman` (`data("ghost_body", package = "ggpacman")`).*
+*Note: `ghost_body` is a dataset of `ggpacman` (`data("ghost_body", package = "ggpacman")`).*  
 *Note: `ghost_body` definitely needs some code refactoring.*
 
 ### Eyes
@@ -753,26 +753,26 @@ blinky_ghost <- blinky_ghost %>%
 #> # A tibble: 20 x 12
 #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
 #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-#>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0194 
-#>  2     0     0 Blinky     0     0      NA      NA middle        2     2 -0.0364 
-#>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.114  
-#>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0164 
-#>  5     1     0 Blinky     1     0       1       0 right         1     5  0.0547 
-#>  6     1     0 Blinky     1     0       1       0 right         2     6  0.00846
-#>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0615 
-#>  8     1     0 Blinky     1     0       1       0 right         4     8  0.0152 
-#>  9     1     1 Blinky     1     1       0       1 up            1     9  0.0379 
-#> 10     1     1 Blinky     1     1       0       1 up            2    10 -0.0474 
-#> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0425 
-#> 12     1     1 Blinky     1     1       0       1 up            4    12 -0.0335 
-#> 13     0     1 Blinky     0     1      -1       0 left          1    13  0.0186 
-#> 14     0     1 Blinky     0     1      -1       0 left          2    14 -0.147  
-#> 15     0     1 Blinky     0     1      -1       0 left          3    15 -0.116  
-#> 16     0     1 Blinky     0     1      -1       0 left          4    16 -0.0316 
-#> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0187 
-#> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0532 
-#> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.00184
-#> 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0321 
+#>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0762 
+#>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.00308
+#>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.0120 
+#>  4     0     0 Blinky     0     0      NA      NA middle        4     4 -0.0468 
+#>  5     1     0 Blinky     1     0       1       0 right         1     5  0.0433 
+#>  6     1     0 Blinky     1     0       1       0 right         2     6  0.0298 
+#>  7     1     0 Blinky     1     0       1       0 right         3     7  0.00582
+#>  8     1     0 Blinky     1     0       1       0 right         4     8  0.0455 
+#>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0421 
+#> 10     1     1 Blinky     1     1       0       1 up            2    10 -0.0191 
+#> 11     1     1 Blinky     1     1       0       1 up            3    11 -0.113  
+#> 12     1     1 Blinky     1     1       0       1 up            4    12 -0.0141 
+#> 13     0     1 Blinky     0     1      -1       0 left          1    13  0.132  
+#> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.0506 
+#> 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0386 
+#> 16     0     1 Blinky     0     1      -1       0 left          4    16 -0.0263 
+#> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0328 
+#> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0665 
+#> 19     0     0 Blinky     0     0       0      -1 down          3    19 -0.0194 
+#> 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0882 
 #> # ... with 1 more variable: noise_y <dbl>
 ```
 
@@ -811,32 +811,32 @@ blinky_ghost <- blinky_ghost %>%
 
 ```
 #> # A tibble: 20 x 12
-#>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
-#>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-#>  1 Blinky     0     0      NA      NA middle        1     1  0.0194   0.0369 
-#>  2 Blinky     0     0      NA      NA middle        2     2 -0.0364   0.00684
-#>  3 Blinky     0     0      NA      NA middle        3     3 -0.114   -0.0116 
-#>  4 Blinky     0     0      NA      NA middle        4     4  0.0164   0.0449 
-#>  5 Blinky     1     0       1       0 right         1     5  0.0547  -0.0495 
-#>  6 Blinky     1     0       1       0 right         2     6  0.00846 -0.0678 
-#>  7 Blinky     1     0       1       0 right         3     7  0.0615  -0.125  
-#>  8 Blinky     1     0       1       0 right         4     8  0.0152   0.0904 
-#>  9 Blinky     1     1       0       1 up            1     9  0.0379  -0.0295 
-#> 10 Blinky     1     1       0       1 up            2    10 -0.0474  -0.0747 
-#> 11 Blinky     1     1       0       1 up            3    11  0.0425  -0.0944 
-#> 12 Blinky     1     1       0       1 up            4    12 -0.0335   0.0464 
-#> 13 Blinky     0     1      -1       0 left          1    13  0.0186  -0.0215 
-#> 14 Blinky     0     1      -1       0 left          2    14 -0.147    0.0106 
-#> 15 Blinky     0     1      -1       0 left          3    15 -0.116    0.0665 
-#> 16 Blinky     0     1      -1       0 left          4    16 -0.0316   0.00713
-#> 17 Blinky     0     0       0      -1 down          1    17  0.0187   0.0686 
-#> 18 Blinky     0     0       0      -1 down          2    18 -0.0532   0.0254 
-#> 19 Blinky     0     0       0      -1 down          3    19  0.00184 -0.00692
-#> 20 Blinky     0     0       0      -1 down          4    20 -0.0321   0.0253 
+#>    colour    X0    Y0 state_x state_y direction state  step  noise_x   noise_y
+#>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>     <dbl>
+#>  1 Blinky     0     0      NA      NA middle        1     1  0.0762   0.0111  
+#>  2 Blinky     0     0      NA      NA middle        2     2  0.00308  0.0496  
+#>  3 Blinky     0     0      NA      NA middle        3     3 -0.0120   0.000904
+#>  4 Blinky     0     0      NA      NA middle        4     4 -0.0468   0.0828  
+#>  5 Blinky     1     0       1       0 right         1     5  0.0433   0.0205  
+#>  6 Blinky     1     0       1       0 right         2     6  0.0298   0.00628 
+#>  7 Blinky     1     0       1       0 right         3     7  0.00582 -0.0318  
+#>  8 Blinky     1     0       1       0 right         4     8  0.0455  -0.00662 
+#>  9 Blinky     1     1       0       1 up            1     9 -0.0421  -0.0498  
+#> 10 Blinky     1     1       0       1 up            2    10 -0.0191   0.0115  
+#> 11 Blinky     1     1       0       1 up            3    11 -0.113   -0.0390  
+#> 12 Blinky     1     1       0       1 up            4    12 -0.0141  -0.00971 
+#> 13 Blinky     0     1      -1       0 left          1    13  0.132   -0.0187  
+#> 14 Blinky     0     1      -1       0 left          2    14  0.0506  -0.0540  
+#> 15 Blinky     0     1      -1       0 left          3    15  0.0386   0.0398  
+#> 16 Blinky     0     1      -1       0 left          4    16 -0.0263  -0.0489  
+#> 17 Blinky     0     0       0      -1 down          1    17  0.0328  -0.0511  
+#> 18 Blinky     0     0       0      -1 down          2    18 -0.0665   0.0566  
+#> 19 Blinky     0     0       0      -1 down          3    19 -0.0194   0.141   
+#> 20 Blinky     0     0       0      -1 down          4    20 -0.0882  -0.00679 
 #> # ... with 2 more variables: body <list>, eyes <list>
 ```
 
-For ease, it is now a call to one function directly on the poition matrix of a ghost.
+For ease, it is now a call to one function directly on the position matrix of a ghost.
 
 
 ```r
@@ -938,7 +938,7 @@ maze_layer_points <- maze_layer +
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/points-eaten-plot-1.png" width="672" style="display: block; margin: auto;" />
 
-A new animation to see, how the new geometry is overlpping the previous one as `step` increases.
+A new animation to see, how the new geometry is overlapping the previous one as `step` increases.
 
 
 ```r
@@ -952,7 +952,7 @@ animated_points <- maze_layer_points + transition_manual(step)
 
 The ghosts were more tricky (I know, they are ghosts ...).
 
-I first retrieved all the positions wereh a `"big"` bonus point was eaten by Pac-Man.
+I first retrieved all the positions where a `"big"` bonus point was eaten by Pac-Man.
 
 
 ```r
@@ -1025,7 +1025,7 @@ ggpacman::compute_ghost_status
 #>         "_eaten"), grepl("weak", .data[["colour"]]) & .data[["already_eaten"]] ~ 
 #>         .data[["ghost_name"]], TRUE ~ .data[["colour"]]))
 #> }
-#> <bytecode: 0x0000000026466a10>
+#> <bytecode: 0x00000000272739d0>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1137,18 +1137,18 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 
 ```
 #> # A tibble: 48 x 12
-#>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
-#>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-#>  1 Blinky     1     0      NA      NA middle        1     1  0.0288  -0.0329 
-#>  2 Blinky     1     0      NA      NA middle        2     2  0.0417  -0.0736 
-#>  3 Blinky     1     0      NA      NA middle        3     3  0.0492  -0.121  
-#>  4 Blinky     1     0      NA      NA middle        4     4 -0.0598  -0.0360 
-#>  5 Blinky     2     0       1       0 right         1     5  0.0603  -0.00499
-#>  6 Blinky     2     0       1       0 right         2     6 -0.0683   0.00691
-#>  7 Blinky     2     0       1       0 right         3     7  0.0161   0.0450 
-#>  8 Blinky     2     0       1       0 right         4     8 -0.0886   0.0548 
-#>  9 Blinky     3     0       1       0 right         1     9  0.0478   0.0342 
-#> 10 Blinky     3     0       1       0 right         2    10 -0.00549  0.0780 
+#>    colour    X0    Y0 state_x state_y direction state  step  noise_x   noise_y
+#>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>     <dbl>
+#>  1 Blinky     1     0      NA      NA middle        1     1  0.0437  -0.0690  
+#>  2 Blinky     1     0      NA      NA middle        2     2  0.0116   0.00555 
+#>  3 Blinky     1     0      NA      NA middle        3     3  0.0270  -0.000196
+#>  4 Blinky     1     0      NA      NA middle        4     4 -0.0477   0.0149  
+#>  5 Blinky     2     0       1       0 right         1     5 -0.0785  -0.0276  
+#>  6 Blinky     2     0       1       0 right         2     6  0.0621  -0.0587  
+#>  7 Blinky     2     0       1       0 right         3     7 -0.0327  -0.0307  
+#>  8 Blinky     2     0       1       0 right         4     8  0.00960  0.0678  
+#>  9 Blinky     3     0       1       0 right         1     9 -0.0321  -0.0487  
+#> 10 Blinky     3     0       1       0 right         2    10 -0.0378  -0.0385  
 #> # ... with 38 more rows, and 2 more variables: body <list>, eyes <list>
 ```
 
@@ -1170,7 +1170,7 @@ blinky_plot <- base_layer +
 
 <img src="{{< blogdown/postref >}}index_files/figure-html/blinky-plot-line-1.png" width="355.2" style="display: block; margin: auto;" />
 
-I am sure, you remember all the colours and their mapped values from the beginning, so you probably won't need the following to understand of the ghost disappaered.
+I am sure, you remember all the colours and their mapped values from the beginning, so you probably won't need the following to understand of the ghost disappeared.
 
 
 ```r
