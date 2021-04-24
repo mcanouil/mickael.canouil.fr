@@ -1,7 +1,6 @@
 ---
 superuser: true
 title: 'Mickaël Canouil'
-email: "mickael.canouil@cnrs.fr"
 highlight_name: true
 
 bio: Biostatiscian, cinephile and [<i class = "fab fa-twitter"></i>@rlille_rug](https://twitter.com/rlille_rug) organiser.
@@ -36,7 +35,7 @@ organizations:
 social:
 - icon: envelope
   icon_pack: fas
-  link: /#contact
+  link: "#contact"
 - icon: orcid
   icon_pack: fab
   link: 'https://orcid.org/0000-0002-3396-4549'
