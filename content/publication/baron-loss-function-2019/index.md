@@ -1,7 +1,7 @@
 ---
 title: "Loss-of-Function Mutations in MRAP2 Are Pathogenic in Hyperphagic Obesity with Hyperglycemia and Hypertension"
 date: 2019-11-01
-publishDate: 2021-04-23T10:12:44.680257Z
+publishDate: 2021-04-29T14:07:52.519152Z
 authors: ["Morgane Baron", "Julie Maillet", "Marlène Huyvaert", "Aurélie Dechaume", "Raphaël Boutry", "Hélène Loiselle", "Emmanuelle Durand", "Bénédicte Toussaint", "Emmanuel Vaillant", "Julien Philippe", "Jérémy Thomas", "Amjad Ghulam", "Sylvia Franc", "Guillaume Charpentier", "Jean-Michel Borys", "Claire Lévy-Marchal", "Maïthé Tauber", "Raphaël Scharfmann", "Jacques Weill", "Cécile Aubert", "Julie Kerr-Conte", "François Pattou", "Ronan Roussel", "Beverley Balkau", "Michel Marre", "Mathilde Boissel", "Mehdi Derhourhi", "Stefan Gaget", "Mickaël Canouil", "Philippe Froguel", "Amélie Bonnefond"]
 publication_types: ["2"]
 abstract: "Large-scale sequencing of coding exons of MRAP2 in 9,418 adults and adolescents identifies loss-of-function mutations that are associated with monogenic obesity, hypertension and hyperglycemia."

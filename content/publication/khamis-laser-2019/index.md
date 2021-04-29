@@ -1,7 +1,7 @@
 ---
 title: "Laser Capture Microdissection of Human Pancreatic Islets Reveals Novel eQTLs Associated with Type 2 Diabetes"
 date: 2019-03-01
-publishDate: 2021-04-23T10:12:44.700504Z
+publishDate: 2021-04-29T14:07:52.561155Z
 authors: ["Amna Khamis", "Mickaël Canouil", "Afshan Siddiq", "Hutokshi Crouch", "Mario Falchi", "Manon von Bulow", "Florian Ehehalt", "Lorella Marselli", "Marius Distler", "Daniela Richter", "Jürgen Weitz", "Krister Bokvist", "Ioannis Xenarios", "Bernard Thorens", "Anke M. Schulte", "Mark Ibberson", "Amelie Bonnefond", "Piero Marchetti", "Michele Solimena", "Philippe Froguel"]
 publication_types: ["2"]
 abstract: ""
