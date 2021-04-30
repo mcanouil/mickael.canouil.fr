@@ -53,9 +53,8 @@ links:
 # url_video: ""
 ---
 
-<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
 
 
 <div class="embed-responsive embed-responsive-16by9 xaringan">
-<p><iframe class="embed-responsive-item" src="https://m.canouil.fr/slides/20190121-joint-model-snp/" allowfullscreen></iframe></p>
+  <iframe class="embed-responsive-item" src="https://m.canouil.fr/slides/20190121-joint-model-snp/" allowfullscreen></iframe>
 </div>

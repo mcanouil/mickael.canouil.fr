@@ -5,8 +5,9 @@ options(
   # to disable knitting Rmd files on save, set this option to FALSE
   blogdown.knit.on_save = FALSE,
   blogdown.author = "mickael-canouil",
-  blogdown.ext = ".Rmarkdown",
-  blogdown.subdir = "post"
+  blogdown.ext = ".Rmd",
+  blogdown.subdir = "post",
+  blogdown.method = "markdown"
 )
 
 if (interactive()) {

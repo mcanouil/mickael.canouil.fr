@@ -1,16 +1,16 @@
 ---
-title: My Journey To Transparency And Reproducibility (French)
+title: My Journey To Transparency And Reproducibility
 summary: A journey towards a more transparent and reproducible work environment using Docker and `renv`.
 abstract: In this talk, I (Mickaël Canouil) will chronicle my journey towards a more transparent and reproducible work environment. I will talk about the changes and improvements that I have implemented in my team, detailing the transition of infrastructure used when I arrived to an infrastructure using Docker and and the {renv} R package.
 
 all_day: false
 
-date: "2021-04-14T11:00:00Z"
-# date_end: "2021-04-14"
-publishDate: "2021-04-14"
+date: "2021-04-15T19:00:00Z"
+# date_end: "2021-04-15"
+publishDate: "2021-04-15"
 
-event: Min2Rien
-event_url: https://www.min2rien.fr/
+event: R Lille Meetup
+event_url: https://www.meetup.com/R-Lille/events/277031496/
 location: Online (Lille, France)
 # address:
 #   # street: 450 Serra Mall
@@ -29,17 +29,18 @@ tags:
   - docker
   - renv
   - reproducibility
-  - french
+  - meetup
+  - english
   
 links:  
 - icon: file-alt
   icon_pack: far
   name: Slides
-  url: https://m.canouil.fr/slides/20210414-journey-reproducibility/
+  url: https://m.canouil.fr/slides/20210415-journey-reproducibility/
 - icon: film
   icon_pack: fas
   name: Video
-  url: https://pod.univ-lille.fr/video/19711-semaine-retex-min2rien-2021-my-journey-to-transparency-and-reproducibility/
+  url: https://youtu.be/1CE8crjkwYY
 - icon: github
   icon_pack: fab
   name: Code
@@ -51,12 +52,14 @@ links:
 # url_video: ""
 ---
 
-<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
 
 
 <div class="embed-responsive embed-responsive-16by9">
-<p><iframe class="embed-responsive-item" src="https://pod.univ-lille.fr/video/19711-semaine-retex-min2rien-2021-my-journey-to-transparency-and-reproducibility/?is_iframe=true" allowfullscreen></iframe></p>
+  <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/1CE8crjkwYY" allowfullscreen></iframe>
 </div>
+
 <div class="embed-responsive embed-responsive-16by9 xaringan">
-<p><iframe class="embed-responsive-item" src="https://m.canouil.fr/slides/20210414-journey-reproducibility/" allowfullscreen></iframe></p>
+  <iframe class="embed-responsive-item" src="https://m.canouil.fr/slides/20210415-journey-reproducibility/" allowfullscreen></iframe>
 </div>

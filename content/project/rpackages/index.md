@@ -35,12 +35,13 @@ tags:
 external_link: "https://github.com/mcanouil/rpackages"
 ---
 
-<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
 
 
 <center>
 <div class="xaringanslides" style="min-width:300px;margin:1em auto;">
-<iframe src="https://m.canouil.fr/rpackages" width="560" height="315" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
-<script>fitvids(".xaringanslides", {players: "iframe"});</script>
+  <iframe src="https://m.canouil.fr/rpackages" width="560" height="315" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
+  <script>fitvids(".xaringanslides", {players: "iframe"});</script>
 </div>
 </center>
