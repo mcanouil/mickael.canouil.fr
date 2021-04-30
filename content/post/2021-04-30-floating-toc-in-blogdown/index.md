@@ -29,198 +29,11 @@ output:
     toc: yes
 ---
 
-```{r setup, include = FALSE}
-options("width" = 110)
-
-suppressPackageStartupMessages({
-  library(here)
-  library(knitr)
-  # library(ragg)
-  # library(svglite)
-  # library(ggplot2)
-  # library(ggtext)
-  # library(patchwork)
-  library(data.table)
-  # library(showtext)
-})
-```
-
-```{r setup-knitr, include = FALSE}
-opts_chunk$set(
-  eval = TRUE, # Default: TRUE
-  include = TRUE, # Default: TRUE
-  echo = TRUE, # Default: TRUE
-  width = getOption("width"),
-  comment = "#>", 
-  fig.align = "center",
-  fig.width = 11.5, # Default: 7
-  fig.height = 5.75,  # Default: 7
-  dpi = 150, # Default: 72
-  dev = "svglite", # Alt: ragg_png
-  dev.args = list(
-    web_fonts = list("https://fonts.googleapis.com/css?family=Alegreya+Sans")
-  )
-)
-# font_add_google("Alegreya Sans", "Alegreya Sans", regular.wt = 300)
-# showtext_auto()
-```
-
-```{r, chromote, include = FALSE, eval = !dir.exists("assets")}
-dir.create("assets")
-
-web_browser <- suppressMessages(try(chromote::ChromoteSession$new(), silent = TRUE))
-if (inherits(web_browser, "try-error") && Sys.info()[["sysname"]] == "Windows") {
-  edge_path <- "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-  if (file.exists(edge_path)) {
-    Sys.setenv(CHROMOTE_CHROME = edge_path)
-  } else {
-    stop('Please set Sys.setenv(CHROMOTE_CHROME = "Path/To/Chrome")')
-  }
-}
 
 
-post_url <- sprintf("http://localhost:%s/post/2020-12-01-r-rmarkdown/", format(Sys.Date(), "1%d%m"))
-default_post <- "content/post/2020-12-01-r-rmarkdown/index.en.Rmd"
-
-site <- file.path(tempdir(), "toc")
-dir.create(site)
-withr::with_dir(new = site, {
-  blogdown::new_site(theme = "wowchemy/starter-academic", force = TRUE, serve = FALSE)
-  old_index <- readLines(default_post)
-  writeLines(
-    text = gsub("^# ", "## ", old_index),
-    con = default_post
-  )
-})
-file.copy(file.path(site, default_post), file.path("assets", "post0.txt"), overwrite = TRUE)
-
-writeLines(c("...", readLines(file.path(site, "config.yaml"))[50:59], "..."), file.path("assets", "config_yaml.txt"))
-
-withr::with_dir(new = site, {
-  rmarkdown::render_site(default_post, encoding = 'UTF-8')
-  blogdown::stop_server()
-  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
-})
-
-withr::with_dir(site, {
-  rmarkdown::render_site(default_post, encoding = 'UTF-8')
-})
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(post_url, wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/rmd_default_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
-web_browser$close()
 
 
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(gsub("2020-12-01-r-rmarkdown", "getting-started", post_url), wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/markdown_default_before.png", scale = 2, cliprect = c(0, 1000, 1600, height = 900))
-web_browser$close()
 
-
-withr::with_dir(new = site, {
-  old_index <- readLines(default_post)
-  writeLines(
-    text = c(
-      old_index[1:6],
-      "output:",
-      "  blogdown::html_page:",
-      "    toc: true",
-      old_index[7:length(old_index)]
-    ),
-    con = default_post
-  )
-  rmarkdown::render_site(default_post, encoding = 'UTF-8')
-})
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(post_url, wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/rmd_default_toc_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
-web_browser$close()
-file.copy(file.path(site, default_post), file.path("assets", "post1.txt"), overwrite = TRUE)
-
-
-withr::with_dir(new = site, {
-  dir.create("layouts/_default")
-  writeLines(
-    text = c(
-      '{{- define "main" -}}',
-      '',
-      '<article class="article">',
-      '',
-      '  {{ partial "page_header" . }}',
-      '',
-      '  <div class="article-container">',
-      '',
-      '    <div class="row">',
-
-      '      <div class="col-12 col-lg-9 article-style">',
-      '        {{ .Content }}',
-      '      </div>',
-      '',
-      '      <div class="col-12 col-lg-3 docs-toc">',
-      '        <ul class="nav toc-top">',
-      '          <li><a href="#" id="back_to_top" class="docs-toc-title">{{ i18n "on_this_page" }}</a></li>',
-      '        </ul>',
-      '',
-      '        {{ .TableOfContents }}',
-      ' ',
-      '      </div>',
-      '    </div>',
-      '',
-      '    {{ partial "page_footer" . }}',
-      '',
-      '  </div>',
-      '</article>',
-      '',
-      '{{- end -}}'
-    ),
-    con = "layouts/_default/single.html"
-  )
-  rmarkdown::render_site(default_post, encoding = 'UTF-8')
-})
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(post_url, wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/rmd_default_toc_single_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
-web_browser$close()
-
-file.copy(
-  gsub("\\.Rmd$", ".html", file.path(site, default_post)),
-  file.path("assets", "rmarkdown_html.txt"), 
-  overwrite = TRUE
-)
-
-
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(gsub("2020-12-01-r-rmarkdown", "getting-started", post_url), wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/markdown_default_after.png", scale = 2, cliprect = c(0, 1000, 1600, height = 900))
-web_browser$close()
-
-
-withr::with_dir(new = site, {
-  blogdown::stop_server()
-  old_index <- readLines(default_post)
-  unlink(list.files(dirname(default_post), full.names = TRUE, recursive = TRUE, include.dirs = TRUE))
-  writeLines(old_index, gsub("\\.Rmd$", ".Rmarkdown", default_post))
-  rmarkdown::render_site(gsub("\\.Rmd$", ".Rmarkdown", default_post), encoding = 'UTF-8')
-  blogdown::serve_site(port = 4321)
-})
-web_browser <- chromote::ChromoteSession$new()
-web_browser$Page$navigate(post_url, wait_ = FALSE)
-# page_browser <- web_browser$Page$loadEventFired()
-web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
-web_browser$screenshot(filename = "assets/rmarkdown_default_toc_single_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
-web_browser$close()
-blogdown::stop_server()
-```
 
 ## Welcome!
 
@@ -230,8 +43,45 @@ In the past few weeks, I have been slowly getting my head around [`blogdown`](ht
 One of the latest tweak I had to figure out was how to get a floating TOC
 Getting a TOC is quite easy with a Rmarkdown, thus in blogdown.
 
-```{r, echo = FALSE}
-cat(readLines("assets/post0.txt"), sep = "\n")
+
+```
+#> ---
+#> title: "Hello R Markdown"
+#> author: "Frida Gomam"
+#> date: 2020-12-01T21:13:14-05:00
+#> categories: ["R"]
+#> tags: ["R Markdown", "plot", "regression"]
+#> ---
+#> 
+#> ```{r setup, include=FALSE}
+#> knitr::opts_chunk$set(collapse = TRUE)
+#> ```
+#> 
+#> ## R Markdown
+#> 
+#> This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#> 
+#> You can embed an R code chunk like this:
+#> 
+#> ```{r cars}
+#> summary(cars)
+#> fit <- lm(dist ~ speed, data = cars)
+#> fit
+#> ```
+#> 
+#> ## Including Plots
+#> 
+#> You can also embed plots. See Figure \@ref(fig:pie) for example:
+#> 
+#> ```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
+#> par(mar = c(0, 1, 0, 1))
+#> pie(
+#>   c(280, 60, 20),
+#>   c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
+#>   col = c('#0292D8', '#F7EA39', '#C4B632'),
+#>   init.angle = -50, border = NA
+#> )
+#> ```
 ```
 
 It is rendered as in the screenshot below ("wowchemy/starter-academic" Hugo theme).  
@@ -254,15 +104,67 @@ output:
 
 I will also decrease headings levels to fit the default settings (see `config.yaml`).
 
-```{r, echo = FALSE}
-cat(readLines("assets/config_yaml.txt"), sep = "\n")
+
+```
+#> ...
+#> markup:
+#>   defaultMarkdownHandler: goldmark
+#>   goldmark:
+#>     renderer:
+#>       unsafe: true
+#>   highlight:
+#>     codeFences: false
+#>   tableOfContents:
+#>     startLevel: 2
+#>     endLevel: 3
+#> ...
 ```
 
 
 With this addition, the `index.en.Rmd` looks like this (not that different, isn't it?!).
 
-```{r, echo = FALSE}
-cat(readLines("assets/post1.txt"), sep = "\n")
+
+```
+#> ---
+#> title: "Hello R Markdown"
+#> author: "Frida Gomam"
+#> date: 2020-12-01T21:13:14-05:00
+#> categories: ["R"]
+#> tags: ["R Markdown", "plot", "regression"]
+#> output:
+#>   blogdown::html_page:
+#>     toc: true
+#> ---
+#> 
+#> ```{r setup, include=FALSE}
+#> knitr::opts_chunk$set(collapse = TRUE)
+#> ```
+#> 
+#> ## R Markdown
+#> 
+#> This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#> 
+#> You can embed an R code chunk like this:
+#> 
+#> ```{r cars}
+#> summary(cars)
+#> fit <- lm(dist ~ speed, data = cars)
+#> fit
+#> ```
+#> 
+#> ## Including Plots
+#> 
+#> You can also embed plots. See Figure \@ref(fig:pie) for example:
+#> 
+#> ```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
+#> par(mar = c(0, 1, 0, 1))
+#> pie(
+#>   c(280, 60, 20),
+#>   c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
+#>   col = c('#0292D8', '#F7EA39', '#C4B632'),
+#>   init.angle = -50, border = NA
+#> )
+#> ```
 ```
 
 Since, we changed the YAML header, we need to render again the html file from `index.en.Rmd`.
@@ -414,14 +316,79 @@ In conclusion, the issue is no longer on blogdown/hugo side.
 
 Let's have a look at the html file produced by `rmarkdown::render_site()`.
 
-```{r, echo = FALSE}
-cat(readLines(file.path("assets", "rmarkdown_html.txt")), sep = "\n")
+
+```
+#> ---
+#> title: "Hello R Markdown"
+#> author: "Frida Gomam"
+#> date: 2020-12-01T21:13:14-05:00
+#> categories: ["R"]
+#> tags: ["R Markdown", "plot", "regression"]
+#> output:
+#>   blogdown::html_page:
+#>     toc: true
+#> ---
+#> 
+#> <script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+#> 
+#> <div id="TOC">
+#> <ul>
+#> <li><a href="#r-markdown">R Markdown</a></li>
+#> <li><a href="#including-plots">Including Plots</a></li>
+#> </ul>
+#> </div>
+#> 
+#> <div id="r-markdown" class="section level2">
+#> <h2>R Markdown</h2>
+#> <p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+#> <p>You can embed an R code chunk like this:</p>
+#> <pre class="r"><code>summary(cars)
+#> ##      speed           dist       
+#> ##  Min.   : 4.0   Min.   :  2.00  
+#> ##  1st Qu.:12.0   1st Qu.: 26.00  
+#> ##  Median :15.0   Median : 36.00  
+#> ##  Mean   :15.4   Mean   : 42.98  
+#> ##  3rd Qu.:19.0   3rd Qu.: 56.00  
+#> ##  Max.   :25.0   Max.   :120.00
+#> fit &lt;- lm(dist ~ speed, data = cars)
+#> fit
+#> ## 
+#> ## Call:
+#> ## lm(formula = dist ~ speed, data = cars)
+#> ## 
+#> ## Coefficients:
+#> ## (Intercept)        speed  
+#> ##     -17.579        3.932</code></pre>
+#> </div>
+#> <div id="including-plots" class="section level2">
+#> <h2>Including Plots</h2>
+#> <p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
+#> <pre class="r"><code>par(mar = c(0, 1, 0, 1))
+#> pie(
+#>   c(280, 60, 20),
+#>   c(&#39;Sky&#39;, &#39;Sunny side of pyramid&#39;, &#39;Shady side of pyramid&#39;),
+#>   col = c(&#39;#0292D8&#39;, &#39;#F7EA39&#39;, &#39;#C4B632&#39;),
+#>   init.angle = -50, border = NA
+#> )</code></pre>
+#> <div class="figure"><span id="fig:pie"></span>
+#> <img src="{{< blogdown/postref >}}index.en_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
+#> <p class="caption">
+#> Figure 1: A fancy pie chart.
+#> </p>
+#> </div>
+#> </div>
 ```
 
 Since, we are only interested in the TOC part, let's remove all other parts.
 
-```{r, echo = FALSE}
-cat(readLines(file.path("assets", "rmarkdown_html.txt"))[14:19], sep = "\n")
+
+```
+#> <div id="TOC">
+#> <ul>
+#> <li><a href="#r-markdown">R Markdown</a></li>
+#> <li><a href="#including-plots">Including Plots</a></li>
+#> </ul>
+#> </div>
 ```
 
 In this part, we are interested in the `id` of the div which includes the TOC.
