@@ -19,7 +19,7 @@ if (interactive()) {
       theme = "wowchemy/starter-academic",
       hostname = "github.com",
       theme_example = FALSE,
-      update_config = FALSE,
+      update_config = TRUE,
       force = TRUE,
       update_hugo = TRUE
     )
