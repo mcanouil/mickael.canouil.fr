@@ -33,7 +33,3 @@ tags:
 # 
 external_link: "https://github.com/mcanouil/rdatabase"
 ---
-
-<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
-
-
