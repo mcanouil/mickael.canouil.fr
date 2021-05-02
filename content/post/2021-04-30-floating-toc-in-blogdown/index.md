@@ -5,21 +5,20 @@ summary: |
     How to have a table of content (TOC) on either the left or the right side of a post?  
     I have an answer!
 author: mickael-canouil
-date: '2021-04-30'
-lastmod: '2021-04-30'
+date: '2021-05-02'
+lastmod: '2021-05-02'
 slug: floating-toc-in-blogdown
 categories:
   - R
   - blogdown
-  - hugo
   - rmarkdown
+  - hugo
 tags:
   - R
   - blogdown
-  - hugo
   - rmarkdown
+  - hugo
   - table-of-content
-  - markdown
 authors: []
 featured: no
 image:
@@ -42,11 +41,11 @@ output:
 
 ## Welcome!
 
-Welcome to my very first blog post (_i.e._, I do not count [ggpacman](https://mickael.canouil.fr/post/ggpacman/)).
+Welcome to my very first blog post (_i.e._,&nbsp;I do not count [ggpacman](https://mickael.canouil.fr/post/ggpacman/)).
 
 The focus of this post is on `blogdown` ([github.com/rstudio/blogdown](https://github.com/rstudio/blogdown)), in particular on how to have a table of content (TOC) on either the left or the right side of a post to ease the navigation through a long post.  
 In the past few weeks, I have been slowly getting my head around [`blogdown`](https://github.com/rstudio/blogdown) and [HUGO](https://gohugo.io/), to finally published this website about a week ago.  
-One of the latest tweak I had to figure out was: how to get a floating TOC.
+One of the latest tweak I had to figure out was: how to get a floating TOC.  
 Getting a TOC is quite easy with an Rmarkdown, thus it should be the same in `blogdown`.
 
 ```markdown
@@ -68,7 +67,7 @@ blogdown::new_site(theme = "wowchemy/starter-academic")
 
 Within a `blogdown` installation based on the "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)" HUGO theme:
 
-1. Create `<root>/layouts/_default/single.html`.
+1. Create `<root>/layouts/_default/single.html`.  
     
     ```r
     writeLines(
@@ -101,24 +100,28 @@ Within a `blogdown` installation based on the "[wowchemy/starter-academic](https
     )
     ```
 
-2. Add to your `<root>//.Rprofile`: `options(blogdown.method = "markdown")`
+2. Add to your `<root>/.Rprofile`.  
+    
+    ```r
+    options(blogdown.method = "markdown")
+    ```
 
-3. Add in the YAML of your `Rmd`/`Rmarkdown` file.
+3. Write your posts in an `Rmd` or `Rmarkdown` file (_it Makes no difference now_) with the following in the YAML header.  
     ```
     output:
       blogdown::html_page:
         toc: true
     ```
-4. You are all set! Write your posts in `Rmd` or `Rmarkdown` file.  
-    (_It Makes no difference now._)
+4. You are all set!
+
+_Note_: To a more complete setup workflow for `blogdown`, I recommend to have a look at [Alison Hill](https://alison.rbind.io/)'s blog post: "[Up & Running with Blogdown in 2021](https://alison.rbind.io/post/new-year-new-blogdown/)".
 
 ## Default Rmarkdown Post
 
 Once installed, several default posts are available, including simple markdown file, Jupyter notebook file and Rmarkdown file.  
-Most of this post will focus on the Rmarkdown file with `.Rmd` as its extension.
+Most of this post will focus on the Rmarkdown file with `.Rmd` extension.
 
-The default Rmarkdown file can be found at `content/post/2020-12-01-r-rmarkdown/index.en.Rmd` from the root directory of the website.  
-This file includes the following.
+The default Rmarkdown file can be found at `content/post/2020-12-01-r-rmarkdown/index.en.Rmd` from the root directory of the website.
 
 
 ````
@@ -161,7 +164,8 @@ pie(
 ```
 ````
 
-To be fair, I decreased the headings level, or increase the number of `#` by one.  
+To be fair, the above document is not exactly the default Rmarkdown file.  
+In fact, I decreased the headings level, or increase the number of `#`, by one.  
 The reason for this small modification comes from the default configuration of HUGO within the `config.yaml` file.
 
 
@@ -180,10 +184,9 @@ markup:
 ...
 ```
 
-As you can see, the TOC is defined to include from level 2 to level 3, so by default, the changes we are going to make would not have any effect for this document particular document which only contains level 1 headings by default.
+As you can see, the TOC is defined to include from level 2 to level 3, so by default, the changes we are going to make would not have any effect for this particular document which only contains level 1 headings.
 
-Posts and any other Rmarkdown contents are rendered with `rmarkdown::render_site()`.  
-So, for our default Rmarkdown (`content/post/2020-12-01-r-rmarkdown/index.en.Rmd`), the rendering is done with `rmarkdown::render_site('content/post/2020-12-01-r-rmarkdown/index.en.Rmd', encoding = 'UTF-8')`.
+Posts and any other Rmarkdown contents are rendered with `rmarkdown::render_site()`, hence, for our default Rmarkdown (`content/post/2020-12-01-r-rmarkdown/index.en.Rmd`), the rendering is done with `rmarkdown::render_site('content/post/2020-12-01-r-rmarkdown/index.en.Rmd', encoding = 'UTF-8')`.
 
 ![](assets/rmd_default_post.png)
 
@@ -191,7 +194,9 @@ _Note_: In this case, `rmarkdown::render_site` produces a html file: `index.en.h
 
 ## Default with a TOC
 
-First, let's edit the default `index.en.Rmd` file by adding three lines in the YAML header as we would have done in a regular `remarkdown::html_document` to add a TOC.
+First, let's edit the default `index.en.Rmd` file by adding three lines. in the YAML header as we would have done in a regular `remarkdown::html_document` to add a TOC.  
+For a `blogdown` post, the output format is `blogdown::html_page`.  
+This output format produces a headless html file (_i.e._,&nbsp;there is no need for header/body part, since the file is going to be included as a part of another html file).
 
 ```markdown
 output:
@@ -199,7 +204,7 @@ output:
     toc: true
 ```
 
-With this addition, the `index.en.Rmd` looks like this (not that different, isn't it?!).
+With this addition, the `index.en.Rmd` looks like this (_not that different, isn't it?!_).
 
 
 ````
@@ -245,20 +250,20 @@ pie(
 ```
 ````
 
-Since, we changed the YAML header, we need to render again (with `rmarkdown::render_site`) the html file from `index.en.Rmd`.
+Since, we changed the YAML header, we need to render again, with `rmarkdown::render_site`, the html file from `index.en.Rmd`.
 
 ![](assets/rmd_default_toc_post.png)
 
 Now we have a TOC, but it sticks to the top.  
-At this stage, we did all we could in `index.en.Rmd`.
+At this stage, we did all we could in the Rmarkdown file `index.en.Rmd`.
 
 ## Modify the Layout
 
-Because everything that relates to the structure of the pages on the website are defined in html template files stored in a `layouts` directory, the answer to our question should be there.  
-And that is the case as stated in a issue opened on GitHub ([wowchemy/wowchemy-hugo-modules #1520](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520)).  
+Because everything that relates to the structure of the pages on the website are defined in html template files stored in a `layouts` directory, the answer to our "problem" should be there.  
+And that is the case, as stated in a issue opened on GitHub ([wowchemy/wowchemy-hugo-modules #1520](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520)). 
 More precisely in [@CharlieLeee](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520#issuecomment-601982609)'s comment.
 
-As mentioned in the comment, we need to modify a particular file, namely `layouts/_default/single.html`, but what is inside this `layouts/_default/single.html` file from the 'starter-academic' theme?  
+As mentioned in the comment, we need to modify a particular file, namely `layouts/_default/single.html`, but what is inside this `layouts/_default/single.html` file from the "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)" theme?  
 In a default installation, the file is located in the following path 
 `themes/github.com/wowchemy/wowchemy-hugo-modules/wowchemy/layouts/_default/single.html` and it includes the following html/code.
 
@@ -283,11 +288,13 @@ In a default installation, the file is located in the following path
 {{- end -}}
 ```
 
+_Note_: Have a look at [HUGO website](https://gohugo.io/templates/introduction/) for the HUDO templating syntax.
+
 We do not want to modify any of the files in the `themes` directory, so we will create a new file at the root directory of our `blogdown` website (`layouts/_default/single.html`).  
 I am not going to use the code proposed in [@CharlieLeee](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520#issuecomment-601982609)'s comment, but instead a slight modification to make the TOC a bit more responsive.
 
-In this case, the TOC will use three out of the twelve columns in a wide screen (_i.e._, grid layout).
-On a smaller screen, TOC will occupy twelve columns (_i.e._, equivalent to the css `width: 100%;`) and will be wrapped after the contents, hence it will be under.
+In this case, the TOC will use three out of the twelve columns in a wide screen (_i.e._,&nbsp;grid layout).
+On a smaller screen, the TOC will occupy twelve columns (_i.e._,&nbsp;equivalent to the css `width: 100%;`) and will be wrapped after the contents, hence it will be under.
 
 To note and for later, in the code chunk below:
 
@@ -331,7 +338,7 @@ To note and for later, in the code chunk below:
 {{- end -}}
 ```
 
-Again, we need to render the `index.en.Rmd` file, or to restart the website (`blogdown::stop_server()`/`blogdown::serve_site()`) again to ensure all modifications are taken into account.
+Again, we need to render the `index.en.Rmd` file, or to restart the website (`blogdown::stop_server()`/`blogdown::serve_site()`) to ensure all modifications are taken into account.
 
 ![](assets/rmd_default_toc_single_post.png)
 
@@ -353,18 +360,19 @@ This TOC header is a hypertext reference to the top of the current page.
 
 Our layout seems to "work", but somehow, does not include the TOC of our html file generated from the `index.en.Rmd` file.
 
-Let's have a look at another post in plain markdown (_not Rmarkdown_) from our `blogdown` website.
+Let's have a look at another post in plain markdown from our `blogdown` website.
 
-+ Before the modifications to the layout  
++ Before the modifications of the layout  
     ![](assets/markdown_default_before.png)
-+ After the modifications to the layout  
+
++ After the modifications of the layout  
     ![](assets/markdown_default_after.png)
 
 It's looking great for the markdown post!
 
-In conclusion, the issue is no longer on the HUGO side, since we modified the page layout.
+In conclusion and since we modified the page layout, the issue no longer seems to be on the HUGO side.
 
-If we take a look at the html file produced by `rmarkdown::render_site()`, we get a headless html file (_i.e._, there is no need for header/body part, since the file is going to be included in another html file).
+If we take a look at the html file produced by `rmarkdown::render_site()`.
 
 
 ```
@@ -443,9 +451,9 @@ To narrow down where to look a little bit, I remove all parts not related to the
 
 In this part, we are interested in the `div` which includes the TOC and we can see that the `id` is `"TOC"`.
 
-You might not know and you will after reading this, but HUGO parses the headings from markdown (_i.e._, `#`, `##`, etc.) and stores all those headings in an html structure (_i.e._, `nav`) with `id="TableOfContents"`.  
+You might not know and you will after reading this, but HUGO parses the headings from markdown (_i.e._,&nbsp;`#`, `##`, etc.) and stores all those headings in an html structure (_i.e._,&nbsp;`nav`) with `id="TableOfContents"`.  
 Seems familiar?! It is the HUGO variable seen earlier, which contains the TOC.  
-To know this, well you have to read HUGO's documentation website (https://gohugo.io/content-management/toc/).
+To know this, well you have to read [HUGO's documentation](https://gohugo.io/content-management/toc/).
 
 At this point, you might not see where all this is going. 
 
@@ -453,18 +461,18 @@ Let me clarify all the information we have:
 
 + HUGO translate markdown files to html files.
 + HUGO has a variable/id for the TOC, named `TableOfContents`
-+ We can change the layout of the HUGO theme to include TOC (if the theme does not already include it as for "starter-academic").
++ We can change the layout of the HUGO theme to include TOC (if the theme does not already include it as for "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)").
     + It works on plain markdown posts.
     + It does not on html posts produced from `.Rmd` files.
     
-In conclusion, there is something wrong with the html files.
+In conclusion, there is something wrong with the html files produced from `.Rmd` files.
 
 ## Fixing `.Rmd`/`.html` Posts
 
 `blogdown` provides an add-in to easily creates new post (`blogdown:::new_post_addin()`), in which you can decide what is the file format/extension you want to use.  
-You can change the default in your `.Rprofile` with, for example `.Rmd`, as your default suing `options(blogdown.ext = ".Rmd")`.
+You can change the default in your `.Rprofile` with, for example `.Rmd`, as your default using `options(blogdown.ext = ".Rmd")`.
 
-You are probably (as I am) more familiar with the `Rmd` extension.
+You are probably (_as I am_) more familiar with the `Rmd` extension.
 
 + `.Rmd` produces `.html` with `rmarkdown::render_site()`.  
     And the floating TOC is not working in that case.  
@@ -472,39 +480,49 @@ You are probably (as I am) more familiar with the `Rmd` extension.
 
 Let's modify the extension to `Rmarkdown`.
 
-+ `.Rmarkdown` produces `.markdown` (basically the same as `.md`) with `rmarkdown::render_site()`.  
++ `.Rmarkdown` produces `.markdown` (_basically the same as `.md`_) with `rmarkdown::render_site()`.  
     ![](assets/rmarkdown_default_toc_single_post.png)
 
-It works! We have a floating TOC when using `.Rmarkdown` extension, thus when we dot not use pandoc to translate to html.
+It works!  
+We have a floating TOC when using `.Rmarkdown` extension, thus when we do not use pandoc to translate markdown to html.
 
 ## I Want `Rmd`, not `Rmarkdown`!
 
+We could only use `.Rmarkdown` file and stop right there, but what if we wanted to keep our favourite `.Rmd` extension everywhere?  
 The solution to this is quite simple!
 
 1. In the `.Rprofile` at the root of your `blogdown` website, change the default rendering method to `"markdown"` using `options(blogdown.method = "markdown")`.
 2. Restart R.
-3. You are all set!
+3. You are all set! `rmarkdown::render_site()` will only produce markdown file when used with `blogdown`.
 
 ## Conclusion
 
 If you want a floating TOC, you should not generates html files from your Rmarkdown files and you need to add the HUGO variable `.TableOfContents` in the layout html file controlling the type of content you want the floating TOC to be.
 
+_Note_: To a more complete setup workflow for `blogdown`, I recommend to have a look at [Alison Hill](https://alison.rbind.io/)'s blog post: "[Up & Running with Blogdown in 2021](https://alison.rbind.io/post/new-year-new-blogdown/)".
+
 ## Going in Style
 
-![](assets/Going-in-Style.jpg)
+![Movie "Going In Style"](assets/Going-in-Style.jpg)
+<div style = "margin-bottom: 2rem; margin-top: -2rem; text-align: center;">
+<em>
+Cinephile, I am ... (Source: <a href = "https://www.imdb.com/title/tt2568862/">IMDb</a>)
+</em>
+</div>
 
-Because, the TOC as an `id` which is `TableOfContents`, you can control the style of the TOC with (s)css (_i.e._, `#TableOfContents`!
+Because, the TOC as an `id` which is `TableOfContents`, you can control the style of the TOC with (s)css (_i.e._,&nbsp;`#TableOfContents`!
 
-For example, to get the left border going up including with the "Contents" header.
+For example, to get the left border going up including the "Contents" header.
 
 
 ```css
 #TableOfContents, .docs-toc-title {
   border-left: 1px solid $sta-primary;
+  /* "$sta-primary" is the primary colour from the theme (sass/scss) */
 }
 ```
 
-You might also want to increase the width of the article container.
+You might also want to increase the width of the article container, because you now have TOC sharing the space with the article itself.
 
 
 ```css
