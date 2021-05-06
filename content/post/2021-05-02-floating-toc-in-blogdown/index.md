@@ -1,12 +1,12 @@
 ---
-title: 'Add a Floating Table of Content in Blogdown Posts'
+title: 'Add a Floating Table of Contents in Blogdown'
 subtitle: ''
 summary: |
-    How to have a table of content (TOC) on either the left or the right side of a post?  
+    How to have a table of contents (TOC) on either the left or the right side of a post?  
     I have an answer!
 author: mickael-canouil
-date: '2021-05-02'
-lastmod: '2021-05-02'
+date: '2021-05-06'
+lastmod: '2021-05-06'
 slug: floating-toc-in-blogdown
 categories:
   - R
@@ -43,7 +43,7 @@ output:
 
 Welcome to my very first blog post (_i.e._,&nbsp;I do not count [ggpacman](https://mickael.canouil.fr/post/ggpacman/)).
 
-The focus of this post is on `blogdown` ([github.com/rstudio/blogdown](https://github.com/rstudio/blogdown)), in particular on how to have a table of content (TOC) on either the left or the right side of a post to ease the navigation through a long post.  
+The focus of this post is on `blogdown` ([github.com/rstudio/blogdown](https://github.com/rstudio/blogdown)), in particular on how to have a table of contents (TOC) on either the left or the right side of a post to ease the navigation through a long post.  
 In the past few weeks, I have been slowly getting my head around [`blogdown`](https://github.com/rstudio/blogdown) and [HUGO](https://gohugo.io/), to finally published this website about a week ago.  
 One of the latest tweak I had to figure out was: how to get a floating TOC.  
 Getting a TOC is quite easy with an Rmarkdown, thus it should be the same in `blogdown`.
