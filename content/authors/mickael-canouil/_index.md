@@ -25,7 +25,7 @@ interests:
 - Learning New Skills
 - Watching Movies
 
-role: Head of the Biostatistics Team
+role: Head of Biostatistics
 organizations:
 - name: Inserm U1283 / CNRS UMR8199
   url: http://http://www.good.cnrs.fr/
@@ -56,7 +56,7 @@ social:
   link: 'https://github.com/mcanouil/'
 ---
 
-I am a biostatistician (Ph.D.) and the head of a small team within a research laboratory, working primarily on the genetics of diabetes and obesity.  
+I am a biostatistician (Ph.D.) and the head of a small biostatistics team in a research laboratory, working primarily on the genetics of diabetes and obesity.  
 I have developed a few {{< icon name="r-project" pack="fab" >}}&nbsp;packages (_e.g._,&nbsp;[insane](https://cran.r-project.org/package=insane), [NACHO](https://cran.r-project.org/package=NACHO)), and although some are not very useful, they are most definitely entertaining (_i.e._,&nbsp;[ggpacman](https://cran.r-project.org/package=ggpacman)).  
 I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} ([m.canouil.fr/imdb_ratings](https://m.canouil.fr/imdb_ratings/)).  
 Finally, as the main organiser of the [R Lille](https://rlille.fr/) ([{{< icon name="twitter" pack="fab" >}}@RLille_RUG](https://twitter.com/RLille_RUG)) {{< icon name="r-project" pack="fab" >}} User Group, I organised [{{< icon name="meetup" pack="fab" >}}Meetups](https://www.meetup.com/R-Lille/) on pretty much anything related to {{< icon name="r-project" pack="fab" >}}.
