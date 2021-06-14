@@ -27,6 +27,7 @@ if (interactive()) {
 
   # python3 -m pip install academic==0.5.1
   # academic import --bibtex content/publications/publications.bib --overwrite
+  # academic import --bibtex content/publications/new.bib --overwrite
 }
 
 
