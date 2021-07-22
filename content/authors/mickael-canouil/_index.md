@@ -62,3 +62,6 @@ I also enjoy watching movies and playing with {{< icon name="r-project" pack="fa
 Finally, as the main organiser of the [R Lille](https://rlille.fr/) ([{{< icon name="twitter" pack="fab" >}}@RLille_RUG](https://twitter.com/RLille_RUG)) {{< icon name="r-project" pack="fab" >}} User Group, I organised [{{< icon name="meetup" pack="fab" >}}Meetups](https://www.meetup.com/R-Lille/) on pretty much anything related to {{< icon name="r-project" pack="fab" >}}.
 
 Have a look at my complete [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
+
+<img src="https://raw.githubusercontent.com/mcanouil/imdb_ratings/main/media/streak.svg" style = "margin-top: 0; margin-bottom: 0;" />
+
