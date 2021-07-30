@@ -1,6 +1,6 @@
 ---
 title: "Shiny: First Steps (French)"
-summary: "A two-days workshop on the R package shiny."
+summary: "A one-day workshop on the R package shiny."
 
 date: "2019-07-25T00:00:00Z"
 
