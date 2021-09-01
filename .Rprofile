@@ -13,7 +13,7 @@ options(
 if (interactive()) {
   library(blogdown)
   library(gert)
-  
+
   update <- function() {
     install_theme(
       theme = "wowchemy/starter-academic",
@@ -25,10 +25,9 @@ if (interactive()) {
     )
   }
 
+  rebuild <- function(...) blogdown::build_site(..., build_rmd = TRUE)
+
   # python3 -m pip install academic==0.5.1
   # academic import --bibtex content/publications/publications.bib --overwrite
   # academic import --bibtex content/publications/new.bib --overwrite
 }
-
-
-
