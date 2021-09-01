@@ -1,13 +1,13 @@
 ---
 title: "R Advanced (French)"
-summary: "A half-day workshop/course on objects and types in R."
+summary: "A 6-hours workshop/course on objects and types in R."
 
 date: "2020-11-09T00:00:00Z"
 
 image:
   # caption: ""
   focal_point: Smart
-  
+
 links:
 - icon: file-alt
   icon_pack: far
@@ -33,7 +33,7 @@ tags:
 # url_pdf: ""
 # url_slides: ""
 # url_video: ""
-# 
+#
 external_link: "https://github.com/mcanouil/radvanced"
 ---
 

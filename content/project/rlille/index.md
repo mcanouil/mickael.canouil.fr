@@ -1,6 +1,6 @@
 ---
 title: |
-    R Lille: R Lille User Group
+    R Lille User Group
 summary: |
     R Lille is an R User Group (RUG) located in Lille, France.
     R Lille is part of the [Meetup](https://www.meetup.com/) RUG network sponsored by the [R Consortium](https://www.r-consortium.org/).

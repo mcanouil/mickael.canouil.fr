@@ -1,11 +1,11 @@
 ---
 title: |
-    umr1283: UMR 1283 - Project Template
+    UMR 1283 - Project Template
 summary: |
     An R package to create the project structure within the Inserm U1283 / CNRS UMR 8199 unit.
     It includes some tools such `fexsend` and a `xaringan` template (download from github repository).
 
-date: "2019-02-13T00:00:00Z"
+date: "2020-02-14T00:00:00Z"
 
 image:
   # caption: ""
