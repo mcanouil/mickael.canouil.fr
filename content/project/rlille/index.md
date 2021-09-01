@@ -20,10 +20,10 @@ links:
   icon_pack: fab
   name: Code
   url: https://github.com/RLille
-- icon: meetup
-  icon_pak: fab
-  name: Meetup
-  url: https://www.meetup.com/R-Lille/
+# - icon: meetup
+#   icon_pak: fab
+#   name: Meetup
+#   url: https://www.meetup.com/R-Lille/
 # - icon: youtube
 #   icon_pak: fab
 #   name: Youtube
