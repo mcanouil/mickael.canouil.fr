@@ -12,14 +12,14 @@ image:
   focal_point: Smart
 
 links:
-- icon: github
-  icon_pack: fab
-  name: Code
-  url: https://github.com/RLille
 - icon: file-alt
   icon_pack: far
   name: Website
   url: https://rlille.fr/
+- icon: github
+  icon_pack: fab
+  name: Code
+  url: https://github.com/RLille
 # - icon: meetup
 #   icon_pak: fab
 #   name: Meetup
