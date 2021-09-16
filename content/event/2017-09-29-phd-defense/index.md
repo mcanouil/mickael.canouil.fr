@@ -52,10 +52,10 @@ links:
   icon_pack: far
   name: Slides
   url: https://github.com/mcanouil/slides/raw/main/20170929-phd-defense/20170929-phd-defense.pdf
-- icon: github
-  icon_pack: fab
-  name: Code
-  url: https://github.com/mcanouil/slides/tree/main/20170929-phd-defense
+# - icon: github
+#   icon_pack: fab
+#   name: Code
+#   url: https://github.com/mcanouil/slides/tree/main/20170929-phd-defense
 
 # url_code: ""
 # url_pdf: ""

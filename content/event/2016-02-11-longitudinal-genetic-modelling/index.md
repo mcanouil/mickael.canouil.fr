@@ -47,10 +47,10 @@ links:
   icon_pack: far
   name: Slides
   url: https://github.com/mcanouil/slides/raw/main/20160211-longitudinal-genetic-modelling/20160211-longitudinal-genetic-modelling.pdf
-- icon: github
-  icon_pack: fab
-  name: Code
-  url: https://github.com/mcanouil/slides/tree/main/20160211-longitudinal-genetic-modelling
+# - icon: github
+#   icon_pack: fab
+#   name: Code
+#   url: https://github.com/mcanouil/slides/tree/main/20160211-longitudinal-genetic-modelling
 
 # url_code: ""
 # url_pdf: ""
