@@ -23,7 +23,7 @@ publishDate: "2017-09-29"
 
 event: Ph.D. Defense.
 # event_url:
-location: Faculté de Médecine de Lille - Pôle Recherche
+location: Université de Lille - Faculté de Médecine de Lille - Pôle Recherche
 address:
   street: 1, Place de Verdun
   city: Lille
