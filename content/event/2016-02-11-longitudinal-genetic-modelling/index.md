@@ -11,14 +11,14 @@ abstract: |
 
 all_day: false
 
-date: "2016-02-11T14:00:00Z"
+date: "2016-02-11T16:00:00Z"
 # date_end: "2019-01-21
 publishDate: "2016-02-11"
 
 event: |
     Statistical Methods for Post Genomic Data (SMPGD)
 # event_url:
-location: Université de Lille - Cité Scientifique
+location: Université de Lille - Cité Scientifique - IUT A
 address:
   # street: 450 Serra Mall
   city: Villeneuve d'Ascq
