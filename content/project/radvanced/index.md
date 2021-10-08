@@ -2,7 +2,7 @@
 title: "R Advanced (French)"
 summary: "A 6-hours workshop/course on objects and types in R."
 
-date: "2020-11-09T00:00:00Z"
+date: "2021-10-07T00:00:00Z"
 
 image:
   # caption: ""
@@ -43,7 +43,7 @@ external_link: "https://github.com/mcanouil/radvanced"
 
 <center>
 <div class="xaringanslides" style="min-width:300px;margin:1em auto;">
-  <iframe src="https://m.canouil.fr/radvanced" width="560" height="315" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
+  <iframe src="https://m.canouil.fr/radvanced/" width="560" height="315" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
   <script>fitvids(".xaringanslides", {players: "iframe"});</script>
 </div>
 </center>

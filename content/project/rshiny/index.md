@@ -2,7 +2,7 @@
 title: "Shiny: First Steps (French)"
 summary: "A one-day workshop on the R package shiny."
 
-date: "2019-07-25T00:00:00Z"
+date: "2021-10-08T00:00:00Z"
 
 image:
   # caption: ""
