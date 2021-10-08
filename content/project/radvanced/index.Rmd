@@ -1,6 +1,6 @@
 ---
-title: "R Advanced (French)"
-summary: "A 6-hours workshop/course on objects and types in R."
+title: "R Advanced Introduction (French)"
+summary: "A 6-hours introduction workshop/course on objects and types in R."
 
 date: "2021-10-07T00:00:00Z"
 
