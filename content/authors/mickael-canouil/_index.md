@@ -63,4 +63,4 @@ Finally, as the main organiser of the [R Lille](https://rlille.fr/) ([{{< icon n
 
 Have a look at my complete [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
 
-<img src="https://raw.githubusercontent.com/mcanouil/imdb_ratings/main/media/streak.svg" style = "margin-top: 0; margin-bottom: 0;" alt="Movies seen in a movie theatre year streak" />
+<img src="https://raw.githubusercontent.com/mcanouil/imdb-ratings/main/media/streak.svg" style = "margin-top: 0; margin-bottom: 0;" alt="Movies seen in a movie theatre year streak" />
