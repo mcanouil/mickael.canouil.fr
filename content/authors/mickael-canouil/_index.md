@@ -61,6 +61,6 @@ I have developed a few {{< icon name="r-project" pack="fab" >}}&nbsp;packages (_
 I also enjoy watching movies and playing with {{< icon name="r-project" pack="fab" >}} ([m.canouil.fr/imdb_ratings](https://m.canouil.fr/imdb_ratings/)).  
 Finally, as the main organiser of the [R Lille](https://rlille.fr/) ([{{< icon name="twitter" pack="fab" >}}@RLille_RUG](https://twitter.com/RLille_RUG)) {{< icon name="r-project" pack="fab" >}} User Group, I organised [{{< icon name="meetup" pack="fab" >}}Meetups](https://www.meetup.com/R-Lille/) on pretty much anything related to {{< icon name="r-project" pack="fab" >}}.
 
-Have a look at my complete [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum_vitae/).
+Have a look at my complete [_{{< icon name="file-alt" pack="far" >}}curriculum vitae_](https://m.canouil.fr/curriculum-vitae/).
 
 <img src="https://raw.githubusercontent.com/mcanouil/imdb-ratings/main/media/streak.svg" style = "margin-top: 0; margin-bottom: 0;" alt="Movies seen in a movie theatre year streak" />
