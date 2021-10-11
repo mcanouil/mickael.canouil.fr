@@ -28,7 +28,7 @@ interests:
 role: Head of Biostatistics
 organizations:
 - name: Inserm U1283 / CNRS UMR8199
-  url: http://http://www.good.cnrs.fr/
+  url: http://http://www.good.cnrs.fr/?lang=en
 - name: Institut Pasteur de Lille
   url: https://www.pasteur-lille.fr/en/
   
