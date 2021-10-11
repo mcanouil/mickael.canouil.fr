@@ -6,3 +6,4 @@
 
 Repository for [mickael.canouil.fr](https://mickael.canouil.fr).
 
+Website content (*i.e.* [`./content`](./content)) is under [CC-BY-NC-SA-4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
