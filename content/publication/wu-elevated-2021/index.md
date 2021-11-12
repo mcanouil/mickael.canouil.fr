@@ -1,7 +1,7 @@
 ---
-title: "Elevated circulating follistatin associates with an increased risk of type 2 diabetes"
+title: "Elevated Circulating Follistatin Associates With an Increased Risk of Type 2 Diabetes"
 date: 2021-12-01
-publishDate: 2021-11-12T08:57:50.981877Z
+publishDate: 2021-11-12T09:12:24.159850Z
 authors: ["Chuanyan Wu", "Yan Borné", "Rui Gao", "Maykel López Rodriguez", "William C. Roell", "Jonathan M. Wilson", "Ajit Regmi", "Cheng Luan", "Dina Mansour Aly", "Andreas Peter", "Jürgen Machann", "Harald Staiger", "Andreas Fritsche", "Andreas L. Birkenfeld", "Rongya Tao", "Robert Wagner", "Mickaël Canouil", "Mun-Gwan Hong", "Jochen M. Schwenk", "Emma Ahlqvist", "Minna U. Kaikkonen", "Peter Nilsson", "Angela C. Shore", "Faisel Khan", "Andrea Natali", "Olle Melander", "Marju Orho-Melander", "Jan Nilsson", "Hans-Ulrich Häring", "Erik Renström", "Claes B. Wollheim", "Gunnar Engström", "Jianping Weng", "Ewan R. Pearson", "Paul W. Franks", "Morris F. White", "Kevin L. Duffin", "Allan Arthur Vaag", "Markku Laakso", "Norbert Stefan", "Leif Groop", "Yang De Marinis"]
 publication_types: ["2"]
 abstract: ""
