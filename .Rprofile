@@ -7,7 +7,8 @@ options(
   blogdown.author = "mickael-canouil",
   blogdown.ext = ".Rmd",
   blogdown.subdir = "post",
-  blogdown.method = "markdown"
+  blogdown.method = "markdown",
+  blogdown.time = TRUE
 )
 
 if (interactive()) {
