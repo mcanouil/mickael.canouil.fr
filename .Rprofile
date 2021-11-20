@@ -13,7 +13,6 @@ options(
 
 if (interactive()) {
   library(blogdown)
-  library(gert)
 
   update <- function() {
     install_theme(
