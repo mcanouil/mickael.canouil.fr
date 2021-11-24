@@ -56,16 +56,16 @@ output:
 ---
 ```
 
-For the remaining of this post, I will use the "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)" HUGO theme within a new default `blogdown` website created with the following function call.
+For the remaining of this post, I will use the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" HUGO theme within a new default `blogdown` website created with the following function call.
 
 
 ```r
-blogdown::new_site(theme = "wowchemy/starter-academic")
+blogdown::new_site(theme = "wowchemy/starter-hugo-academic")
 ```
 
 ## TL;DR
 
-Within a `blogdown` installation based on the "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)" HUGO theme:
+Within a `blogdown` installation based on the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" HUGO theme:
 
 1. Create `<root>/layouts/_default/single.html`.  
     
@@ -263,7 +263,7 @@ Because everything that relates to the structure of the pages on the website are
 And that is the case, as stated in a issue opened on GitHub ([wowchemy/wowchemy-hugo-modules #1520](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520)). 
 More precisely in [@CharlieLeee](https://github.com/wowchemy/wowchemy-hugo-modules/issues/1520#issuecomment-601982609)'s comment.
 
-As mentioned in the comment, we need to modify a particular file, namely `layouts/_default/single.html`, but what is inside this `layouts/_default/single.html` file from the "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)" theme?  
+As mentioned in the comment, we need to modify a particular file, namely `layouts/_default/single.html`, but what is inside this `layouts/_default/single.html` file from the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" theme?  
 In a default installation, the file is located in the following path 
 `themes/github.com/wowchemy/wowchemy-hugo-modules/wowchemy/layouts/_default/single.html` and it includes the following HTML/code.
 
@@ -461,7 +461,7 @@ Let me clarify all the information we have:
 
 + HUGO translate markdown files to HTML files.
 + HUGO has a variable/id for the TOC, named `TableOfContents`
-+ We can change the layout of the HUGO theme to include TOC (if the theme does not already include it as for "[wowchemy/starter-academic](https://github.com/wowchemy/starter-academic)").
++ We can change the layout of the HUGO theme to include TOC (if the theme does not already include it as for "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)").
     + It works on plain markdown posts.
     + It does not on HTML posts produced from `.Rmd` files.
     
@@ -530,5 +530,3 @@ You might also want to increase the width of the article container, because you 
   max-width: 960px;
 }
 ```
-
-

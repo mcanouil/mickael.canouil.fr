@@ -16,7 +16,7 @@ if (interactive()) {
 
   update <- function() {
     install_theme(
-      theme = "wowchemy/starter-academic",
+      theme = "wowchemy/starter-hugo-academic",
       hostname = "github.com",
       theme_example = FALSE,
       update_config = TRUE,
