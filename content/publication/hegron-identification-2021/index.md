@@ -1,25 +1,32 @@
 ---
 # Documentation: https://wowchemy.com/docs/managing-content/
 
-title: Histone Deacetylase 9 Promoter Hypomethylation Associated with Adipocyte Dysfunction
-  is a Statin-Related Metabolic Effect
+title: Identification of Key Regions Mediating Human Melatonin Type 1 Receptor Functional
+  Selectivity Revealed by Natural Variants
 subtitle: ''
 summary: ''
 authors:
-- Amna Khamis
-- Raphael Boutry
+- Alan Hegron
+- Eunna Huh
+- Xavier Deupi
+- Badr Sokrat
+- Wenwen Gao
+- Christian Le Gouill
 - Mickaël Canouil
-- Sumi Mathew
-- Stephane Lobbens
-- Hutokshi Crouch
-- Toby Andrew
-- Amar Abderrahmani
-- Filippo Tamanini
+- Mathilde Boissel
+- Guillaume Charpentier
+- Ronan Roussel
+- Beverley Balkau
 - Philippe Froguel
+- Bianca Plouffe
+- Amélie Bonnefond
+- Olivier Lichtarge
+- Ralf Jockers
+- Michel Bouvier
 tags: []
 categories: []
-date: '2020-05-01'
-lastmod: 2021-12-06T15:21:57+01:00
+date: '2021-10-01'
+lastmod: 2021-12-06T15:21:56+01:00
 featured: false
 draft: false
 
@@ -37,13 +44,13 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:57.551383Z'
+publishDate: '2021-12-06T14:21:56.807152Z'
 publication_types:
 - '2'
 abstract: ''
-publication: '*Clinical Epigenetics*'
-doi: 10.1186/s13148-020-00858-w
+publication: '*ACS Pharmacology & Translational Science*'
+doi: 10.1021/acsptsci.1c00157
 links:
 - name: URL
-  url: https://clinicalepigeneticsjournal.biomedcentral.com/articles/10.1186/s13148-020-00858-w
+  url: https://pubs.acs.org/doi/10.1021/acsptsci.1c00157
 ---
