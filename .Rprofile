@@ -27,7 +27,7 @@ if (interactive()) {
 
   rebuild <- function(...) blogdown::build_site(..., build_rmd = TRUE)
 
-  # python3 -m pip install academic==0.5.1
+  # python3 -m pip install academic==0.8.1
   # academic import --bibtex content/publications/publications.bib --overwrite
   # academic import --bibtex content/publications/new.bib --overwrite
 }
