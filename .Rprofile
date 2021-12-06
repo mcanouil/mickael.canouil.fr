@@ -25,7 +25,7 @@ if (interactive()) {
     )
   }
 
-  rebuild <- function(...) blogdown::build_site(..., build_rmd = TRUE)
+  rebuild <- function(...) blogdown::build_site(..., build_rmd = "timestamp")
 
   # python3 -m pip install academic==0.8.1
   # /Users/mcanouil/Library/Python/3.8/bin/academic import --bibtex content/publications/publications.bib --overwrite
