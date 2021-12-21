@@ -204,13 +204,13 @@
     {{- $style = $style | minify -}}
   {{- end -}}
   {{ $style := slice $css_bundle_head $style | resources.Concat "css/wowchemy.css" }}
-  {{- if eq (getenv "WC_POST_CSS") "true" -}}
+  {{- if eq (getenv "HUGO_WC_POST_CSS") "true" -}}
     {{- $style = $style | postCSS -}}
   {{- end -}}
   {{- if hugo.IsProduction -}}
     {{- $style = $style | fingerprint "md5" -}}
   {{- end -}}
-  {{- if eq (getenv "WC_POST_CSS") "true" -}}
+  {{- if eq (getenv "HUGO_WC_POST_CSS") "true" -}}
     {{/* PostProcess must be last action in the pipeline */}}
     {{- $style = $style | resources.PostProcess -}}
   {{- end -}}
