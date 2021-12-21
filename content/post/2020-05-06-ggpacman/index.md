@@ -384,7 +384,7 @@ To draw Pac-Man, I needed few things:
     ```r
     data("pacman", package = "ggpacman")
     unnest(pacman, c("x", "y"))
-    #> # A tibble: 150 x 3
+    #> # A tibble: 150 × 3
     #>        x     y colour 
     #>    <dbl> <dbl> <chr>  
     #>  1    10     6 Pac-Man
@@ -397,7 +397,7 @@ To draw Pac-Man, I needed few things:
     #>  8    10     6 Pac-Man
     #>  9    10     6 Pac-Man
     #> 10    10     6 Pac-Man
-    #> # ... with 140 more rows
+    #> # … with 140 more rows
     ```
     
     ```r
@@ -462,7 +462,7 @@ pacman %>%
     )
   )  %>%
   unnest("state")
-#> # A tibble: 300 x 6
+#> # A tibble: 300 × 6
 #>        x     y colour  state_x state_y state      
 #>    <dbl> <dbl> <chr>     <dbl>   <dbl> <chr>      
 #>  1    10     6 Pac-Man      NA      NA open_right 
@@ -475,7 +475,7 @@ pacman %>%
 #>  8    10     6 Pac-Man       0       0 close_right
 #>  9    10     6 Pac-Man       0       0 open_right 
 #> 10    10     6 Pac-Man       0       0 close_right
-#> # ... with 290 more rows
+#> # … with 290 more rows
 ```
 
 Here, in preparation for [`gganimate`](https://gganimate.com/), I also added a column `step` before merging the new upgraded `pacman` (*i.e.*, with the Pac-Man `state` column) with the `pacman_state` defined earlier.
@@ -486,7 +486,7 @@ pacman_moves <- ggpacman::compute_pacman_coord(pacman)
 ```
 
 ```
-#> # A tibble: 300 x 9
+#> # A tibble: 300 × 9
 #>        x     y colour  state_x state_y state        step start   end
 #>    <dbl> <dbl> <chr>     <dbl>   <dbl> <chr>       <int> <dbl> <dbl>
 #>  1    10     6 Pac-Man      NA      NA open_right      1  7.33  2.09
@@ -499,7 +499,7 @@ pacman_moves <- ggpacman::compute_pacman_coord(pacman)
 #>  8    10     6 Pac-Man       0       0 close_right     8  7.85  1.57
 #>  9    10     6 Pac-Man       0       0 open_right      9  7.33  2.09
 #> 10    10     6 Pac-Man       0       0 close_right    10  7.85  1.57
-#> # ... with 290 more rows
+#> # … with 290 more rows
 ```
 
 
@@ -724,7 +724,7 @@ blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Bli
 
 
 ```
-#> # A tibble: 5 x 8
+#> # A tibble: 5 × 8
 #>       x     y colour    X0    Y0 state_x state_y direction
 #>   <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>    
 #> 1     0     0 Blinky     0     0      NA      NA middle   
@@ -750,30 +750,30 @@ blinky_ghost <- blinky_ghost %>%
 
 
 ```
-#> # A tibble: 20 x 12
+#> # A tibble: 20 × 12
 #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
 #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-#>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -3.33e-2
-#>  2     0     0 Blinky     0     0      NA      NA middle        2     2  9.59e-3
-#>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -2.40e-2
-#>  4     0     0 Blinky     0     0      NA      NA middle        4     4  4.35e-2
-#>  5     1     0 Blinky     1     0       1       0 right         1     5 -3.47e-2
-#>  6     1     0 Blinky     1     0       1       0 right         2     6 -8.00e-4
-#>  7     1     0 Blinky     1     0       1       0 right         3     7  2.26e-2
-#>  8     1     0 Blinky     1     0       1       0 right         4     8 -4.72e-2
-#>  9     1     1 Blinky     1     1       0       1 up            1     9 -7.22e-2
-#> 10     1     1 Blinky     1     1       0       1 up            2    10 -1.25e-2
-#> 11     1     1 Blinky     1     1       0       1 up            3    11  9.45e-2
-#> 12     1     1 Blinky     1     1       0       1 up            4    12 -8.87e-2
-#> 13     0     1 Blinky     0     1      -1       0 left          1    13 -1.68e-2
-#> 14     0     1 Blinky     0     1      -1       0 left          2    14  1.41e-2
-#> 15     0     1 Blinky     0     1      -1       0 left          3    15  7.52e-3
-#> 16     0     1 Blinky     0     1      -1       0 left          4    16 -4.82e-3
-#> 17     0     0 Blinky     0     0       0      -1 down          1    17 -6.54e-4
-#> 18     0     0 Blinky     0     0       0      -1 down          2    18  4.81e-2
-#> 19     0     0 Blinky     0     0       0      -1 down          3    19 -5.25e-2
-#> 20     0     0 Blinky     0     0       0      -1 down          4    20 -2.02e-2
-#> # ... with 1 more variable: noise_y <dbl>
+#>  1     0     0 Blinky     0     0      NA      NA middle        1     1  9.12e-3
+#>  2     0     0 Blinky     0     0      NA      NA middle        2     2 -3.13e-2
+#>  3     0     0 Blinky     0     0      NA      NA middle        3     3  2.71e-2
+#>  4     0     0 Blinky     0     0      NA      NA middle        4     4  2.39e-2
+#>  5     1     0 Blinky     1     0       1       0 right         1     5 -8.88e-2
+#>  6     1     0 Blinky     1     0       1       0 right         2     6 -3.33e-2
+#>  7     1     0 Blinky     1     0       1       0 right         3     7  1.45e-3
+#>  8     1     0 Blinky     1     0       1       0 right         4     8  6.94e-4
+#>  9     1     1 Blinky     1     1       0       1 up            1     9 -4.41e-2
+#> 10     1     1 Blinky     1     1       0       1 up            2    10 -4.16e-3
+#> 11     1     1 Blinky     1     1       0       1 up            3    11  4.34e-2
+#> 12     1     1 Blinky     1     1       0       1 up            4    12 -5.87e-3
+#> 13     0     1 Blinky     0     1      -1       0 left          1    13  7.51e-2
+#> 14     0     1 Blinky     0     1      -1       0 left          2    14  9.87e-2
+#> 15     0     1 Blinky     0     1      -1       0 left          3    15  5.79e-2
+#> 16     0     1 Blinky     0     1      -1       0 left          4    16 -3.39e-2
+#> 17     0     0 Blinky     0     0       0      -1 down          1    17 -1.30e-1
+#> 18     0     0 Blinky     0     0       0      -1 down          2    18 -3.19e-2
+#> 19     0     0 Blinky     0     0       0      -1 down          3    19 -6.24e-3
+#> 20     0     0 Blinky     0     0       0      -1 down          4    20 -2.40e-3
+#> # … with 1 more variable: noise_y <dbl>
 ```
 
 Then, I added (*in a weird way I might say*) the polygons coordinates for the body and the eyes.
@@ -810,30 +810,30 @@ blinky_ghost <- blinky_ghost %>%
 
 
 ```
-#> # A tibble: 20 x 12
+#> # A tibble: 20 × 12
 #>    colour    X0    Y0 state_x state_y direction state  step   noise_x  noise_y
 #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>     <dbl>    <dbl>
-#>  1 Blinky     0     0      NA      NA middle        1     1 -0.0333    0.00229
-#>  2 Blinky     0     0      NA      NA middle        2     2  0.00959   0.0537 
-#>  3 Blinky     0     0      NA      NA middle        3     3 -0.0240   -0.00175
-#>  4 Blinky     0     0      NA      NA middle        4     4  0.0435   -0.0363 
-#>  5 Blinky     1     0       1       0 right         1     5 -0.0347    0.00273
-#>  6 Blinky     1     0       1       0 right         2     6 -0.000800  0.0534 
-#>  7 Blinky     1     0       1       0 right         3     7  0.0226   -0.101  
-#>  8 Blinky     1     0       1       0 right         4     8 -0.0472   -0.0650 
-#>  9 Blinky     1     1       0       1 up            1     9 -0.0722    0.0168 
-#> 10 Blinky     1     1       0       1 up            2    10 -0.0125    0.0278 
-#> 11 Blinky     1     1       0       1 up            3    11  0.0945    0.0133 
-#> 12 Blinky     1     1       0       1 up            4    12 -0.0887    0.0619 
-#> 13 Blinky     0     1      -1       0 left          1    13 -0.0168    0.0158 
-#> 14 Blinky     0     1      -1       0 left          2    14  0.0141   -0.0537 
-#> 15 Blinky     0     1      -1       0 left          3    15  0.00752   0.0948 
-#> 16 Blinky     0     1      -1       0 left          4    16 -0.00482  -0.0225 
-#> 17 Blinky     0     0       0      -1 down          1    17 -0.000654  0.0440 
-#> 18 Blinky     0     0       0      -1 down          2    18  0.0481    0.0634 
-#> 19 Blinky     0     0       0      -1 down          3    19 -0.0525    0.0176 
-#> 20 Blinky     0     0       0      -1 down          4    20 -0.0202   -0.0183 
-#> # ... with 2 more variables: body <list>, eyes <list>
+#>  1 Blinky     0     0      NA      NA middle        1     1  0.00912  -0.126  
+#>  2 Blinky     0     0      NA      NA middle        2     2 -0.0313   -0.0273 
+#>  3 Blinky     0     0      NA      NA middle        3     3  0.0271    0.0243 
+#>  4 Blinky     0     0      NA      NA middle        4     4  0.0239   -0.00465
+#>  5 Blinky     1     0       1       0 right         1     5 -0.0888   -0.0311 
+#>  6 Blinky     1     0       1       0 right         2     6 -0.0333    0.00982
+#>  7 Blinky     1     0       1       0 right         3     7  0.00145   0.0477 
+#>  8 Blinky     1     0       1       0 right         4     8  0.000694  0.0427 
+#>  9 Blinky     1     1       0       1 up            1     9 -0.0441   -0.0518 
+#> 10 Blinky     1     1       0       1 up            2    10 -0.00416   0.00736
+#> 11 Blinky     1     1       0       1 up            3    11  0.0434    0.0233 
+#> 12 Blinky     1     1       0       1 up            4    12 -0.00587   0.0615 
+#> 13 Blinky     0     1      -1       0 left          1    13  0.0751   -0.0817 
+#> 14 Blinky     0     1      -1       0 left          2    14  0.0987   -0.00747
+#> 15 Blinky     0     1      -1       0 left          3    15  0.0579    0.0102 
+#> 16 Blinky     0     1      -1       0 left          4    16 -0.0339    0.0884 
+#> 17 Blinky     0     0       0      -1 down          1    17 -0.130     0.0413 
+#> 18 Blinky     0     0       0      -1 down          2    18 -0.0319    0.0535 
+#> 19 Blinky     0     0       0      -1 down          3    19 -0.00624  -0.0930 
+#> 20 Blinky     0     0       0      -1 down          4    20 -0.00240  -0.0601 
+#> # … with 2 more variables: body <list>, eyes <list>
 ```
 
 For ease, it is now a call to one function directly on the position matrix of a ghost.
@@ -890,7 +890,7 @@ right_join(get(data("maze_points")), pacman_moves, by = c("x", "y")) %>%
     colour = "eaten"
   ) %>%
   unnest("step")
-#> # A tibble: 45,150 x 5
+#> # A tibble: 45,150 × 5
 #>        x     y type    step colour
 #>    <dbl> <dbl> <chr>  <dbl> <chr> 
 #>  1     1     1 normal    61 eaten 
@@ -903,7 +903,7 @@ right_join(get(data("maze_points")), pacman_moves, by = c("x", "y")) %>%
 #>  8     1     1 normal    68 eaten 
 #>  9     1     1 normal    69 eaten 
 #> 10     1     1 normal    70 eaten 
-#> # ... with 45,140 more rows
+#> # … with 45,140 more rows
 ```
 
 Again, for ease, I am using a function I defined to compute everything.
@@ -972,7 +972,7 @@ ghosts_vulnerability <- bonus_points_eaten %>%
 
 
 ```
-#> # A tibble: 93 x 3
+#> # A tibble: 93 × 3
 #>    step_init  step vulnerability
 #>        <dbl> <dbl> <lgl>        
 #>  1        79    79 TRUE         
@@ -985,7 +985,7 @@ ghosts_vulnerability <- bonus_points_eaten %>%
 #>  8        79    86 TRUE         
 #>  9        79    87 TRUE         
 #> 10        79    88 TRUE         
-#> # ... with 83 more rows
+#> # … with 83 more rows
 ```
 
 This is part of a bigger function (I won't dive too deep into it).
@@ -1025,7 +1025,7 @@ ggpacman::compute_ghost_status
 #>         "_eaten"), grepl("weak", .data[["colour"]]) & .data[["already_eaten"]] ~ 
 #>         .data[["ghost_name"]], TRUE ~ .data[["colour"]]))
 #> }
-#> <bytecode: 0x0000000025f2fd18>
+#> <bytecode: 0x1384556f0>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1136,20 +1136,20 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 
 
 ```
-#> # A tibble: 48 x 12
+#> # A tibble: 48 × 12
 #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
 #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-#>  1 Blinky     1     0      NA      NA middle        1     1  0.0106   0.0636 
-#>  2 Blinky     1     0      NA      NA middle        2     2 -0.00894 -0.0135 
-#>  3 Blinky     1     0      NA      NA middle        3     3  0.0865  -0.0815 
-#>  4 Blinky     1     0      NA      NA middle        4     4  0.0168   0.0452 
-#>  5 Blinky     2     0       1       0 right         1     5  0.0432   0.0464 
-#>  6 Blinky     2     0       1       0 right         2     6 -0.0137  -0.0353 
-#>  7 Blinky     2     0       1       0 right         3     7 -0.0796   0.0502 
-#>  8 Blinky     2     0       1       0 right         4     8  0.0388   0.00286
-#>  9 Blinky     3     0       1       0 right         1     9 -0.0184   0.0708 
-#> 10 Blinky     3     0       1       0 right         2    10 -0.0295  -0.0634 
-#> # ... with 38 more rows, and 2 more variables: body <list>, eyes <list>
+#>  1 Blinky     1     0      NA      NA middle        1     1  0.00265  0.0361 
+#>  2 Blinky     1     0      NA      NA middle        2     2 -0.0499   0.0477 
+#>  3 Blinky     1     0      NA      NA middle        3     3  0.0300  -0.111  
+#>  4 Blinky     1     0      NA      NA middle        4     4 -0.0266  -0.0121 
+#>  5 Blinky     2     0       1       0 right         1     5  0.0215   0.0481 
+#>  6 Blinky     2     0       1       0 right         2     6 -0.100   -0.0161 
+#>  7 Blinky     2     0       1       0 right         3     7 -0.0106   0.00445
+#>  8 Blinky     2     0       1       0 right         4     8 -0.0352  -0.0458 
+#>  9 Blinky     3     0       1       0 right         1     9 -0.0760  -0.0224 
+#> 10 Blinky     3     0       1       0 right         2    10  0.0310   0.0233 
+#> # … with 38 more rows, and 2 more variables: body <list>, eyes <list>
 ```
 
 
