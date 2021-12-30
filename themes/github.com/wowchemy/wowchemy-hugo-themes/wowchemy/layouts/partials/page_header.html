@@ -45,17 +45,20 @@
 
 {{/* Determine image placement. */}}
 {{ $placement := .Params.image.placement | default 1 }}{{/* Default to full column width. */}}
-{{/* Fit image to container's max width */}}
 {{ $image_container := "" }}
 {{ if eq $placement 2}}
   {{ $image_container = "container" }}
-  {{ $image = $featured.Fit "1200x2500 webp" }}
+  {{ if gt $featured.Width 1200 }}
+    {{ $image = $featured.Resize "1200x" }}
+  {{ end }}
 {{else if eq $placement 3}}
   {{ $image_container = "container-fluid" }}
-  {{ $image := $featured.Fit "2560x2560 webp" }}
+  {{ $image := $featured.Fit "2560x2560" }}
 {{else}}
   {{ $image_container = "article-container" }}
-  {{ $image = $featured.Fit "720x2500 webp" }}
+  {{ if gt $featured.Width 720 }}
+    {{ $image = $featured.Resize "720x" }}
+  {{ end }}
 {{end}}
 
 <div class="article-container pt-3">

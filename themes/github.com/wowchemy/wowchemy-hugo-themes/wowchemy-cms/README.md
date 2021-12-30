@@ -11,8 +11,8 @@ Built upon the open source [Netlify CMS](https://www.netlifycms.org/) and [Netli
    ```yaml
    module:
      imports:
-       - path: github.com/wowchemy/wowchemy-hugo-themes/wowchemy-cms/v5
-       - path: github.com/wowchemy/wowchemy-hugo-themes/wowchemy/v5
+       - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy-cms/v5
+       - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy/v5
    ```
 
 2. Create a `content/admin/index.md` file containing:
