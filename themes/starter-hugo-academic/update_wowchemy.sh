@@ -24,8 +24,8 @@ function update_wowchemy () {
 function update_netlify () {
   # - Update Netlify.toml with required Hugo version
   if [ -f ./netlify.toml ]; then
-    echo "Attempting to get compatible Hugo version from https://raw.githubusercontent.com/wowchemy/wowchemy-hugo-modules/main/wowchemy/config.yaml ..."
-    curl -o "tmp_get_version" https://raw.githubusercontent.com/wowchemy/wowchemy-hugo-modules/main/wowchemy/config.yaml
+    echo "Attempting to get compatible Hugo version from https://raw.githubusercontent.com/wowchemy/wowchemy-hugo-themes/main/wowchemy/config.yaml ..."
+    curl -o "tmp_get_version" https://raw.githubusercontent.com/wowchemy/wowchemy-hugo-themes/main/wowchemy/config.yaml
     version=$(sed -n 's/^[[:space:]]*min: //p' "tmp_get_version" | tr -d "'")
     version="${version}"
     echo "Set Netlify Hugo version to v${version}"
