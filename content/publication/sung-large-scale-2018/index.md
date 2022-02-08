@@ -316,7 +316,7 @@ tags:
 - smoking
 categories: []
 date: '2018-03-01'
-lastmod: 2021-12-06T15:21:59+01:00
+lastmod: 2022-02-08T21:11:54+01:00
 featured: false
 draft: false
 
@@ -334,31 +334,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:59.721884Z'
+publishDate: '2022-02-08T20:11:54.077106Z'
 publication_types:
 - '2'
-abstract: Genome-wide association analysis advanced understanding of blood pressure
-  (BP), a major risk factor for vascular conditions such as coronary heart disease
-  and stroke. Accounting for smoking behavior may help identify BP loci and extend
-  our knowledge of its genetic architecture. We performed genome-wide association
-  meta-analyses of systolic and diastolic BP incorporating gene-smoking interactions
-  in 610,091 individuals. Stage 1 analysis examined ∼18.8 million SNPs and small insertion/deletion
-  variants in 129,913 individuals from four ancestries (European, African, Asian,
-  and Hispanic) with follow-up analysis of promising variants in 480,178 additional
-  individuals from five ancestries. We identified 15 loci that were genome-wide significant
-  (p textless 5 × 10-8) in stage 1 and formally replicated in stage 2. A combined
-  stage 1 and 2 meta-analysis identified 66 additional genome-wide significant loci
-  (13, 35, and 18 loci in European, African, and trans-ancestry, respectively). A
-  total of 56 known BP loci were also identified by our results (p textless 5 × 10-8).
-  Of the newly identified loci, ten showed significant interaction with smoking status,
-  but none of them were replicated in stage 2. Several loci were identified in African
-  ancestry, highlighting the importance of genetic studies in diverse populations.
-  The identified loci show strong evidence for regulatory features and support shared
-  pathophysiology with cardiometabolic and addiction traits. They also highlight a
-  role in BP regulation for biological candidates such as modulators of vascular structure
-  and function (CDKN1B, BCAR1-CFDP1, PXDN, EEA1), ciliopathies (SDCCAG8, RPGRIP1L),
-  telomere maintenance (TNKS, PINX1, AKTIP), and central dopaminergic signaling (MSRA,
-  EBF2).
+abstract: ''
 publication: '*American Journal of Human Genetics*'
 doi: 10.1016/j.ajhg.2018.01.015
 ---

@@ -1,7 +1,7 @@
 ---
 # Documentation: https://wowchemy.com/docs/managing-content/
 
-title: Elevated Circulating Follistatin Associates With an Increased Risk of Type
+title: Elevated Circulating Follistatin Associates with an Increased Risk of Type
   2 Diabetes
 subtitle: ''
 summary: ''
@@ -51,7 +51,7 @@ authors:
 tags: []
 categories: []
 date: '2021-11-01'
-lastmod: 2022-01-10T17:31:52+01:00
+lastmod: 2022-02-08T21:11:55+01:00
 featured: false
 draft: false
 
@@ -69,7 +69,7 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2022-01-10T16:31:52.531115Z'
+publishDate: '2022-02-08T20:11:55.001889Z'
 publication_types:
 - '2'
 abstract: ''

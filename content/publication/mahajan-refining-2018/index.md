@@ -252,7 +252,7 @@ authors:
 tags: []
 categories: []
 date: '2018-04-01'
-lastmod: 2021-12-06T15:22:00+01:00
+lastmod: 2022-02-08T21:11:54+01:00
 featured: false
 draft: false
 
@@ -270,23 +270,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:22:00.143898Z'
+publishDate: '2022-02-08T20:11:54.485779Z'
 publication_types:
 - '2'
-abstract: "We aggregated coding variant data for 81,412 type 2 diabetes cases and\
-  \ 370,832 controls of diverse ancestry, identifying 40 coding variant association\
-  \ signals (P textless 2.2 × 10-7); of these, 16 map outside known risk-associated\
-  \ loci. We make two important observations. First, only five of these signals are\
-  \ driven by low-frequency variants: even for these, effect sizes are modest (odds\
-  \ ratio ≤1.29). Second, when we used large-scale genome-wide association data to\
-  \ fine-map the associated variants in their regional context, accounting for the\
-  \ global enrichment of complex trait associations in coding sequence, compelling\
-  \ evidence for coding variant causality was obtained for only 16 signals. At 13\
-  \ others, the associated coding variants clearly represent 'false leads' with potential\
-  \ to generate erroneous mechanistic inference. Coding variant associations offer\
-  \ a direct route to biological insight for complex diseases and identification of\
-  \ validated therapeutic targets; however, appropriate mechanistic inference requires\
-  \ careful specification of their causal contribution to disease predisposition."
+abstract: ''
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-018-0084-1
 ---

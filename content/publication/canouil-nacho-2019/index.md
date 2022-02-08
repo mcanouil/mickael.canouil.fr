@@ -14,7 +14,7 @@ authors:
 tags: []
 categories: []
 date: '2019-08-01'
-lastmod: 2021-12-06T15:21:57+01:00
+lastmod: 2022-02-08T21:11:52+01:00
 featured: false
 draft: false
 
@@ -32,24 +32,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:57.874227Z'
+publishDate: '2022-02-08T20:11:52.295860Z'
 publication_types:
 - '2'
-abstract: 'The NanoStringTM nCounter® is a platform for the targeted quantification
-  of expression data in biofluids and tissues. While software by the manufacturer
-  is available in addition to third parties packages, they do not provide a complete
-  quality control (QC) pipeline. Here, we present NACHO (‘NAnostring quality Control
-  dasHbOard’), a comprehensive QC R-package. The package consists of three subsequent
-  steps: summarize, visualize and normalize. The summarize function collects all the
-  relevant data and stores it in a tidy format, the visualize function initiates a
-  dashboard with plots of the relevant QC outcomes. It contains QC metrics that are
-  measured by default by the manufacturer, but also calculates other insightful measures,
-  including the scaling factors that are needed in the normalization step. In this
-  normalization step, different normalization methods can be chosen to optimally preprocess
-  data. Together, NACHO is a comprehensive method that optimizes insight and preprocessing
-  of nCounter® data.NACHO is available as an R-package on CRAN and the development
-  version on GitHub https://github.com/mcanouil/NACHO.Supplementary data are available
-  at Bioinformatics online.'
+abstract: ''
 publication: '*Bioinformatics*'
 doi: 10.1093/bioinformatics/btz647
 links:
