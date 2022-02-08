@@ -291,7 +291,7 @@ authors:
 tags: []
 categories: []
 date: '2019-04-01'
-lastmod: 2021-12-06T15:21:58+01:00
+lastmod: 2022-02-08T21:11:53+01:00
 featured: false
 draft: false
 
@@ -309,11 +309,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:58.630105Z'
+publishDate: '2022-02-08T20:11:53.026914Z'
 publication_types:
 - '2'
-abstract: Abstract.  Elevated blood pressure (BP), a leading cause of global morbidity
-  and mortality, is influenced by both genetic and lifestyle factors. Cigarette smoki
+abstract: ''
 publication: '*Human Molecular Genetics*'
 doi: 10.1093/hmg/ddz070
 links:

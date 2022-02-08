@@ -40,7 +40,7 @@ authors:
 tags: []
 categories: []
 date: '2019-11-01'
-lastmod: 2021-12-06T15:21:58+01:00
+lastmod: 2022-02-08T21:11:52+01:00
 featured: false
 draft: false
 
@@ -58,12 +58,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:57.979231Z'
+publishDate: '2022-02-08T20:11:52.396769Z'
 publication_types:
 - '2'
-abstract: Large-scale sequencing of coding exons of MRAP2 in 9,418 adults and adolescents
-  identifies loss-of-function mutations that are associated with monogenic obesity,
-  hypertension and hyperglycemia.
+abstract: ''
 publication: '*Nature Medicine*'
 doi: 10.1038/s41591-019-0622-0
 links:

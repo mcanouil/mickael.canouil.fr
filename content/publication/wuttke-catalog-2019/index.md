@@ -336,7 +336,7 @@ authors:
 tags: []
 categories: []
 date: '2019-06-01'
-lastmod: 2021-12-06T15:21:58+01:00
+lastmod: 2022-02-08T21:11:52+01:00
 featured: false
 draft: false
 
@@ -354,12 +354,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:58.410008Z'
+publishDate: '2022-02-08T20:11:52.809937Z'
 publication_types:
 - '2'
-abstract: Trans-ancestry meta-analysis of estimated glomerular filtration rate (eGFR)
-  from 1,046,070 individuals identifies 264 associated loci, providing a resource
-  of molecular targets for translational research of chronic kidney disease.
+abstract: ''
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-019-0407-x
 links:

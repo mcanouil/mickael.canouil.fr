@@ -66,7 +66,7 @@ tags:
 - Transcriptome
 categories: []
 date: '2017-02-01'
-lastmod: 2021-12-06T15:21:59+01:00
+lastmod: 2022-02-08T21:11:54+01:00
 featured: false
 draft: false
 
@@ -84,31 +84,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:59.832498Z'
+publishDate: '2022-02-08T20:11:54.183141Z'
 publication_types:
 - '2'
-abstract: Genetic variants near ARAP1 (CENTD2) and STARD10 influence type 2 diabetes
-  (T2D) risk. The risk alleles impair glucose-induced insulin secretion and, paradoxically
-  but characteristically, are associated with decreased proinsulin:insulin ratios,
-  indicating improved proinsulin conversion. Neither the identity of the causal variants
-  nor the gene(s) through which risk is conferred have been firmly established. Whereas
-  ARAP1 encodes a GTPase activating protein, STARD10 is a member of the steroidogenic
-  acute regulatory protein (StAR)-related lipid transfer protein family. By integrating
-  genetic fine-mapping and epigenomic annotation data and performing promoter-reporter
-  and chromatin conformational capture (3C) studies in β cell lines, we localize the
-  causal variant(s) at this locus to a 5 kb region that overlaps a stretch-enhancer
-  active in islets. This region contains several highly correlated T2D-risk variants,
-  including the rs140130268 indel. Expression QTL analysis of islet transcriptomes
-  from three independent subject groups demonstrated that T2D-risk allele carriers
-  displayed reduced levels of STARD10 mRNA, with no concomitant change in ARAP1 mRNA
-  levels. Correspondingly, β-cell-selective deletion of StarD10 in mice led to impaired
-  glucose-stimulated Ca2+ dynamics and insulin secretion and recapitulated the pattern
-  of improved proinsulin processing observed at the human GWAS signal. Conversely,
-  overexpression of StarD10 in the adult β cell improved glucose tolerance in high
-  fat-fed animals. In contrast, manipulation of Arap1 in β cells had no impact on
-  insulin secretion or proinsulin conversion in mice. This convergence of human and
-  murine data provides compelling evidence that the T2D risk associated with variation
-  at this locus is mediated through reduction in STARD10 expression in the β cell.
+abstract: ''
 publication: '*American Journal of Human Genetics*'
 doi: 10.1016/j.ajhg.2017.01.011
 ---

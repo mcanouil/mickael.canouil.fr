@@ -124,7 +124,7 @@ authors:
 tags: []
 categories: []
 date: '2018-10-01'
-lastmod: 2021-12-06T15:21:59+01:00
+lastmod: 2022-02-08T21:11:53+01:00
 featured: false
 draft: false
 
@@ -142,13 +142,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:59.184506Z'
+publishDate: '2022-02-08T20:11:53.553825Z'
 publication_types:
 - '2'
-abstract: Combining 32 genome-wide association studies with high-density imputation
-  provides a comprehensive view of the genetic contribution to type 2 diabetes in
-  individuals of European ancestry with respect to locus discovery, causal-variant
-  resolution, and mechanistic insight.
+abstract: ''
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-018-0241-6
 links:

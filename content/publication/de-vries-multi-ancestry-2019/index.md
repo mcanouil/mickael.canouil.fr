@@ -275,7 +275,7 @@ authors:
 tags: []
 categories: []
 date: '2019-01-01'
-lastmod: 2021-12-06T15:21:58+01:00
+lastmod: 2022-02-08T21:11:53+01:00
 featured: false
 draft: false
 
@@ -293,11 +293,10 @@ image:
 #   E.g. `projects = ["internal-project"]` references `content/project/deep-learning/index.md`.
 #   Otherwise, set `projects = []`.
 projects: []
-publishDate: '2021-12-06T14:21:58.745023Z'
+publishDate: '2022-02-08T20:11:53.133849Z'
 publication_types:
 - '2'
-abstract: Abstract.  An individual's lipid profile is influenced by genetic variants
-  and alcohol consumption, but the contribution of interactions between these exposures
+abstract: ''
 publication: '*American Journal of Epidemiology*'
 doi: 10.1093/aje/kwz005
 links:
