@@ -97,7 +97,7 @@ abstract: |
   - The four archetypes are different in disease progression, GRSs, and omics signals.
   - Some patients are dominated by one archetype, but many have etiological combinations.
 
-  *Summary*
+  *Summary*  
   The presentation and underlying pathophysiology of type 2 diabetes (T2D) is complex and heterogeneous. Recent studies attempted to stratify T2D into distinct subgroups using data-driven approaches, but their clinical utility may be limited if categorical representations of complex phenotypes are suboptimal.  
   We apply a soft-clustering (archetype) method to characterize newly diagnosed T2D based on 32 clinical variables. We assign quantitative clustering scores for individuals and investigate the associations with glycemic deterioration, genetic risk scores, circulating omics biomarkers, and phenotypic stability over 36 months. Four archetype profiles represent dysfunction patterns across combinations of T2D etiological processes and correlate with multiple circulating biomarkers. One archetype associated with obesity, insulin resistance, dyslipidemia, and impaired β cell glucose sensitivity corresponds with the fastest disease progression and highest demand for anti-diabetic treatment. We demonstrate that clinical heterogeneity in T2D can be mapped to heterogeneity in individual etiological processes, providing a potential route to personalized treatments.
 publication: '*Cell Reports Medicine*'
