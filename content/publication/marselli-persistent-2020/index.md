@@ -66,10 +66,8 @@ projects: []
 publishDate: '2022-02-08T20:11:51.676022Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Pancreatic β cell failure is key to type 2 diabetes (T2D) onset and progression. Here, we assess whether human β cell dysfunction induced by metabolic stress is reversible, evaluate the molecular pathways underlying persistent or transient damage, and explore the relationships with T2D islet traits. Twenty-six islet preparations are exposed to several lipotoxic/glucotoxic conditions, some of which impair insulin release, depending on stressor type, concentration, and combination. The reversal of dysfunction occurs after washout for some, although not all, of the lipoglucotoxic insults. Islet transcriptomes assessed by RNA sequencing and expression quantitative trait loci (eQTL) analysis identify specific pathways underlying β cell failure and recovery. Comparison of a large number of human T2D islet transcriptomes with those of persistent or reversible β cell lipoglucotoxicity show shared gene expression signatures. The identification of mechanisms associated with human β cell dysfunction and recovery and their overlap with T2D islet traits provide insights into T2D pathogenesis, fostering the development of improved β cell-targeted therapeutic strategies.
 publication: '*Cell Reports*'
 doi: 10.1016/j.celrep.2020.108466
-links:
-- name: URL
-  url: https://linkinghub.elsevier.com/retrieve/pii/S2211124720314558
 ---

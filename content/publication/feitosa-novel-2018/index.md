@@ -312,10 +312,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.762441Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Heavy alcohol consumption is an established risk factor for hypertension; the mechanism by which alcohol consumption impact blood pressure (BP) regulation remains unknown. We hypothesized that a genome-wide association study accounting for gene-alcohol consumption interaction for BP might identify additional BP loci and contribute to the understanding of alcohol-related BP regulation. We conducted a large two-stage investigation incorporating joint testing of main genetic effects and single nucleotide variant (SNV)-alcohol consumption interactions. In Stage 1, genome-wide discovery meta-analyses in ≈131K individuals across several ancestry groups yielded 3,514 SNVs (245 loci) with suggestive evidence of association (P < 1.0 x 10<sup>-5</sup>). In Stage 2, these SNVs were tested for independent external replication in ≈440K individuals across multiple ancestries. We identified and replicated (at Bonferroni correction threshold) five novel BP loci (380 SNVs in 21 genes) and 49 previously reported BP loci (2,159 SNVs in 109 genes) in European ancestry, and in multi-ancestry meta-analyses (P < 5.0 x 10<sup>-8</sup>). For African ancestry samples, we detected 18 potentially novel BP loci (P < 5.0 x 10<sup>-8</sup>) in Stage 1 that warrant further replication. Additionally, correlated meta-analysis identified eight novel BP loci (11 genes). Several genes in these loci (e.g., PINX1, GATA4, BLK, FTO and GABBR2) have been previously reported to be associated with alcohol consumption. These findings provide insights into the role of alcohol consumption in the genetic architecture of hypertension.
 publication: '*PLOS ONE*'
 doi: 10.1371/journal.pone.0198166
-links:
-- name: URL
-  url: http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0198166
 ---

@@ -47,10 +47,8 @@ projects: []
 publishDate: '2022-02-08T20:11:52.922181Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Melatonin is produced during the night and regulates sleep and circadian rhythms. Loss-of-function variants in MTNR1B, which encodes the melatonin receptor MT2, a G protein–coupled receptor (GPCR), are associated with an increased risk of type 2 diabetes (T2D). To identify specific T2D-associated signaling pathway(s), we profiled the signaling output of 40 MT2 variants by monitoring spontaneous (ligand-independent) and melatonin-induced activation of multiple signaling effectors. Genetic association analysis showed that defects in the melatonin-induced activation of Gαi1 and Gαz proteins and in spontaneous β-arrestin2 recruitment to MT2 were the most statistically significantly associated with an increased T2D risk. Computational variant impact prediction by in silico evolutionary lineage analysis strongly correlated with the measured phenotypic effect of each variant, providing a predictive tool for future studies on GPCR variants. Together, this large-scale functional study provides an operational framework for the postgenomic analysis of the multiple GPCR variants present in the human population. The association of T2D risk with signaling pathway–specific defects opens avenues for pathway-specific personalized therapeutic intervention and reveals the potential relevance of MT2 function during the day, when melatonin is undetectable, but spontaneous activity of the receptor occurs.
 publication: '*Science Signaling*'
 doi: 10.1126/scisignal.aan6622
-links:
-- name: URL
-  url: http://stke.sciencemag.org/content/11/545/eaan6622
 ---

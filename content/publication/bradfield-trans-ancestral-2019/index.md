@@ -129,10 +129,8 @@ projects: []
 publishDate: '2022-02-08T20:11:52.600099Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Although hundreds of genome-wide association studies-implicated loci have been reported for adult obesity-related traits, less is known about the genetics specific for early-onset obesity and with only a few studies conducted in non-European populations to date. Searching for additional genetic variants associated with childhood obesity, we performed a trans-ancestral meta-analysis of 30 studies consisting of up to 13 005 cases (≥95th percentile of body mass index (BMI) achieved 2–18 years old) and 15 599 controls (consistently <50th percentile of BMI) of European, African, North/South American and East Asian ancestry. Suggestive loci were taken forward for replication in a sample of 1888 cases and 4689 controls from seven cohorts of European and North/South American ancestry. In addition to observing 18 previously implicated BMI or obesity loci, for both early and late onset, we uncovered one completely novel locus in this trans-ancestral analysis (nearest gene, METTL15). The variant was nominally associated with only the European subgroup analysis but had a consistent direction of effect in other ethnicities. We then utilized trans-ancestral Bayesian analysis to narrow down the location of the probable causal variant at each genome-wide significant signal. Of all the fine-mapped loci, we were able to narrow down the causative variant at four known loci to fewer than 10 single nucleotide polymorphisms (SNPs) (FAIM2, GNPDA2, MC4R and SEC16B loci). In conclusion, an ethnically diverse setting has enabled us to both identify an additional pediatric obesity locus and further fine-map existing loci.
 publication: '*Human Molecular Genetics*'
 doi: 10.1093/hmg/ddz161
-links:
-- name: URL
-  url: https://academic.oup.com/hmg/advance-article/doi/10.1093/hmg/ddz161/5528371
 ---
