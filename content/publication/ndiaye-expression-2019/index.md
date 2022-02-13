@@ -61,7 +61,4 @@ abstract: |
     Our data suggest for the first time that the susceptibility genes for common obesity may have an effect on eating addiction and reward behaviors through their high expression in substantia nigra and insula, i.e., a different pattern from monogenic obesity genes that act in the hypothalamus and cause hyperphagia. Further epidemiological studies with relevant food behavior phenotypes are necessary to confirm these findings.
 publication: '*International Journal of Obesity*'
 doi: 10.1038/s41366-019-0428-7
-links:
-- name: URL
-  url: https://www.nature.com/articles/s41366-019-0428-7
 ---

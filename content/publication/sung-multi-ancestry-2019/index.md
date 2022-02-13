@@ -312,10 +312,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.026914Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Elevated blood pressure (BP), a leading cause of global morbidity and mortality, is influenced by both genetic and lifestyle factors. Cigarette smoking is one such lifestyle factor. Across five ancestries, we performed a genome-wide gene–smoking interaction study of mean arterial pressure (MAP) and pulse pressure (PP) in 129 913 individuals in stage 1 and follow-up analysis in 480 178 additional individuals in stage 2. We report here 136 loci significantly associated with MAP and/or PP. Of these, 61 were previously published through main-effect analysis of BP traits, 37 were recently reported by us for systolic BP and/or diastolic BP through gene–smoking interaction analysis and 38 were newly identified (P < 5 × 10<sup>-8</sup>, false discovery rate < 0.05). We also identified nine new signals near known loci. Of the 136 loci, 8 showed significant interaction with smoking status. They include CSMD1 previously reported for insulin resistance and BP in the spontaneously hypertensive rats. Many of the 38 new loci show biologic plausibility for a role in BP regulation. SLC26A7 encodes a chloride/bicarbonate exchanger expressed in the renal outer medullary collecting duct. AVPR1A is widely expressed, including in vascular smooth muscle cells, kidney, myocardium and brain. FHAD1 is a long non-coding RNA overexpressed in heart failure. TMEM51 was associated with contractile function in cardiomyocytes. CASP9 plays a central role in cardiomyocyte apoptosis. Identified only in African ancestry were 30 novel loci. Our findings highlight the value of multi-ancestry investigations, particularly in studies of interaction with lifestyle factors, where genomic and lifestyle differences may contribute to novel findings.
 publication: '*Human Molecular Genetics*'
 doi: 10.1093/hmg/ddz070
-links:
-- name: URL
-  url: https://academic.oup.com/hmg/advance-article/doi/10.1093/hmg/ddz070/5439584
 ---

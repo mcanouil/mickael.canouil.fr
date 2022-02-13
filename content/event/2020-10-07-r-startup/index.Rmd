@@ -10,7 +10,7 @@ abstract: |
     Vous ignorez ce que sont les fichiers .Rdata, .rds, .R, .Rmd, .Renviron et/ou .Rprofile ?
     Vous maitrisez les commandes rm(list = ls()) et setwd() ?
     
-    Ce MeetUp vise à donner quelques trucs et astuces autour de R et de l'IDE Rstudio, ainsi qu'ouvrir la discussion sur quelques “règles/conventions” de bonnes pratiques dans un objectif de reproductibilité.
+    Ce MeetUp vise à donner quelques trucs et astuces autour de R et de l'IDE Rstudio, ainsi qu'ouvrir la discussion sur quelques "règles/conventions" de bonnes pratiques dans un objectif de reproductibilité.
 
 all_day: false
 

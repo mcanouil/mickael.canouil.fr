@@ -80,10 +80,8 @@ projects: []
 publishDate: '2022-02-08T20:11:52.706309Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Type 2 diabetes (T2D) affects the health of millions of people worldwide. The identification of genetic determinants associated with changes in glycemia over time might illuminate biological features that precede the development of T2D. Here we conducted a genome-wide association study of longitudinal fasting glucose changes in up to 13,807 non-diabetic individuals of European descent from nine cohorts. Fasting glucose change over time was defined as the slope of the line defined by multiple fasting glucose measurements obtained over up to 14 years of observation. We tested for associations of genetic variants with inverse-normal transformed fasting glucose change over time adjusting for age at baseline, sex, and principal components of genetic variation. We found no genome-wide significant association (P < 5 × 10<sup>−8</sup>) with fasting glucose change over time. Seven loci previously associated with T2D, fasting glucose or HbA1c were nominally (P < 0.05) associated with fasting glucose change over time. Limited power influences unambiguous interpretation, but these data suggest that genetic effects on fasting glucose change over time are likely to be small. A public version of the data provides a genomic resource to combine with future studies to evaluate shared genetic links with T2D and other metabolic risk traits.
 publication: '*Scientific Reports*'
 doi: 10.1038/s41598-019-45823-7
-links:
-- name: URL
-  url: https://www.nature.com/articles/s41598-019-45823-7
 ---

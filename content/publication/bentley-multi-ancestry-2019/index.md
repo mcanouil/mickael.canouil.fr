@@ -331,10 +331,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.242670Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    The concentrations of high- and low-density-lipoprotein cholesterol and triglycerides are influenced by smoking, but it is unknown whether genetic associations with lipids may be modified by smoking. We conducted a multi-ancestry genome-wide gene–smoking interaction study in 133,805 individuals with follow-up in an additional 253,467 individuals. Combined meta-analyses identified 13 new loci associated with lipids, some of which were detected only because association differed by smoking status. Additionally, we demonstrate the importance of including diverse populations, particularly in studies of interactions with lifestyle factors, where genomic and lifestyle differences by ancestry may contribute to novel findings.
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-019-0378-y
-links:
-- name: URL
-  url: https://www.nature.com/articles/s41588-019-0378-y
 ---

@@ -296,10 +296,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.133849Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    A person's lipid profile is influenced by genetic variants and alcohol consumption, but the contribution of interactions between these exposures has not been studied. We therefore incorporated gene-alcohol interactions into a multiancestry genome-wide association study of levels of high-density lipoprotein cholesterol, low-density lipoprotein cholesterol, and triglycerides. We included 45 studies in stage 1 (genome-wide discovery) and 66 studies in stage 2 (focused follow-up), for a total of 394,584 individuals from 5 ancestry groups. Analyses covered the period July 2014–November 2017. Genetic main effects and interaction effects were jointly assessed by means of a 2–degrees-of-freedom (df) test, and a 1-df test was used to assess the interaction effects alone. Variants at 495 loci were at least suggestively associated (P < 1 × 10<sup>-6</sup>) with lipid levels in stage 1 and were evaluated in stage 2, followed by combined analyses of stage 1 and stage 2. In the combined analysis of stages 1 and 2, a total of 147 independent loci were associated with lipid levels at P < 5 × 10<sup>-8</sup> using 2-df tests, of which 18 were novel. No genome-wide-significant associations were found testing the interaction effect alone. The novel loci included several genes (proprotein convertase subtilisin/kexin type 5 (PCSK5), vascular endothelial growth factor B (VEGFB), and apolipoprotein B mRNA editing enzyme, catalytic polypeptide 1 (APOBEC1) complementation factor (A1CF)) that have a putative role in lipid metabolism on the basis of existing evidence from cellular and experimental models.
 publication: '*American Journal of Epidemiology*'
 doi: 10.1093/aje/kwz005
-links:
-- name: URL
-  url: https://academic.oup.com/aje/advance-article/doi/10.1093/aje/kwz005/5304469
 ---

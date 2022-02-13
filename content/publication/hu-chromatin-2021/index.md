@@ -49,17 +49,7 @@ publishDate: '2022-02-08T20:11:51.575220Z'
 publication_types:
 - '2'
 abstract: |
-    *Highlights*
-    - Type 2 risk variants at STARD10 reside in CTCF-flanked enhancer clusters.
-    - Loss of the risk variant-bearing region inhibits regulated insulin secretion.
-    - 3D chromatin interaction maps reveal FCHSD2 as target of the enhancer cluster.
-    - Deletion of STARD10 or FCHSD2 from EndoC-βH1 β cells inhibits insulin secretion.
-    
-    *Summary*  
     Using chromatin conformation capture, we show that an enhancer cluster in the STARD10 type 2 diabetes (T2D) locus forms a defined 3-dimensional (3D) chromatin domain. A 4.1-kb region within this locus, carrying 5 T2D-associated variants, physically interacts with CTCF-binding regions and with an enhancer possessing strong transcriptional activity. Analysis of human islet 3D chromatin interaction maps identifies the FCHSD2 gene as an additional target of the enhancer cluster. CRISPR-Cas9-mediated deletion of the variant region, or of the associated enhancer, from human pancreas-derived EndoC-βH1 cells impairs glucose-stimulated insulin secretion. Expression of both STARD10 and FCHSD2 is reduced in cells harboring CRISPR deletions, and lower expression of STARD10 and FCHSD2 is associated, the latter nominally, with the possession of risk variant alleles in human islets. Finally, CRISPR-Cas9-mediated loss of STARD10 or FCHSD2, but not ARAP1, impairs regulated insulin secretion. Thus, multiple genes at the STARD10 locus influence β cell function.
 publication: '*Cell Reports*'
 doi: 10.1016/j.celrep.2021.108703
-links:
-- name: URL
-  url: https://linkinghub.elsevier.com/retrieve/pii/S2211124721000164
 ---

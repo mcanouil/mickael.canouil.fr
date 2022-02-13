@@ -51,7 +51,4 @@ abstract: |
     We identified an epigenetic link between adipogenesis and adipose tissue insulin resistance in the context of T2D risk associated with statin use, which has important implications as HDAC9 and ABCG1 are considered potential therapeutic targets for obesity and metabolic diseases.
 publication: '*Clinical Epigenetics*'
 doi: 10.1186/s13148-020-00858-w
-links:
-- name: URL
-  url: https://clinicalepigeneticsjournal.biomedcentral.com/articles/10.1186/s13148-020-00858-w
 ---

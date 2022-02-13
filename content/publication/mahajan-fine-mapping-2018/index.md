@@ -145,10 +145,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.553825Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    We expanded GWAS discovery for type 2 diabetes (T2D) by combining data from 898,130 European-descent individuals (9% cases), after imputation to high-density reference panels. With these data, we (i) extend the inventory of T2D-risk variants (243 loci, 135 newly implicated in T2D predisposition, comprising 403 distinct association signals); (ii) enrich discovery of lower-frequency risk alleles (80 index variants with minor allele frequency <5%, 14 with estimated allelic odds ratio >2); (iii) substantially improve fine-mapping of causal variants (at 51 signals, one variant accounted for >80% posterior probability of association (PPA)); (iv) extend fine-mapping through integration of tissue-specific epigenomic information (islet regulatory annotations extend the number of variants with PPA >80% to 73); (v) highlight validated therapeutic targets (18 genes with associations attributable to coding variants); and (vi) demonstrate enhanced potential for clinical translation (genome-wide chip heritability explains 18% of T2D risk; individuals in the extremes of a T2D polygenic risk score differ more than ninefold in prevalence).
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-018-0241-6
-links:
-- name: URL
-  url: https://www.nature.com/articles/s41588-018-0241-6
 ---

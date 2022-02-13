@@ -33,10 +33,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.659764Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Dimension reduction is one of the biggest challenges in high-dimensional regression models. We recently introduced a new methodology based on variable clustering as a means to reduce dimen sionality. We present here the R package clere that implements some refinements of this methodology. An overview of the package functionalities as well as examples to run an analysis are described. Numerical experiments on real data were performed to illustrate the good predictive performance of our parsimonious method compared to standard dimension reduction approaches.
 publication: '*The R Journal*'
-doi: https://journal.r-project.org/archive/2016/RJ-2016-006/
-links:
-- name: URL
-  url: https://journal.r-project.org/archive/2016/RJ-2016-006/index.html
+doi: 10.32614/RJ-2016-006
 ---

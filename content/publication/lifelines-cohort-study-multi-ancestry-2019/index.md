@@ -260,10 +260,8 @@ projects: []
 publishDate: '2022-02-08T20:11:53.353493Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Many genetic loci affect circulating lipid levels, but it remains unknown whether lifestyle factors, such as physical activity, modify these genetic effects. To identify lipid loci interacting with physical activity, we performed genome-wide analyses of circulating HDL cholesterol, LDL cholesterol, and triglyceride levels in up to 120,979 individuals of European, African, Asian, Hispanic, and Brazilian ancestry, with follow-up of suggestive associations in an additional 131,012 individuals. We find four loci, in/near CLASP1, LHX1, SNTA1, and CNTNAP2, that are associated with circulating lipid levels through interaction with physical activity; higher levels of physical activity enhance the HDL cholesterol-increasing effects of the CLASP1, LHX1, and SNTA1 loci and attenuate the LDL cholesterol-increasing effect of the CNTNAP2 locus. The CLASP1, LHX1, and SNTA1 regions harbor genes linked to muscle function and lipid metabolism. Our results elucidate the role of physical activity interactions in the genetic contribution to blood lipid levels.
 publication: '*Nature Communications*'
 doi: 10.1038/s41467-018-08008-w
-links:
-- name: URL
-  url: http://www.nature.com/articles/s41467-018-08008-w
 ---

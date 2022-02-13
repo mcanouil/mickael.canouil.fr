@@ -55,13 +55,6 @@ publishDate: '2022-02-08T20:11:51.776725Z'
 publication_types:
 - '2'
 abstract: |
-    *Highlights*
-    - Exome sequencing enables etiological diagnosis of heterogeneous genetic diseases.
-    - We looked for monogenic diabetes in young adults of eleven Mediterranean countries.
-    - Monogenic diabetes was diagnosed in 17.6% of them, with variable diagnosis rates according to countries.
-    - Lower body mass index and HbA1c at study inclusion are hallmarks of mutation carriers.
-    - Our study provided better knowledge of diabetes subtypes and improved patient follow-up.
-
     *Background*  
     Diagnosis of monogenic diabetes has important clinical implications for treatment and health expenditure. However, its prevalence remains to be specified in many countries, particularly from South Europe, North Africa and Middle-East, where non-autoimmune diabetes in young adults is increasing dramatically.
     
@@ -78,7 +71,4 @@ abstract: |
     Our data from patients in several Mediterranean countries highlight a broad clinical and genetic spectrum of diabetes, showing the relevance of wide genetic testing for personalized care of early-onset diabetes.
 publication: '*Diabetes Research and Clinical Practice*'
 doi: 10.1016/j.diabres.2020.108553
-links:
-- name: URL
-  url: https://linkinghub.elsevier.com/retrieve/pii/S016882272030810X
 ---

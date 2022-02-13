@@ -67,7 +67,8 @@ projects: []
 publishDate: '2022-02-08T20:11:54.592189Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Hepatic DPP4 expression is elevated in subjects with ectopic fat accumulation in the liver. However, whether increased dipeptidyl peptidase 4 (DPP4) is involved in the pathogenesis or is rather a consequence of metabolic disease is not known. We therefore studied the transcriptional regulation of hepatic Dpp4 in young mice prone to diet-induced obesity. Already at 6 weeks of age, expression of hepatic Dpp4 was increased in mice with high weight gain, independent of liver fat content. In the same animals, methylation of four intronic CpG sites was decreased, amplifying glucose-induced transcription of hepatic Dpp4. In older mice, hepatic triglyceride content was increased only in animals with elevated Dpp4 expression. Expression and release of DPP4 were markedly higher in the liver compared with adipose depots. Analysis of human liver biopsy specimens revealed a correlation of DPP4 expression and DNA methylation to stages of hepatosteatosis and nonalcoholic steatohepatitis. In summary, our results indicate a crucial role of the liver in participation to systemic DPP4 levels. Furthermore, the data show that glucose-induced expression of Dpp4 in the liver is facilitated by demethylation of the Dpp4 gene early in life. This might contribute to early deteriorations in hepatic function, which in turn result in metabolic disease such as hepatosteatosis later in life.
 publication: '*Diabetes*'
 doi: 10.2337/db15-1716
 ---

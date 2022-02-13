@@ -58,7 +58,18 @@ projects: []
 publishDate: '2022-02-08T20:11:54.695211Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    *Objectives*  
+    Genome-wide association studies (GWAS) have identified >100 loci independently contributing to type 2 diabetes (T2D) risk. However, translational implications for precision medicine and for the development of novel treatments have been disappointing, due to poor knowledge of how these loci impact T2D pathophysiology. Here, we aimed to measure the expression of genes located nearby T2D associated signals and to assess their effect on insulin secretion from pancreatic beta cells.
+
+    *Methods*  
+    The expression of 104 candidate T2D susceptibility genes was measured in a human multi-tissue panel, through PCR-free expression assay. The effects of the knockdown of beta-cell enriched genes were next investigated on insulin secretion from the human EndoC-βH1 beta-cell line. Finally, we performed RNA-sequencing (RNA-seq) so as to assess the pathways affected by the knockdown of the new genes impacting insulin secretion from EndoC-βH1, and we analyzed the expression of the new genes in mouse models with altered pancreatic beta-cell function.
+
+    *Results*  
+    We found that the candidate T2D susceptibility genes' expression is significantly enriched in pancreatic beta cells obtained by laser capture microdissection or sorted by flow cytometry and in EndoC-βH1 cells, but not in insulin sensitive tissues. Furthermore, the knockdown of seven T2D-susceptibility genes (CDKN2A, GCK, HNF4A, KCNK16, SLC30A8, TBC1D4, and TCF19) with already known expression and/or function in beta cells changed insulin secretion, supporting our functional approach. We showed first evidence for a role in insulin secretion of four candidate T2D-susceptibility genes (PRC1, SRR, ZFAND3, and ZFAND6) with no previous knowledge of presence and function in beta cells. RNA-seq in EndoC-βH1 cells with decreased expression of PRC1, SRR, ZFAND6, or ZFAND3 identified specific gene networks related to T2D pathophysiology. Finally, a positive correlation between the expression of Ins2 and the expression of Prc1, Srr, Zfand6, and Zfand3 was found in mouse pancreatic islets with altered beta-cell function.
+
+    *Conclusions*  
+    This study showed the ability of post-GWAS functional studies to identify new genes and pathways involved in human pancreatic beta-cell function and in T2D pathophysiology.
 publication: '*Molecular Metabolism*'
 doi: 10.1016/j.molmet.2017.03.011
 ---
