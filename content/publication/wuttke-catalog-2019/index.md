@@ -202,8 +202,8 @@ authors:
 - Boting Ning
 - Ilja M. Nolte
 - Raymond Noordam
-- Jeffrey O’Connell
-- Michelle L. O’Donoghue
+- Jeffrey O'Connell
+- Michelle L. O'Donoghue
 - Isleifur Olafsson
 - Albertine J. Oldehinkel
 - Marju Orho-Melander

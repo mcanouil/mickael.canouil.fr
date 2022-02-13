@@ -56,7 +56,8 @@ projects: []
 publishDate: '2022-02-08T20:11:51.877980Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    Genome-wide association studies have identified 240 independent loci associated with type 2 diabetes (T2D) risk, but this knowledge has not advanced precision medicine. In contrast, the genetic diagnosis of monogenic forms of diabetes (including maturity-onset diabetes of the young (MODY)) are textbook cases of genomic medicine. Recent studies trying to bridge the gap between monogenic diabetes and T2D have been inconclusive. Here, we show a significant burden of pathogenic variants in genes linked with monogenic diabetes among people with common T2D, particularly in actionable MODY genes, thus implying that there should be a substantial change in care for carriers with T2D. We show that, among 74,629 individuals, this burden is probably driven by the pathogenic variants found in GCK, and to a lesser extent in HNF4A, KCNJ11, HNF1B and ABCC8. The carriers with T2D are leaner, which evidences a functional metabolic effect of these mutations. Pathogenic variants in actionable MODY genes are more frequent than was previously expected in common T2D. These results open avenues for future interventions assessing the clinical interest of these pathogenic mutations in precision medicine.
 publication: '*Nature Metabolism*'
 doi: 10.1038/s42255-020-00294-3
 links:

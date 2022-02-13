@@ -61,7 +61,7 @@ authors:
 - Brigitte Kühnel
 - Karin Leander
 - Keng-Hung Lin
-- Jian’an Luan
+- Jian'an Luan
 - Leo-Pekka Lyytikäinen
 - Nana Matoba
 - Ilja M. Nolte
@@ -181,7 +181,7 @@ authors:
 - Matthias Nauck
 - Christopher P. Nelson
 - Kari E. North
-- Jeffrey R. O’Connell
+- Jeffrey R. O'Connell
 - Nicholette D. Palmer
 - George J. Papanicolau
 - Nancy L. Pedersen

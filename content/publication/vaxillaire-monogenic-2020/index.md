@@ -54,7 +54,28 @@ projects: []
 publishDate: '2022-02-08T20:11:51.776725Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    *Highlights*
+    - Exome sequencing enables etiological diagnosis of heterogeneous genetic diseases.
+    - We looked for monogenic diabetes in young adults of eleven Mediterranean countries.
+    - Monogenic diabetes was diagnosed in 17.6% of them, with variable diagnosis rates according to countries.
+    - Lower body mass index and HbA1c at study inclusion are hallmarks of mutation carriers.
+    - Our study provided better knowledge of diabetes subtypes and improved patient follow-up.
+
+    *Background*  
+    Diagnosis of monogenic diabetes has important clinical implications for treatment and health expenditure. However, its prevalence remains to be specified in many countries, particularly from South Europe, North Africa and Middle-East, where non-autoimmune diabetes in young adults is increasing dramatically.
+    
+    *Aims*
+    To identify cases of monogenic diabetes in young adults from Mediterranean countries and assess the specificities between countries.
+
+    *Methods*  
+    We conducted a transnational multicenter study based on exome sequencing in 204 unrelated patients with diabetes (age-at-diagnosis: 26.1 ± 9.1 years). Rare coding variants in 35 targeted genes were evaluated for pathogenicity. Data were analyzed using one-way ANOVA, chi-squared test and factor analysis of mixed data.
+
+    *Results*  
+    Forty pathogenic or likely pathogenic variants, 14 of which novel, were identified in 36 patients yielding a genetic diagnosis rate of 17.6%. The majority of cases were due to GCK, HNF1A, ABCC8 and HNF4A variants. We observed highly variable diagnosis rates according to countries, with association to genetic ancestry. Lower body mass index and HbA1c at study inclusion, and less frequent insulin treatment were hallmarks of pathogenic variant carriers. Treatment changes following genetic diagnosis have been made in several patients.
+
+    *Conclusions*  
+    Our data from patients in several Mediterranean countries highlight a broad clinical and genetic spectrum of diabetes, showing the relevance of wide genetic testing for personalized care of early-onset diabetes.
 publication: '*Diabetes Research and Clinical Practice*'
 doi: 10.1016/j.diabres.2020.108553
 links:

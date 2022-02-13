@@ -5,12 +5,12 @@ summary: |
     Tips and advices to start well with R (and RStudio).
 abstract: |
     Vous souhaitez démarrer avec de bonnes bases ?
-    Vous suspectez que vous n’avez pas que des bonnes pratiques/habitudes ?
+    Vous suspectez que vous n'avez pas que des bonnes pratiques/habitudes ?
     Vous aimeriez améliorer ou modifier votre pratique de R, pour être plus efficace et plus autonome ?
     Vous ignorez ce que sont les fichiers .Rdata, .rds, .R, .Rmd, .Renviron et/ou .Rprofile ?
     Vous maitrisez les commandes rm(list = ls()) et setwd() ?
     
-    Ce MeetUp vise à donner quelques trucs et astuces autour de R et de l’IDE Rstudio, ainsi qu’ouvrir la discussion sur quelques “règles/conventions” de bonnes pratiques dans un objectif de reproductibilité.
+    Ce MeetUp vise à donner quelques trucs et astuces autour de R et de l'IDE Rstudio, ainsi qu'ouvrir la discussion sur quelques “règles/conventions” de bonnes pratiques dans un objectif de reproductibilité.
 
 all_day: false
 

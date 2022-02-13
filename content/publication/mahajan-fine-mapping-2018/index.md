@@ -48,7 +48,7 @@ authors:
 - Kristi Läll
 - Ching-Ti Liu
 - Adam E. Locke
-- Jian’an Luan
+- Jian'an Luan
 - Ioanna Ntalla
 - Vibe Nylander
 - Sebastian Schönherr

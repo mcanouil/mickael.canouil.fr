@@ -64,7 +64,7 @@ authors:
 - Karin Leander
 - Wen-Jane Lee
 - Keng-Hung Lin
-- Jian’an Luan
+- Jian'an Luan
 - Leo-Pekka Lyytikainen
 - Colin A. McKenzie
 - He Meian

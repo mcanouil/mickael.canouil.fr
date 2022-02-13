@@ -61,7 +61,8 @@ projects: []
 publishDate: '2022-02-08T20:11:52.396769Z'
 publication_types:
 - '2'
-abstract: ''
+abstract: |
+    The G-protein-coupled receptor accessory protein MRAP2 is implicated in energy control in rodents, notably via the melanocortin-4 receptor1. Although some MRAP2 mutations have been described in people with obesity1,2,3, their functional consequences on adiposity remain elusive. Using large-scale sequencing of MRAP2 in 9,418 people, we identified 23 rare heterozygous variants associated with increased obesity risk in both adults and children. Functional assessment of each variant shows that loss-of-function MRAP2 variants are pathogenic for monogenic hyperphagic obesity, hyperglycemia and hypertension. This contrasts with other monogenic forms of obesity characterized by excessive hunger, including melanocortin-4 receptor deficiency, that present with low blood pressure and normal glucose tolerance4. The pleiotropic metabolic effect of loss-of-function mutations in MRAP2 might be due to the failure of different MRAP2-regulated G-protein-coupled receptors in various tissues including pancreatic islets.
 publication: '*Nature Medicine*'
 doi: 10.1038/s41591-019-0622-0
 links:

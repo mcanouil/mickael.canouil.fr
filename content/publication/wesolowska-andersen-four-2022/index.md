@@ -41,7 +41,7 @@ authors:
 - Torben Hansen
 - Femke Rutters
 - Petra Elders
-- Leen t’Hart
+- Leen t'Hart
 - Amelie Bonnefond
 - Mickaël Canouil
 - Soren Brage

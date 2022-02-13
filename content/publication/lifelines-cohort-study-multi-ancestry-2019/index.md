@@ -132,7 +132,7 @@ authors:
 - Sotoodehnia Nona
 - Jill M. Norris
 - Chiamaka Vivian Nwuba
-- Jeff O’Connell
+- Jeff O'Connell
 - Nicholette D. Palmer
 - George J. Papanicolau
 - Raha Pazoki
