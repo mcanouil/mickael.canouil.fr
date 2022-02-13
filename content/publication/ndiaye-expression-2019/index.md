@@ -55,7 +55,7 @@ abstract: |
     We performed a PCR-free expression assay targeting genes located nearby the GWAS-identified SNPs associated with BMI/obesity in a large panel of human tissues. Furthermore, we analyzed several genetic risk scores (GRS) summing GWAS-identified alleles associated with increased BMI in 4236 individuals.
 
     *Results*  
-    We found that the expression of BMI/obesity susceptibility genes was strongly enriched in the brain, especially in the insula (p = 4.7 × 10<sup>–9</sup>) and substantia nigra (p = 6.8 × 10<sup>–7</sup>), which are two brain regions involved in addiction and reward. Inversely, we found that top obesity/BMI-associated loci, including FTO, showed the strongest gene expression enrichment in the two brain regions.
+    We found that the expression of BMI/obesity susceptibility genes was strongly enriched in the brain, especially in the insula (p  =  4.7 × 10<sup>–9</sup>) and substantia nigra (p  =  6.8 × 10<sup>–7</sup>), which are two brain regions involved in addiction and reward. Inversely, we found that top obesity/BMI-associated loci, including FTO, showed the strongest gene expression enrichment in the two brain regions.
 
     *Conclusions*  
     Our data suggest for the first time that the susceptibility genes for common obesity may have an effect on eating addiction and reward behaviors through their high expression in substantia nigra and insula, i.e., a different pattern from monogenic obesity genes that act in the hypothalamus and cause hyperphagia. Further epidemiological studies with relevant food behavior phenotypes are necessary to confirm these findings.
