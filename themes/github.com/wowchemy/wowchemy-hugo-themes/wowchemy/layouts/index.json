@@ -2,14 +2,13 @@
 {{- $index := slice -}}
 {{- $pages := site.RegularPages -}}
 {{- /* Add the index page of multi-page content separately since it's not in RegularPages above. */ -}}
-{{- $pages := $pages | union (where (where site.Pages "Kind" "section") "Type" "docs") -}}
 {{- $pages := $pages | union (where (where site.Pages "Kind" "section") "Type" "book") -}}
 {{- /* Add author pages to index so their bios can be searched. Hide empty `/authors/` node. */ -}}
 {{- $pages := $pages | union (where (where site.Pages "Section" "authors") "Params.superuser" "!=" nil) -}}
 
 {{- range $pages -}}
   {{- /* Do not index drafts or private pages. */ -}}
-  {{- if and (not .Draft) (not .Params.private) -}}
+  {{- if and (not .Draft) (not .Params.private) | and (ne .Params.searchable false) -}}
 
     {{- /* Generate page description. */ -}}
     {{- $desc := "" -}}
@@ -53,7 +52,7 @@
     {{- end -}}
 
     {{- /* Add page to index. */ -}}
-    {{- $index = $index | append (dict "objectID" .File.UniqueID "date" .Date.UTC.Unix "publishdate" .PublishDate "lastmod" .Lastmod.UTC.Unix "expirydate" .ExpiryDate.UTC.Unix "lang" .Lang "permalink" $permalink "relpermalink" $rel_permalink "title" $title "summary" (plainify $desc) "content" .Plain "authors" $authors "kind" .Kind "type" .Type "section" .Section "tags" .Params.Tags "categories" .Params.Categories) -}}
+    {{- $index = $index | append (dict "objectID" .File.UniqueID "date" .Date.UTC.Unix "publishdate" .PublishDate "lastmod" .Lastmod.UTC.Unix "expirydate" .ExpiryDate.UTC.Unix "lang" .Lang "permalink" $permalink "relpermalink" $rel_permalink "title" $title "summary" (plainify $desc | htmlUnescape) "content" (.Plain | htmlUnescape | truncate 5000) "authors" $authors "kind" .Kind "type" .Type "section" .Section "tags" .Params.Tags "categories" .Params.Categories) -}}
 
   {{- end -}}
 {{- end -}}

@@ -53,8 +53,8 @@
   {{ if $bg.image }}
     {{/* See Hugo note on linking assets in styles: https://github.com/gohugoio/hugoThemes#common-permalink-issues */}}
     {{ $bg_img := resources.Get (printf "media/%s" $bg.image) }}
-    {{ $bg_img = $bg_img.Fit "1920x1920 webp" }}
     {{ if $bg_img }}
+      {{ $bg_img = $bg_img.Fit "1920x1920 webp" }}
       {{ $style_bg = printf "%sbackground-image: url('%s');" $style_bg $bg_img.Permalink }}
     {{ else }}
       {{ errorf "Couldn't find `%s` in the `assets/media/` folder - please add it." $bg.image }}
@@ -104,7 +104,7 @@
   {{/* Special case: Slider widget. */}}
   {{ if in (slice "slider") $widget }}
     {{ $css_classes = print $css_classes " carousel slide" }}
-    {{ $extra_attributes = printf "data-ride=\"carousel\" data-interval=\"%s\"" (string $st.Params.interval | default "5000") }}
+    {{ $extra_attributes = printf "data-ride=\"carousel\" data-interval=\"%s\"" (cond ($st.Params.design.loop | default true) (string $st.Params.design.interval | default "3000") "false") }}
     {{ $use_container = false }}
   {{ end }}
 
