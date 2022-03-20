@@ -23,21 +23,26 @@ if (interactive()) {
       force = TRUE,
       update_hugo = FALSE
     )
-    # gert::git_clone(
-    #   url = "https://github.com/wowchemy/wowchemy-hugo-themes",
-    #   path = "themes/github.com/wowchemy/wowchemy-hugo-themes"
-    # )
-    # files <- list.files(
-    #   path = "themes/github.com/wowchemy/wowchemy-hugo-modules",
-    #   all.files = TRUE,
-    #   full.names = TRUE,
-    #   include.dirs = TRUE,
-    #   no.. = TRUE
-    # )
-    # unlink(
-    #   x = files[!grepl("^wowchemy", basename(files))],
-    #   recursive = TRUE
-    # )
+    unlink(
+      x = "themes/starter-hugo-academic/exampleSite",
+      recursive = TRUE
+    )
+    gert::git_clone(
+      url = "https://github.com/wowchemy/wowchemy-hugo-themes",
+      path = "themes/github.com/wowchemy/wowchemy-hugo-themes"
+    )
+    files <- list.files(
+      path = "themes/github.com/wowchemy/wowchemy-hugo-themes",
+      all.files = TRUE,
+      full.names = TRUE,
+      include.dirs = TRUE,
+      no.. = TRUE
+    )
+    unlink(
+      x = files[!grepl("^wowchemy", basename(files))],
+      recursive = TRUE
+    )
+    message("Replace \"wowchemy-hugo-modules\" by \"starter-hugo-themes\"!")
   }
 
   rebuild <- function(build_rmd = "timestamp", ...) blogdown::build_site(..., build_rmd = build_rmd)
