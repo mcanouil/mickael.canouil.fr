@@ -17,13 +17,13 @@ education:
     year: 2009
 
 interests:
-- Multi-omics
-- Longitudinal Data
-- Data Analysis
-- Data Visualisation
-- Knowledge Sharing
-- Learning New Skills
-- Watching Movies
+  - Multi-omics
+  - Longitudinal Data
+  - Data Analysis
+  - Data Visualisation
+  - Knowledge Sharing
+  - Learning New Skills
+  - Watching Movies
 
 role: Head of Biostatistics
 organizations:
