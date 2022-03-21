@@ -38,6 +38,6 @@ content:
 
 design:
   columns: '1'
-  view: masonry
+  view: 'masonry'
   flip_alt_rows: false
 ---
