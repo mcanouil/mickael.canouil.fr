@@ -43,7 +43,7 @@ social:
     header: false
   icon: twitter
   icon_pack: fab
-  link: 'https://twitter.com/mickaelcanouil'
+  link: 'https://twitter.com/MickaelCanouil'
 - display:
     header: false
   icon: linkedin
