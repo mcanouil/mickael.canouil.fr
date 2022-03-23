@@ -27,6 +27,10 @@ if (interactive()) {
       x = "themes/starter-hugo-academic/exampleSite",
       recursive = TRUE
     )
+    unlink(
+      x = "themes/github.com/wowchemy/wowchemy-hugo-themes",
+      recursive = TRUE
+    )
     gert::git_clone(
       url = "https://github.com/wowchemy/wowchemy-hugo-themes",
       path = "themes/github.com/wowchemy/wowchemy-hugo-themes"
