@@ -12,6 +12,7 @@ options(
 )
 
 if (interactive()) {
+  if (file.exists("~/.Rprofile")) source("~/.Rprofile")
   library(blogdown)
 
   update <- function() {
