@@ -1,8 +1,8 @@
 ---
 # Documentation: https://wowchemy.com/docs/managing-content/
 
-title: Multi-ancestry genetic study of type 2 diabetes highlights the power of diverse
-  populations for discovery and translation
+title: Multi-ancestry Genetic Study of Type 2 Diabetes Highlights the Power of Diverse
+  Populations for Discovery and Translation
 subtitle: ''
 summary: ''
 authors:
