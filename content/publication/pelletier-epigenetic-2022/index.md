@@ -42,19 +42,20 @@ projects: []
 publishDate: '2022-07-05T20:22:52.651886Z'
 publication_types:
 - '2'
-abstract: Excessive fetal growth is associated with DNA methylation alterations in
-  human hematopoietic stem and progenitor cells (HSPC), but their functional impact
-  remains elusive. We implemented an integrative analysis combining single-cell epigenomics,
-  single-cell transcriptomics, and in vitro analyses to functionally link DNA methylation
-  changes to putative alterations of HSPC functions. We showed in hematopoietic stem
-  cells (HSC) from large for gestational age neonates that both DNA hypermethylation
-  and chromatin rearrangements target a specific network of transcription factors
-  known to sustain stem cell quiescence. In parallel, we found a decreased expression
-  of key genes regulating HSC differentiation including EGR1, KLF2, SOCS3, and JUNB.
-  Our functional analyses showed that this epigenetic programming was associated with
-  a decreased ability for HSCs to remain quiescent. Taken together, our multimodal
-  approach using single-cell (epi)genomics showed that human fetal overgrowth affects
-  hematopoietic stem cells’ quiescence signaling via epigenetic programming.
+abstract: |
+    Excessive fetal growth is associated with DNA methylation alterations in
+    human hematopoietic stem and progenitor cells (HSPC), but their functional impact
+    remains elusive. We implemented an integrative analysis combining single-cell epigenomics,
+    single-cell transcriptomics, and in vitro analyses to functionally link DNA methylation
+    changes to putative alterations of HSPC functions. We showed in hematopoietic stem
+    cells (HSC) from large for gestational age neonates that both DNA hypermethylation
+    and chromatin rearrangements target a specific network of transcription factors
+    known to sustain stem cell quiescence. In parallel, we found a decreased expression
+    of key genes regulating HSC differentiation including EGR1, KLF2, SOCS3, and JUNB.
+    Our functional analyses showed that this epigenetic programming was associated with
+    a decreased ability for HSCs to remain quiescent. Taken together, our multimodal
+    approach using single-cell (epi)genomics showed that human fetal overgrowth affects
+    hematopoietic stem cells’ quiescence signaling via epigenetic programming.
 publication: '*International Journal of Molecular Sciences*'
 doi: 10.3390/ijms23137323
 links:
