@@ -389,7 +389,4 @@ abstract: |
     We assembled an ancestrally diverse collection of genome-wide association studies (GWAS) of type 2 diabetes (T2D) in 180,834 affected individuals and 1,159,055 controls (48.9% non-European descent) through the Diabetes Meta-Analysis of Trans-Ethnic association studies (DIAMANTE) Consortium. Multi-ancestry GWAS meta-analysis identified 237 loci attaining stringent genome-wide significance (P < 5 × 10−9), which were delineated to 338 distinct association signals. Fine-mapping of these signals was enhanced by the increased sample size and expanded population diversity of the multi-ancestry meta-analysis, which localized 54.4% of T2D associations to a single variant with >50% posterior probability. This improved fine-mapping enabled systematic assessment of candidate causal genes and molecular mechanisms through which T2D associations are mediated, laying the foundations for functional investigations. Multi-ancestry genetic risk scores enhanced transferability of T2D prediction across diverse populations. Our study provides a step toward more effective clinical translation of T2D GWAS to improve global health for all, irrespective of genetic background.
 publication: '*Nature Genetics*'
 doi: 10.1038/s41588-022-01058-3
-links:
-- name: URL
-  url: https://www.nature.com/articles/s41588-022-01058-3
 ---
