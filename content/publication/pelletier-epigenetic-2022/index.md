@@ -58,7 +58,4 @@ abstract: |
     hematopoietic stem cells’ quiescence signaling via epigenetic programming.
 publication: '*International Journal of Molecular Sciences*'
 doi: 10.3390/ijms23137323
-links:
-- name: URL
-  url: https://www.mdpi.com/1422-0067/23/13/7323
 ---
