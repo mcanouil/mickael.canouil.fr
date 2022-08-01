@@ -29,6 +29,8 @@ content:
     tag: '*'
   - name: "R Package"
     tag: "r package"
+  - name: "Quarto"
+    tag: "quarto"
   - name: "Workshop"
     tag: "workshop"
   - name: "Course"
