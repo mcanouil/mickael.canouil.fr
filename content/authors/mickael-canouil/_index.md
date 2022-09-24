@@ -3,7 +3,7 @@ superuser: true
 title: 'Mickaël Canouil'
 highlight_name: true
 
-bio: Biostatiscian, cinephile and [<i class = "fab fa-twitter"></i>@rlille_rug](https://twitter.com/rlille_rug) organiser.
+bio: Biostatistician, cinephile and [<i class = "fab fa-twitter"></i>@rlille_rug](https://twitter.com/rlille_rug) organiser.
 education:
   courses:
   - course: Ph.D. in Biostatistics
