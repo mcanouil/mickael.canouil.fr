@@ -1,4 +1,4 @@
-# mickael.canouil.fr <img src="assets/media/icon.png" align="right" width="120" />
+# mickael.canouil.fr <img src="assets/media/logo.png" align="right" width="120" />
 
 <!-- badges: start -->
 [![License](https://img.shields.io/github/license/mcanouil/mickael.canouil.fr)](LICENSE)
@@ -7,4 +7,4 @@
 
 Repository for [mickael.canouil.fr](https://mickael.canouil.fr).
 
-Website content (*i.e.* [`./content`](./content)) is under [CC-BY-NC-SA-4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+Website content is under [CC-BY-NC-SA-4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
