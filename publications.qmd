@@ -1,10 +1,13 @@
 ---
+title: 'Publications (7 + 35)'
+page-layout: full
+title-block-banner: true
 date-format: 'MMMM,<br>YYYY'
 listing:
   contents:
     - publications.yml
   page-size: 10
-  sort: "issued desc"
+  sort: 'issued desc'
   type: table
   categories: false
   sort-ui: [date, title, journal-title, position, first]
@@ -14,71 +17,5 @@ listing:
     date: Issued
     journal-title: Journal
     position: Rank
-    first: "First"
-page-layout: full
-title-block-banner: true
+    first: 'First'
 ---
-
-```{r}
-#| include: false
-bib <- strsplit(paste(
-  readLines("publications.bib"),
-  collapse = "\n"
-), "\n@")[[1]]
-articles <- lapply(
-  X = paste0("@", bib[bib != ""]),
-  FUN = function(ibib) {
-    f <- tempfile()
-    on.exit(unlink(f))
-    writeLines(ibib, f)
-    article <- tail(
-      head(
-        system(
-          command = paste("pandoc", f, "--standalone", "--from=bibtex", "--to=markdown"),
-          intern = TRUE
-        ),
-        -2
-      ),
-      -3
-    )
-    authors <- sub(".*- family: ", "", grep("- family:", article, value = TRUE))
-    if (isTRUE(grepl("first", grep("annote:", article, value = TRUE)))) {
-      first <- "  first: '*As first or co-first*'"
-    } else {
-      first <- "  first: ''"
-    }
-    
-    position <- sprintf("  position: '%s/%s'", grep("Canouil", authors), length(authors))
-    article <- c(
-      article,
-      sub("  container-title: (.*)", "  journal-title: '*\\1*'", grep("  container-title:", article, value = TRUE)),
-      sub("  issued: ", "  date: ", grep("  issued:", article, value = TRUE)),
-      sub("  doi: ", "  path: https://doi.org/", grep("doi:", article, value = TRUE)),
-      position,
-      first
-    )
-    article
-  }
-)
-writeLines(
-  text = unlist(articles),
-  con = "publications.yml"
-)
-```
-
-```{r}
-#| echo: false
-#| output: asis
-cat(sprintf(
-  '---\ntitle: "Publications (%s)"\n---\n',
-  paste(
-    table(
-      factor(
-        x = sapply(articles, function(x) any(grepl("As first or co-first", x))),
-        levels = c("TRUE", "FALSE")
-      )
-    )[c("TRUE", "FALSE")],
-    collapse = " + "
-  )
-))
-```
