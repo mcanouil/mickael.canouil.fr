@@ -26,3 +26,14 @@ jobs:
           version: pre-release
       - name: Render Quarto Project
         uses: quarto-dev/quarto-actions/render@v2
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: "ci: automatic website rendering with latest Quarto"
+          signoff: false
+          branch: latest-quarto-updates
+          delete-branch: true
+          title: "Automatic website rendering with latest Quarto"
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
