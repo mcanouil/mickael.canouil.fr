@@ -1,0 +1,567 @@
+---
+title: "Add a Floating Table of Contents in `blogdown`"
+description: |
+  How to have a table of contents (TOC) on either the left or the right side of a post?  
+  I have an answer!
+date: "2021-05-06"
+categories: [R, blogdown, rmarkdown, HUGO, Website]
+image: featured.png
+image-alt: |
+  Screenshot of the `blogdown` blog post 'Add a Floating Table of Contents in `blogdown`' showing a table of content on the right.
+knitr:
+  opts_chunk: 
+    width: 110
+    comment: ""
+    fig-width: 11.5
+    fig-height: 5.75
+    dev: "svglite"
+    dev.args: {web_fonts: {"https://fonts.googleapis.com/css?family=Alegreya+Sans"}}
+---
+
+```{r}
+#| label: setup
+#| include: false
+options("width" = 110)
+
+suppressPackageStartupMessages({
+  library(here)
+  library(knitr)
+  library(data.table)
+})
+```
+
+```{r}
+#| label: chromote
+#| include: false
+#| eval: !expr '!dir.exists("assets")'
+dir.create("assets")
+
+web_browser <- suppressMessages(try(chromote::ChromoteSession$new(), silent = TRUE))
+if (file.exists(chromote::find_chrome())) {
+  Sys.setenv(CHROMOTE_CHROME = "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser")
+}
+
+post_url <- sprintf("http://localhost:%s/post/2020-12-01-r-rmarkdown/", format(Sys.Date(), "1%d%m"))
+default_post <- "content/post/2020-12-01-r-rmarkdown/index.en.Rmd"
+
+site <- file.path(tempdir(), "toc")
+dir.create(site)
+withr::with_dir(new = site, {
+  blogdown::new_site(theme = "wowchemy/starter-hugo-academic", force = TRUE, serve = FALSE)
+  old_index <- readLines(default_post)
+  writeLines(
+    text = gsub("^# ", "## ", old_index),
+    con = default_post
+  )
+})
+file.copy(file.path(site, default_post), file.path("assets", "post0.txt"), overwrite = TRUE)
+
+writeLines(c("...", readLines(file.path(site, "config.yaml"))[50:59], "..."), file.path("assets", "config_yaml.txt"))
+
+withr::with_dir(new = site, {
+  rmarkdown::render_site(default_post, encoding = 'UTF-8')
+  blogdown::stop_server()
+  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
+})
+
+withr::with_dir(site, {
+  blogdown::stop_server()
+  rmarkdown::render_site(default_post, encoding = 'UTF-8')
+  blogdown::stop_server()
+  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
+})
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(post_url, wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/rmd_default_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
+web_browser$close()
+
+
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(gsub("2020-12-01-r-rmarkdown", "getting-started", post_url), wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/markdown_default_before.png", scale = 2, cliprect = c(0, 1000, 1600, height = 900))
+web_browser$close()
+
+
+withr::with_dir(new = site, {
+  blogdown::stop_server()
+  old_index <- readLines(default_post)
+  writeLines(
+    text = c(
+      old_index[1:6],
+      "output:",
+      "  blogdown::html_page:",
+      "    toc: true",
+      old_index[7:length(old_index)]
+    ),
+    con = default_post
+  )
+  rmarkdown::render_site(default_post, encoding = 'UTF-8')
+  blogdown::stop_server()
+  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
+})
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(post_url, wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/rmd_default_toc_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
+web_browser$close()
+file.copy(file.path(site, default_post), file.path("assets", "post1.txt"), overwrite = TRUE)
+
+
+withr::with_dir(new = site, {
+  dir.create("layouts/_default")
+  writeLines(
+    text = c(
+      '{{- define "main" -}}',
+      '',
+      '<article class="article">',
+      '',
+      '  {{ partial "page_header" . }}',
+      '',
+      '  <div class="article-container">',
+      '',
+      '    <div class="row">',
+
+      '      <div class="col-12 col-lg-9 article-style">',
+      '        {{ .Content }}',
+      '      </div>',
+      '',
+      '      <div class="col-12 col-lg-3 docs-toc">',
+      '        <ul class="nav toc-top">',
+      '          <li><a href="#" id="back_to_top" class="docs-toc-title">{{ i18n "on_this_page" }}</a></li>',
+      '        </ul>',
+      '',
+      '        {{ .TableOfContents }}',
+      ' ',
+      '      </div>',
+      '    </div>',
+      '',
+      '    {{ partial "page_footer" . }}',
+      '',
+      '  </div>',
+      '</article>',
+      '',
+      '{{- end -}}'
+    ),
+    con = "layouts/_default/single.html"
+  )
+  rmarkdown::render_site(default_post, encoding = 'UTF-8')
+  blogdown::stop_server()
+  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
+})
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(post_url, wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/rmd_default_toc_single_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
+web_browser$close()
+
+file.copy(
+  gsub("\\.Rmd$", ".html", file.path(site, default_post)),
+  file.path("assets", "rmarkdown_html.txt"), 
+  overwrite = TRUE
+)
+
+
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(gsub("2020-12-01-r-rmarkdown", "getting-started", post_url), wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/markdown_default_after.png", scale = 2, cliprect = c(0, 1000, 1600, height = 900))
+web_browser$close()
+
+
+withr::with_dir(new = site, {
+  blogdown::stop_server()
+  old_index <- readLines(default_post)
+  unlink(list.files(dirname(default_post), full.names = TRUE, recursive = TRUE, include.dirs = TRUE))
+  writeLines(old_index, gsub("\\.Rmd$", ".Rmarkdown", default_post))
+  rmarkdown::render_site(gsub("\\.Rmd$", ".Rmarkdown", default_post), encoding = 'UTF-8')
+  blogdown::stop_server()
+  blogdown::serve_site(port = format(Sys.Date(), "1%d%m"))
+})
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate(post_url, wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1600, height = 900, wait_ = FALSE)
+web_browser$screenshot(filename = "assets/rmarkdown_default_toc_single_post.png", scale = 2, cliprect = c(0, 0, 1600, height = 900))
+web_browser$close()
+blogdown::stop_server()
+```
+
+```{r}
+#| label: featured
+#| include: false
+#| eval: false
+web_browser <- suppressMessages(try(chromote::ChromoteSession$new(), silent = TRUE))
+if (inherits(web_browser, "try-error") && Sys.info()[["sysname"]] == "Windows") {
+  edge_path <- "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+  if (file.exists(edge_path)) {
+    Sys.setenv(CHROMOTE_CHROME = edge_path)
+  } else {
+    stop('Please set Sys.setenv(CHROMOTE_CHROME = "Path/To/Chrome")')
+  }
+}
+
+web_browser <- chromote::ChromoteSession$new()
+web_browser$Page$navigate("http://localhost:4321/post/floating-toc-in-blogdown/", wait_ = FALSE)
+# page_browser <- web_browser$Page$loadEventFired()
+web_browser$Emulation$setVisibleSize(width = 1920, height = 1080, wait_ = FALSE)
+web_browser$screenshot(
+  filename = "assets/featured.png", 
+  scale = 4, 
+  # selector = "div.page-body",
+  cliprect = c(0, 0, 1920, 1080)
+)
+web_browser$close()
+```
+
+## Welcome!
+
+Welcome to my very first blog post (_i.e._,&nbsp;I do not count [ggpacman](https://mickael.canouil.fr/post/ggpacman/)).
+
+The focus of this post is on `blogdown` ([github.com/rstudio/blogdown](https://github.com/rstudio/blogdown)), in particular on how to have a table of contents (TOC) on either the left or the right side of a post to ease the navigation through a long post.  
+In the past few weeks, I have been slowly getting my head around [`blogdown`](https://github.com/rstudio/blogdown) and [HUGO](https://gohugo.io/), to finally published this website about a week ago.  
+One of the latest tweak I had to figure out was: how to get a floating TOC.  
+Getting a TOC is quite easy with an Rmarkdown, thus it should be the same in `blogdown`.
+
+```markdown
+---
+output:
+  rmarkdown::html_document:
+    toc: true
+---
+```
+
+For the remaining of this post, I will use the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" HUGO theme within a new default `blogdown` website created with the following function call.
+
+```{r}
+#| eval: false
+#| echo: true
+blogdown::new_site(theme = "wowchemy/starter-hugo-academic")
+```
+
+## TL;DR
+
+Within a `blogdown` installation based on the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" HUGO theme:
+
+1. Create `<root>/layouts/_default/single.html`.
+   ```{r}
+   #| eval: false
+   #| echo: true
+   writeLines(
+     text = c(
+       '{{- define "main" -}}',
+       '<article class="article">',
+       '  {{ partial "page_header" . }}',
+       '  <div class="article-container">',
+       '    <div class="row">',
+       '      <div class="col-12 col-lg-9 article-style">',
+       '        {{ .Content }}',
+       '      </div>',
+       '      <div class="col-12 col-lg-3 docs-toc">',
+       '        <ul class="nav toc-top">',
+       '          <li>',
+       '            <a href="#" id="back_to_top" class="docs-toc-title">',
+       '              {{ i18n "on_this_page" }}',
+       '            </a>',
+       '          </li>',
+       '        </ul>',
+       '        {{ .TableOfContents }}',
+       '      </div>',
+       '    </div>',
+       '    {{ partial "page_footer" . }}',
+       '  </div>',
+       '</article>',
+       '{{- end -}}'
+     ), 
+     con = "layouts/_default/single.html"
+   )
+   ```
+2. Add to your `<root>/.Rprofile`.
+   ```{r}
+   #| eval: false
+   #| echo: true
+   options(blogdown.method = "markdown")
+   ```
+3. Write your posts in an `Rmd` or `Rmarkdown` file (_it Makes no difference now_) with the following in the YAML header.
+   ```
+   output:
+     blogdown::html_page:
+       toc: true
+   ```
+4. You are all set!
+
+_Note_: To a more complete setup workflow for `blogdown`, I recommend to have a look at [Alison Hill](https://alison.rbind.io/)'s blog post: "[Up & Running with Blogdown in 2021](https://alison.rbind.io/post/new-year-new-blogdown/)".
+
+## Default Rmarkdown Post
+
+Once installed, several default posts are available, including simple markdown file, Jupyter notebook file and Rmarkdown file.  
+Most of this post will focus on the Rmarkdown file with `.Rmd` extension.
+
+The default Rmarkdown file can be found at `content/post/2020-12-01-r-rmarkdown/index.en.Rmd` from the root directory of the website.
+
+```{r}
+#| echo: false
+#| output: asis
+cat(c("````md", readLines("assets/post0.txt"), "````"), sep = "\n")
+```
+
+To be fair, the above document is not exactly the default Rmarkdown file.  
+In fact, I decreased the headings level, or increase the number of `#`, by one.  
+The reason for this small modification comes from the default configuration of HUGO within the `config.yaml` file.
+
+```{r}
+#| echo: false
+#| output: asis
+cat(c("````md", readLines("assets/config_yaml.txt"), "````"), sep = "\n")
+```
+
+As you can see, the TOC is defined to include from level 2 to level 3, so by default, the changes we are going to make would not have any effect for this particular document which only contains level 1 headings.
+
+Posts and any other Rmarkdown contents are rendered with `rmarkdown::render_site()`, hence, for our default Rmarkdown (`content/post/2020-12-01-r-rmarkdown/index.en.Rmd`), the rendering is done with `rmarkdown::render_site('content/post/2020-12-01-r-rmarkdown/index.en.Rmd')`.
+
+![](assets/rmd_default_post.png)
+
+_Note_: In this case, `rmarkdown::render_site()` produces a HTML file: `index.en.html`.
+
+## Default with a TOC
+
+First, let's edit the default `index.en.Rmd` file by adding three lines. in the YAML header as we would have done in a regular `rmarkdown::html_document()` to add a TOC.  
+For a `blogdown` post, the output format is `blogdown::html_page()`.  
+This output format produces a headless HTML file (_i.e._,&nbsp;there is no need for header/body part, since the file is going to be included as a part of another HTML file).
+
+```markdown
+output:
+  blogdown::html_page:
+    toc: true
+```
+
+With this addition, the `index.en.Rmd` looks like this (_not that different, isn't it?!_).
+
+```{r}
+#| echo: false
+#| output: asis
+cat(c("````md", readLines("assets/post1.txt"), "````"), sep = "\n")
+```
+
+Since, we changed the YAML header, we need to render again, with `rmarkdown::render_site()`, the HTML file from `index.en.Rmd`.
+
+![](assets/rmd_default_toc_post.png)
+
+Now we have a TOC, but it sticks to the top.  
+At this stage, we did all we could in the Rmarkdown file `index.en.Rmd`.
+
+## Modify the Layout
+
+Because everything that relates to the structure of the pages on the website are defined in HTML template files stored in a `layouts` directory, the answer to our "problem" should be there.  
+And that is the case, as stated in a issue opened on GitHub ([wowchemy/wowchemy-hugo-themes #1520](https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520)). 
+More precisely in [@CharlieLeee](https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609)'s comment.
+
+As mentioned in the comment, we need to modify a particular file, namely `layouts/_default/single.html`, but what is inside this `layouts/_default/single.html` file from the "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)" theme?  
+In a default installation, the file is located in the following path 
+`themes/github.com/wowchemy/wowchemy-hugo-themes/wowchemy/layouts/_default/single.html` and it includes the following HTML/code.
+
+```html
+{{- define "main" -}}
+
+<article class="article">
+
+  {{ partial "page_header" . }}
+
+  <div class="article-container">
+
+    <div class="article-style">
+      {{ .Content }}
+    </div>
+
+    {{ partial "page_footer" . }}
+
+  </div>
+</article>
+
+{{- end -}}
+```
+
+_Note_: Have a look at [HUGO website](https://gohugo.io/templates/introduction/) for the HUDO templating syntax.
+
+We do not want to modify any of the files in the `themes` directory, so we will create a new file at the root directory of our `blogdown` website (`layouts/_default/single.html`).  
+I am not going to use the code proposed in [@CharlieLeee](https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609)'s comment, but instead a slight modification to make the TOC a bit more responsive.
+
+In this case, the TOC will use three out of the twelve columns in a wide screen (_i.e._,&nbsp;grid layout).
+On a smaller screen, the TOC will occupy twelve columns (_i.e._,&nbsp;equivalent to the css `width: 100%;`) and will be wrapped after the contents, hence it will be under.
+
+To note and for later, in the code chunk below:
+
+- `.Content` is a HUGO variable which contains the content of the post.
+- `.TableOfContents` is a HUGO variable which contains the TOC of the post.
+
+```html
+{{- define "main" -}}
+
+<article class="article">
+
+  {{ partial "page_header" . }}
+
+  <div class="article-container">
+
+    <div class="row">
+      
+      <div class="col-12 col-lg-9 article-style">
+        {{ .Content }} <!-- HUGO variable which contains the content of the post -->
+      </div>
+      
+      <div class="col-12 col-lg-3 docs-toc">
+        <ul class="nav toc-top">
+          <li>
+            <a href="#" id="back_to_top" class="docs-toc-title">
+              {{ i18n "on_this_page" }}
+            </a>
+          </li>
+        </ul>
+    
+        {{ .TableOfContents }} <!-- HUGO variable which contains the TOC of the post -->
+        
+      </div>
+    </div>
+
+    {{ partial "page_footer" . }}
+
+  </div>
+</article>
+
+{{- end -}}
+```
+
+Again, we need to render the `index.en.Rmd` file, or to restart the website (`blogdown::stop_server()`/`blogdown::serve_site()`) to ensure all modifications are taken into account.
+
+![](assets/rmd_default_toc_single_post.png)
+
+Not quite, what we could have expected ...
+
+The TOC from the Rmarkdown (HTML) file is still at the top, but there is a "Contents" on the right side (as define in `layouts/_default/single.html`).  
+This "Contents" comes from our modified layout file and it is not included in a HUGO variable.  
+This TOC header is a hypertext reference to the top of the current page.
+
+```html
+<ul class="nav toc-top">
+  <li>
+    <a href="#" id="back_to_top" class="docs-toc-title">
+      {{ i18n "on_this_page" }}
+    </a>
+  </li>
+</ul>
+```
+
+Our layout seems to "work", but somehow, does not include the TOC of our HTML file generated from the `index.en.Rmd` file.
+
+Let's have a look at another post in plain markdown from our `blogdown` website.
+
+- Before the modifications of the layout  
+  ![](assets/markdown_default_before.png)
+
+- After the modifications of the layout  
+  ![](assets/markdown_default_after.png)
+
+It's looking great for the markdown post!
+
+In conclusion and since we modified the page layout, the issue no longer seems to be on the HUGO side.
+
+If we take a look at the HTML file produced by `rmarkdown::render_site()`.
+
+```{r}
+#| echo: false
+#| output: asis
+cat(c("````md", readLines("assets/rmarkdown_html.txt"), "````"), sep = "\n")
+```
+
+To narrow down where to look a little bit, I remove all parts not related to the TOC generated in the HTML file.
+
+```{r}
+#| echo: false
+#| output: asis
+cat(c("````md", readLines("assets/rmarkdown_html.txt")[14:19], "````"), sep = "\n")
+```
+
+In this part, we are interested in the `div` which includes the TOC and we can see that the `id` is `"TOC"`.
+
+You might not know and you will after reading this, but HUGO parses the headings from markdown (_i.e._,&nbsp;`#`, `##`, etc.) and stores all those headings in an HTML structure (_i.e._,&nbsp;`nav`) with `id="TableOfContents"`.  
+Seems familiar?! It is the HUGO variable seen earlier, which contains the TOC.  
+To know this, well you have to read [HUGO's documentation](https://gohugo.io/content-management/toc/).
+
+At this point, you might not see where all this is going. 
+
+Let me clarify all the information we have:
+
+- HUGO translate markdown files to HTML files.
+- HUGO has a variable/id for the TOC, named `TableOfContents`
+- We can change the layout of the HUGO theme to include TOC (if the theme does not already include it as for "[wowchemy/starter-hugo-academic](https://github.com/wowchemy/starter-hugo-academic)").
+  - It works on plain markdown posts.
+  - It does not on HTML posts produced from `.Rmd` files.
+    
+In conclusion, there is something wrong with the HTML files produced from `.Rmd` files.
+
+## Fixing `.Rmd`/`.html` Posts
+
+`blogdown` provides an add-in to easily creates new post (`blogdown:::new_post_addin()`), in which you can decide what is the file format/extension you want to use.  
+You can change the default in your `.Rprofile` with, for example `.Rmd`, as your default using `options(blogdown.ext = ".Rmd")`.
+
+You are probably (_as I am_) more familiar with the `Rmd` extension.
+
+- `.Rmd` produces `.html` with `rmarkdown::render_site()`.  
+  And the floating TOC is not working in that case.  
+  ![](assets/rmd_default_toc_single_post.png)
+
+Let's modify the extension to `Rmarkdown`.
+
+- `.Rmarkdown` produces `.markdown` (_basically the same as `.md`_) with `rmarkdown::render_site()`.  
+  ![](assets/rmarkdown_default_toc_single_post.png)
+
+It works!  
+We have a floating TOC when using `.Rmarkdown` extension, thus when we do not use pandoc to translate markdown to HTML.
+
+## I Want `Rmd`, not `Rmarkdown`!
+
+We could only use `.Rmarkdown` file and stop right there, but what if we wanted to keep our favourite `.Rmd` extension everywhere?  
+The solution to this is quite simple!
+
+1. In the `.Rprofile` at the root of your `blogdown` website, change the default rendering method to `"markdown"` using `options(blogdown.method = "markdown")`.
+2. Restart R.
+3. You are all set! `rmarkdown::render_site()` will only produce markdown file when used with `blogdown`.
+
+## Conclusion
+
+If you want a floating TOC, you should not generates HTML files from your Rmarkdown files and you need to add the HUGO variable `.TableOfContents` in the layout HTML file controlling the type of content you want the floating TOC to be.
+
+_Note_: To a more complete setup workflow for `blogdown`, I recommend to have a look at [Alison Hill](https://alison.rbind.io/)'s blog post: "[Up & Running with Blogdown in 2021](https://alison.rbind.io/post/new-year-new-blogdown/)".
+
+## Going in Style
+
+:::{style="text-align:center;"}
+![Movie poster of "Going in Style" (<a href = "https://www.imdb.com/title/tt2568862/">IMDb</a>).](assets/Going-in-Style.jpg){fig-alt="poster of the movie Going in Style showing from left to right Alan Arkin, Morgan Freeman, and Michael Caine."}
+:::
+
+Because, the TOC has an `id` which is `TableOfContents`, you can control the style of the TOC with (s)css (_i.e._,&nbsp;`#TableOfContents`!
+
+For example, to get the left border going up including the "Contents" header.
+
+```{css}
+/*| eval: false*/
+#TableOfContents, .docs-toc-title {
+  border-left: 1px solid $sta-primary;
+  /* "$sta-primary" is the primary colour from the theme (sass/scss) */
+}
+```
+
+You might also want to increase the width of the article container, because you now have TOC sharing the space with the article itself.
+
+```{css}
+/*| eval: false*/
+.article-container {
+  max-width: 960px;
+}
+```
