@@ -1,0 +1,29 @@
+name: Accessibility Validation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      # Insert any jobs here required to build your website files
+      - name: Scan for accessibility issues
+        uses: microsoft/accessibility-insights-action@v3
+        with:
+          static-site-dir: ${{ github.workspace }}/_site
+          static-site-url-relative-path: /
+          fail-on-accessibility-error: false
+      - name: Upload report artifact
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-reports
+          path: ${{ github.workspace }}/_accessibility-reports
