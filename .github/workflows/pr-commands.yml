@@ -1,20 +1,16 @@
-name: Quarto Render
+name: Pull Request Commands
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - "_site/**"
-      - "_freeze/**"
-  workflow_dispatch:
+  issue_comment:
+    types: [created]
 
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
-  quarto-render:
+  build:
+    if: startsWith(github.event.comment.body, '/render')
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -35,14 +31,12 @@ jobs:
           version: pre-release
       - name: Render Quarto Project
         uses: quarto-dev/quarto-actions/render@v2
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v4
+      - name: commit
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add _site/*
+          git commit -m 'ci: quarto render' || echo "No changes to commit"
+      - uses: r-lib/actions/pr-push@v2
         with:
-          commit-message: "ci: automatic website rendering with latest Quarto"
-          signoff: false
-          branch: ci/latest-quarto-updates
-          delete-branch: true
-          title: "Automatic website rendering with latest Quarto"
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
