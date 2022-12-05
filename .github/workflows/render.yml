@@ -1,0 +1,46 @@
+name: Quarto Render
+
+on:
+  pull_request:
+    paths-ignore:
+      - "_site/**"
+      - "_freeze/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  quarto-render:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages:
+            any::knitr
+            any::rmarkdown
+            any::downlit
+            any::xml2
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: pre-release
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: "ci: automatic website rendering with latest Quarto"
+          signoff: false
+          branch: ci/latest-quarto-updates
+          delete-branch: true
+          title: "Automatic website rendering with latest Quarto"
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
