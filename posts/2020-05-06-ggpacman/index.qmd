@@ -7,7 +7,7 @@ image: featured.png
 image-alt: |
   `ggpacman` hexagonal logo representing a red ghost from the game Pac-Man on a black background with a blue border and `ggpacman` written in yellow below the ghost.
 knitr:
-  opts_chunk: 
+  opts_chunk:
     dev: "ragg_png"
     dev.args: {background: "#ffffff00"}
 ---
@@ -44,11 +44,11 @@ My first thought, was let's draw and animate Pac-Man, that should not be that ha
 Well, it was not that easy after-all ...
 But, I am going to go through my code here (you might be interested to actually look at the [commits history](https://github.com/mcanouil/ggpacman/commits/master).
 
-:::{style="text-align: center;"}
+::: {.hcenter}
 
 <!-- <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Maybe I went too far with <a href="https://twitter.com/hashtag/ggplot2?src=hash&amp;ref_src=twsrc%5Etfw">#ggplot2</a> and <a href="https://twitter.com/hashtag/gganimate?src=hash&amp;ref_src=twsrc%5Etfw">#gganimate</a> ...😅<br>What do you think <a href="https://twitter.com/hadleywickham?ref_src=twsrc%5Etfw">@hadleywickham</a> &amp; <a href="https://twitter.com/thomasp85?ref_src=twsrc%5Etfw">@thomasp85</a> , did I go too far or not enough ? (I am planning to add the ghosts 😎) <a href="https://t.co/nkfbti1Etd">pic.twitter.com/nkfbti1Etd</a></p>&mdash; Mickaël CANOUIL (@MickaelCanouil) <a href="https://twitter.com/mickaelcanouil/status/1241760925499170824?ref_src=twsrc%5Etfw">March 22, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
 
-<img src="media/tweet-1.png" alt="Tweet: Maybe I went too far with ggplot2 and gganimate ... 😅 What do you \@hadleywickham & \@thomasp85, did I go too far or not enough ? (I am planning to add the ghosts 😎) followed by an GIF of a PacMan moving in a labyrinth" style="position: static; visibility: visible; width: 550px; height: 821px; display: block; flex-grow: 1; padding: 10px;"/>
+<img src="media/tweet-1.png" alt="Tweet: Maybe I went too far with ggplot2 and gganimate ... 😅 What do you \@hadleywickham & \@thomasp85, did I go too far or not enough ? (I am planning to add the ghosts 😎) followed by an GIF of a PacMan moving in a labyrinth" style="position: static; visibility: visible; width: 550px; height: 821px; display: inline-block; flex-grow: 1; padding: 10px; text-align: center;"/>
 
 :::
 
@@ -118,6 +118,7 @@ base_layer <- base_layer +
 ```{r}
 #| label: base-layer-colours-print
 #| echo: false
+#| classes: hcenter
 base_layer
 ```
 
@@ -371,6 +372,7 @@ maze_layer <- base_layer +
 ```{r}
 #| label: maze-point-plot-print
 #| echo: false
+#| classes: hcenter
 maze_layer
 ```
 
@@ -401,6 +403,7 @@ To draw Pac-Man, I needed few things:
 
 - The Pac-Man shape (open and closed mouth). Since, Pac-Man is not a complete circle shape, I used `geom_arc_bar()` (from [`ggforce`](https://ggforce.data-imaginist.com/)), and defined the properties of each state of Pac-Man based on the aesthetics required by this function.
   *Note*: At first, I wanted a smooth animation/transition ofPac-Man opening and closing its mouth, this is why there arefour `"close_"` states.
+  
   ```{r}
   #| label: pacman-state
   pacman_state <- tribble(
@@ -415,6 +418,7 @@ To draw Pac-Man, I needed few things:
     "close_down", pi, - pi
   )
   ```
+
   ```{r}
   #| label: pacman-state-plot
   ggplot() +
@@ -427,11 +431,11 @@ To draw Pac-Man, I needed few things:
     facet_wrap(vars(state), ncol = 4)
   ```
 
-:::{style="text-align: center;"}
+::: {.hcenter}
 
 <!-- <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Next mission, should you choose to accept, is to make Pac-Man face the direction of movement🎖</p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/1241767912370774020?ref_src=twsrc%5Etfw">March 22, 2020</a></blockquote> -->
 
-<img src="media/tweet-2.png" alt="Tweet: Next mission, should you choose to accept, is to make Pac-Man face the direction of movement &mdash; Thomas Lin Pedersen (\@thomasp85)" style="position: static; visibility: visible; width: 550px; height: 327px; display: block; flex-grow: 1; padding: 10px;"/>
+<img src="media/tweet-2.png" alt="Tweet: Next mission, should you choose to accept, is to make Pac-Man face the direction of movement &mdash; Thomas Lin Pedersen (\@thomasp85)" style="position: static; visibility: visible; width: 550px; height: 327px; display: inline-block; flex-grow: 1; padding: 10px; text-align: center;"/>
 
 :::
 
@@ -462,9 +466,11 @@ Here, in preparation for [`gganimate`](https://gganimate.com/), I also added a c
 #| label: pacman-moves
 pacman_moves <- ggpacman::compute_pacman_coord(pacman)
 ```
+
 ```{r}
 #| label: pacman-moves-p
 #| echo: false
+#| classes: sourceCode
 pacman_moves
 ```
 
@@ -496,6 +502,7 @@ animated_pacman <- maze_layer +
 ```{r}
 #| label: pacman-plot-animated
 #| echo: false
+#| classes: hcenter
 animate(
   plot = animated_pacman,
   width = 3.7 * 2.54,
@@ -543,6 +550,7 @@ top <- ggplot() +
 ```{r}
 #| label: ghost-top-plot
 #| echo: false
+#| classes: hcenter
 top
 ```
 
@@ -568,6 +576,7 @@ bottom <- ggplot() +
 ```{r}
 #| label: ghost-bottom-plot
 #| echo: false
+#| classes: hcenter
 bottom
 ```
 
@@ -575,6 +584,7 @@ bottom
 #| label: ghost-bottom-polygon
 bottom_polygon <- ggplot_build(bottom)$data[[1]][, c("x", "y")]
 ```
+
 Then, I just added one point to "properly" link the top and the bottom part.
 
 ```{r}
@@ -704,6 +714,7 @@ blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Bli
 ```{r}
 #| label: blinky-ghost-static
 #| echo: false
+#| classes: sourceCode
 blinky_ghost
 ```
 
@@ -724,6 +735,7 @@ blinky_ghost <- blinky_ghost %>%
 ```{r}
 #| label: blinky-ghost-noise
 #| echo: false
+#| classes: sourceCode
 blinky_ghost
 ```
 
@@ -762,6 +774,7 @@ blinky_ghost <- blinky_ghost %>%
 ```{r}
 #| label: blinky-ghost-show
 #| echo: false
+#| classes: sourceCode
 blinky_ghost
 ```
 
@@ -792,6 +805,7 @@ blinky_plot <- base_layer +
 ```{r}
 #| label: blinky-plot-static
 #| echo: false
+#| classes: hcenter
 blinky_plot
 ```
 
@@ -805,6 +819,7 @@ animated_blinky <- blinky_plot + transition_manual(step)
 ```{r}
 #| label: blinky-plot-animated
 #| echo: false
+#| classes: hcenter
 animate(
   plot = animated_blinky,
   width = 3.7 * 2.54,
@@ -851,6 +866,7 @@ If you don't recall, `maze_layer` already includes a geometry with the bonus poi
 ```{r}
 #| label: reminder-maze
 #| echo: false
+#| classes: hcenter
 maze_layer
 ```
 
@@ -876,6 +892,7 @@ maze_layer_points <- maze_layer +
 ```{r}
 #| label: points-eaten-plot
 #| echo: false
+#| classes: hcenter
 maze_layer_points
 ```
 
@@ -889,6 +906,7 @@ animated_points <- maze_layer_points + transition_manual(step)
 ```{r}
 #| label: points-eaten-plot-animated
 #| echo: false
+#| classes: hcenter
 animate(
   plot = animated_points,
   width = 3.7 * 2.54,
@@ -900,7 +918,6 @@ animate(
   renderer = gifski_renderer()
 )
 ```
-
 
 ### Ghost `"weak"` and `"eaten"` states
 
@@ -927,6 +944,7 @@ ghosts_vulnerability <- bonus_points_eaten %>%
 ```{r}
 #| label: vulnerability-values
 #| echo: false
+#| classes: sourceCode
 ghosts_vulnerability
 ```
 
@@ -969,6 +987,7 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 ```{r}
 #| label: blinky-moves-small
 #| echo: false
+#| classes: sourceCode
 blinky_moves
 ```
 
@@ -991,6 +1010,7 @@ blinky_plot <- base_layer +
 ```{r}
 #| label: blinky-plot-line
 #| echo: false
+#| classes: hcenter
 #| fig.height: 0.5
 #| fig.width: 3.7
 blinky_plot
@@ -1016,6 +1036,7 @@ animated_blinky <- blinky_plot + transition_manual(step)
 ```{r}
 #| label: blinky-state-plot-animated
 #| echo: false
+#| classes: hcenter
 animate(
   plot = animated_blinky,
   width = 3.7 * 2.54,
@@ -1032,7 +1053,7 @@ animate(
 
 In the current version, nearly everything is either a dataset or a function and could be used like this.
 
-### Load and compute the data.
+### Load and compute the data
   
 ```{r}
 #| label: plot-time-data
@@ -1059,7 +1080,7 @@ map_colours <- c(
 )
 ```
 
-### Build the base layer with the maze.
+### Build the base layer with the maze
    
 ```{r}
 #| label: plot-time-base
@@ -1097,7 +1118,7 @@ base_grid <- ggplot() +
 base_grid
 ```
 
-### Draw the `"eaten"` bonus points geometry.
+### Draw the `"eaten"` bonus points geometry
    
 ```{r}
 #| label: plot-time-points
@@ -1139,7 +1160,7 @@ p_pacman <- list(
 base_grid + p_pacman
 ```
 
-### Draw the ghosts, using the trick that `+` works also on a list of geometries.
+### Draw the ghosts, using the trick that `+` works also on a list of geometries
   
 ```{r}
 #| label: plot-time-ghosts
@@ -1178,14 +1199,14 @@ p_ghosts <- map(.x = ghosts, .f = function(data) {
 base_grid + p_ghosts
 ```
 
-### Draw everything.
+### Draw everything
   
 ```{r}
 #| label: plot-time-all
 base_grid + p_points + p_pacman + p_ghosts
 ```
 
-### Animate everything.
+### Animate everything
    
 ```{r}
 #| label: plot-time-all-transition
@@ -1196,6 +1217,7 @@ PacMan <- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)
 ```{r}
 #| label: plot-time-all-animated
 #| echo: false
+#| classes: hcenter
 animate(
   plot = PacMan,
   width = 3.7 * 2.54,
