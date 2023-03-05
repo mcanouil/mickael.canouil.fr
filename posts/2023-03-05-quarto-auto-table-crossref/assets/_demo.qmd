@@ -1,0 +1,35 @@
+---
+format: html
+---
+
+```{r}
+#| include: false
+library(palmerpenguins)
+library(gt)
+library(dplyr)
+```
+
+Below are tables of the first six rows of the Palmer penguins dataset by species:
+
+```{r}
+#| echo: false
+#| output: asis
+cat(sprintf("- `%s` (@tbl-%s)", levels(penguins[["species"]]), levels(penguins[["species"]])), sep = "\n")
+
+for (ispecies in levels(penguins[["species"]])) {
+  tab <- penguins |>
+    filter(species %in% ispecies) |>
+    select(-species) |>
+    head() |>
+    gt() |>
+    tab_header(title = ispecies)
+  cat(sep = "\n", knitr::knit_child(quiet = TRUE, text = c(
+    "```{r}",
+    "#| echo: false",
+    sprintf("#| tbl-cap: %s", ispecies),
+    sprintf("#| label: tbl-%s", ispecies),
+    "tab",
+    "```"
+  )))
+}
+```
