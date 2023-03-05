@@ -4,7 +4,28 @@
     "href": "blog.html",
     "title": "Blog",
     "section": "",
-    "text": "Add a Floating Table of Contents in blogdown\n\n\n\n\n\n\n\nR\n\n\nblogdown\n\n\nrmarkdown\n\n\nHUGO\n\n\nWebsite\n\n\n\n\nHow to have a table of contents (TOC) on either the left or the right side of a post? I have an answer!\n\n\n\n\n\n\nThursday, the 6 of May, 2021\n\n\nMickaël CANOUIL\n\n\n\n\n\n\n  \n\n\n\n\nA ggplot2 and gganimate Version of Pac-Man\n\n\n\n\n\n\n\nR\n\n\nVisualisation\n\n\nggplot2\n\n\ngganimate\n\n\nFun\n\n\n\n\nThe story of ggpacman. Or how to build a useless but fun R package to make a GIF of the game Pac-Man.\n\n\n\n\n\n\nWednesday, the 6 of May, 2020\n\n\nMickaël CANOUIL\n\n\n\n\n\n\nNo matching items"
+    "text": "Quarto Q&A: How to have labels and captions for an unknown number of tables?\n\n\n\n\n\n\n\nQuarto\n\n\nQ&A\n\n\nR\n\n\nknitr\n\n\n\n\nA small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.\n\n\n\n\n\n\nSunday, the 5 of March, 2023\n\n\nMickaël CANOUIL\n\n\n\n\n\n\n  \n\n\n\n\nAdd a Floating Table of Contents in blogdown\n\n\n\n\n\n\n\nR\n\n\nblogdown\n\n\nrmarkdown\n\n\nHUGO\n\n\nWebsite\n\n\n\n\nHow to have a table of contents (TOC) on either the left or the right side of a post? I have an answer!\n\n\n\n\n\n\nThursday, the 6 of May, 2021\n\n\nMickaël CANOUIL\n\n\n\n\n\n\n  \n\n\n\n\nA ggplot2 and gganimate Version of Pac-Man\n\n\n\n\n\n\n\nR\n\n\nVisualisation\n\n\nggplot2\n\n\ngganimate\n\n\nFun\n\n\n\n\nThe story of ggpacman. Or how to build a useless but fun R package to make a GIF of the game Pac-Man.\n\n\n\n\n\n\nWednesday, the 6 of May, 2020\n\n\nMickaël CANOUIL\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "",
+    "text": "I decided to start small blog posts with answers/solutions to questions I have seen and answered on Twitter, Mastodon, and Quarto GitHub Issues & Discussions."
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n1 The Question/Problem",
+    "text": "1 The Question/Problem\n\nSuppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx. G is unknown apriori, but will be at least 1.\nIs there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?\n\nSource: https://mastodon.ie/@DToher/109915736491084825"
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n2 The Answer/Solution",
+    "text": "2 The Answer/Solution\nThe trick is, within a code cell with output: asis, to use knitr::knit_child() to create code cells with label, caption (tbl-cap), or whatever option you might want or need.\n\n\nQuarto Input\nQuarto Output\n\n\n\n---\nformat: html\n---\n\n```{r}\n#| include: false\nfor (ipkg in c(\"palmerpenguins\", \"gt\", \"dplyr\")) {\n  if (!require(ipkg, character.only = TRUE)) {\n    install.packages(ipkg)\n    library(ipkg, character.only = TRUE)\n  }\n}\n```\n\nBelow are tables of the first six rows of the Palmer penguins dataset by species:\n\n```{r}\n#| echo: false\n#| output: asis\ncat(\n  sprintf(\n    \"- `%s` (@tbl-%s)\",\n    levels(penguins[[\"species\"]]),\n    levels(penguins[[\"species\"]])\n  ),\n  sep = \"\\n\"\n)\n\nfor (ispecies in levels(penguins[[\"species\"]])) {\n  tab &lt;- penguins |&gt;\n    filter(species %in% ispecies) |&gt;\n    select(-species) |&gt;\n    head() |&gt;\n    gt() |&gt;\n    tab_header(title = ispecies)\n  cat(sep = \"\\n\", knitr::knit_child(quiet = TRUE, text = c(\n    \"```{r}\",\n    \"#| echo: false\",\n    sprintf(\"#| tbl-cap: %s\", ispecies),\n    sprintf(\"#| label: tbl-%s\", ispecies),\n    \"tab\",\n    \"```\"\n  )))\n}\n```"
   },
   {
     "objectID": "posts/2021-05-06-floating-toc-in-blogdown/index.html",
