@@ -1,0 +1,58 @@
+---
+title: "How to automatically have labels and captions for an unknown number of tables in Quarto?"
+description: |
+  A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using `knitr` and R.
+date: "2023-03-05"
+categories: [Quarto, R, knitr]
+image: featured.png
+image-alt: |
+  Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables.
+  Tables are simply on top of each other after the item list.
+---
+
+I decided to start small blog post with answers/solutions to questions I have seen on [Twitter](https://twitter.com/), [Mastodon](https://joinmastodon.org/), and Quarto GitHub [Issues](https://github.com/quarto-dev/quarto-cli/issues) & [Discussions](https://github.com/quarto-dev/quarto-cli/discussions).
+
+I hope this will be useful for others.
+
+## The Question/Problem
+
+<iframe src="https://mastodon.ie/@DToher/109915736491084825/embed" class="mastodon-embed" style="max-width: 100%; border: 0" width="400" allowfullscreen="allowfullscreen"></iframe>
+
+> Suppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx.
+> G is unknown apriori, but will be at least 1.
+>
+> Is there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? 
+> Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?
+
+Source: <https://mastodon.ie/@DToher/109915736491084825>
+
+## The Answer/Solution
+
+The trick is, within a code cell with `output: asis`, to use `knitr::knit_child()` to create code cells with `label`, caption (`tbl-cap`), or whatever option you might want or need.
+
+```{r}
+#| echo: false
+#| output: asis
+#| classes: panel-tabset
+cat("\n\n## Quarto Input\n\n")
+cat(
+  "\n````md",
+  readLines("assets/_demo.qmd"),
+  "````\n",
+  sep = "\n"
+)
+system2("quarto", c("render", "assets/_demo.qmd"))
+devnull <- webshot2::webshot(
+  url = "assets/_demo.html",
+  file = "featured.png",
+  vwidth = 1920 * 1.3,
+  vheight = 1080 * 1.3,
+  cliprect = "viewport"
+)
+unlink("assets/_demo.html")
+unlink("assets/_demo_files", recursive = TRUE)
+cat("\n\n## Quarto Output\n\n")
+fig_alt <- "Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables.
+Tables are simply on top of each other after the item list."
+cat(sprintf("![](%s){fig-alt='%s'}", "featured.png", fig_alt))
+```
