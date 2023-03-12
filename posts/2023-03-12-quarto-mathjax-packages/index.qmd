@@ -1,0 +1,52 @@
+---
+title: "Quarto Q&A: How to use non-default LaTeX packages/macros in MathJax?"
+description: |
+  A second blog post of the "Quarto Q&A" series on how to activate additional MathJax packages in a Quarto document.
+date: "2023-03-12"
+categories: [Quarto, Q&A, MathJax, LaTeX]
+image: featured.png
+image-alt: |
+  Screenshot of an html rendered by Quarto. It contains Quarto MathJax as a title, followed by an equation of rank bold upper sigma.
+---
+
+A second blog post of the "Quarto Q&A" series.  
+This time, I will show how to activate additional MathJax packages in a Quarto document.
+
+## The Question/Problem
+
+Sometimes you want to use additional MathJax packages in a Quarto document, such as being able to use `\qty` from `physics` or upper/lower case Greek letters from `upgreek`.
+
+## The Answer/Solution
+
+The solution is to load the additional packages in the `include-in-header` key of the YAML header, using JavaScript as documented on MathJax documentation.  
+You can load several packages at once, as shown in the example below.
+
+```{r}
+#| echo: false
+#| output: asis
+#| classes: panel-tabset
+cat("\n\n## Quarto Input\n\n")
+cat(
+  "\n````md",
+  readLines("assets/_demo.qmd"),
+  "````\n",
+  sep = "\n"
+)
+# system2("quarto", c("render", "assets/_demo.qmd"))
+# devnull <- webshot2::webshot(
+#   url = "assets/_demo.html",
+#   file = "featured.png",
+#   vwidth = 1920 * 0.25,
+#   vheight = 1080 * 0.25,
+#   cliprect = "viewport",
+#   zoom = 4
+# )
+cat("\n\n## Quarto Output\n\n")
+fig_alt <- "Screenshot of an html rendered by Quarto. It contains Quarto MathJax as a title, followed by an equation of rank bold upper sigma."
+cat(sprintf("![](%s){fig-alt='%s'}", "featured.png", fig_alt))
+```
+
+## More on MathJax Extensions/Macros
+
+See <https://docs.mathjax.org/en/latest/input/tex/extensions/index.html> for more information on MathJax LaTex extensions.
+See <https://docs.mathjax.org/en/latest/input/tex/macros/index.html> for more information on MathJax LaTeX macros.
