@@ -20,7 +20,7 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
       if (isTRUE(grepl("first", grep("annote:", article, value = TRUE)))) {
         first <- "  first: '*As first or co-first*'"
       } else {
-        first <- "  first: ''"
+        first <- sprintf("  first: '%s'", paste(rep("&emsp;", 3), collapse = ""))
       }
       position <- sprintf("  position: '%s/%s'", grep(author, authors), length(authors))
       article <- c(
