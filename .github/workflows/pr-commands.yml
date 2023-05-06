@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   render:
-    if: startsWith(github.event.comment.body, '/render')
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/render') }}
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -19,28 +19,17 @@ jobs:
       - uses: r-lib/actions/pr-fetch@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: r-lib/actions/setup-pandoc@v2
-      - uses: r-lib/actions/setup-r@v2
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages:
-            any::knitr
-            any::rmarkdown
-            any::downlit
-            any::xml2
-            any::webshot2
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+      - uses: ./.github/quarto
         with:
           version: pre-release
-      - name: Render Quarto Project
-        uses: quarto-dev/quarto-actions/render@v2
-      - name: commit
+      - name: Commit/Push to Pull Request
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add _site/*
-          git commit -m 'ci: quarto render' || echo "No changes to commit"
+          git add _freeze/*
+          git commit -m 'ci: quarto rautomatic renderering' || echo "No changes to commit"
+          git push
       - uses: r-lib/actions/pr-push@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
