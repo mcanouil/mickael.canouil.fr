@@ -9,11 +9,9 @@ inputs:
   token:
     description: "The GitHub token to use for pushing the rendered project."
     required: true
-    default: ${{ secrets.GITHUB_TOKEN }}
   actor:
     description: "The GitHub actor to use for pushing the rendered project."
     required: true
-    default: ${{ github.actor }}
   packages:
     description: "A list of R packages to install."
     required: false
@@ -38,6 +36,7 @@ runs:
       uses: quarto-dev/quarto-actions/render@v2
     - if: ${{ github.event_name == 'pull_request' }}
       name: Commit/Push to Pull Request
+      shell: bash
       run: |
         git config --local user.name "${{ github.actor }}"
         git config --local user.email "${{ github.actor }}@users.noreply.github.com"
