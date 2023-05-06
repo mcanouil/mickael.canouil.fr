@@ -7,6 +7,10 @@ on:
     paths-ignore:
       - "_site/**"
       - "_freeze/**"
+      - ".github/**"
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -14,30 +18,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quarto-render:
+  quarto-render-main:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: r-lib/actions/setup-pandoc@v2
-      - uses: r-lib/actions/setup-r@v2
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - if: github.event_name == 'push'
+        uses: actions/checkout@v3
+      - if: github.event_name == 'pull_request'
+        uses: actions/checkout@v3
         with:
-          packages:
-            any::knitr
-            any::rmarkdown
-            any::downlit
-            any::xml2
-            any::webshot2
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: ./.github/actions/quarto.yml
         with:
           version: pre-release
-      - name: Render Quarto Project
-        uses: quarto-dev/quarto-actions/render@v2
+      - name: Commit/Push to Pull Request
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git add _site/*
+          git add _freeze/*
+          git commit -m 'ci: quarto rautomatic renderering' || echo "No changes to commit"
+          git push
       - name: Create Pull Request
-        id: cpr
+        if: github.event_name == 'push'
         uses: peter-evans/create-pull-request@v4
         with:
           commit-message: "ci: automatic website rendering with latest Quarto"
