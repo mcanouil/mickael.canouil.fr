@@ -6,23 +6,52 @@ inputs:
     description: "The Quarto release version type."
     required: true
     default: pre-release
+  token:
+    description: "The GitHub token to use for pushing the rendered project."
+    required: true
+    default: ${{ secrets.GITHUB_TOKEN }}
+  packages:
+    description: "A list of R packages to install."
+    required: false
   
 runs:
   using: "composite"
   steps:
+    - if: ${{ github.event_name == 'pull_request' }}
+      uses: r-lib/actions/pr-fetch@v2
+      with:
+        repo-token: ${{ inputs.token }}
     - uses: r-lib/actions/setup-pandoc@v2
     - uses: r-lib/actions/setup-r@v2
     - uses: r-lib/actions/setup-r-dependencies@v2
       with:
-        packages:
-          any::knitr
-          any::rmarkdown
-          any::downlit
-          any::xml2
-          any::webshot2
+        packages: ${{ inputs.packages }}
     - name: Set up Quarto
       uses: quarto-dev/quarto-actions/setup@v2
       with:
         version: ${{ inputs.version }}
     - name: Render Quarto Project
       uses: quarto-dev/quarto-actions/render@v2
+    - if: ${{ github.event_name == 'pull_request' }}
+      name: Commit/Push to Pull Request
+      run: |
+        git config --local user.name "$GITHUB_ACTOR"
+        git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        git add _site/*
+        git add _freeze/*
+        git commit -m 'ci: quarto rautomatic renderering' || echo "No changes to commit"
+    - if: ${{ github.event_name == 'pull_request' }}
+      uses: r-lib/actions/pr-push@v2
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Pull Request
+      if: ${{ github.event_name == 'push' }}
+      uses: peter-evans/create-pull-request@v4
+      with:
+        commit-message: "ci: automatic website rendering with latest Quarto"
+        signoff: false
+        branch: ci/latest-quarto-updates
+        delete-branch: true
+        title: "ci: automatic website rendering with latest Quarto"
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
