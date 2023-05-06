@@ -10,6 +10,10 @@ inputs:
     description: "The GitHub token to use for pushing the rendered project."
     required: true
     default: ${{ secrets.GITHUB_TOKEN }}
+  actor:
+    description: "The GitHub actor to use for pushing the rendered project."
+    required: true
+    default: ${{ github.actor }}
   packages:
     description: "A list of R packages to install."
     required: false
@@ -35,15 +39,15 @@ runs:
     - if: ${{ github.event_name == 'pull_request' }}
       name: Commit/Push to Pull Request
       run: |
-        git config --local user.name "$GITHUB_ACTOR"
-        git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+        git config --local user.name "${{ github.actor }}"
+        git config --local user.email "${{ github.actor }}@users.noreply.github.com"
         git add _site/*
         git add _freeze/*
         git commit -m 'ci: quarto rautomatic renderering' || echo "No changes to commit"
     - if: ${{ github.event_name == 'pull_request' }}
       uses: r-lib/actions/pr-push@v2
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token: ${{ inputs.token }}
     - name: Create Pull Request
       if: ${{ github.event_name == 'push' }}
       uses: peter-evans/create-pull-request@v4
