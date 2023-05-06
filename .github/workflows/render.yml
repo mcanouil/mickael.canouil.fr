@@ -18,21 +18,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quarto-render-main:
+  quarto-render:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - if: github.event_name == 'push'
+      - if: ${{ github.event_name == 'push' }}
         uses: actions/checkout@v3
-      - if: github.event_name == 'pull_request'
+      - if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.ref }}
+      - run: |
+          git branch --show-current
       - uses: ./.github/quarto
         with:
           version: pre-release
-      - name: Commit/Push to Pull Request
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Commit/Push to Pull Request
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
@@ -41,7 +44,7 @@ jobs:
           git commit -m 'ci: quarto rautomatic renderering' || echo "No changes to commit"
           git push
       - name: Create Pull Request
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' }}
         uses: peter-evans/create-pull-request@v4
         with:
           commit-message: "ci: automatic website rendering with latest Quarto"
