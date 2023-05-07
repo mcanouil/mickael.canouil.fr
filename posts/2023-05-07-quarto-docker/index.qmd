@@ -1,0 +1,195 @@
+---
+title: "Quarto Q&A: How to publish your document/book/website as a Docker container?"
+description: |
+  In this blog post of the "Quarto Q&A" series you will learn how
+  to publish your Quarto project as a Docker container.
+date: "2023-05-07"
+categories: [Quarto, Q&A, Docker]
+image: featured.png
+image-alt: |
+  Docker logo with a whale and containers, and Quarto logo with text inside the whale.
+code-annotations: hover
+footnotes-hover: true
+toc-depth: 4
+---
+
+A new blog post of the "Quarto Q&A" series.  
+This time, I will show how to publish your Quarto project as a Docker container as light as possible.
+
+## The Question/Problem
+
+There are different ways to publish a Quarto project, either if it is a document, a book or a website:
+
+- [Quarto Pub](https://quarto.org/docs/publishing/quarto-pub.html),
+- [GitHub Pages](https://quarto.org/docs/publishing/github-pages.html),
+- [Posit Connect](https://quarto.org/docs/publishing/rstudio-connect.html),
+- [Netlify](https://quarto.org/docs/publishing/netlify.html),
+- [Confluence](https://quarto.org/docs/publishing/confluence.html).
+
+But, what if you want to publish your Quarto project as a Docker container, as an app?
+
+## The Answer/Solution
+
+Again, there are several ways to do it.
+I will show you one way to publish your Quarto project as a Docker container, as light as possible.
+To do so, I will use a Dockerfile with staged builds.
+
+### Create a project
+
+For example, I create a website using the Quarto CLI and add a code cell to the `about.qmd` file that uses the `palmerpenguins` R package.  
+I will publish this Quarto project as a Docker container.
+
+```bash
+quarto create-project --type website:blog mywebsite
+cd mywebsite
+echo '```{r}
+library(ggplot2)
+library(palmerpenguins)
+ggplot(penguins) +
+  aes(x = bill_length_mm, y = bill_depth_mm) +
+  geom_point(aes(colour = species)) +
+  geom_smooth(method = "lm", se = FALSE)
+```' >> about.qmd
+```
+
+### `renv`
+
+_See <https://rstudio.github.io/renv/>._
+
+#### Setup `renv`
+
+I am using `renv` to record the dependencies of the project[^renv-deps].  
+
+[^renv-deps]: See [`renv` documentation](https://rstudio.github.io/renv/articles/renv.html#snapshotting-dependencies) for more information on snapshotting dependencies.
+
+```bash
+echo 'library(knitr)
+library(rmarkdown)
+library(ggplot2)
+library(palmerpenguins)' >> _dependencies.R
+Rscript -e 'install.packages("renv")' -e "renv::init()"
+Rscript -e "renv::hydrate()" -e "renv::snapshot()"
+```
+
+#### The Dockerfile
+
+Here, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the R versions.  
+This allows to change the versions without having to change the Dockerfile itself.
+
+```bash
+ARG QUARTO_VERSION="1.3.340"
+
+FROM ghcr.io/quarto-dev/quarto:${QUARTO_VERSION} AS builder             # <1>
+
+ARG RIG_VERSION="latest"
+ARG R_VERSION="release"
+COPY install-rig.sh /tmp/install-rig.sh
+RUN bash /tmp/install-rig.sh "${RIG_VERSION}"                           # <2>
+RUN rig add ${R_VERSION} && Rscript -e 'pak::pkg_install("renv")'       # <3>
+
+COPY mywebsite /app                                                     # <4>
+WORKDIR /app
+RUN Rscript -e "renv::restore()"
+RUN quarto render .                                                     # <5>
+
+FROM httpd:alpine                                                       # <6>
+COPY --from=builder /app/_site/ /usr/local/apache2/htdocs/              # <7>
+```
+1. The base Docker image used as the "_builder_", _i.e._,
+   the image with all requirements to build your Quarto project.
+   Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.  
+   The "_builder_" stage is used to install the specified `rig` and {{< iconify fa6-brands r-project>}} version,
+   and to render the website.
+2. The `install-rig.sh` script is used to install the `rig` software.
+3. Using `rig`, we add the specified R version and install the `renv` package.
+4. Copy the Quarto project into the `/app` directory of the "_builder_".
+5. Restore the `lockfile` created with `pak` and render the website with Quarto CLI.
+6. The second and last stage is based on the `httpd:alpine` image which is a light image with Apache pre-installed.
+7. Copy the rendered website from the "_builder_" to the `/usr/local/apache2/htdocs/` directory of the second stage image.
+
+### `pak`
+
+_See <https://pak.r-lib.org/>._
+
+#### Setup `pak`
+
+Alternatively to `renv`, it's also possible de record (and restore) the dependencies of a project[^pak-deps].
+
+[^pak-deps]: See [`pak` documentation](https://pak.r-lib.org/reference/index.html#lock-files) for more information on snapshotting dependencies.
+
+```bash
+Rscript -e 'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'
+Rscript -e 'pak::lockfile_create(c("knitr", "rmarkdown", "ggplot2", "palmerpenguins"))'
+```
+
+#### The Dockerfile  
+
+Again, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the R versions.  
+This allows to change the versions without having to change the Dockerfile.
+
+```bash
+ARG QUARTO_VERSION="1.3.340"
+
+FROM ghcr.io/quarto-dev/quarto:${QUARTO_VERSION} AS builder             # <1>
+
+ARG RIG_VERSION="latest"
+ARG R_VERSION="release"
+COPY install-rig.sh /tmp/install-rig.sh
+RUN bash /tmp/install-rig.sh "${RIG_VERSION}"                           # <2>
+RUN rig add ${R_VERSION}                                                # <3>
+
+COPY mywebsite /app                                                     # <4>
+WORKDIR /app
+RUN Rscript -e "pak::lockfile_install()" && quarto render .             # <5>
+
+FROM httpd:alpine                                                       # <6>
+COPY --from=builder /app/_site/ /usr/local/apache2/htdocs/              # <7>
+```
+1. The base Docker image used as the "_builder_", _i.e._,
+   the image with all requirements to build your Quarto project.
+   Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.  
+   The "_builder_" stage is used to install the specified `rig` and {{< iconify fa6-brands r-project>}} version,
+   and to render the website.
+3. Using `rig`, we add the specified R version which already includes `pak`.
+4. Copy the Quarto project into the `/app` directory of the "_builder_".
+5. Restore the `lockfile` created with `pak` and render the website with Quarto CLI.
+6. The second and last stage is based on the `httpd:alpine` image which is a light image with Apache pre-installed.
+7. Copy the rendered website from the "_builder_" to the `/usr/local/apache2/htdocs/` directory of the second stage image.
+
+### Build the image
+
+It's time to build the image using the Dockerfile and the [`docker buildx build`](https://docs.docker.com/engine/reference/commandline/buildx_build/) command.
+
+```bash
+docker buildx build \
+--platform "linux/amd64" \                                            # <1>
+--build-arg QUARTO_VERSION=1.3.340 \                                  # <2>
+--tag "mywebsite:1.0.0" \                                             # <3>
+--push \                                                              # <4>
+.
+```
+1. The platform to build the image for.
+2. The Quarto version to use when building the image.
+3. The tag to use to label the image, _i.e._, the name `mywebsite` and the version `1.0.0`.
+   This is useful to be able to identify the image later.
+4. (Optional) Assuming you have access to a registry (`docker login`),
+   push the image to the registry, such as Docker Hub.
+
+### Deploy a container
+
+Finally, deploying locally the image as a Docker container using [`docker container run`](https://docs.docker.com/engine/reference/commandline/container_run/) and access the website from your browser at <http://localhost:8080>.
+
+```bash
+docker container run \
+   --detach \                                                            # <1>
+   --platform "linux/amd64" \                                            # <2>
+   --name mywebsite \                                                    # <3>
+   --publish 8080:80 \                                                   # <4>
+   mywebsite:1.0.0                                                       # <5>
+```
+1. The container in detached mode, _i.e._, the container runs in the background.
+2. The platform to run the container on, _i.e._, same as the platform used to build the image in this case.
+3. The name of the container for easy identification, _i.e._, `mywebsite`.
+4. The port mapping, _i.e._, we publish the port `8080` of the host to the port `80` of the container.
+   This is useful to be able to access the website from the host.
+5. The image to use to run the container, _i.e._, `mywebsite:1.0.0`.
