@@ -36,7 +36,7 @@ To do so, I will use a Dockerfile with staged builds.
 
 ### Create a project
 
-For example, I create a website using the Quarto CLI and add a code cell to the `about.qmd` file that uses the `palmerpenguins` R package.  
+For example, I create a website using the Quarto CLI and add a code cell to the `about.qmd` file that uses the `palmerpenguins` {{< iconify fa6-brands r-project >}} package.  
 I will publish this Quarto project as a Docker container.
 
 ```bash
@@ -73,7 +73,7 @@ Rscript -e "renv::hydrate()" -e "renv::snapshot()"
 
 #### The Dockerfile
 
-Here, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the R versions.  
+Here, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the {{< iconify fa6-brands r-project >}} versions.  
 This allows to change the versions without having to change the Dockerfile itself.
 
 ```bash
@@ -98,10 +98,10 @@ COPY --from=builder /app/_site/ /usr/local/apache2/htdocs/              # <7>
 1. The base Docker image used as the "_builder_", _i.e._,
    the image with all requirements to build your Quarto project.
    Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.  
-   The "_builder_" stage is used to install the specified `rig` and {{< iconify fa6-brands r-project>}} version,
+   The "_builder_" stage is used to install the specified `rig` and {{< iconify fa6-brands r-project >}} version,
    and to render the website.
 2. The `install-rig.sh` script is used to install the `rig` software.
-3. Using `rig`, we add the specified R version and install the `renv` package.
+3. Using `rig`, we add the specified {{< iconify fa6-brands r-project >}} version and install the `renv` package.
 4. Copy the Quarto project into the `/app` directory of the "_builder_".
 5. Restore the `lockfile` created with `pak` and render the website with Quarto CLI.
 6. The second and last stage is based on the `httpd:alpine` image which is a light image with Apache pre-installed.
@@ -124,7 +124,7 @@ Rscript -e 'pak::lockfile_create(c("knitr", "rmarkdown", "ggplot2", "palmerpengu
 
 #### The Dockerfile  
 
-Again, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the R versions.  
+Again, I am using "build arguments" (_i.e._, `ARGS`) to specify the [Quarto](https://quarto.org/), the [rig](https://github.com/r-lib/rig) and the {{< iconify fa6-brands r-project >}} versions.  
 This allows to change the versions without having to change the Dockerfile.
 
 ```bash
@@ -150,7 +150,7 @@ COPY --from=builder /app/_site/ /usr/local/apache2/htdocs/              # <7>
    Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.  
    The "_builder_" stage is used to install the specified `rig` and {{< iconify fa6-brands r-project>}} version,
    and to render the website.
-3. Using `rig`, we add the specified R version which already includes `pak`.
+3. Using `rig`, we add the specified {{< iconify fa6-brands r-project >}} version which already includes `pak`.
 4. Copy the Quarto project into the `/app` directory of the "_builder_".
 5. Restore the `lockfile` created with `pak` and render the website with Quarto CLI.
 6. The second and last stage is based on the `httpd:alpine` image which is a light image with Apache pre-installed.
