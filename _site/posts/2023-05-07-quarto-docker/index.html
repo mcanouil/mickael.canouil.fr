@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL">
-<meta name="description" content="In this blog post of the “Quarto Q&amp;A” series you will learn the steps/principles to publish your Quarto project as a Docker container.">
+<meta name="description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
 
 <title>MCU - Quarto Q&amp;A: How to publish your document/book/website as a Docker container?</title>
 <style>
@@ -104,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:site-name" content="MCU">
 <meta property="og:image:height" content="640">
 <meta property="og:image:width" content="1280">
-<meta property="og:image:alt" content="Screenshot of an html rendered by Quarto. It contains Quarto MathJax as a title, followed by an equation of rank bold upper sigma.
+<meta property="og:image:alt" content="Docker logo with a whale and containers, and Quarto logo with text inside the whale.
 ">
 <meta name="twitter:title" content="MCU">
 <meta name="twitter:description" content="A data science blog and portfolio by Mickaël CANOUIL">
@@ -114,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image-height" content="640">
 <meta name="twitter:image-width" content="1280">
-<meta name="twitter:image:alt" content="Screenshot of an html rendered by Quarto. It contains Quarto MathJax as a title, followed by an equation of rank bold upper sigma.
+<meta name="twitter:image:alt" content="Docker logo with a whale and containers, and Quarto logo with text inside the whale.
 ">
 </head>
 
@@ -192,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">Quarto Q&amp;A: How to publish your document/book/website as a Docker container?</h1>
                   <div>
         <div class="description">
-          <p>In this blog post of the “Quarto Q&amp;A” series you will learn the steps/principles to publish your Quarto project as a Docker container.</p>
+          <p>In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.</p>
         </div>
       </div>
                           <div class="quarto-categories">
@@ -216,7 +216,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Monday, the 1 of May, 2023</p>
+        <p class="date">Sunday, the 7 of May, 2023</p>
       </div>
     </div>
     
@@ -235,26 +235,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-questionproblem" id="toc-the-questionproblem" class="nav-link active" data-scroll-target="#the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</a></li>
   <li><a href="#the-answersolution" id="toc-the-answersolution" class="nav-link" data-scroll-target="#the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</a>
   <ul>
-  <li><a href="#renv-httpsrstudio.github.iorenv" id="toc-renv-httpsrstudio.github.iorenv" class="nav-link" data-scroll-target="#renv-httpsrstudio.github.iorenv"><span class="header-section-number">2.1</span> <code>renv</code> (https://rstudio.github.io/renv/)</a>
+  <li><a href="#create-a-project" id="toc-create-a-project" class="nav-link" data-scroll-target="#create-a-project"><span class="header-section-number">2.1</span> Create a project</a></li>
+  <li><a href="#renv" id="toc-renv" class="nav-link" data-scroll-target="#renv"><span class="header-section-number">2.2</span> <code>renv</code></a>
   <ul class="collapse">
-  <li><a href="#create-a-project" id="toc-create-a-project" class="nav-link" data-scroll-target="#create-a-project"><span class="header-section-number">2.1.1</span> Create a project</a></li>
-  <li><a href="#setup-renv" id="toc-setup-renv" class="nav-link" data-scroll-target="#setup-renv"><span class="header-section-number">2.1.2</span> Setup <code>renv</code></a></li>
-  <li><a href="#the-dockerfile" id="toc-the-dockerfile" class="nav-link" data-scroll-target="#the-dockerfile"><span class="header-section-number">2.1.3</span> The Dockerfile</a></li>
-  <li><a href="#build-the-image" id="toc-build-the-image" class="nav-link" data-scroll-target="#build-the-image"><span class="header-section-number">2.1.4</span> Build the image</a></li>
-  <li><a href="#share-the-image" id="toc-share-the-image" class="nav-link" data-scroll-target="#share-the-image"><span class="header-section-number">2.1.5</span> Share the image</a></li>
+  <li><a href="#setup-renv" id="toc-setup-renv" class="nav-link" data-scroll-target="#setup-renv"><span class="header-section-number">2.2.1</span> Setup <code>renv</code></a></li>
+  <li><a href="#the-dockerfile" id="toc-the-dockerfile" class="nav-link" data-scroll-target="#the-dockerfile"><span class="header-section-number">2.2.2</span> The Dockerfile</a></li>
   </ul></li>
-  <li><a href="#pak-httpspak.r-lib.org" id="toc-pak-httpspak.r-lib.org" class="nav-link" data-scroll-target="#pak-httpspak.r-lib.org"><span class="header-section-number">2.2</span> <code>pak</code> (https://pak.r-lib.org/)</a>
+  <li><a href="#pak" id="toc-pak" class="nav-link" data-scroll-target="#pak"><span class="header-section-number">2.3</span> <code>pak</code></a>
   <ul class="collapse">
-  <li><a href="#create-a-project-1" id="toc-create-a-project-1" class="nav-link" data-scroll-target="#create-a-project-1"><span class="header-section-number">2.2.1</span> Create a project</a></li>
-  <li><a href="#setup-pak" id="toc-setup-pak" class="nav-link" data-scroll-target="#setup-pak"><span class="header-section-number">2.2.2</span> Setup <code>pak</code></a></li>
-  <li><a href="#the-dockerfile-1" id="toc-the-dockerfile-1" class="nav-link" data-scroll-target="#the-dockerfile-1"><span class="header-section-number">2.2.3</span> The Dockerfile</a></li>
-  <li><a href="#build-the-image-1" id="toc-build-the-image-1" class="nav-link" data-scroll-target="#build-the-image-1"><span class="header-section-number">2.2.4</span> Build the image</a></li>
-  <li><a href="#share-the-image-1" id="toc-share-the-image-1" class="nav-link" data-scroll-target="#share-the-image-1"><span class="header-section-number">2.2.5</span> Share the image</a></li>
+  <li><a href="#setup-pak" id="toc-setup-pak" class="nav-link" data-scroll-target="#setup-pak"><span class="header-section-number">2.3.1</span> Setup <code>pak</code></a></li>
+  <li><a href="#the-dockerfile-1" id="toc-the-dockerfile-1" class="nav-link" data-scroll-target="#the-dockerfile-1"><span class="header-section-number">2.3.2</span> The Dockerfile</a></li>
   </ul></li>
+  <li><a href="#build-the-image" id="toc-build-the-image" class="nav-link" data-scroll-target="#build-the-image"><span class="header-section-number">2.4</span> Build the image</a></li>
+  <li><a href="#deploy-a-container" id="toc-deploy-a-container" class="nav-link" data-scroll-target="#deploy-a-container"><span class="header-section-number">2.5</span> Deploy a container</a></li>
   </ul></li>
-  <li><a href="#finally" id="toc-finally" class="nav-link" data-scroll-target="#finally"><span class="header-section-number">3</span> Finally</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-05-01-quarto-docker/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-05-07-quarto-docker/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -266,7 +262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 This time, I will show how to publish your Quarto project as a Docker container as light as possible.</p>
 <section id="the-questionproblem" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
-<p>There are different ways to publish your Quarto project, either if is a document, a book or a website:</p>
+<p>There are different ways to publish a Quarto project, either if it is a document, a book or a website:</p>
 <ul>
 <li><a href="https://quarto.org/docs/publishing/quarto-pub.html">Quarto Pub</a>,</li>
 <li><a href="https://quarto.org/docs/publishing/github-pages.html">GitHub Pages</a>,</li>
@@ -274,16 +270,15 @@ This time, I will show how to publish your Quarto project as a Docker container 
 <li><a href="https://quarto.org/docs/publishing/netlify.html">Netlify</a>,</li>
 <li><a href="https://quarto.org/docs/publishing/confluence.html">Confluence</a>.</li>
 </ul>
-<p>But what if you want to publish your Quarto project as a Docker container? As an app?</p>
+<p>But, what if you want to publish your Quarto project as a Docker container, as an app?</p>
 </section>
 <section id="the-answersolution" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</h2>
-<p>Again, there are several ways to do it, but I will show you the steps/principles to publish your Quarto project as a Docker container as light as possible. To do so, I will use a Dockerfile with staged builds.</p>
-<section id="renv-httpsrstudio.github.iorenv" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="renv-httpsrstudio.github.iorenv"><span class="header-section-number">2.1</span> <code>renv</code> (<a href="https://rstudio.github.io/renv/" class="uri">https://rstudio.github.io/renv/</a>)</h3>
-<section id="create-a-project" class="level4" data-number="2.1.1">
-<h4 data-number="2.1.1" class="anchored" data-anchor-id="create-a-project"><span class="header-section-number">2.1.1</span> Create a project</h4>
-<p>For example, create a website using the Quarto CLI and add a code cell to the <code>about.qmd</code> file that uses the <code>palmerpenguins</code> R package.</p>
+<p>Again, there are several ways to do it. I will show you one way to publish your Quarto project as a Docker container, as light as possible. To do so, I will use a Dockerfile with staged builds.</p>
+<section id="create-a-project" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="create-a-project"><span class="header-section-number">2.1</span> Create a project</h3>
+<p>For example, I create a website using the Quarto CLI and add a code cell to the <code>about.qmd</code> file that uses the <code>palmerpenguins</code> R package.<br>
+I will publish this Quarto project as a Docker container.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> create-project <span class="at">--type</span> website:blog mywebsite</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> mywebsite</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'```{r}</span></span>
@@ -295,10 +290,12 @@ This time, I will show how to publish your Quarto project as a Docker container 
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_smooth(method = "lm", se = FALSE)</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">```'</span> <span class="op">&gt;&gt;</span> about.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="setup-renv" class="level4" data-number="2.1.2">
-<h4 data-number="2.1.2" class="anchored" data-anchor-id="setup-renv"><span class="header-section-number">2.1.2</span> Setup <code>renv</code></h4>
-<p>Setup <code>renv</code> and snapshot the dependencies in the <code>_dependencies.R</code> file.<br>
-See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-dependencies"><code>renv</code> documentation</a> for more information on snapshotting dependencies.</p>
+<section id="renv" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="renv"><span class="header-section-number">2.2</span> <code>renv</code></h3>
+<p><em>See <a href="https://rstudio.github.io/renv/" class="uri">https://rstudio.github.io/renv/</a>.</em></p>
+<section id="setup-renv" class="level4" data-number="2.2.1">
+<h4 data-number="2.2.1" class="anchored" data-anchor-id="setup-renv"><span class="header-section-number">2.2.1</span> Setup <code>renv</code></h4>
+<p>I am using <code>renv</code> to record the dependencies of the project<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'library(knitr)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">library(rmarkdown)</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">library(ggplot2)</span></span>
@@ -306,9 +303,10 @@ See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-depe
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'install.packages("renv")'</span> <span class="at">-e</span> <span class="st">"renv::init()"</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"renv::hydrate()"</span> <span class="at">-e</span> <span class="st">"renv::snapshot()"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="the-dockerfile" class="level4" data-number="2.1.3">
-<h4 data-number="2.1.3" class="anchored" data-anchor-id="the-dockerfile"><span class="header-section-number">2.1.3</span> The Dockerfile</h4>
-<p>Here, I added “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the R versions.</p>
+<section id="the-dockerfile" class="level4" data-number="2.2.2">
+<h4 data-number="2.2.2" class="anchored" data-anchor-id="the-dockerfile"><span class="header-section-number">2.2.2</span> The Dockerfile</h4>
+<p>Here, I am using “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the R versions.<br>
+This allows to change the versions without having to change the Dockerfile itself.</p>
 <div class="sourceCode" id="annotated-cell-3"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> QUARTO_VERSION=<span class="st">"1.3.340"</span></span>
 <span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a></span>
 <button class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1">1</button><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> ghcr.io/quarto-dev/quarto:<span class="va">${QUARTO_VERSION}</span> AS builder</span>
@@ -329,230 +327,162 @@ See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-depe
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-3" data-code-lines="3">The base Docker image use to be the builder, here it is the Quarto image which is Ubuntu based image with Quarto pre-installed.<br>
-The <code>builder</code> stage is used to install the <code>rig</code> and the specified R version, and to render the website.</span>
+<span data-code-annotation="1" data-code-lines="3" data-code-cell="annotated-cell-3">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
+The “<em>builder</em>” stage is used to install the specified <code>rig</code> and </span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-3" data-code-lines="8">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
+<span data-code-annotation="2" data-code-lines="8" data-code-cell="annotated-cell-3">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-3" data-code-lines="9">Using <code>rig</code>, we add the specified R version and install the <code>renv</code> package.</span>
+<span data-code-annotation="3" data-code-lines="9" data-code-cell="annotated-cell-3">Using <code>rig</code>, we add the specified R version and install the <code>renv</code> package.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-annotation="4" data-code-cell="annotated-cell-3" data-code-lines="11">We copy the Quarto project into the <code>/app</code> directory of the builder.</span>
+<span data-code-annotation="4" data-code-lines="11" data-code-cell="annotated-cell-3">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-annotation="5" data-code-cell="annotated-cell-3" data-code-lines="14">We restore the <code>renv</code> environment and render the website.</span>
+<span data-code-annotation="5" data-code-lines="14" data-code-cell="annotated-cell-3">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="6">6</dt>
 <dd>
-<span data-code-annotation="6" data-code-cell="annotated-cell-3" data-code-lines="16">The second and last stage is the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.<br>
-</span>
+<span data-code-annotation="6" data-code-lines="16" data-code-cell="annotated-cell-3">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="7">7</dt>
 <dd>
-<span data-code-annotation="7" data-code-cell="annotated-cell-3" data-code-lines="17">We copy the rendered website from the <code>builder</code> to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage.</span>
+<span data-code-annotation="7" data-code-lines="17" data-code-cell="annotated-cell-3">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
 </dd>
 </dl>
 </section>
-<section id="build-the-image" class="level4" data-number="2.1.4">
-<h4 data-number="2.1.4" class="anchored" data-anchor-id="build-the-image"><span class="header-section-number">2.1.4</span> Build the image</h4>
-<div class="sourceCode" id="annotated-cell-4"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> buildx build <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1">1</button><span id="annotated-cell-4-2" class="code-annotation-target"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>--platform <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2">2</button><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>--build-arg QUARTO_VERSION=1.3.340 <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="3">3</button><span id="annotated-cell-4-4" class="code-annotation-target"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>--tag <span class="st">"mywebsite:1.0.0"</span> <span class="dt">\</span></span>
-<span id="annotated-cell-4-5"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a>.</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-4" data-code-lines="2">We specify the platform to build the image for.</span>
-</dd>
-<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-4" data-code-lines="3">We specify the Quarto version to use during the build.</span>
-</dd>
-<dt data-target-cell="annotated-cell-4" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-4" data-code-lines="4">We tag the image with the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
-</dd>
-</dl>
 </section>
-<section id="share-the-image" class="level4" data-number="2.1.5">
-<h4 data-number="2.1.5" class="anchored" data-anchor-id="share-the-image"><span class="header-section-number">2.1.5</span> Share the image</h4>
-<p>To share the image with others<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> or deploy it locally:</p>
-<div class="sourceCode" id="annotated-cell-5"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container run <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1">1</button><span id="annotated-cell-5-2" class="code-annotation-target"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">--detach</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2">2</button><span id="annotated-cell-5-3" class="code-annotation-target"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">--platform</span> <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="3">3</button><span id="annotated-cell-5-4" class="code-annotation-target"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--name</span> mywebsite <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="4">4</button><span id="annotated-cell-5-5" class="code-annotation-target"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">--publish</span> 8080:80 <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="5">5</button><span id="annotated-cell-5-6" class="code-annotation-target"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>   mywebsite:1.0.0</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="pak" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pak"><span class="header-section-number">2.3</span> <code>pak</code></h3>
+<p><em>See <a href="https://pak.r-lib.org/" class="uri">https://pak.r-lib.org/</a>.</em></p>
+<section id="setup-pak" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="setup-pak"><span class="header-section-number">2.3.1</span> Setup <code>pak</code></h4>
+<p>Alternatively to <code>renv</code>, it’s also possible de record (and restore) the dependencies of a project<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'pak::lockfile_create(c("knitr", "rmarkdown", "ggplot2", "palmerpenguins"))'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="the-dockerfile-1" class="level4" data-number="2.3.2">
+<h4 data-number="2.3.2" class="anchored" data-anchor-id="the-dockerfile-1"><span class="header-section-number">2.3.2</span> The Dockerfile</h4>
+<p>Again, I am using “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the R versions.<br>
+This allows to change the versions without having to change the Dockerfile.</p>
+<div class="sourceCode" id="annotated-cell-5"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> QUARTO_VERSION=<span class="st">"1.3.340"</span></span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1">1</button><span id="annotated-cell-5-3" class="code-annotation-target"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> ghcr.io/quarto-dev/quarto:<span class="va">${QUARTO_VERSION}</span> AS builder</span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> RIG_VERSION=<span class="st">"latest"</span></span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> R_VERSION=<span class="st">"release"</span></span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> install-rig.sh /tmp/install-rig.sh</span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2">2</button><span id="annotated-cell-5-8" class="code-annotation-target"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> bash /tmp/install-rig.sh <span class="st">"</span><span class="va">${RIG_VERSION}</span><span class="st">"</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="3">3</button><span id="annotated-cell-5-9" class="code-annotation-target"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> rig add <span class="va">${R_VERSION}</span></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="4">4</button><span id="annotated-cell-5-11" class="code-annotation-target"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> mywebsite /app</span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /app</span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="5">5</button><span id="annotated-cell-5-13" class="code-annotation-target"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> Rscript <span class="at">-e</span> <span class="st">"pak::lockfile_install()"</span> <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render .</span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="6">6</button><span id="annotated-cell-5-15" class="code-annotation-target"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> httpd:alpine</span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> <span class="at">--from</span><span class="op">=</span>builder /app/_site/ /usr/local/apache2/htdocs/</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-5" data-code-lines="2">We run the container in detached mode.</span>
+<span data-code-annotation="1" data-code-lines="3" data-code-cell="annotated-cell-5">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
+The “<em>builder</em>” stage is used to install the specified <code>rig</code> and </span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-5" data-code-lines="3">We specify the platform to define the architecture of the container, thus the image to use.</span>
+<span data-code-annotation="2" data-code-lines="8" data-code-cell="annotated-cell-5">Using <code>rig</code>, we add the specified R version which already includes <code>pak</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-5" data-code-lines="4">We name the container <code>mywebsite</code>, to ease identification.</span>
+<span data-code-annotation="3" data-code-lines="9" data-code-cell="annotated-cell-5">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-annotation="4" data-code-cell="annotated-cell-5" data-code-lines="5">We publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
+<span data-code-annotation="4" data-code-lines="11" data-code-cell="annotated-cell-5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-annotation="5" data-code-cell="annotated-cell-5" data-code-lines="6">We specify the image to use.</span>
+<span data-code-annotation="5" data-code-lines="13" data-code-cell="annotated-cell-5">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-annotation="6" data-code-lines="15" data-code-cell="annotated-cell-5">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
 </dd>
 </dl>
 </section>
 </section>
-<section id="pak-httpspak.r-lib.org" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="pak-httpspak.r-lib.org"><span class="header-section-number">2.2</span> <code>pak</code> (<a href="https://pak.r-lib.org/" class="uri">https://pak.r-lib.org/</a>)</h3>
-<section id="create-a-project-1" class="level4" data-number="2.2.1">
-<h4 data-number="2.2.1" class="anchored" data-anchor-id="create-a-project-1"><span class="header-section-number">2.2.1</span> Create a project</h4>
-<p>For example, create a website using the Quarto CLI and add a code cell to the <code>about.qmd</code> file that uses the <code>palmerpenguins</code> R package.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> create-project <span class="at">--type</span> website:blog mywebsite</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> mywebsite</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'```{r}</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">library(ggplot2)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">library(palmerpenguins)</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">ggplot(penguins) +</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">  aes(x = bill_length_mm, y = bill_depth_mm) +</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_point(aes(colour = species)) +</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_smooth(method = "lm", se = FALSE)</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">```'</span> <span class="op">&gt;&gt;</span> about.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="setup-pak" class="level4" data-number="2.2.2">
-<h4 data-number="2.2.2" class="anchored" data-anchor-id="setup-pak"><span class="header-section-number">2.2.2</span> Setup <code>pak</code></h4>
-<p>Setup <code>pak</code> <code>lockfile</code> to record the dependencies (see <a href="https://pak.r-lib.org/reference/index.html#lock-files"><code>pak</code> documentation</a> for more information on snapshotting dependencies).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'pak::lockfile_create(c("knitr", "rmarkdown", "ggplot2", "palmerpenguins"))'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="the-dockerfile-1" class="level4" data-number="2.2.3">
-<h4 data-number="2.2.3" class="anchored" data-anchor-id="the-dockerfile-1"><span class="header-section-number">2.2.3</span> The Dockerfile</h4>
-<p>Here, I added “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the R versions.</p>
-<div class="sourceCode" id="annotated-cell-8"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> QUARTO_VERSION=<span class="st">"1.3.340"</span></span>
-<span id="annotated-cell-8-2"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1">1</button><span id="annotated-cell-8-3" class="code-annotation-target"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> ghcr.io/quarto-dev/quarto:<span class="va">${QUARTO_VERSION}</span> AS builder</span>
-<span id="annotated-cell-8-4"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-8-5"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> RIG_VERSION=<span class="st">"latest"</span></span>
-<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> R_VERSION=<span class="st">"release"</span></span>
-<span id="annotated-cell-8-7"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> install-rig.sh /tmp/install-rig.sh</span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2">2</button><span id="annotated-cell-8-8" class="code-annotation-target"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> bash /tmp/install-rig.sh <span class="st">"</span><span class="va">${RIG_VERSION}</span><span class="st">"</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="3">3</button><span id="annotated-cell-8-9" class="code-annotation-target"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> rig add <span class="va">${R_VERSION}</span></span>
-<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="4">4</button><span id="annotated-cell-8-11" class="code-annotation-target"><a href="#annotated-cell-8-11" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> mywebsite /app</span>
-<span id="annotated-cell-8-12"><a href="#annotated-cell-8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /app</span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="5">5</button><span id="annotated-cell-8-13" class="code-annotation-target"><a href="#annotated-cell-8-13" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> Rscript <span class="at">-e</span> <span class="st">"pak::lockfile_install()"</span> <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render .</span>
-<span id="annotated-cell-8-14"><a href="#annotated-cell-8-14" aria-hidden="true" tabindex="-1"></a></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="6">6</button><span id="annotated-cell-8-15" class="code-annotation-target"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> httpd:alpine</span>
-<span id="annotated-cell-8-16"><a href="#annotated-cell-8-16" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> <span class="at">--from</span><span class="op">=</span>builder /app/_site/ /usr/local/apache2/htdocs/</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="build-the-image" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="build-the-image"><span class="header-section-number">2.4</span> Build the image</h3>
+<p>It’s time to build the image using the Dockerfile and the <a href="https://docs.docker.com/engine/reference/commandline/buildx_build/"><code>docker buildx build</code></a> command.</p>
+<div class="sourceCode" id="annotated-cell-6"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> buildx build <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1">1</button><span id="annotated-cell-6-2" class="code-annotation-target"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>--platform <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2">2</button><span id="annotated-cell-6-3" class="code-annotation-target"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>--build-arg QUARTO_VERSION=1.3.340 <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3">3</button><span id="annotated-cell-6-4" class="code-annotation-target"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>--tag <span class="st">"mywebsite:1.0.0"</span> <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="4">4</button><span id="annotated-cell-6-5" class="code-annotation-target"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>--push <span class="dt">\</span></span>
+<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>.</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-8" data-code-lines="3">The base Docker image use to be the builder, here it is the Quarto image which is Ubuntu based image with Quarto pre-installed.<br>
-The <code>builder</code> stage is used to install the <code>rig</code> and the specified R version, and to render the website.</span>
+<span data-code-annotation="1" data-code-lines="2" data-code-cell="annotated-cell-6">The platform to build the image for.</span>
 </dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-8" data-code-lines="8">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
+<span data-code-annotation="2" data-code-lines="3" data-code-cell="annotated-cell-6">The Quarto version to use when building the image.</span>
 </dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-8" data-code-lines="9">Using <code>rig</code>, we add the specified R version which already includes <code>pak</code>.</span>
+<span data-code-annotation="3" data-code-lines="4" data-code-cell="annotated-cell-6">The tag to use to label the image, <em>i.e.</em>, the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
 </dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="4">4</dt>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-annotation="4" data-code-cell="annotated-cell-8" data-code-lines="11">We copy the Quarto project into the <code>/app</code> directory of the builder.</span>
-</dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-annotation="5" data-code-cell="annotated-cell-8" data-code-lines="13">We restore the <code>pak</code> <code>lockfile</code> and render the website.</span>
-</dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-annotation="6" data-code-cell="annotated-cell-8" data-code-lines="15">The second and last stage is the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.<br>
-We copy the rendered website from the <code>builder</code> to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage.</span>
+<span data-code-annotation="4" data-code-lines="5" data-code-cell="annotated-cell-6">(Optional) Assuming you have access to a registry (<code>docker login</code>), push the image to the registry, such as Docker Hub.</span>
 </dd>
 </dl>
 </section>
-<section id="build-the-image-1" class="level4" data-number="2.2.4">
-<h4 data-number="2.2.4" class="anchored" data-anchor-id="build-the-image-1"><span class="header-section-number">2.2.4</span> Build the image</h4>
-<div class="sourceCode" id="annotated-cell-9"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> buildx build <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1">1</button><span id="annotated-cell-9-2" class="code-annotation-target"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">--platform</span> <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2">2</button><span id="annotated-cell-9-3" class="code-annotation-target"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">--build-arg</span> QUARTO_VERSION=1.3.340 <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="3">3</button><span id="annotated-cell-9-4" class="code-annotation-target"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--tag</span> <span class="st">"mywebsite:1.0.0"</span> <span class="dt">\</span></span>
-<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a>   .</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="deploy-a-container" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="deploy-a-container"><span class="header-section-number">2.5</span> Deploy a container</h3>
+<p>Finally, deploying locally the image as a Docker container using <a href="https://docs.docker.com/engine/reference/commandline/container_run/"><code>docker container run</code></a> and access the website from your browser at <a href="http://localhost:8080" class="uri">http://localhost:8080</a>.</p>
+<div class="sourceCode" id="annotated-cell-7"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-7-1"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container run <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1">1</button><span id="annotated-cell-7-2" class="code-annotation-target"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">--detach</span> <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="2">2</button><span id="annotated-cell-7-3" class="code-annotation-target"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">--platform</span> <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="3">3</button><span id="annotated-cell-7-4" class="code-annotation-target"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--name</span> mywebsite <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="4">4</button><span id="annotated-cell-7-5" class="code-annotation-target"><a href="#annotated-cell-7-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">--publish</span> 8080:80 <span class="dt">\</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="5">5</button><span id="annotated-cell-7-6" class="code-annotation-target"><a href="#annotated-cell-7-6" aria-hidden="true" tabindex="-1"></a>   mywebsite:1.0.0</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-9" data-code-lines="2">We specify the platform to build the image for.</span>
+<span data-code-annotation="1" data-code-lines="2" data-code-cell="annotated-cell-7">The container in detached mode, <em>i.e.</em>, the container runs in the background.</span>
 </dd>
-<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-9" data-code-lines="3">We specify the Quarto version to use during the build.</span>
+<span data-code-annotation="2" data-code-lines="3" data-code-cell="annotated-cell-7">The platform to run the container on, <em>i.e.</em>, same as the platform used to build the image in this case.</span>
 </dd>
-<dt data-target-cell="annotated-cell-9" data-target-annotation="3">3</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-9" data-code-lines="4">We tag the image with the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
+<span data-code-annotation="3" data-code-lines="4" data-code-cell="annotated-cell-7">The name of the container for easy identification, <em>i.e.</em>, <code>mywebsite</code>.</span>
 </dd>
-</dl>
-</section>
-<section id="share-the-image-1" class="level4" data-number="2.2.5">
-<h4 data-number="2.2.5" class="anchored" data-anchor-id="share-the-image-1"><span class="header-section-number">2.2.5</span> Share the image</h4>
-<p>To share the image with others<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> or deploy it locally:</p>
-<div class="sourceCode" id="annotated-cell-10"><pre class="sourceCode bash code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-10-1"><a href="#annotated-cell-10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container run <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="1">1</button><span id="annotated-cell-10-2" class="code-annotation-target"><a href="#annotated-cell-10-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">--detach</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="2">2</button><span id="annotated-cell-10-3" class="code-annotation-target"><a href="#annotated-cell-10-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">--platform</span> <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="3">3</button><span id="annotated-cell-10-4" class="code-annotation-target"><a href="#annotated-cell-10-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--name</span> mywebsite <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="4">4</button><span id="annotated-cell-10-5" class="code-annotation-target"><a href="#annotated-cell-10-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">--publish</span> 8080:80 <span class="dt">\</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="5">5</button><span id="annotated-cell-10-6" class="code-annotation-target"><a href="#annotated-cell-10-6" aria-hidden="true" tabindex="-1"></a>   mywebsite:1.0.0</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-10" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-annotation="1" data-code-cell="annotated-cell-10" data-code-lines="2">We run the container in detached mode.</span>
+<span data-code-annotation="4" data-code-lines="5" data-code-cell="annotated-cell-7">The port mapping, <em>i.e.</em>, we publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
 </dd>
-<dt data-target-cell="annotated-cell-10" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-annotation="2" data-code-cell="annotated-cell-10" data-code-lines="3">We specify the platform to define the architecture of the container, thus the image to use.</span>
-</dd>
-<dt data-target-cell="annotated-cell-10" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-annotation="3" data-code-cell="annotated-cell-10" data-code-lines="4">We name the container <code>mywebsite</code>, to ease identification.</span>
-</dd>
-<dt data-target-cell="annotated-cell-10" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-annotation="4" data-code-cell="annotated-cell-10" data-code-lines="5">We publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
-</dd>
-<dt data-target-cell="annotated-cell-10" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-annotation="5" data-code-cell="annotated-cell-10" data-code-lines="6">We specify the image to use.</span>
+<span data-code-annotation="5" data-code-lines="6" data-code-cell="annotated-cell-7">The image to use to run the container, <em>i.e.</em>, <code>mywebsite:1.0.0</code>.</span>
 </dd>
 </dl>
-</section>
-</section>
-</section>
-<section id="finally" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="finally"><span class="header-section-number">3</span> Finally</h2>
-<p>View the website locally at <a href="http://localhost:8080" class="uri">http://localhost:8080</a>.</p>
 
 
+</section>
 </section>
 <aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>Add the <code>--push</code> flag to the <code>docker buildx build</code> command to push the image to a registry.<br>
-Assuming you have access to the registry (<code>docker login</code>), you can then share the image with others.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Add the <code>--push</code> flag to the <code>docker buildx build</code> command to push the image to a registry.<br>
-Assuming you have access to the registry (<code>docker login</code>), you can then share the image with others.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-dependencies"><code>renv</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>See <a href="https://pak.r-lib.org/reference/index.html#lock-files"><code>pak</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </aside>
 
