@@ -1,0 +1,87 @@
+---
+title: "Quarto Q&A: How to have images for both light and dark theme?"
+description: |
+  In this blog post of the "Quarto Q&A" series you will learn how
+  to generate images for light and dark theme using `knitr` and switch between them when changing theme.
+date: "2023-05-30"
+categories: [Quarto, Q&A, JavaScript, theme, dark mode, light mode]
+image: featured.gif
+image-alt: |
+  Animated GIF showing a ggplot2 figure switching from light to dark on theme toggle switch.
+code-annotations: hover
+footnotes-hover: true
+toc-depth: 4
+filters:
+  - include-code-files
+---
+
+A new blog post of the "Quarto Q&A" series.  
+This time, I will show how to have images both for light and dark theme, when switching between them.
+
+![](featured.gif){fig-alt="Animated GIF showing a ggplot2 figure switching from light to dark on theme toggle switch." fig-align="center"}
+
+```{=html}
+<!-- gifski --fps 10 --height 1080 --width 1920 -o features.gif assets/light-dark.mov -->
+```
+
+## The Question/Problem
+
+When you build a website with Quarto, you can use the `theme` option
+to specify the theme you want to use for `light` and `dark` mode[^1].
+
+[^1]: See <https://quarto.org/docs/output-formats/html-themes.html#dark-mode>.
+
+```yml
+theme:
+  light: united
+  dark: slate
+```
+
+However, if you want to have images for both themes, you need to have two versions of the same image,
+one for `light` and one for `dark` mode.
+But how can you do that and how can you switch between them automatically?
+
+## The Answer/Solution
+
+Let's use `knitr` as the engine to generate the images.
+For example, you can use `svglite` to generate SVG images and/or any custom `knitr` handler.
+
+1. Set the `dev` option to use `svglite` for `light` mode and `darksvglite` for `dark` mode and `fig.ext` to set the generated images extensions.
+   ```{.yaml include="assets/_demo.qmd" start-line=11 end-line=14}
+   ```
+2. Create `ggplot2` themes for `light` and `dark` images.
+
+   ::: {.panel-tabset}
+   ## Light
+
+   ```{.r include="assets/_demo.qmd" start-line=23 end-line=38}
+   ```
+   
+   ## Dark
+
+   ```{.r include="assets/_demo.qmd" start-line=40 end-line=55}
+   ```
+   :::
+3. Create a new function to save the `dark` images.
+   ```{.r include="assets/_demo.qmd" start-line=57 end-line=67}
+   ```
+4. The `ggplot2` code to build an image.
+   ```{.r include="assets/_demo.qmd" start-line=75 end-line=92}
+   ```
+5. The JavaScript code to switch between the two images (_i.e._, `.light.svg` and `.dark.svg`)[^2].
+   <details><summary>JavaScript code</summary>
+   ```{.javascript include="assets/light-dark.js"}
+   ```
+   </details>
+6. Finally, the whole Quarto document code.
+   <details><summary>Quarto document code</summary>
+   ```{.md include="assets/_demo.qmd"}
+   ```
+   </details>
+   ::: {layout-ncol="2" style="text-align:center;"}
+   ![**Light** mode **ON**](assets/light.png){fig-alt='Scatter plot on a light background with light mode switched on.' fig-align=center}
+   
+   ![**Dark** mode **ON**](assets/dark.png){fig-alt='Scatter plot on a dark background width dark mode switched on.' fig-align=center}
+   :::
+
+[^2]: The JavaScript code does not actually look for the images extensions, but for the images names.

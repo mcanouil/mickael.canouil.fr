@@ -1,0 +1,93 @@
+---
+title: "Generated images for dark and light mode"
+format:
+  html:
+    theme:
+      light: united
+      dark: slate
+execute:
+  echo: false
+  warning: false
+knitr: 
+  opts_chunk: 
+    dev: [svglite, darksvglite]
+    fig.ext: [.light.svg, .dark.svg]
+include-after-body:
+  text: |
+    <script type="application/javascript" src="light-dark.js"></script>
+---
+
+```{r}
+#| include: false
+library(ggplot2)
+theme_light <- function() {
+  theme_minimal(base_size = 11) %+%
+  theme(
+    panel.border = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    text = element_text(colour = "black"),
+    axis.text = element_text(colour = "black"),
+    rect = element_rect(colour = "white", fill = "black"),
+    plot.background = element_rect(fill = "white", colour = NA),
+    axis.line = element_line(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+}
+
+theme_dark <- function() {
+  theme_minimal(base_size = 11) %+%
+  theme(
+    panel.border = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    text = element_text(colour = "white"),
+    axis.text = element_text(colour = "white"),
+    rect = element_rect(colour = "#272b30", fill = "#272b30"),
+    plot.background = element_rect(fill = "#272b30", colour = NA),
+    axis.line = element_line(colour = "white"),
+    axis.ticks = element_line(colour = "white")
+  )
+}
+
+darksvglite <- function(file, width, height) {
+  on.exit(reset_theme_settings())
+  theme_set(theme_dark())
+  ggsave(
+    filename = file,
+    width = width,
+    height = height,
+    dev = "svg",
+    bg = "transparent"
+  )
+}
+```
+
+```{r}
+#| column: screen-inset
+#| fig-width: !expr 16/2
+#| fig-height: !expr 9/2
+#| out-width: 80%
+library(ggplot2)
+library(palmerpenguins)
+theme_set(theme_light())
+ggplot(data = penguins) +
+  aes(
+    x = flipper_length_mm,
+    y = body_mass_g / 1e3,
+    colour = species,
+    shape = species
+  ) +
+  geom_point(alpha = 0.8, na.rm = TRUE) +
+  scale_colour_manual(values = c("darkorange", "purple", "cyan4")) +
+  labs(
+    x = "Flipper Length (mm)",
+    y = "Body Mass (kg)",
+    color = "Penguin Species",
+    shape = "Penguin Species"
+  )
+```

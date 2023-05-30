@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.100">
+<meta name="generator" content="quarto-1.4.112">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Mickaël CANOUIL">
 <meta name="description" content="How to have a table of contents (TOC) on either the left or the right side of a post? I have an answer!">
@@ -72,6 +72,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/iconify-1.0.0-beta.2/iconify-icon.min.js"></script><script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -357,7 +360,10 @@ The reason for this small modification comes from the default configuration of H
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>As you can see, the TOC is defined to include from level 2 to level 3, so by default, the changes we are going to make would not have any effect for this particular document which only contains level 1 headings.</p>
 <p>Posts and any other Rmarkdown contents are rendered with <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code>, hence, for our default Rmarkdown (<code>content/post/2020-12-01-r-rmarkdown/index.en.Rmd</code>), the rendering is done with <code>rmarkdown::render_site('content/post/2020-12-01-r-rmarkdown/index.en.Rmd')</code>.</p>
-<p><img src="assets/rmd_default_post.png" class="img-fluid"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><a href="assets/rmd_default_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="assets/rmd_default_post.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
 <p><em>Note</em>: In this case, <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code> produces a HTML file: <code>index.en.html</code>.</p>
 </section><section id="default-with-a-toc" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="default-with-a-toc">
 <span class="header-section-number">4</span> Default with a TOC</h2>
@@ -409,7 +415,10 @@ This output format produces a headless HTML file (<em>i.e.</em>,&nbsp;there is n
 <span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Since, we changed the YAML header, we need to render again, with <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code>, the HTML file from <code>index.en.Rmd</code>.</p>
-<p><img src="assets/rmd_default_toc_post.png" class="img-fluid"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><a href="assets/rmd_default_toc_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="assets/rmd_default_toc_post.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
 <p>Now we have a TOC, but it sticks to the top.<br>
 At this stage, we did all we could in the Rmarkdown file <code>index.en.Rmd</code>.</p>
 </section><section id="modify-the-layout" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="modify-the-layout">
@@ -482,7 +491,10 @@ I am not going to use the code proposed in <a href="https://github.com/wowchemy/
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>{{- end -}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Again, we need to render the <code>index.en.Rmd</code> file, or to restart the website (<code>blogdown::stop_server()</code>/<code>blogdown::serve_site()</code>) to ensure all modifications are taken into account.</p>
-<p><img src="assets/rmd_default_toc_single_post.png" class="img-fluid"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><a href="assets/rmd_default_toc_single_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="assets/rmd_default_toc_single_post.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
 <p>Not quite, what we could have expected …</p>
 <p>The TOC from the Rmarkdown (HTML) file is still at the top, but there is a “Contents” on the right side (as define in <code>layouts/_default/single.html</code>).<br>
 This “Contents” comes from our modified layout file and it is not included in a HUGO variable.<br>
@@ -497,8 +509,8 @@ This TOC header is a hypertext reference to the top of the current page.</p>
 <p>Our layout seems to “work”, but somehow, does not include the TOC of our HTML file generated from the <code>index.en.Rmd</code> file.</p>
 <p>Let’s have a look at another post in plain markdown from our <code>blogdown</code> website.</p>
 <ul>
-<li><p>Before the modifications of the layout<br><img src="assets/markdown_default_before.png" class="img-fluid"></p></li>
-<li><p>After the modifications of the layout<br><img src="assets/markdown_default_after.png" class="img-fluid"></p></li>
+<li><p>Before the modifications of the layout<br><a href="assets/markdown_default_before.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="assets/markdown_default_before.png" class="img-fluid"></a></p></li>
+<li><p>After the modifications of the layout<br><a href="assets/markdown_default_after.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="assets/markdown_default_after.png" class="img-fluid"></a></p></li>
 </ul>
 <p>It’s looking great for the markdown post!</p>
 <p>In conclusion and since we modified the page layout, the issue no longer seems to be on the HUGO side.</p>
@@ -595,13 +607,13 @@ You can change the default in your <code>.Rprofile</code> with, for example <cod
 <ul>
 <li>
 <code>.Rmd</code> produces <code>.html</code> with <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code>.<br>
-And the floating TOC is not working in that case.<br><img src="assets/rmd_default_toc_single_post.png" class="img-fluid">
+And the floating TOC is not working in that case.<br><a href="assets/rmd_default_toc_single_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="assets/rmd_default_toc_single_post.png" class="img-fluid"></a>
 </li>
 </ul>
 <p>Let’s modify the extension to <code>Rmarkdown</code>.</p>
 <ul>
 <li>
-<code>.Rmarkdown</code> produces <code>.markdown</code> (<em>basically the same as <code>.md</code></em>) with <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code>.<br><img src="assets/rmarkdown_default_toc_single_post.png" class="img-fluid">
+<code>.Rmarkdown</code> produces <code>.markdown</code> (<em>basically the same as <code>.md</code></em>) with <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render_site.html">rmarkdown::render_site()</a></code>.<br><a href="assets/rmarkdown_default_toc_single_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="assets/rmarkdown_default_toc_single_post.png" class="img-fluid"></a>
 </li>
 </ul>
 <p>It works!<br>
@@ -622,7 +634,7 @@ The solution to this is quite simple!</p>
 <span class="header-section-number">9</span> Going in Style</h2>
 <div style="text-align:center;">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><img src="assets/Going-in-Style.jpg" class="img-fluid figure-img" alt="poster of the movie Going in Style showing from left to right Alan Arkin, Morgan Freeman, and Michael Caine."></p>
+<figure class="figure"><p><a href="assets/Going-in-Style.jpg" class="lightbox" title="Movie poster of “Going in Style” (IMDb)." data-gallery="quarto-lightbox-gallery-8"><img src="assets/Going-in-Style.jpg" class="img-fluid figure-img" alt="poster of the movie Going in Style showing from left to right Alan Arkin, Morgan Freeman, and Michael Caine."></a></p>
 <figcaption class="figure-caption">Movie poster of “Going in Style” (<a href="https://www.imdb.com/title/tt2568862/">IMDb</a>).</figcaption></figure>
 </div>
 </div>
@@ -1017,7 +1029,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
 </div>
   </div>
-</footer>
+</footer><script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","openEffect":"zoom","descPosition":"bottom","loop":true});</script>
 
 
 </body></html>
