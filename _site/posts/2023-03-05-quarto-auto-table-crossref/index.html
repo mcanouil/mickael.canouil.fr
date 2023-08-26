@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.330">
+<meta name="generator" content="quarto-99.9.9">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
 <meta name="author" content="Mickaël CANOUIL">
 <meta name="description" content="A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.">
+
 <title>MCU - Quarto Q&amp;A: How to have labels and captions for an unknown number of tables?</title>
 <style>
 code{white-space: pre-wrap;}
@@ -55,6 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 </style>
 
+
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
@@ -75,7 +79,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
-<script src="../../site_libs/quarto-contrib/iconify-1.0.0-beta.2/iconify-icon.min.js"></script><script id="quarto-search-options" type="application/json">{
+<script src="../../site_libs/quarto-contrib/iconify-1.0.0-beta.2/iconify-icon.min.js"></script>
+<script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
   "collapse-after": 3,
@@ -100,6 +105,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+
+
 <meta property="og:title" content="MCU - Quarto Q&amp;A: How to have labels and captions for an unknown number of tables?">
 <meta property="og:description" content="A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.">
 <meta property="og:image" content="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/featured.png">
@@ -119,13 +126,17 @@ Tables are simply on top of each other after the item list.
 ">
 <meta name="twitter:card" content="summary_large_image">
 </head>
+
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg navbar-dark "><div class="navbar-container container-fluid">
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../assets/images/logo.svg" alt="" class="navbar-logo"></a>
+    <img src="../../assets/images/logo.svg" alt="" class="navbar-logo">
+    </a>
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">MCU</span>
     </a>
@@ -136,7 +147,7 @@ Tables are simply on top of each other after the item list.
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
-<li class="nav-item">
+  <li class="nav-item">
     <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
@@ -177,11 +188,15 @@ Tables are simply on top of each other after the item list.
 <span class="menu-text"><iconify-icon inline="" icon="fa6-regular:heart"></iconify-icon></span></a>
   </li>  
 </ul>
-</div> <!-- /navcollapse -->
+          </div> <!-- /navcollapse -->
           <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
-    </nav></header><!-- content --><header id="title-block-header" class="quarto-title-block default page-columns page-full"><div class="quarto-title-banner page-columns page-full">
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Quarto Q&amp;A: How to have labels and captions for an unknown number of tables?</h1>
                   <div>
@@ -223,36 +238,42 @@ Tables are simply on top of each other after the item list.
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
    
   <ul>
-<li><a href="#the-questionproblem" id="toc-the-questionproblem" class="nav-link active" data-scroll-target="#the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</a></li>
+  <li><a href="#the-questionproblem" id="toc-the-questionproblem" class="nav-link active" data-scroll-target="#the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</a></li>
   <li><a href="#the-answersolution" id="toc-the-answersolution" class="nav-link" data-scroll-target="#the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">3</span> References</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples"><span class="header-section-number">4</span> Examples</a></li>
-  </ul><div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-03-05-quarto-auto-table-crossref/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-03-05-quarto-auto-table-crossref/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content"><p>I decided to start small blog posts with answers/solutions to questions I have seen and answered on <a href="https://twitter.com/">Twitter</a>, <a href="https://joinmastodon.org/">Mastodon</a>, and <a href="https://quarto.org/">Quarto</a> GitHub <a href="https://github.com/quarto-dev/quarto-cli/issues">Issues</a> &amp; <a href="https://github.com/quarto-dev/quarto-cli/discussions">Discussions</a>.</p>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>I decided to start small blog posts with answers/solutions to questions I have seen and answered on <a href="https://twitter.com/">Twitter</a>, <a href="https://joinmastodon.org/">Mastodon</a>, and <a href="https://quarto.org/">Quarto</a> GitHub <a href="https://github.com/quarto-dev/quarto-cli/issues">Issues</a> &amp; <a href="https://github.com/quarto-dev/quarto-cli/discussions">Discussions</a>.</p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><a href="featured.png" class="lightbox" title="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list." data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid figure-img" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."><img src="featured.png" class="img-fluid figure-img" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
 </figure>
 </div>
-<section id="the-questionproblem" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem">
-<span class="header-section-number">1</span> The Question/Problem</h2>
+<section id="the-questionproblem" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
 <blockquote class="blockquote">
 <p>Suppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx. G is unknown apriori, but will be at least 1.</p>
 <p>Is there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?</p>
 </blockquote>
 <p><em>Source: <a href="https://mastodon.ie/@DToher/109915736491084825" class="uri">https://mastodon.ie/@DToher/109915736491084825</a></em></p>
-</section><section id="the-answersolution" class="level2" data-number="2"><h2 data-number="2" class="anchored" data-anchor-id="the-answersolution">
-<span class="header-section-number">2</span> The Answer/Solution</h2>
-<p>The trick is, within a code cell with <code>output: asis</code>, to use <code><a href="https://rdrr.io/pkg/knitr/man/knit_child.html">knitr::knit_child()</a></code> to create code cells with <code>label</code>, caption (<code>tbl-cap</code>), or whatever option you might want or need.</p>
+</section>
+<section id="the-answersolution" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</h2>
+<p>The trick is, within a code cell with <code>output: asis</code>, to use <code>knitr::knit_child()</code> to create code cells with <code>label</code>, caption (<code>tbl-cap</code>), or whatever option you might want or need.</p>
 <div class="tabset-margin-container"></div><div class="cell panel-tabset">
-<ul class="nav nav-tabs" role="tablist">
-<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Quarto Input</a></li>
-<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Quarto Output</a></li>
-</ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Quarto Input</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Quarto Output</a></li></ul>
 <div class="cell tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="sourceCode" id="cb1"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
@@ -303,23 +324,29 @@ Tables are simply on top of each other after the item list.
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure"><p><a href="featured.png" class="lightbox" title="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list." data-gallery="quarto-lightbox-gallery-2"><img src="featured.png" class="img-fluid figure-img" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."><img src="featured.png" class="img-fluid figure-img" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
-</section><section id="references" class="level2" data-number="3"><h2 data-number="3" class="anchored" data-anchor-id="references">
-<span class="header-section-number">3</span> References</h2>
+</section>
+<section id="references" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="references"><span class="header-section-number">3</span> References</h2>
 <p>References: - <a href="https://bookdown.org/yihui/rmarkdown-cookbook/child-document.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/child-document.html</a> - <a href="https://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html</a> - <a href="https://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html</a></p>
-</section><section id="examples" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="examples">
-<span class="header-section-number">4</span> Examples</h2>
+</section>
+<section id="examples" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="examples"><span class="header-section-number">4</span> Examples</h2>
 <ul>
 <li><a href="https://github.com/quarto-dev/quarto-examples" class="uri">https://github.com/quarto-dev/quarto-examples</a></li>
 </ul>
 
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -727,10 +754,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       }
     }
 });
-</script><script src="https://giscus.app/client.js" data-repo="mcanouil/mickael.canouil.fr" data-repo-id="MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=" data-category="Blog posts" data-category-id="DIC_kwDOFLAkg84CSh-t" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="dark_dimmed" data-lang="en" crossorigin="anonymous" async="">
-</script><input type="hidden" id="giscus-base-theme" value="dark_dimmed"><input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+</script>
+<script src="https://giscus.app/client.js" data-repo="mcanouil/mickael.canouil.fr" data-repo-id="MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=" data-category="Blog posts" data-category-id="DIC_kwDOFLAkg84CSh-t" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="dark_dimmed" data-lang="en" crossorigin="anonymous" async="">
+</script>
+<input type="hidden" id="giscus-base-theme" value="dark_dimmed">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
 </div> <!-- /content -->
-<footer class="footer"><div class="nav-footer">
+<footer class="footer">
+  <div class="nav-footer">
     <div class="nav-footer-left">
 <p>Powered by <a href="https://quarto.org">Quarto</a>.</p>
 </div>   
@@ -741,7 +772,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
 </div>
   </div>
-</footer><script>var lightboxQuarto = GLightbox({"selector":".lightbox","descPosition":"bottom","closeEffect":"zoom","loop":true,"openEffect":"zoom"});</script>
+</footer>
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","closeEffect":"zoom","descPosition":"bottom","selector":".lightbox","loop":true});</script>
+
+
 
 
 </body></html>
