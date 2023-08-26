@@ -1,4 +1,4 @@
-# mickael.canouil.fr <img src="media/logo.png" align="right" width="120" />
+# mickael.canouil.fr <img src="assets/images/logo.png" align="right" width="120" />
 
 <!-- badges: start -->
 [![License](https://img.shields.io/github/license/mcanouil/mickael.canouil.fr)](LICENSE)

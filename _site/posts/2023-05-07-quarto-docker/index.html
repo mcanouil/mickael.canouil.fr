@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.163">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL">
 <meta name="description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
 
-<title>MCU - Quarto Q&amp;A: How to publish your Quarto document/book/website as a Docker container?</title>
+<title>MCU - Quarto Q&amp;A: How to publish your Quarto content as a Docker container?</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,7 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../..//media/logo.svg" rel="icon" type="image/svg+xml">
+<link href="../..//assets/images/logo.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -87,11 +87,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -107,15 +102,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="MCU - Quarto Q&amp;A: How to publish your Quarto document/book/website as a Docker container?">
+<meta property="og:title" content="MCU - Quarto Q&amp;A: How to publish your Quarto content as a Docker container?">
 <meta property="og:description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
 <meta property="og:image" content="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/featured.png">
-<meta property="og:site_name" content="MCU">
+<meta property="og:site-name" content="MCU">
 <meta property="og:image:height" content="1080">
 <meta property="og:image:width" content="1920">
 <meta property="og:image:alt" content="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale.
 ">
-<meta name="twitter:title" content="MCU - Quarto Q&amp;A: How to publish your Quarto document/book/website as a Docker container?">
+<meta name="twitter:title" content="MCU - Quarto Q&amp;A: How to publish your Quarto content as a Docker container?">
 <meta name="twitter:description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
 <meta name="twitter:image" content="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/featured.png">
 <meta name="twitter:image-height" content="1080">
@@ -131,9 +126,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
+      <div class="navbar-brand-container">
     <a href="../../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../../media/logo.svg" alt="" class="navbar-logo">
+    <img src="../../assets/images/logo.svg" alt="" class="navbar-logo">
     </a>
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">MCU</span>
@@ -186,9 +181,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><iconify-icon inline="" icon="fa6-regular:heart"></iconify-icon></span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
+          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -196,7 +191,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Quarto Q&amp;A: How to publish your Quarto document/book/website as a Docker container?</h1>
+      <h1 class="title">Quarto Q&amp;A: How to publish your Quarto content as a Docker container?</h1>
                   <div>
         <div class="description">
           <p>In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.</p>
@@ -339,32 +334,32 @@ This allows to change the versions without having to change the Dockerfile itsel
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
+<span data-code-lines="3" data-code-cell="annotated-cell-3" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
 The “<em>builder</em>” stage is used to install the specified <code>rig</code> and <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version, and to render the website.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="8" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
+<span data-code-lines="8" data-code-cell="annotated-cell-3" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="9" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version and install the <code>renv</code> package.</span>
+<span data-code-lines="9" data-code-cell="annotated-cell-3" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version and install the <code>renv</code> package.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="11" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
+<span data-code-lines="11" data-code-cell="annotated-cell-3" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="14" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
+<span data-code-lines="14" data-code-cell="annotated-cell-3" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="6">6</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="16" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
+<span data-code-lines="16" data-code-cell="annotated-cell-3" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="7">7</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="17" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
+<span data-code-lines="17" data-code-cell="annotated-cell-3" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
 </dd>
 </dl>
 </section>
@@ -401,32 +396,32 @@ This allows to change the versions without having to change the Dockerfile.</p>
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="3" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
+<span data-code-lines="3" data-code-cell="annotated-cell-5" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
 The “<em>builder</em>” stage is used to install the specified <code>rig</code> and <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version, and to render the website.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="8" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
+<span data-code-lines="8" data-code-cell="annotated-cell-5" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="9" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version which already includes <code>pak</code>.</span>
+<span data-code-lines="9" data-code-cell="annotated-cell-5" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon inline="" icon="fa6-brands:r-project"></iconify-icon> version which already includes <code>pak</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="11" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
+<span data-code-lines="11" data-code-cell="annotated-cell-5" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
+<span data-code-lines="13" data-code-cell="annotated-cell-5" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="6">6</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="15" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
+<span data-code-lines="15" data-code-cell="annotated-cell-5" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="7">7</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="16" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
+<span data-code-lines="16" data-code-cell="annotated-cell-5" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
 </dd>
 </dl>
 </section>
@@ -443,19 +438,19 @@ The “<em>builder</em>” stage is used to install the specified <code>rig</cod
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="2" data-code-annotation="1">The platform to build the image for.</span>
+<span data-code-lines="2" data-code-cell="annotated-cell-6" data-code-annotation="1">The platform to build the image for.</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="2">The Quarto version to use when building the image.</span>
+<span data-code-lines="3" data-code-cell="annotated-cell-6" data-code-annotation="2">The Quarto version to use when building the image.</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="4" data-code-annotation="3">The tag to use to label the image, <em>i.e.</em>, the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
+<span data-code-lines="4" data-code-cell="annotated-cell-6" data-code-annotation="3">The tag to use to label the image, <em>i.e.</em>, the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
 </dd>
 <dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="5" data-code-annotation="4">(Optional) Assuming you have access to a registry (<code>docker login</code>), push the image to the registry, such as Docker Hub.</span>
+<span data-code-lines="5" data-code-cell="annotated-cell-6" data-code-annotation="4">(Optional) Assuming you have access to a registry (<code>docker login</code>), push the image to the registry, such as Docker Hub.</span>
 </dd>
 </dl>
 </section>
@@ -471,23 +466,23 @@ The “<em>builder</em>” stage is used to install the specified <code>rig</cod
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="2" data-code-annotation="1">The container in detached mode, <em>i.e.</em>, the container runs in the background.</span>
+<span data-code-lines="2" data-code-cell="annotated-cell-7" data-code-annotation="1">The container in detached mode, <em>i.e.</em>, the container runs in the background.</span>
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="3" data-code-annotation="2">The platform to run the container on, <em>i.e.</em>, same as the platform used to build the image in this case.</span>
+<span data-code-lines="3" data-code-cell="annotated-cell-7" data-code-annotation="2">The platform to run the container on, <em>i.e.</em>, same as the platform used to build the image in this case.</span>
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="4" data-code-annotation="3">The name of the container for easy identification, <em>i.e.</em>, <code>mywebsite</code>.</span>
+<span data-code-lines="4" data-code-cell="annotated-cell-7" data-code-annotation="3">The name of the container for easy identification, <em>i.e.</em>, <code>mywebsite</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="5" data-code-annotation="4">The port mapping, <em>i.e.</em>, we publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
+<span data-code-lines="5" data-code-cell="annotated-cell-7" data-code-annotation="4">The port mapping, <em>i.e.</em>, we publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="6" data-code-annotation="5">The image to use to run the container, <em>i.e.</em>, <code>mywebsite:1.0.0</code>.</span>
+<span data-code-lines="6" data-code-cell="annotated-cell-7" data-code-annotation="5">The image to use to run the container, <em>i.e.</em>, <code>mywebsite:1.0.0</code>.</span>
 </dd>
 </dl>
 
@@ -496,13 +491,13 @@ The “<em>builder</em>” stage is used to install the specified <code>rig</cod
 </section>
 
 
-<div id="quarto-appendix" class="default"><aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
 <li id="fn1"><p>See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-dependencies"><code>renv</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>See <a href="https://pak.r-lib.org/reference/index.html#lock-files"><code>pak</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</aside></div></main> <!-- /main -->
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -633,9 +628,10 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+  function tippyHover(el, contentFn) {
     const config = {
       allowHTML: true,
+      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -645,17 +641,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start',
+      placement: 'bottom-start'
     };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -668,60 +655,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    if (id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
-        }
-        return container.innerHTML
-      } else {
-        return note.innerHTML;
-      }
-    } else {
-      return note.innerHTML;
-    }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      try { hash = new URL(url).hash; } catch {}
-      const id = hash.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note !== null) {
-        try {
-          const html = processXRef(id, note);
-          instance.setContent(html);
-        } finally {
-          instance.enable();
-          instance.show();
-        }
-      } else {
-        // See if we can fetch this
-        fetch(url.split('#')[0])
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.getElementById(id);
-          if (note !== null) {
-            const html = processXRef(id, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -765,7 +698,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
-            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -931,24 +863,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://giscus.app/client.js" data-repo="mcanouil/mickael.canouil.fr" data-repo-id="MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=" data-category="Blog posts" data-category-id="DIC_kwDOFLAkg84CSh-t" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="dark_dimmed" data-lang="en" crossorigin="anonymous" async="">
 </script>
-<input type="hidden" id="giscus-base-theme" value="dark_dimmed">
-<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">
-<p>Powered by <a href="https://quarto.org">Quarto</a>.</p>
-</div>   
-    <div class="nav-footer-center">
-<p>© 2022 Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon inline="" icon="fa6-regular:heart"></iconify-icon> Sponsor</a>.</p>
-</div>
-    <div class="nav-footer-right">
-<p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
-</div>
+    <div class="nav-footer-left">Powered by <a href="https://quarto.org">Quarto</a>.</div>   
+    <div class="nav-footer-center">© 2022 Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon inline="" icon="fa6-regular:heart"></iconify-icon> Sponsor</a>.</div>
+    <div class="nav-footer-right">License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"descPosition":"bottom","selector":".lightbox","openEffect":"zoom","closeEffect":"zoom","loop":true});</script>
-
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","selector":".lightbox","descPosition":"bottom","openEffect":"zoom","loop":true});</script>
 
 
 

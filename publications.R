@@ -42,7 +42,7 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
     "title: 'Publications (%s)'",
     "page-layout: full",
     "title-block-banner: true",
-    "image: /media/social-profile.png",
+    "image: /assets/images/social-profile.png",
     "date-format: 'MMMM,<br>YYYY'",
     "listing:",
     "  contents:",
