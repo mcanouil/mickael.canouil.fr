@@ -1,4 +1,4 @@
-source("renv/activate.R")
+# source("renv/activate.R")
 
 if (nzchar(system.file(package = "cli"))) {
   cli::cli_alert_info(R.version.string)
