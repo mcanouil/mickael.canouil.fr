@@ -14,15 +14,35 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/quarto
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/pr-fetch@v2
         with:
-          version: pre-release
-          token: ${{ secrets.GITHUB_TOKEN }}
-          actor: ${{ github.actor }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: r-lib/actions/setup-r@v2
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
           packages:
             any::knitr
             any::rmarkdown
             any::downlit
             any::xml2
             any::webshot2
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: pre-release
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+      - name: Commit to Pull Request
+        shell: bash
+        run: |
+          git config --local user.name "${{ github.actor }}"
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git add _site/*
+          git add _freeze/*
+          git commit -m 'ci: quarto automatic render' || echo "No changes to commit"
+      - uses: r-lib/actions/pr-push@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
