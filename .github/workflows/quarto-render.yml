@@ -1,13 +1,8 @@
 name: Quarto Render
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-  issue_comment:
-    types: [created]
   workflow_dispatch:
+  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}
@@ -15,7 +10,6 @@ concurrency:
 
 jobs:
   quarto-render:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.event_name == 'push' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/render')) }}
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
