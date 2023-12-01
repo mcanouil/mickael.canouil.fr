@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.466">
+<meta name="generator" content="quarto-1.4.515">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -269,7 +269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>A new blog post of the “Quarto Q&amp;A” series.<br>
 This time, I will show how to publish your Quarto project as a Docker container as light as possible.</p>
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale."><img src="featured.png" class="img-fluid quarto-figure-center" alt="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale."></a></p>
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid quarto-figure quarto-figure-center" alt="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale."></a></p>
 <section id="the-questionproblem" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
 <p>There are different ways to publish a Quarto project, either if it is a document, a book or a website:</p>
@@ -631,6 +631,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   if (showAllCode) {
     showAllCode.addEventListener("click", toggleCodeHandler(true));
   }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/mickael\.canouil\.fr");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          if (link.getAttribute("rel") === null) {
+            link.setAttribute("rel", "noopener");
+          }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -705,8 +723,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       // Special case sections, only their first couple elements
       const container = document.createElement("div");
       if (note.children && note.children.length > 2) {
-        for (let i = 0; i < 2; i++) {
-          container.appendChild(note.children[i].cloneNode(true));
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
         }
         typesetMath(container);
         return container.innerHTML
@@ -979,24 +1004,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       });
     }
   }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/mickael\.canouil\.fr");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-    }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-          // target, if specified
-          link.setAttribute("target", "_blank");
-          if (link.getAttribute("rel") === null) {
-            link.setAttribute("rel", "noopener");
-          }
-      }
-    }
 });
 </script>
 <script src="https://giscus.app/client.js" data-repo="mcanouil/mickael.canouil.fr" data-repo-id="MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=" data-category="Blog posts" data-category-id="DIC_kwDOFLAkg84CSh-t" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="dark_dimmed" data-lang="en" crossorigin="anonymous" async="">
@@ -1026,7 +1033,7 @@ dateElements.forEach((el) => {
   );
 });
 </script>
-<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","selector":".lightbox","closeEffect":"zoom","descPosition":"bottom","loop":false});</script>
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"openEffect":"zoom","closeEffect":"zoom","descPosition":"bottom"});</script>
 
 
 
