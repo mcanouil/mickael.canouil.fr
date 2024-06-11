@@ -25,7 +25,7 @@
 local function ensure_html_deps()
   quarto.doc.add_html_dependency({
     name = 'iconify',
-    version = '2.0.0',
+    version = '2.1.0',
     scripts = {"iconify-icon.min.js"}
   })
 end
@@ -79,9 +79,21 @@ return {
     -- detect html (excluding epub which won't handle fa)
     if quarto.doc.is_format("html:js") then
       ensure_html_deps()
-      local set = "fluent-emoji"
       local icon = pandoc.utils.stringify(args[1])
-      if #args > 1 then
+      local set = "fluent-emoji"
+
+      if #args > 1 and string.find(pandoc.utils.stringify(args[2]), ":") then
+        quarto.log.warning(
+          'Use "set:icon" or "set icon" syntax, not both! ' ..
+          'Using "set:icon" syntax and discarding first argument!'
+        )
+        icon = pandoc.utils.stringify(args[2])
+      end
+
+      if string.find(icon, ":") then
+        set = string.sub(icon, 1, string.find(icon, ":") - 1)
+        icon = string.sub(icon, string.find(icon, ":") + 1)
+      elseif #args > 1 then
         set = icon
         icon = pandoc.utils.stringify(args[2])
       end
