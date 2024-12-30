@@ -42,35 +42,52 @@ jobs:
           version: pre-release
       
       - name: Render Quarto Project
-        uses: quarto-dev/quarto-actions/render@v2
+        shell: bash
+        run: |
+          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
+          if grep -q "output-dir: _site" _quarto.yml; then
+            quarto render
+          else
+            quarto render --output-dir _site
+          fi
       
       - name: Commit to Pull Request
         shell: bash
         run: |
-          git config --local user.name "${{ github.actor }}"
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --local user.name github-actions[bot]
+          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add _site/*
           git add _freeze/*
-          git commit -m 'ci: quarto automatic render
+          git commit -m 'ci: quarto automatic render'
           
           
           skip-checks: true' || echo "No changes to commit"
       
       - name: Create Pull Request
         if: ${{ github.event_name != 'pull_request' }}
-        uses: peter-evans/create-pull-request@v4
-        with:
-          commit-message: |
-            ci: quarto automatic render
-            
-            
-            skip-checks: true
-          signoff: false
-          branch: ci/latest-quarto-updates
-          delete-branch: true
-          title: "ci: quarto automatic render"
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        env:
+          BRANCH: ci/latest-quarto-updates
+          GH_TOKEN: ${{ secrets.github_token }}
+        shell: bash
+        run: |
+          if git show-ref --quiet refs/heads/${{ env.BRANCH }}; then
+            echo "Branch ${{ env.BRANCH }} already exists."
+            git checkout "${{ env.BRANCH }}"
+          else
+            echo "Branch ${{ env.BRANCH }} does not exist. Creating..."
+            git checkout -b "${{ env.BRANCH }}"
+          fi
+          git push --force origin ${{ env.BRANCH }}
+          gh pr create \
+            --title "ci: quarto automatic render" \
+            --body "GitHub Actions: ${{ github.workflow }} (${{ github.workflow_sha }})" \
+            --base "main" \
+            --label "Type: CI/CD :robot:" \
+            --head "${{ env.BRANCH }}" \
+            --repo ${{ github.repository }} \
+            --assignee "${{ github.actor }}" \
+            --reviewer "${{ github.actor }}"
+          gh pr merge --auto --squash --delete-branch
       
       - name: Push to Pull Request
         if: ${{ github.event_name == 'pull_request' }}
