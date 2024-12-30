@@ -18,6 +18,9 @@ We'll cover both manual and automated approaches to help you choose the best fit
 Before proceeding, ensure you have enabled and configured GitHub Pages for your repository (*i.e.*, `https://github.com/<username>/<repository>/settings/pages`), see [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) for more details.
 :::
 
+The following methods mostly assume your GitHub repository is public.
+If your repository is private, you may need to adjust the settings to allow GitHub Pages to access the repository using a personal access token.
+
 ## Manual Method
 
 ### Using Quarto CLI
@@ -75,6 +78,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+      pages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,9 +90,6 @@ jobs:
           version: pre-release
       # Add any additional steps as needed, such as installing dependencies
       - name: Build and Deploy
-        permissions: 
-          contents: write
-          pages: write
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: gh-pages
@@ -137,6 +140,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -148,11 +153,13 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: docs > _quarto.yml
-          quarto render
+          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: docs" > _quarto.yml
+          if grep -q "output-dir: docs" _quarto.yml; then
+            quarto render
+          else
+            quarto render --output-dir docs
+          fi
       - name: Deploy
-        permissions: 
-          contents: write
         shell: bash
         run: |
           git config --local user.name github-actions[bot]
@@ -178,8 +185,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -188,6 +193,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -201,8 +209,12 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site > _quarto.yml
-          quarto render .
+          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
+          if grep -q "output-dir: _site" _quarto.yml; then
+            quarto render
+          else
+            quarto render --output-dir _site
+          fi
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages Artifact
