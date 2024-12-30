@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL">
-<meta name="description" content="Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze. This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions. By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world. Let’s dive into the essentials of making your Quarto project live on GitHub Pages.">
+<meta name="description" content="In this guide, we’ll explore various methods to publish your Quarto projects to GitHub Pages. We’ll cover both manual and automated approaches to help you choose the best fit for your workflow.">
 
 <title>Quarto: Publishing to GitHub Pages – MCU</title>
 <style>
@@ -75,8 +75,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-356f70157ff813ec4d6c5f6934bf6a09.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-b6387ae2caf81a34493047ff5a89e8bb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-1255f90ac73abe9cb20281312d59c5bb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
 <script src="../../site_libs/quarto-contrib/iconify-2.1.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,16 +110,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="Quarto: Publishing to GitHub Pages – MCU">
-<meta property="og:description" content="Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze. This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions. By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world. Let’s dive into the essentials of making your Quarto project live on GitHub Pages.">
-<meta property="og:image" content="https://mickael.canouil.fr/assets/images/social-profile.png">
+<meta property="og:description" content="In this guide, we’ll explore various methods to publish your Quarto projects to GitHub Pages. We’ll cover both manual and automated approaches to help you choose the best fit for your workflow.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2024-12-31-quarto-github-pages/featured.png">
 <meta property="og:site_name" content="MCU">
-<meta property="og:image:height" content="1280">
-<meta property="og:image:width" content="2560">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:alt" content="Quarto icon and text logo above GitHub Pages logo.
+">
 <meta name="twitter:title" content="Quarto: Publishing to GitHub Pages – MCU">
-<meta name="twitter:description" content="Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze. This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions. By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world. Let’s dive into the essentials of making your Quarto project live on GitHub Pages.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/assets/images/social-profile.png">
-<meta name="twitter:image-height" content="1280">
-<meta name="twitter:image-width" content="2560">
+<meta name="twitter:description" content="In this guide, we’ll explore various methods to publish your Quarto projects to GitHub Pages. We’ll cover both manual and automated approaches to help you choose the best fit for your workflow.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2024-12-31-quarto-github-pages/featured.png">
+<meta name="twitter:image-height" content="1080">
+<meta name="twitter:image-width" content="1920">
+<meta name="twitter:image:alt" content="Quarto icon and text logo above GitHub Pages logo.
+">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -198,7 +205,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">Quarto: Publishing to GitHub Pages</h1>
                   <div>
         <div class="description">
-          <p>Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze. This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions. By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world. Let’s dive into the essentials of making your Quarto project live on GitHub Pages.</p>
+          <p>In this guide, we’ll explore various methods to publish your Quarto projects to GitHub Pages. We’ll cover both manual and automated approaches to help you choose the best fit for your workflow.</p>
         </div>
       </div>
                           <div class="quarto-categories">
@@ -242,13 +249,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link active" data-scroll-target="#prerequisites"><span class="header-section-number">1</span> Prerequisites</a></li>
   <li><a href="#manual-method" id="toc-manual-method" class="nav-link" data-scroll-target="#manual-method"><span class="header-section-number">2</span> Manual Method</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#using-quarto-cli" id="toc-using-quarto-cli" class="nav-link" data-scroll-target="#using-quarto-cli"><span class="header-section-number">2.1</span> Using Quarto CLI</a></li>
   </ul></li>
   <li><a href="#automated-method" id="toc-automated-method" class="nav-link" data-scroll-target="#automated-method"><span class="header-section-number">3</span> Automated Method</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#quarto-publish-github-action" id="toc-quarto-publish-github-action" class="nav-link" data-scroll-target="#quarto-publish-github-action"><span class="header-section-number">3.1</span> Quarto Publish GitHub Action</a></li>
-  <li><a href="#custom-github-actions-workflow" id="toc-custom-github-actions-workflow" class="nav-link" data-scroll-target="#custom-github-actions-workflow"><span class="header-section-number">3.2</span> Custom GitHub Actions Workflow</a></li>
+  <li><a href="#custom-github-actions-workflow" id="toc-custom-github-actions-workflow" class="nav-link" data-scroll-target="#custom-github-actions-workflow"><span class="header-section-number">3.2</span> Custom GitHub Actions Workflow</a>
+  <ul>
+  <li><a href="#deploy-from-a-branch" id="toc-deploy-from-a-branch" class="nav-link" data-scroll-target="#deploy-from-a-branch"><span class="header-section-number">3.2.1</span> Deploy From a Branch</a>
+  <ul class="collapse">
+  <li><a href="#deploying-from-the-docs-folder-e.g.-main-branch" id="toc-deploying-from-the-docs-folder-e.g.-main-branch" class="nav-link" data-scroll-target="#deploying-from-the-docs-folder-e.g.-main-branch"><span class="header-section-number">3.2.1.1</span> Deploying From the <code>docs</code> Folder (<em>e.g.</em>, <code>main</code> Branch)</a></li>
+  <li><a href="#deploying-from-the-root-e.g.-gh-pages-branch" id="toc-deploying-from-the-root-e.g.-gh-pages-branch" class="nav-link" data-scroll-target="#deploying-from-the-root-e.g.-gh-pages-branch"><span class="header-section-number">3.2.1.2</span> Deploying From the Root (<em>e.g.</em>, <code>gh-pages</code> Branch)</a></li>
+  </ul></li>
+  <li><a href="#github-actions" id="toc-github-actions" class="nav-link" data-scroll-target="#github-actions"><span class="header-section-number">3.2.2</span> GitHub Actions</a></li>
+  </ul></li>
   <li><a href="#keeping-your-github-actions-workflow-up-to-date" id="toc-keeping-your-github-actions-workflow-up-to-date" class="nav-link" data-scroll-target="#keeping-your-github-actions-workflow-up-to-date"><span class="header-section-number">3.3</span> Keeping Your GitHub Actions Workflow Up-to-Date</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">4</span> Conclusion</a></li>
@@ -262,7 +277,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>In this guide, we’ll explore various methods to publish your Quarto projects to GitHub Pages. We’ll cover both manual and automated approaches to help you choose the best fit for your workflow.</p>
+<p>Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze.<br>
+This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions.<br>
+By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world.</p>
+<p>Let’s dive into the essentials of making your Quarto project live on GitHub Pages.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Quarto icon and text logo above GitHub Pages logo."></a></p>
+</figure>
+</div>
 <section id="prerequisites" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="prerequisites"><span class="header-section-number">1</span> Prerequisites</h2>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -402,8 +425,9 @@ Note
 <p>The GitHub Action workflow described in <a href="#quarto-publish-github-action">Quarto Publish GitHub Action</a> uses <code>gh-pages</code> root as the source for GitHub Pages.</p>
 </div>
 </div>
-<ul>
-<li><p>Using the <code>docs</code> folder as the source for GitHub Pages. Be sure to use a Quarto project (<em>i.e.</em>, <code>_quarto.yml</code>) to be able to set <code>output-dir</code>.</p>
+<section id="deploying-from-the-docs-folder-e.g.-main-branch" class="level5" data-number="3.2.1.1">
+<h5 data-number="3.2.1.1" class="anchored" data-anchor-id="deploying-from-the-docs-folder-e.g.-main-branch"><span class="header-section-number">3.2.1.1</span> Deploying From the <code>docs</code> Folder (<em>e.g.</em>, <code>main</code> Branch)</h5>
+<p>Using the <code>docs</code> folder as the source for GitHub Pages. Be sure to use a Quarto project (<em>i.e.</em>, <code>_quarto.yml</code>) to be able to set <code>output-dir</code>.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>.github/workflows/deploy.yml</strong></pre>
@@ -453,10 +477,25 @@ Note
 <span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>          git add docs || echo "No changes."</span>
 <span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>          git commit -m "ci: quarto render" || echo "No changes."</span>
 <span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>          git push origin || echo "No changes."</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></li>
-<li><p>Using the root of the <code>gh-pages</code> branch as the source for GitHub Pages.<br>
-::: {.callout-tip} This method offers an advantage over <code>quarto publish gh-pages</code> as it does not necessitate a local run to create the <code>gh-pages</code> branch beforehand.<br>
-Additionally, it provides some insight into the processes that occur behind the scenes when using <code>quarto publish gh-pages</code>. :::</p>
+</div>
+</section>
+<section id="deploying-from-the-root-e.g.-gh-pages-branch" class="level5" data-number="3.2.1.2">
+<h5 data-number="3.2.1.2" class="anchored" data-anchor-id="deploying-from-the-root-e.g.-gh-pages-branch"><span class="header-section-number">3.2.1.2</span> Deploying From the Root (<em>e.g.</em>, <code>gh-pages</code> Branch)</h5>
+<p>Using the root of the <code>gh-pages</code> branch as the source for GitHub Pages.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This method offers an advantage over <code>quarto publish gh-pages</code> as it does not necessitate a local run to create the <code>gh-pages</code> branch beforehand.<br>
+Additionally, it provides some insight into the processes that occur behind the scenes when using <code>quarto publish gh-pages</code>, thus when using the <a href="#quarto-publish-github-action">Quarto Publish GitHub Action</a>.</p>
+</div>
+</div>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>.github/workflows/deploy.yml</strong></pre>
@@ -518,8 +557,8 @@ Additionally, it provides some insight into the processes that occur behind the 
 <span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>          git add . || echo "No changes."</span>
 <span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>          git commit --allow-empty -m "ci: quarto render" || echo "No changes."</span>
 <span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>          git push origin "${GH_PAGES}" || echo "No changes."</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></li>
-</ul>
+</div>
+</section>
 </section>
 <section id="github-actions" class="level4" data-number="3.2.2">
 <h4 data-number="3.2.2" class="anchored" data-anchor-id="github-actions"><span class="header-section-number">3.2.2</span> GitHub Actions</h4>
@@ -613,7 +652,8 @@ Note
 </section>
 <section id="conclusion" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4</span> Conclusion</h2>
-<p>By following these methods, you’ll be able to publish your Quarto projects to GitHub Pages efficiently. Choose the approach that best suits your needs and workflow.</p>
+<p>By following these methods, you’ll be able to publish your Quarto projects to GitHub Pages efficiently.<br>
+Choose the approach that best suits your needs and workflow.</p>
 <p>Happy publishing!</p>
 
 
@@ -1165,6 +1205,38 @@ dateElements.forEach((el) => {
   );
 });
 </script>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
