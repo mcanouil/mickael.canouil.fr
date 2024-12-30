@@ -13,8 +13,6 @@ concurrency:
 jobs:
   quarto-render:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       pull-requests: write
@@ -71,7 +69,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           BRANCH: ci/latest-quarto-updates
-          GH_TOKEN: ${{ secrets.github_token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           if git show-ref --quiet refs/heads/${{ env.BRANCH }}; then
