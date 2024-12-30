@@ -121,53 +121,119 @@ The GitHub Action workflow described in [Quarto Publish GitHub Action](#quarto-p
 
 - Using the `docs` folder as the source for GitHub Pages. Be sure to use a Quarto project (*i.e.*, `_quarto.yml`) to be able to set `output-dir`.
 
-```{.yaml filename=".github/workflows/deploy.yml"}
-name: Deploy
+  ```{.yaml filename=".github/workflows/deploy.yml"}
+  name: Deploy
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+  on:
+    workflow_dispatch:
+    push:
+      branches:
+        - main
 
-permissions:
-  contents: read
+  permissions:
+    contents: read
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: true
+  concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions: 
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Install Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-        with:
-          version: pre-release
-      # Add any additional steps as needed, such as installing dependencies
-      - name: Build
-        shell: bash
-        run: |
-          [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: docs" > _quarto.yml
-          if grep -q "output-dir: docs" _quarto.yml; then
-            quarto render
-          else
-            quarto render --output-dir docs
-          fi
-      - name: Deploy
-        shell: bash
-        run: |
-          git config --local user.name github-actions[bot]
-          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add docs || echo "No changes."
-          git commit -m "ci: quarto render" || echo "No changes."
-          git push origin || echo "No changes."
-```
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      permissions: 
+        contents: write
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Install Quarto
+          uses: quarto-dev/quarto-actions/setup@v2
+          with:
+            version: pre-release
+        # Add any additional steps as needed, such as installing dependencies
+        - name: Build
+          shell: bash
+          run: |
+            [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: docs" > _quarto.yml
+            if grep -q "output-dir: docs" _quarto.yml; then
+              quarto render
+            else
+              quarto render --output-dir docs
+            fi
+        - name: Deploy
+          shell: bash
+          run: |
+            git config --local user.name github-actions[bot]
+            git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add docs || echo "No changes."
+            git commit -m "ci: quarto render" || echo "No changes."
+            git push origin || echo "No changes."
+  ```
+
+- Using the root of the `gh-pages` branch as the source for GitHub Pages.  
+  ::: {.callout-tip}
+  This method offers an advantage over `quarto publish gh-pages` as it does not necessitate a local run to create the `gh-pages` branch beforehand.  
+Additionally, it provides some insight into the processes that occur behind the scenes when using `quarto publish gh-pages`.
+  :::
+
+  ```{.yaml filename=".github/workflows/deploy.yml"}
+  name: Deploy
+
+  on:
+    workflow_dispatch:
+    push:
+      branches:
+        - main
+
+  permissions:
+    contents: read
+
+  concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: true
+
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      permissions: 
+        contents: write
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Install Quarto
+          uses: quarto-dev/quarto-actions/setup@v2
+          with:
+            version: pre-release
+        # Add any additional steps as needed, such as installing dependencies
+        - name: Build
+          shell: bash
+          run: |
+            [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
+            if grep -q "output-dir: _site" _quarto.yml; then
+              quarto render
+            else
+              quarto render --output-dir _site
+            fi
+        - name: Deploy
+          shell: bash
+          env:
+            GH_PAGES: gh-pages
+          run: |
+            git config --local user.name github-actions[bot]
+            git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
+            BUILD_DIR=$(mktemp -d)
+            mv _site "${BUILD_DIR}/quarto-output"
+            if git ls-remote --exit-code origin "${GH_PAGES}"; then
+              git fetch origin "${GH_PAGES}"
+              git checkout origin/"${GH_PAGES}"
+            else
+              git checkout --orphan "${GH_PAGES}"
+              git rm -rf .
+            fi
+            mv ${BUILD_DIR}/quarto-output/* .
+            git add . || echo "No changes."
+            git commit --allow-empty -m "ci: quarto render" || echo "No changes."
+            git push origin "${GH_PAGES}" || echo "No changes."
+  ```
 
 #### GitHub Actions
 
