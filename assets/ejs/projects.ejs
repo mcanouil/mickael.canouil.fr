@@ -4,29 +4,43 @@
 
 :::: {.g-col-12 .g-col-lg-6 .g-col-xl-4 <%= metadataAttrs(item) %>}
 
-`<a href="<%- item.path %>" class=".quarto-grid-link" style="text-decoration: none;">`{=html}
-
 :::: {.quarto-grid-item .card .h-100 .card-center .projects}
 
 ```{=html}
 <div class="card-img-top">
-<img src="<%= item.image %>" class="thumbnail-image card-img" loading="lazy" alt="<%= item.title %>">
+<a href="<%- item.path %>">
+  <img src="<%= item.image %>" class="thumbnail-image card-img" loading="lazy" alt="<%= item.title %>">
+</a>
 </div>
 ```
 
 :::: {.card-body .post-contents}
-##### <%= item.title %> {.no-anchor .card-title .listing-title}
+
+[{{< iconify octicon:mark-github-16 title="GitHub Repository" label="GitHub Repository" >}}](<%- item.path %>){#github-link .quarto-grid-link style="position: absolute; top: 0; right: 0; padding: 0.5em;"}
+
+```{=html}
+<a class="quarto-grid-link" href="<%- item.path %>">
+  <h5 class="no-anchor card-title listing-title"><%= item.title %></h5>
+</a>
+```
 
 :::: {.listing-categories}
 ```{=html}
 <% for (const category of item.categories) { %>
-<div class="listing-category" onclick="window.quartoListingCategory('<%=category%>'); return false;"><%= category %></div>
+<div class="listing-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></div>
 <% } %>
 ```
 :::
 
-:::: {.card-text .listing-description}
+:::: {.card-text}
+:::: {.listing-description}
 <%= item.description %>
+:::
+
+<% if (item.usage) { %>
+<% partial("extension-install-modal.ejs", { item }) %>
+<% } %>
+
 :::
 
 :::
@@ -38,8 +52,6 @@
 :::
 
 :::
-
-`</a>`{=html}
 
 :::
 
