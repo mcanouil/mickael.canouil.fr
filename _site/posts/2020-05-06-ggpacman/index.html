@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.20">
+<meta name="generator" content="quarto-99.9.9">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Mickaël CANOUIL, Ph.D.">
 <meta name="description" content="The story of ggpacman. Or how to build a useless but fun R package to make a GIF of the game Pac-Man.">
@@ -70,10 +70,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-94ada8eef8a9f7057eb8b9d53ceea79a.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-56b67755cebbfb78539c873898544994.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-f60903b695884a356c0d9f066c65055c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-cd4094294126fd071f16f6922b93eed5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
 <script src="../../site_libs/quarto-contrib/iconify-2.1.0/iconify-icon.min.js"></script>
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
@@ -277,6 +277,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <main class="content quarto-banner-title-block" id="quarto-document-content"><section id="the-story-of-ggpacman" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="the-story-of-ggpacman">
 <span class="header-section-number">1</span> The Story of <code>ggpacman</code>
 </h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="`ggpacman` hexagonal logo representing a red ghost from the game Pac-Man on a black background with a blue border and `ggpacman` written in yellow below the ghost."></a></p>
+</figure>
+</div>
 <p>It started on a Saturday evening …</p>
 <p>It was the 21<sup>st</sup> of March (<em>for the sake of precision</em>), around 10 pm CET (<em>also for the sake of precision and mostly because it is not relevant</em>). I was playing around with my data on ‘all’ the movies I have seen so far (<a href="https://github.com/mcanouil/imdb-ratings">mcanouil/imdb-ratings</a>) and looking on possibly new ideas of visualisation on twitter using <code>#ggplot2</code> and <code>#gganimate</code> (by the way the first time I played with <a href="https://gganimate.com/"><code>gganimate</code></a> was at <a href="https://www.r-project.org/conferences/useR-2018/">useR-2018 (Brisbane, Australia)</a>, just before and when <span class="citation" data-cites="thomasp85">@thomasp85</span> released the actual framework). The only thing on the feed was “contaminated/deaths and covid-19” curves made with <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> and a few with <a href="https://gganimate.com/"><code>gganimate</code></a> … Let’s say, it was not as funny and interesting as I was hoping for … Then, I’ve got an idea, what if I can do something funny and not expected with <a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a> and <a href="https://gganimate.com/"><code>gganimate</code></a>? My first thought, was let’s draw and animate Pac-Man, that should not be that hard!</p>
 <p>Well, it was not that easy after-all … But, I am going to go through my code here (you might be interested to actually look at the <a href="https://github.com/mcanouil/ggpacman/commits/master">commits history</a>.</p>
@@ -305,14 +309,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="header-section-number">3.1</span> The base layer</h3>
 <p>First thing first, I needed to set-up the base layer, meaning, the maze from Pac-Man. I did start by setting the coordinates of the maze.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>    plot.background <span class="op">=</span> <span class="fu">element_rect</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
-<span>    panel.background <span class="op">=</span> <span class="fu">element_rect</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
+<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">26</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">26</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For later use, I defined some scales (actually those scales, where defined way after chronologically speaking). I am using those to define sizes and colours for all the geometries I am going to use to achieve the Pac-Man GIF.</p>
 <div class="cell">
@@ -330,14 +334,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">&lt;-</span> <span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_size_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_colour_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-layer-colours-print-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="index_files/figure-html/base-layer-colours-print-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-layer-colours-print-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="index_files/figure-html/base-layer-colours-print-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -345,16 +349,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>My <code>base_layer</code> here is not really helpful, so I temporarily added some elements to help me draw everything on it. <em>Note</em>: I won’t use it in the following.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">21</span>, sec.axis <span class="op">=</span> <span class="fu">dup_axis</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_y_continuous</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">26</span>, sec.axis <span class="op">=</span> <span class="fu">dup_axis</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span></span>
-<span>    panel.grid.major <span class="op">=</span> <span class="fu">element_line</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>,</span>
-<span>    axis.text <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">21</span>, sec.axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">26</span>, sec.axis <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span>,</span>
+<span>    axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">annotate</span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">0</span>, xmax <span class="op">=</span> <span class="fl">21</span>, ymin <span class="op">=</span> <span class="fl">0</span>, ymax <span class="op">=</span> <span class="fl">26</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">0</span>, xmax <span class="op">=</span> <span class="fl">21</span>, ymin <span class="op">=</span> <span class="fl">0</span>, ymax <span class="op">=</span> <span class="fl">26</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-layer-dev-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="index_files/figure-html/base-layer-dev-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-layer-dev-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="index_files/figure-html/base-layer-dev-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -389,16 +393,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">left_vertical_segments</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"white"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/left-vertical-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="index_files/figure-html/left-vertical-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/left-vertical-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="index_files/figure-html/left-vertical-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -439,16 +443,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">left_segments</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"white"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/left-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="index_files/figure-html/left-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/left-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="index_files/figure-html/left-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -463,16 +467,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">left_segments</span>, <span class="va">right_segments</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"white"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/right-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="index_files/figure-html/right-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/right-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="index_files/figure-html/right-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -500,16 +504,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_walls</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"white"</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/maze-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="index_files/figure-html/maze-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/maze-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="index_files/figure-html/maze-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -517,15 +521,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The maze is now complete, but no-one can actually see the door, since it appears the same way as the walls. You may have noticed, I added a column named <code>type</code>. <code>type</code> can currently hold two values: <code>"wall"</code> and <code>"door"</code>. I am going to use <code>type</code> as values for two aesthetics, you may already have guessed which ones. The answer is the <code>colour</code> and <code>size</code> aesthetics.</p>
 <div class="cell">
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_walls</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, colour <span class="op">=</span> <span class="va">type</span>, size <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, colour <span class="op">=</span> <span class="va">type</span>, size <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/maze-plot-colour-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="index_files/figure-html/maze-plot-colour-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/maze-plot-colour-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="index_files/figure-html/maze-plot-colour-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -569,22 +573,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">maze_layer</span> <span class="op">&lt;-</span> <span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_walls</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, colour <span class="op">=</span> <span class="va">type</span>, size <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, colour <span class="op">=</span> <span class="va">type</span>, size <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_points</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/maze-point-plot-print-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="index_files/figure-html/maze-point-plot-print-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/maze-point-plot-print-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="index_files/figure-html/maze-point-plot-print-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -612,18 +616,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt;  8    10     6 Pac-Man</span></span>
 <span><span class="co">#&gt;  9    10     6 Pac-Man</span></span>
 <span><span class="co">#&gt; 10    10     6 Pac-Man</span></span>
-<span><span class="co">#&gt; # … with 140 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt; # ℹ 140 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">maze_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">pacman</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">4</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/pacman-position-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="index_files/figure-html/pacman-position-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/pacman-position-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="index_files/figure-html/pacman-position-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -645,17 +649,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">pacman_state</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span><span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="fl">0</span>, y0 <span class="op">=</span> <span class="fl">0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span><span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"yellow"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">state</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/pacman-state-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="index_files/figure-html/pacman-state-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/pacman-state-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="index_files/figure-html/pacman-state-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -695,7 +699,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt;  8    10     6 Pac-Man       0       0 close_right</span></span>
 <span><span class="co">#&gt;  9    10     6 Pac-Man       0       0 open_right </span></span>
 <span><span class="co">#&gt; 10    10     6 Pac-Man       0       0 close_right</span></span>
-<span><span class="co">#&gt; # … with 290 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt; # ℹ 290 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here, in preparation for <a href="https://gganimate.com/"><code>gganimate</code></a>, I also added a column <code>step</code> before merging the new upgraded <code>pacman</code> (<em>i.e.</em>, with the Pac-Man <code>state</code> column) with the <code>pacman_state</code> defined earlier.</p>
 <div class="cell">
@@ -715,18 +719,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 #&gt;  8    10     6 Pac-Man       0       0 close_right     8  7.85  1.57
 #&gt;  9    10     6 Pac-Man       0       0 open_right      9  7.33  2.09
 #&gt; 10    10     6 Pac-Man       0       0 close_right    10  7.85  1.57
-#&gt; # … with 290 more rows</code></pre>
+#&gt; # ℹ 290 more rows</code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">maze_layer</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">pacman_moves</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x</span>, y0 <span class="op">=</span> <span class="va">y</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span>, colour <span class="op">=</span> <span class="va">colour</span>, fill <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x</span>, y0 <span class="op">=</span> <span class="va">y</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span>, colour <span class="op">=</span> <span class="va">colour</span>, fill <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/pacman-moves-plots-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="index_files/figure-html/pacman-moves-plots-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/pacman-moves-plots-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="index_files/figure-html/pacman-moves-plots-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -736,7 +740,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">animated_pacman</span> <span class="op">&lt;-</span> <span class="va">maze_layer</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">pacman_moves</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x</span>, y0 <span class="op">=</span> <span class="va">y</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span>, colour <span class="op">=</span> <span class="va">colour</span>, fill <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x</span>, y0 <span class="op">=</span> <span class="va">y</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span>, colour <span class="op">=</span> <span class="va">colour</span>, fill <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">transition_manual</span><span class="op">(</span><span class="va">step</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -744,7 +748,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/pacman-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="index_files/figure-html/pacman-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/pacman-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="index_files/figure-html/pacman-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
 </figure>
 </div>
 </div>
@@ -767,44 +771,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">ghost_arc</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="va">r</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="va">r</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/ghost-top-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="index_files/figure-html/ghost-top-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/ghost-top-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="index_files/figure-html/ghost-top-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
 </div>
-<p>I retrieved the coordinates of the created polygon, using <code>ggplot_build()</code>.</p>
+<p>I retrieved the coordinates of the created polygon, using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build()</a></code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top_polygon</span> <span class="op">&lt;-</span> <span class="fu">ggplot_build</span><span class="op">(</span><span class="va">top</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top_polygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build</a></span><span class="op">(</span><span class="va">top</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And I proceeded the same way for the bottom part of the ghost.</p>
 <div class="cell">
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bottom</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bottom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">ghost_arc</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span>, <span class="op">]</span>,</span>
-<span>        mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="va">r</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span></span>
+<span>        mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="va">r</span>, start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/ghost-bottom-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="index_files/figure-html/ghost-bottom-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/ghost-bottom-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="index_files/figure-html/ghost-bottom-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bottom_polygon</span> <span class="op">&lt;-</span> <span class="fu">ggplot_build</span><span class="op">(</span><span class="va">bottom</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bottom_polygon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build</a></span><span class="op">(</span><span class="va">bottom</span><span class="op">)</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, I just added one point to “properly” link the top and the bottom part.</p>
 <div class="cell">
@@ -825,16 +829,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>I finally got the whole ghost shape I was looking for.</p>
 <div class="cell">
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_polygon</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">ghost_body</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/ghost-body-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="index_files/figure-html/ghost-body-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/ghost-body-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="index_files/figure-html/ghost-body-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -863,20 +867,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">map_eyes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"eye"</span> <span class="op">=</span> <span class="st">"white"</span>, <span class="st">"iris"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span>
-<span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_eyes</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_eyes</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_colour_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_eyes</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_eyes</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_eyes</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_eyes</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_eyes</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_eyes</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_circle</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">ghost_eyes</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    show.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">direction</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">direction</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/ghost-eyes-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="index_files/figure-html/ghost-eyes-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/ghost-eyes-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="index_files/figure-html/ghost-eyes-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -886,25 +890,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="header-section-number">5.3</span> Ghost shape</h3>
 <p>I had the whole ghost shape and the eyes.</p>
 <div class="cell">
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_colour_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_polygon</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"ghost_body"</span>, package <span class="op">=</span> <span class="st">"ggpacman"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_circle</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"ghost_eyes"</span>, package <span class="op">=</span> <span class="st">"ggpacman"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    show.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">direction</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op">(</span><span class="va">direction</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/ghost-shape-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="index_files/figure-html/ghost-shape-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/ghost-shape-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="index_files/figure-html/ghost-shape-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -951,35 +955,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell sourceCode">
 <pre><code>#&gt; # A tibble: 20 × 12
-#&gt;        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;
-#&gt;  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0586 
-#&gt;  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0619 
-#&gt;  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.0552 
-#&gt;  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0196 
-#&gt;  5     1     0 Blinky     1     0       1       0 right         1     5  0.0342 
-#&gt;  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0173 
-#&gt;  7     1     0 Blinky     1     0       1       0 right         3     7  0.0616 
-#&gt;  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0979 
-#&gt;  9     1     1 Blinky     1     1       0       1 up            1     9  0.0481 
-#&gt; 10     1     1 Blinky     1     1       0       1 up            2    10  0.0540 
-#&gt; 11     1     1 Blinky     1     1       0       1 up            3    11  0.0445 
-#&gt; 12     1     1 Blinky     1     1       0       1 up            4    12  0.0641 
-#&gt; 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0431 
-#&gt; 14     0     1 Blinky     0     1      -1       0 left          2    14  0.00634
-#&gt; 15     0     1 Blinky     0     1      -1       0 left          3    15 -0.0333 
-#&gt; 16     0     1 Blinky     0     1      -1       0 left          4    16 -0.0391 
-#&gt; 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0164 
-#&gt; 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.00357
-#&gt; 19     0     0 Blinky     0     0       0      -1 down          3    19 -0.0166 
-#&gt; 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0298 
-#&gt; # … with 1 more variable: noise_y &lt;dbl&gt;</code></pre>
+#&gt;        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x   noise_y
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+#&gt;  1     0     0 Blinky     0     0      NA      NA middle        1     1 -0.0826   0.0312  
+#&gt;  2     0     0 Blinky     0     0      NA      NA middle        2     2 -0.0857  -0.0106  
+#&gt;  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0855  -0.0281  
+#&gt;  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0617   0.000468
+#&gt;  5     1     0 Blinky     1     0       1       0 right         1     5  0.00206  0.0607  
+#&gt;  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0895  -0.0251  
+#&gt;  7     1     0 Blinky     1     0       1       0 right         3     7  0.0118  -0.0452  
+#&gt;  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0231   0.0571  
+#&gt;  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0327   0.0179  
+#&gt; 10     1     1 Blinky     1     1       0       1 up            2    10  0.0379  -0.0877  
+#&gt; 11     1     1 Blinky     1     1       0       1 up            3    11  0.00870  0.00561 
+#&gt; 12     1     1 Blinky     1     1       0       1 up            4    12 -0.0449  -0.0458  
+#&gt; 13     0     1 Blinky     0     1      -1       0 left          1    13  0.0893   0.0848  
+#&gt; 14     0     1 Blinky     0     1      -1       0 left          2    14 -0.0216  -0.0732  
+#&gt; 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0150   0.0446  
+#&gt; 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0366   0.0516  
+#&gt; 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0222  -0.0130  
+#&gt; 18     0     0 Blinky     0     0       0      -1 down          2    18  0.0513   0.0574  
+#&gt; 19     0     0 Blinky     0     0       0      -1 down          3    19  0.0142  -0.0150  
+#&gt; 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0436   0.0656</code></pre>
 </div>
 <p>Then, I added (<em>in a weird way I might say</em>) the polygons coordinates for the body and the eyes.</p>
 <div class="cell">
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">blinky_ghost</span> <span class="op">&lt;-</span> <span class="va">blinky_ghost</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>    body <span class="op">=</span> <span class="fu">pmap</span><span class="op">(</span></span>
+<span>    body <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/pmap.html">pmap</a></span><span class="op">(</span></span>
 <span>      .l <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">noise_x</span>, <span class="va">noise_y</span><span class="op">)</span>,</span>
 <span>      .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.noise_x</span>, <span class="va">.noise_y</span><span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="fu">mutate</span><span class="op">(</span></span>
@@ -989,7 +992,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>        <span class="op">)</span></span>
 <span>      <span class="op">}</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    eyes <span class="op">=</span> <span class="fu">pmap</span><span class="op">(</span></span>
+<span>    eyes <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/pmap.html">pmap</a></span><span class="op">(</span></span>
 <span>      .l <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">noise_x</span>, <span class="va">noise_y</span>, <span class="va">direction</span><span class="op">)</span>,</span>
 <span>      .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="va">.noise_x</span>, <span class="va">.noise_y</span>, <span class="va">.direction</span><span class="op">)</span> <span class="op">{</span></span>
 <span>        <span class="fu">mutate</span><span class="op">(</span></span>
@@ -1006,29 +1009,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell sourceCode">
 <pre><code>#&gt; # A tibble: 20 × 12
-#&gt;    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
-#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
-#&gt;  1 Blinky     0     0      NA      NA middle        1     1  0.0586  -0.0504 
-#&gt;  2 Blinky     0     0      NA      NA middle        2     2  0.0619  -0.00298
-#&gt;  3 Blinky     0     0      NA      NA middle        3     3 -0.0552   0.0317 
-#&gt;  4 Blinky     0     0      NA      NA middle        4     4  0.0196  -0.104  
-#&gt;  5 Blinky     1     0       1       0 right         1     5  0.0342   0.0781 
-#&gt;  6 Blinky     1     0       1       0 right         2     6 -0.0173   0.00306
-#&gt;  7 Blinky     1     0       1       0 right         3     7  0.0616   0.0107 
-#&gt;  8 Blinky     1     0       1       0 right         4     8 -0.0979  -0.0575 
-#&gt;  9 Blinky     1     1       0       1 up            1     9  0.0481  -0.0265 
-#&gt; 10 Blinky     1     1       0       1 up            2    10  0.0540  -0.0886 
-#&gt; 11 Blinky     1     1       0       1 up            3    11  0.0445  -0.0244 
-#&gt; 12 Blinky     1     1       0       1 up            4    12  0.0641  -0.0399 
-#&gt; 13 Blinky     0     1      -1       0 left          1    13 -0.0431   0.0715 
-#&gt; 14 Blinky     0     1      -1       0 left          2    14  0.00634  0.0267 
-#&gt; 15 Blinky     0     1      -1       0 left          3    15 -0.0333  -0.0453 
-#&gt; 16 Blinky     0     1      -1       0 left          4    16 -0.0391   0.0148 
-#&gt; 17 Blinky     0     0       0      -1 down          1    17  0.0164   0.0367 
-#&gt; 18 Blinky     0     0       0      -1 down          2    18 -0.00357  0.0986 
-#&gt; 19 Blinky     0     0       0      -1 down          3    19 -0.0166  -0.0322 
-#&gt; 20 Blinky     0     0       0      -1 down          4    20 -0.0298   0.0287 
-#&gt; # … with 2 more variables: body &lt;list&gt;, eyes &lt;list&gt;</code></pre>
+#&gt;    colour    X0    Y0 state_x state_y direction state  step  noise_x   noise_y body           eyes            
+#&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;list&gt;         &lt;list&gt;          
+#&gt;  1 Blinky     0     0      NA      NA middle        1     1 -0.0826   0.0312   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  2 Blinky     0     0      NA      NA middle        2     2 -0.0857  -0.0106   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  3 Blinky     0     0      NA      NA middle        3     3  0.0855  -0.0281   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  4 Blinky     0     0      NA      NA middle        4     4  0.0617   0.000468 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  5 Blinky     1     0       1       0 right         1     5  0.00206  0.0607   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  6 Blinky     1     0       1       0 right         2     6 -0.0895  -0.0251   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  7 Blinky     1     0       1       0 right         3     7  0.0118  -0.0452   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  8 Blinky     1     0       1       0 right         4     8 -0.0231   0.0571   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  9 Blinky     1     1       0       1 up            1     9 -0.0327   0.0179   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 10 Blinky     1     1       0       1 up            2    10  0.0379  -0.0877   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 11 Blinky     1     1       0       1 up            3    11  0.00870  0.00561  &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 12 Blinky     1     1       0       1 up            4    12 -0.0449  -0.0458   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 13 Blinky     0     1      -1       0 left          1    13  0.0893   0.0848   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 14 Blinky     0     1      -1       0 left          2    14 -0.0216  -0.0732   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 15 Blinky     0     1      -1       0 left          3    15  0.0150   0.0446   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 16 Blinky     0     1      -1       0 left          4    16  0.0366   0.0516   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 17 Blinky     0     0       0      -1 down          1    17  0.0222  -0.0130   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 18 Blinky     0     0       0      -1 down          2    18  0.0513   0.0574   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 19 Blinky     0     0       0      -1 down          3    19  0.0142  -0.0150   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 20 Blinky     0     0       0      -1 down          4    20 -0.0436   0.0656   &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;</code></pre>
 </div>
 <p>For ease, it is now a call to one function directly on the position matrix of a ghost.</p>
 <div class="cell">
@@ -1037,22 +1039,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">blinky_plot</span> <span class="op">&lt;-</span> <span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_polygon</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">blinky_moves</span>, <span class="st">"body"</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">colour</span>, colour <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">colour</span>, colour <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_circle</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">blinky_moves</span>, <span class="st">"eyes"</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-static-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="index_files/figure-html/blinky-plot-static-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-static-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="index_files/figure-html/blinky-plot-static-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1064,7 +1066,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="index_files/figure-html/blinky-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="index_files/figure-html/blinky-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
 </figure>
 </div>
 </div>
@@ -1079,24 +1081,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="fu">right_join</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/get.html">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"maze_points"</span><span class="op">)</span><span class="op">)</span>, <span class="va">pacman_moves</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">distinct</span><span class="op">(</span><span class="va">step</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>    step <span class="op">=</span> <span class="fu">map2</span><span class="op">(</span><span class="va">step</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">step</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    step <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2</a></span><span class="op">(</span><span class="va">step</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">step</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">.y</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"eaten"</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">unnest</span><span class="op">(</span><span class="st">"step"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 45,150 × 5</span></span>
-<span><span class="co">#&gt;        x     y type    step colour</span></span>
-<span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; </span></span>
-<span><span class="co">#&gt;  1     1     1 normal    61 eaten </span></span>
-<span><span class="co">#&gt;  2     1     1 normal    62 eaten </span></span>
-<span><span class="co">#&gt;  3     1     1 normal    63 eaten </span></span>
-<span><span class="co">#&gt;  4     1     1 normal    64 eaten </span></span>
-<span><span class="co">#&gt;  5     1     1 normal    65 eaten </span></span>
-<span><span class="co">#&gt;  6     1     1 normal    66 eaten </span></span>
-<span><span class="co">#&gt;  7     1     1 normal    67 eaten </span></span>
-<span><span class="co">#&gt;  8     1     1 normal    68 eaten </span></span>
-<span><span class="co">#&gt;  9     1     1 normal    69 eaten </span></span>
-<span><span class="co">#&gt; 10     1     1 normal    70 eaten </span></span>
-<span><span class="co">#&gt; # … with 45,140 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt;     step     x     y type   colour</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; </span></span>
+<span><span class="co">#&gt;  1    61     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  2    62     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  3    63     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  4    64     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  5    65     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  6    66     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  7    67     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  8    68     1     1 normal eaten </span></span>
+<span><span class="co">#&gt;  9    69     1     1 normal eaten </span></span>
+<span><span class="co">#&gt; 10    70     1     1 normal eaten </span></span>
+<span><span class="co">#&gt; # ℹ 45,140 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Again, for ease, I am using a function I defined to compute everything.</p>
 <div class="cell">
@@ -1107,27 +1109,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/reminder-maze-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="index_files/figure-html/reminder-maze-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/reminder-maze-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="index_files/figure-html/reminder-maze-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
 </div>
-<p>I could have change this geometry (<em>i.e.</em>, <code>geom_point()</code>), but I did not, and draw a new geometry on top of the previous ones. Do you remember the values of the scale for the size aesthetic?</p>
+<p>I could have change this geometry (<em>i.e.</em>, <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>), but I did not, and draw a new geometry on top of the previous ones. Do you remember the values of the scale for the size aesthetic?</p>
 <div class="cell">
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">scale_size_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">maze_layer_points</span> <span class="op">&lt;-</span> <span class="va">maze_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">bonus_points_eaten</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span>, size <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span>, size <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/points-eaten-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="index_files/figure-html/points-eaten-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/points-eaten-plot-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="index_files/figure-html/points-eaten-plot-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1139,7 +1141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/points-eaten-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-22"><img src="index_files/figure-html/points-eaten-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/points-eaten-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="index_files/figure-html/points-eaten-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
 </figure>
 </div>
 </div>
@@ -1155,7 +1157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>  <span class="fu">summarise</span><span class="op">(</span>step_init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">step</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>    step <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">step_init</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">.x</span> <span class="op">+</span> <span class="fl">30</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    step <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">step_init</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">.x</span> <span class="op">+</span> <span class="fl">30</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    vulnerability <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>    y <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -1176,44 +1178,64 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 #&gt;  8        79    86 TRUE         
 #&gt;  9        79    87 TRUE         
 #&gt; 10        79    88 TRUE         
-#&gt; # … with 83 more rows</code></pre>
+#&gt; # ℹ 83 more rows</code></pre>
 </div>
 <p>This is part of a bigger function (I won’t dive too deep into it).</p>
 <div class="cell">
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggpacman</span><span class="fu">::</span><span class="va">compute_ghost_status</span></span>
-<span><span class="co">#&gt; function (ghost, pacman_moves, bonus_points_eaten) </span></span>
-<span><span class="co">#&gt; {</span></span>
-<span><span class="co">#&gt;     ghosts_vulnerability &lt;- bonus_points_eaten %&gt;% dplyr::filter(.data[["type"]] == </span></span>
-<span><span class="co">#&gt;         "big") %&gt;% dplyr::group_by(.data[["x"]], .data[["y"]]) %&gt;% </span></span>
-<span><span class="co">#&gt;         dplyr::summarise(step_init = min(.data[["step"]])) %&gt;% </span></span>
-<span><span class="co">#&gt;         dplyr::ungroup() %&gt;% dplyr::mutate(step = purrr::map(.data[["step_init"]], </span></span>
-<span><span class="co">#&gt;         ~seq(.x, .x + 30, 1)), vulnerability = TRUE, x = NULL, </span></span>
-<span><span class="co">#&gt;         y = NULL) %&gt;% tidyr::unnest("step")</span></span>
-<span><span class="co">#&gt;     ghost_out &lt;- dplyr::left_join(x = compute_ghost_coord(ghost), </span></span>
-<span><span class="co">#&gt;         y = pacman_moves %&gt;% dplyr::mutate(ghost_eaten = TRUE) %&gt;% </span></span>
-<span><span class="co">#&gt;             dplyr::select(c(X0 = "x", Y0 = "y", "step", "ghost_eaten")), </span></span>
-<span><span class="co">#&gt;         by = c("X0", "Y0", "step")) %&gt;% dplyr::left_join(y = ghosts_vulnerability, </span></span>
-<span><span class="co">#&gt;         by = "step") %&gt;% dplyr::mutate(vulnerability = tidyr::replace_na(.data[["vulnerability"]], </span></span>
-<span><span class="co">#&gt;         FALSE), ghost_name = .data[["colour"]], ghost_eaten = .data[["ghost_eaten"]] &amp; </span></span>
-<span><span class="co">#&gt;         .data[["vulnerability"]], colour = ifelse(.data[["vulnerability"]], </span></span>
-<span><span class="co">#&gt;         paste0(.data[["ghost_name"]], "_weak"), .data[["colour"]]))</span></span>
-<span><span class="co">#&gt;     pos_eaten_start &lt;- which(ghost_out[["ghost_eaten"]])</span></span>
-<span><span class="co">#&gt;     ghosts_home &lt;- which(ghost_out[["X0"]] == 10 &amp; ghost_out[["Y0"]] == </span></span>
-<span><span class="co">#&gt;         14)</span></span>
-<span><span class="co">#&gt;     for (ipos in pos_eaten_start) {</span></span>
-<span><span class="co">#&gt;         pos_eaten_end &lt;- min(ghosts_home[ghosts_home &gt;= ipos])</span></span>
-<span><span class="co">#&gt;         ghost_out[["colour"]][ipos:pos_eaten_end] &lt;- paste0(unique(ghost_out[["ghost_name"]]), </span></span>
-<span><span class="co">#&gt;             "_eaten")</span></span>
-<span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     dplyr::left_join(x = ghost_out, y = ghost_out %&gt;% dplyr::filter(.data[["step"]] == </span></span>
-<span><span class="co">#&gt;         .data[["step_init"]] &amp; grepl("eaten", .data[["colour"]])) %&gt;% </span></span>
-<span><span class="co">#&gt;         dplyr::mutate(already_eaten = TRUE) %&gt;% dplyr::select(c("step_init", </span></span>
-<span><span class="co">#&gt;         "already_eaten")), by = "step_init") %&gt;% dplyr::mutate(colour = dplyr::case_when(.data[["already_eaten"]] &amp; </span></span>
-<span><span class="co">#&gt;         .data[["X0"]] == 10 &amp; .data[["Y0"]] == 14 ~ paste0(.data[["ghost_name"]], </span></span>
-<span><span class="co">#&gt;         "_eaten"), grepl("weak", .data[["colour"]]) &amp; .data[["already_eaten"]] ~ </span></span>
-<span><span class="co">#&gt;         .data[["ghost_name"]], TRUE ~ .data[["colour"]]))</span></span>
+<span><span class="co">#&gt; function(ghost, pacman_moves, bonus_points_eaten) {</span></span>
+<span><span class="co">#&gt;   ghosts_vulnerability &lt;- bonus_points_eaten %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::filter(.data[["type"]] == "big") %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::group_by(.data[["x"]], .data[["y"]]) %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::summarise(step_init = min(.data[["step"]])) %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::ungroup() %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::mutate(</span></span>
+<span><span class="co">#&gt;       step = purrr::map(.data[["step_init"]], ~ seq(.x, .x + 30, 1)),</span></span>
+<span><span class="co">#&gt;       vulnerability = TRUE,</span></span>
+<span><span class="co">#&gt;       x = NULL,</span></span>
+<span><span class="co">#&gt;       y = NULL</span></span>
+<span><span class="co">#&gt;     ) %&gt;%</span></span>
+<span><span class="co">#&gt;     tidyr::unnest("step")</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ghost_out &lt;- dplyr::left_join(</span></span>
+<span><span class="co">#&gt;     x = compute_ghost_coord(ghost),</span></span>
+<span><span class="co">#&gt;     y = pacman_moves %&gt;%</span></span>
+<span><span class="co">#&gt;       dplyr::mutate(ghost_eaten = TRUE) %&gt;%</span></span>
+<span><span class="co">#&gt;       dplyr::select(c("X0" = "x", "Y0" = "y", "step", "ghost_eaten")),</span></span>
+<span><span class="co">#&gt;     by = c("X0", "Y0", "step")</span></span>
+<span><span class="co">#&gt;   ) %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::left_join(y = ghosts_vulnerability, by = "step") %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::mutate(</span></span>
+<span><span class="co">#&gt;       vulnerability = tidyr::replace_na(.data[["vulnerability"]], FALSE),</span></span>
+<span><span class="co">#&gt;       ghost_name = .data[["colour"]],</span></span>
+<span><span class="co">#&gt;       ghost_eaten = .data[["ghost_eaten"]] &amp; .data[["vulnerability"]],</span></span>
+<span><span class="co">#&gt;       colour = ifelse(.data[["vulnerability"]], paste0(.data[["ghost_name"]], "_weak"), .data[["colour"]])</span></span>
+<span><span class="co">#&gt;     )</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   pos_eaten_start &lt;- which(ghost_out[["ghost_eaten"]])</span></span>
+<span><span class="co">#&gt;   ghosts_home &lt;- which(ghost_out[["X0"]] == 10 &amp; ghost_out[["Y0"]] == 14)</span></span>
+<span><span class="co">#&gt;   for (ipos in pos_eaten_start) {</span></span>
+<span><span class="co">#&gt;     pos_eaten_end &lt;- min(ghosts_home[ghosts_home&gt;=ipos])</span></span>
+<span><span class="co">#&gt;     ghost_out[["colour"]][ipos:pos_eaten_end] &lt;- paste0(unique(ghost_out[["ghost_name"]]), "_eaten")</span></span>
+<span><span class="co">#&gt;   }</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   dplyr::left_join(</span></span>
+<span><span class="co">#&gt;     x = ghost_out,</span></span>
+<span><span class="co">#&gt;     y = ghost_out %&gt;%</span></span>
+<span><span class="co">#&gt;       dplyr::filter(.data[["step"]] == .data[["step_init"]] &amp; grepl("eaten", .data[["colour"]])) %&gt;%</span></span>
+<span><span class="co">#&gt;       dplyr::mutate(already_eaten = TRUE) %&gt;%</span></span>
+<span><span class="co">#&gt;       dplyr::select(c("step_init", "already_eaten")),</span></span>
+<span><span class="co">#&gt;       by = "step_init"</span></span>
+<span><span class="co">#&gt;   ) %&gt;%</span></span>
+<span><span class="co">#&gt;     dplyr::mutate(</span></span>
+<span><span class="co">#&gt;       colour = dplyr::case_when(</span></span>
+<span><span class="co">#&gt;         .data[["already_eaten"]] &amp; .data[["X0"]] == 10 &amp; .data[["Y0"]] == 14 ~ paste0(.data[["ghost_name"]], "_eaten"),</span></span>
+<span><span class="co">#&gt;         grepl("weak", .data[["colour"]]) &amp; .data[["already_eaten"]] ~ .data[["ghost_name"]],</span></span>
+<span><span class="co">#&gt;         TRUE ~ .data[["colour"]]</span></span>
+<span><span class="co">#&gt;       )</span></span>
+<span><span class="co">#&gt;     )</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x10c690fb0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x103de6358&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:ggpacman&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The goal of this function, is to compute the different states of a ghost, according to the bonus points eaten and, of course, the current Pac-Man position at a determined <code>step</code>.</p>
@@ -1229,82 +1251,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">state</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">distinct</span><span class="op">(</span><span class="va">step</span>, <span class="va">direction</span>, <span class="va">colour</span>, <span class="va">vulnerability</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;          colour direction step vulnerability</span></span>
-<span><span class="co">#&gt; 1        Blinky    middle    1         FALSE</span></span>
-<span><span class="co">#&gt; 2        Blinky    middle    5         FALSE</span></span>
-<span><span class="co">#&gt; 3        Blinky    middle    9         FALSE</span></span>
-<span><span class="co">#&gt; 4        Blinky    middle   13         FALSE</span></span>
-<span><span class="co">#&gt; 5        Blinky    middle   17         FALSE</span></span>
-<span><span class="co">#&gt; 6        Blinky    middle   21         FALSE</span></span>
-<span><span class="co">#&gt; 7        Blinky    middle   25         FALSE</span></span>
-<span><span class="co">#&gt; 8        Blinky    middle   29         FALSE</span></span>
-<span><span class="co">#&gt; 9        Blinky    middle   33         FALSE</span></span>
-<span><span class="co">#&gt; 10       Blinky      left   37         FALSE</span></span>
-<span><span class="co">#&gt; 11       Blinky      left   41         FALSE</span></span>
-<span><span class="co">#&gt; 12       Blinky      left   45         FALSE</span></span>
-<span><span class="co">#&gt; 13       Blinky      down   49         FALSE</span></span>
-<span><span class="co">#&gt; 14       Blinky      down   53         FALSE</span></span>
-<span><span class="co">#&gt; 15       Blinky      down   57         FALSE</span></span>
-<span><span class="co">#&gt; 16       Blinky      left   61         FALSE</span></span>
-<span><span class="co">#&gt; 17       Blinky      left   65         FALSE</span></span>
-<span><span class="co">#&gt; 18       Blinky      down   69         FALSE</span></span>
-<span><span class="co">#&gt; 19       Blinky      down   73         FALSE</span></span>
-<span><span class="co">#&gt; 20       Blinky      down   77         FALSE</span></span>
-<span><span class="co">#&gt; 21  Blinky_weak      down   81          TRUE</span></span>
-<span><span class="co">#&gt; 22  Blinky_weak      down   85          TRUE</span></span>
-<span><span class="co">#&gt; 23 Blinky_eaten      left   89          TRUE</span></span>
-<span><span class="co">#&gt; 24 Blinky_eaten     right   93          TRUE</span></span>
-<span><span class="co">#&gt; 25 Blinky_eaten    middle   97          TRUE</span></span>
-<span><span class="co">#&gt; 26 Blinky_eaten    middle  101          TRUE</span></span>
-<span><span class="co">#&gt; 27 Blinky_eaten     right  105          TRUE</span></span>
-<span><span class="co">#&gt; 28 Blinky_eaten        up  109          TRUE</span></span>
-<span><span class="co">#&gt; 29 Blinky_eaten     right  113         FALSE</span></span>
-<span><span class="co">#&gt; 30 Blinky_eaten        up  117         FALSE</span></span>
-<span><span class="co">#&gt; 31 Blinky_eaten     right  121         FALSE</span></span>
-<span><span class="co">#&gt; 32 Blinky_eaten        up  125         FALSE</span></span>
-<span><span class="co">#&gt; 33 Blinky_eaten     right  129         FALSE</span></span>
-<span><span class="co">#&gt; 34 Blinky_eaten        up  133         FALSE</span></span>
-<span><span class="co">#&gt; 35 Blinky_eaten     right  137         FALSE</span></span>
-<span><span class="co">#&gt; 36 Blinky_eaten        up  141          TRUE</span></span>
-<span><span class="co">#&gt; 37 Blinky_eaten        up  145          TRUE</span></span>
-<span><span class="co">#&gt; 38 Blinky_eaten    middle  149          TRUE</span></span>
-<span><span class="co">#&gt; 39 Blinky_eaten    middle  153          TRUE</span></span>
-<span><span class="co">#&gt; 40 Blinky_eaten    middle  157          TRUE</span></span>
-<span><span class="co">#&gt; 41       Blinky        up  161          TRUE</span></span>
-<span><span class="co">#&gt; 42       Blinky        up  165          TRUE</span></span>
-<span><span class="co">#&gt; 43       Blinky     right  169          TRUE</span></span>
-<span><span class="co">#&gt; 44       Blinky     right  173         FALSE</span></span>
-<span><span class="co">#&gt; 45       Blinky     right  177         FALSE</span></span>
-<span><span class="co">#&gt; 46       Blinky      down  181         FALSE</span></span>
-<span><span class="co">#&gt; 47       Blinky      down  185         FALSE</span></span>
-<span><span class="co">#&gt; 48       Blinky      down  189         FALSE</span></span>
-<span><span class="co">#&gt; 49       Blinky      down  193         FALSE</span></span>
-<span><span class="co">#&gt; 50       Blinky      down  197         FALSE</span></span>
-<span><span class="co">#&gt; 51       Blinky      down  201         FALSE</span></span>
-<span><span class="co">#&gt; 52       Blinky      down  205         FALSE</span></span>
-<span><span class="co">#&gt; 53       Blinky      down  209         FALSE</span></span>
-<span><span class="co">#&gt; 54       Blinky      left  213         FALSE</span></span>
-<span><span class="co">#&gt; 55  Blinky_weak      left  217          TRUE</span></span>
-<span><span class="co">#&gt; 56  Blinky_weak      down  221          TRUE</span></span>
-<span><span class="co">#&gt; 57  Blinky_weak      down  225          TRUE</span></span>
-<span><span class="co">#&gt; 58  Blinky_weak     right  229          TRUE</span></span>
-<span><span class="co">#&gt; 59  Blinky_weak     right  233          TRUE</span></span>
-<span><span class="co">#&gt; 60  Blinky_weak     right  237          TRUE</span></span>
-<span><span class="co">#&gt; 61  Blinky_weak     right  241          TRUE</span></span>
-<span><span class="co">#&gt; 62  Blinky_weak    middle  245          TRUE</span></span>
-<span><span class="co">#&gt; 63       Blinky      down  249         FALSE</span></span>
-<span><span class="co">#&gt; 64       Blinky      down  253         FALSE</span></span>
-<span><span class="co">#&gt; 65       Blinky      down  257         FALSE</span></span>
-<span><span class="co">#&gt; 66       Blinky     right  261         FALSE</span></span>
-<span><span class="co">#&gt; 67       Blinky     right  265         FALSE</span></span>
-<span><span class="co">#&gt; 68       Blinky        up  269         FALSE</span></span>
-<span><span class="co">#&gt; 69       Blinky        up  273         FALSE</span></span>
-<span><span class="co">#&gt; 70       Blinky        up  277         FALSE</span></span>
-<span><span class="co">#&gt; 71       Blinky    middle  281         FALSE</span></span>
-<span><span class="co">#&gt; 72       Blinky     right  285         FALSE</span></span>
-<span><span class="co">#&gt; 73       Blinky     right  289         FALSE</span></span>
-<span><span class="co">#&gt; 74       Blinky        up  293         FALSE</span></span>
-<span><span class="co">#&gt; 75       Blinky        up  297         FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt;    step direction       colour vulnerability</span></span>
+<span><span class="co">#&gt; 1     1    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 2     5    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 3     9    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 4    13    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 5    17    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 6    21    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 7    25    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 8    29    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 9    33    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 10   37      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 11   41      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 12   45      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 13   49      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 14   53      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 15   57      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 16   61      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 17   65      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 18   69      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 19   73      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 20   77      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 21   81      down  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 22   85      down  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 23   89      left Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 24   93     right Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 25   97    middle Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 26  101    middle Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 27  105     right Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 28  109        up Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 29  113     right Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 30  117        up Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 31  121     right Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 32  125        up Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 33  129     right Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 34  133        up Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 35  137     right Blinky_eaten         FALSE</span></span>
+<span><span class="co">#&gt; 36  141        up Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 37  145        up Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 38  149    middle Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 39  153    middle Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 40  157    middle Blinky_eaten          TRUE</span></span>
+<span><span class="co">#&gt; 41  161        up       Blinky          TRUE</span></span>
+<span><span class="co">#&gt; 42  165        up       Blinky          TRUE</span></span>
+<span><span class="co">#&gt; 43  169     right       Blinky          TRUE</span></span>
+<span><span class="co">#&gt; 44  173     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 45  177     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 46  181      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 47  185      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 48  189      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 49  193      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 50  197      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 51  201      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 52  205      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 53  209      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 54  213      left       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 55  217      left  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 56  221      down  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 57  225      down  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 58  229     right  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 59  233     right  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 60  237     right  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 61  241     right  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 62  245    middle  Blinky_weak          TRUE</span></span>
+<span><span class="co">#&gt; 63  249      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 64  253      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 65  257      down       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 66  261     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 67  265     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 68  269        up       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 69  273        up       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 70  277        up       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 71  281    middle       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 72  285     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 73  289     right       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 74  293        up       Blinky         FALSE</span></span>
+<span><span class="co">#&gt; 75  297        up       Blinky         FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To simplify a little, below a small example of a ghost moving in one direction with predetermined states.</p>
 <div class="cell">
@@ -1317,39 +1339,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell sourceCode">
 <pre><code>#&gt; # A tibble: 48 × 12
-#&gt;    colour    X0    Y0 state_x state_y direc…¹ state  step noise_x  noise_y body 
-#&gt;    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;lis&gt;
-#&gt;  1 Blinky     1     0      NA      NA middle      1     1  0.0381 -1.02e-2 &lt;df&gt; 
-#&gt;  2 Blinky     1     0      NA      NA middle      2     2  0.0138  8.09e-2 &lt;df&gt; 
-#&gt;  3 Blinky     1     0      NA      NA middle      3     3 -0.0236 -7.36e-2 &lt;df&gt; 
-#&gt;  4 Blinky     1     0      NA      NA middle      4     4  0.0463 -1.09e-1 &lt;df&gt; 
-#&gt;  5 Blinky     2     0       1       0 right       1     5  0.0443 -5.53e-2 &lt;df&gt; 
-#&gt;  6 Blinky     2     0       1       0 right       2     6 -0.0241  6.92e-2 &lt;df&gt; 
-#&gt;  7 Blinky     2     0       1       0 right       3     7 -0.0517  2.81e-2 &lt;df&gt; 
-#&gt;  8 Blinky     2     0       1       0 right       4     8  0.0766  1.86e-2 &lt;df&gt; 
-#&gt;  9 Blinky     3     0       1       0 right       1     9  0.0182  1.15e-2 &lt;df&gt; 
-#&gt; 10 Blinky     3     0       1       0 right       2    10 -0.0943  6.72e-4 &lt;df&gt; 
-#&gt; # … with 38 more rows, 1 more variable: eyes &lt;list&gt;, and abbreviated variable
-#&gt; #   name ¹​direction</code></pre>
+#&gt;    colour    X0    Y0 state_x state_y direction state  step   noise_x noise_y body           eyes            
+#&gt;    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;list&gt;         &lt;list&gt;          
+#&gt;  1 Blinky     1     0      NA      NA middle        1     1 -0.0465   -0.0123 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  2 Blinky     1     0      NA      NA middle        2     2 -0.000573  0.0365 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  3 Blinky     1     0      NA      NA middle        3     3 -0.0325   -0.0160 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  4 Blinky     1     0      NA      NA middle        4     4  0.00643   0.122  &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  5 Blinky     2     0       1       0 right         1     5  0.0791    0.0245 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  6 Blinky     2     0       1       0 right         2     6  0.0468   -0.0279 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  7 Blinky     2     0       1       0 right         3     7  0.0143   -0.0502 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  8 Blinky     2     0       1       0 right         4     8 -0.0295   -0.0159 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt;  9 Blinky     3     0       1       0 right         1     9 -0.0394    0.0220 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; 10 Blinky     3     0       1       0 right         2    10  0.0313    0.0372 &lt;df [729 × 2]&gt; &lt;tibble [4 × 4]&gt;
+#&gt; # ℹ 38 more rows</code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">blinky_plot</span> <span class="op">&lt;-</span> <span class="va">base_layer</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">13</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_polygon</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">13</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">blinky_moves</span>, <span class="st">"body"</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">colour</span>, colour <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">colour</span>, colour <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_circle</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">blinky_moves</span>, <span class="st">"eyes"</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>, r <span class="op">=</span> <span class="va">r</span>, colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-line-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-23"><img src="index_files/figure-html/blinky-plot-line-1.png" class="img-fluid figure-img" width="355"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/blinky-plot-line-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="index_files/figure-html/blinky-plot-line-1.png" class="img-fluid figure-img" width="355"></a></p>
 </figure>
 </div>
 </div>
@@ -1366,7 +1387,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/blinky-state-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-24"><img src="index_files/figure-html/blinky-state-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/blinky-state-plot-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="index_files/figure-html/blinky-state-plot-animated-1.gif" class="img-fluid figure-img"></a></p>
 </figure>
 </div>
 </div>
@@ -1402,31 +1423,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section><section id="build-the-base-layer-with-the-maze" class="level3" data-number="7.2"><h3 data-number="7.2" class="anchored" data-anchor-id="build-the-base-layer-with-the-maze">
 <span class="header-section-number">7.2</span> Build the base layer with the maze</h3>
 <div class="cell">
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">&lt;-</span> <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span></span>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span></span>
 <span>    legend.position <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>    plot.background <span class="op">=</span> <span class="fu">element_rect</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
-<span>    panel.background <span class="op">=</span> <span class="fu">element_rect</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span>
+<span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>,</span>
+<span>    panel.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"black"</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_size_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">scale_colour_manual</span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">coord_fixed</span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">26</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"wall"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"door"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"big"</span> <span class="op">=</span> <span class="fl">2.5</span>, <span class="st">"normal"</span> <span class="op">=</span> <span class="fl">0.5</span>, <span class="st">"eaten"</span> <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">map_colours</span><span class="op">)</span>, values <span class="op">=</span> <span class="va">map_colours</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">20</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">26</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_walls</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
 <span>    lineend <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">maze_points</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, size <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_text</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">10</span>, y <span class="op">=</span> <span class="fl">11</span>, label <span class="op">=</span> <span class="st">"READY!"</span>, step <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span>, colour <span class="op">=</span> <span class="va">label</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, label <span class="op">=</span> <span class="va">label</span>, colour <span class="op">=</span> <span class="va">label</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    size <span class="op">=</span> <span class="fl">6</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -1434,7 +1455,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb62"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-grid-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-25"><img src="index_files/figure-html/base-grid-final-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-grid-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="index_files/figure-html/base-grid-final-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1443,9 +1464,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="header-section-number">7.3</span> Draw the <code>"eaten"</code> bonus points geometry</h3>
 <div class="cell">
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">p_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">bonus_points_eaten</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span>, size <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, colour <span class="op">=</span> <span class="va">colour</span>, size <span class="op">=</span> <span class="va">colour</span>, group <span class="op">=</span> <span class="va">step</span><span class="op">)</span>,</span>
 <span>    inherit.aes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1454,7 +1475,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">+</span> <span class="va">p_points</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-grid-points-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-26"><img src="index_files/figure-html/base-grid-points-final-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-grid-points-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="index_files/figure-html/base-grid-points-final-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1465,7 +1486,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">p_pacman</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu">geom_arc_bar</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">pacman_moves</span>,</span>
-<span>    mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
+<span>    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>      x0 <span class="op">=</span> <span class="va">x</span>, y0 <span class="op">=</span> <span class="va">y</span>,</span>
 <span>      r0 <span class="op">=</span> <span class="fl">0</span>, r <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>      start <span class="op">=</span> <span class="va">start</span>, end <span class="op">=</span> <span class="va">end</span>,</span>
@@ -1480,7 +1501,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">+</span> <span class="va">p_pacman</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-grid-pacman-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-27"><img src="index_files/figure-html/base-grid-pacman-final-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-grid-pacman-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="index_files/figure-html/base-grid-pacman-final-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1488,16 +1509,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section><section id="draw-the-ghosts-using-the-trick-that-works-also-on-a-list-of-geometries" class="level3" data-number="7.5"><h3 data-number="7.5" class="anchored" data-anchor-id="draw-the-ghosts-using-the-trick-that-works-also-on-a-list-of-geometries">
 <span class="header-section-number">7.5</span> Draw the ghosts, using the trick that <code>+</code> works also on a list of geometries</h3>
 <div class="cell">
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">p_ghosts</span> <span class="op">&lt;-</span> <span class="fu">map</span><span class="op">(</span>.x <span class="op">=</span> <span class="va">ghosts</span>, .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">p_ghosts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">ghosts</span>, .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">ghost_moves</span> <span class="op">&lt;-</span> <span class="fu">compute_ghost_status</span><span class="op">(</span></span>
 <span>    ghost <span class="op">=</span> <span class="va">data</span>,</span>
 <span>    pacman_moves <span class="op">=</span> <span class="va">pacman_moves</span>,</span>
 <span>    bonus_points_eaten <span class="op">=</span> <span class="va">bonus_points_eaten</span></span>
 <span>  <span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu">geom_polygon</span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op">(</span></span>
 <span>      data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">ghost_moves</span>, <span class="st">"body"</span><span class="op">)</span>,</span>
-<span>      mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
+<span>      mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>        x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>        fill <span class="op">=</span> <span class="va">colour</span>, colour <span class="op">=</span> <span class="va">colour</span>,</span>
 <span>        group <span class="op">=</span> <span class="va">step</span></span>
@@ -1506,7 +1527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu">geom_circle</span><span class="op">(</span></span>
 <span>      data <span class="op">=</span> <span class="fu">unnest</span><span class="op">(</span><span class="va">ghost_moves</span>, <span class="st">"eyes"</span><span class="op">)</span>,</span>
-<span>      mapping <span class="op">=</span> <span class="fu">aes</span><span class="op">(</span></span>
+<span>      mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span></span>
 <span>        x0 <span class="op">=</span> <span class="va">x0</span>, y0 <span class="op">=</span> <span class="va">y0</span>,</span>
 <span>        r <span class="op">=</span> <span class="va">r</span>,</span>
 <span>        colour <span class="op">=</span> <span class="va">part</span>, fill <span class="op">=</span> <span class="va">part</span>,</span>
@@ -1521,7 +1542,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">+</span> <span class="va">p_ghosts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/base-grid-ghosts-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-28"><img src="index_files/figure-html/base-grid-ghosts-final-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/base-grid-ghosts-final-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="index_files/figure-html/base-grid-ghosts-final-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1532,7 +1553,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb69"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_grid</span> <span class="op">+</span> <span class="va">p_points</span> <span class="op">+</span> <span class="va">p_pacman</span> <span class="op">+</span> <span class="va">p_ghosts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/plot-time-all-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-29"><img src="index_files/figure-html/plot-time-all-1.png" class="img-fluid figure-img" width="672"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/plot-time-all-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-30"><img src="index_files/figure-html/plot-time-all-1.png" class="img-fluid figure-img" width="672"></a></p>
 </figure>
 </div>
 </div>
@@ -1545,7 +1566,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell hcenter">
 <div class="cell-output-display">
 <div>
-<figure class="figure"><p><a href="index_files/figure-html/plot-time-all-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-30"><img src="index_files/figure-html/plot-time-all-animated-1.gif" class="img-fluid figure-img"></a></p>
+<figure class="figure"><p><a href="index_files/figure-html/plot-time-all-animated-1.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-31"><img src="index_files/figure-html/plot-time-all-animated-1.gif" class="img-fluid figure-img"></a></p>
 </figure>
 </div>
 </div>
