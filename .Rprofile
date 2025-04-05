@@ -9,20 +9,10 @@ if (nzchar(system.file(package = "cli"))) {
 }
 
 options(
-  languageserver.formatting_style = function(options, ...) {
-    transformers <- styler::tidyverse_style(indent_by = options$tabSize, ...)
-    transformers$indention$update_indention_ref_fun_dec <- NULL
-    transformers$indention$unindent_fun_dec <- NULL
-    transformers$line_break$remove_line_breaks_in_fun_dec <- NULL
-    transformers
-  }
+  width = 150,
+  menu.graphics = FALSE,
+  renv.config.pak.enabled = TRUE,
+  renv.config.cache.enabled = FALSE
 )
 
 Sys.setenv(CHROMOTE_CHROME = "/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser")
-
-if (interactive()) {
-  options(
-    width = 200,
-    menu.graphics = FALSE
-  )
-}
