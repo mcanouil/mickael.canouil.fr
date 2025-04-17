@@ -1,3 +1,9 @@
+#!/usr/bin/env Rscript
+
+if (!nzchar(Sys.getenv("QUARTO_PROJECT_RENDER_ALL"))) {
+  quit()
+}
+
 create_pub_listing <- function(bib_file, author = "Canouil") {
   bib <- strsplit(paste(readLines(bib_file), collapse = "\n"), "\n@")[[1]]
   articles <- lapply(
@@ -9,25 +15,50 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
       article <- tail(
         head(
           system(
-            command = paste("pandoc", f, "--standalone", "--from=bibtex", "--to=markdown"),
+            command = paste(
+              "pandoc",
+              f,
+              "--standalone",
+              "--from=bibtex",
+              "--to=markdown"
+            ),
             intern = TRUE
           ),
           -2
         ),
         -3
       )
-      authors <- sub(".*- family: ", "", grep("- family:", article, value = TRUE))
+      authors <- sub(
+        ".*- family: ",
+        "",
+        grep("- family:", article, value = TRUE)
+      )
       if (isTRUE(grepl("first", grep("annote:", article, value = TRUE)))) {
         first <- "  first: '*As first or co-first*'"
       } else {
-        first <- sprintf("  first: '%s'", paste(rep("&emsp;", 3), collapse = ""))
+        first <- sprintf(
+          "  first: '%s'",
+          paste(rep("&emsp;", 3), collapse = "")
+        )
       }
-      position <- sprintf("  position: '%s/%s'", grep(author, authors), length(authors))
+      position <- sprintf(
+        "  position: '%s/%s'",
+        grep(author, authors),
+        length(authors)
+      )
       article <- c(
         article,
-        sub("  container-title: (.*)", "  journal-title: '*\\1*'", grep("  container-title:", article, value = TRUE)),
+        sub(
+          "  container-title: (.*)",
+          "  journal-title: '*\\1*'",
+          grep("  container-title:", article, value = TRUE)
+        ),
         sub("  issued: ", "  date: ", grep("  issued:", article, value = TRUE)),
-        sub("  doi: ", "  path: https://doi.org/", grep("doi:", article, value = TRUE)),
+        sub(
+          "  doi: ",
+          "  path: https://doi.org/",
+          grep("doi:", article, value = TRUE)
+        ),
         position,
         first
       )
@@ -35,7 +66,6 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
     }
   )
   writeLines(text = unlist(articles), con = sub("\\.bib$", ".yml", bib_file))
-
 
   yaml_text <- c(
     "---",
@@ -68,7 +98,10 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
       paste(
         table(
           factor(
-            x = sapply(articles, function(x) any(grepl("As first or co-first", x))),
+            x = sapply(
+              articles,
+              function(x) any(grepl("As first or co-first", x))
+            ),
             levels = c("TRUE", "FALSE")
           )
         )[c("TRUE", "FALSE")],
