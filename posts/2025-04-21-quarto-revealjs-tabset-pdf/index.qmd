@@ -1,0 +1,174 @@
+---
+title: "Quarto: Unleash Dynamic Tabset Navigation & Polished PDF Exports"
+description: |
+  Discover how to supercharge your Quarto presentations with interactive tabset navigation in Reveal.js and create stunning, professional PDFs.
+  Get ready to dazzle your audience!
+date: "2025-04-21"
+categories: [Quarto, Reveal.js, PDF, Presentations, Decktape]
+image: featured.gif
+image-alt: |
+  Illustration showing Quarto Reveal.js presentation with tabset navigation.
+toc-depth: 5
+engine: knitr
+filters:
+  - include-code-files
+code-links:
+  - text: Default Quarto Reveal.js
+    icon: file-code
+    href: assets/_demo-default.qmd
+  - text: Tabset Quarto Reveal.js
+    icon: file-code
+    href: assets/_demo-default.qmd
+  - text: Tabset JavaScript
+    icon: file-code
+    href: assets/revealjs-tabset.html
+resources:
+  - assets/revealjs-tabset.html
+  - assets/_demo-default.qmd
+  - assets/_demo-default.html
+  - assets/_demo-default.pdf
+  - assets/_demo-tabset.qmd
+  - assets/_demo-tabset.html
+  - assets/_demo-tabset.pdf
+---
+
+## Introduction
+
+Creating presentations with Quarto's Reveal.js  format comes with great flexibility, but navigating tabsets and exporting polished PDFs can be challenging.
+
+In this post, you'll learn how to streamline these tasks, making your workflow smoother and ensuring your slides are both interactive and well-formatted for sharing.
+With the right techniques, you can:
+
+1. Craft slides with tabset navigation that flows as naturally as your ideas.
+2. Transform your interactive presentations into sleek, professionally polished PDFs.
+
+Let's dive in and start elevating your slide game!
+
+## Setting Up the Presentation
+
+Let's kick off by creating a basic Reveal.js presentation with the essential YAML header.
+
+```{.yaml include="assets/_demo-default.qmd" start-line=2 end-line=7}
+```
+
+## Structuring Your Content
+
+Break free from linear storytelling by organising your slides into engaging segments.
+Use the `.panel-tabset` class in your markdown content to create a dynamic, tabbed interface that keeps your audience on the edge of their seats:
+
+```{.markdown include="assets/_demo-default.qmd" start-line=10 end-line=40 shortcodes="false"}
+```
+
+## Default Navigation Limitations
+
+Out of the box, Quarto's default configuration requires a manual click on every tab—a small, yet frustrating interruption in the flow of your presentation.
+Imagine having to constantly click through your content when you could be gliding from idea to idea!
+
+```{bash}
+#| label: quarto-render-default
+#| include: false
+#| echo: false
+quarto render assets/_demo-default.qmd --to revealjs --embed-resources
+```
+
+```{.bash}
+quarto render assets/_demo-default.qmd
+```
+
+{{< revealjs "assets/_demo-default.html" full-screen-link="false" >}}
+
+## Enhanced Tabset Navigation
+
+What if you could navigate through your tabs with the fluid grace of arrow keys? Inspired by [Emil Hvitfeldt](https://github.com/EmilHvitfeldt/)'s [Slidecraft 101: Fragments - JS](https://emilhvitfeldt.com/post/slidecraft-fragment-js/#tabset-advance), I've taken tabset navigation to the next level with a custom JavaScript solution.
+
+Here's how you can make your presentation navigation as smooth as silk:
+
+1. **Create a Custom JavaScript stored as an HTML file.**  
+   Save[^1] the following code snippet in an HTML file.
+   This script leverages Reveal.js's fragment feature to enable arrow key navigation, letting you effortlessly glide between your tabs as if they were different slides.
+
+   ```{.html include="assets/revealjs-tabset.html" start-line=25 end-line=63}
+   ```
+
+2. **Embed the Script in Your YAML Header.**  
+   Integrate this new functionality by including the script in your Quarto presentation's YAML header:
+
+   ```{.yaml include="assets/_demo-tabset.qmd" start-line=2 end-line=10}
+   ```
+
+[^1]: Or download the file directly using the link under the table of contents.
+
+```{bash}
+#| label: quarto-render-tabset
+#| include: false
+#| echo: false
+quarto render assets/_demo-tabset.qmd --to revealjs --embed-resources
+```
+
+Render your updated slides and experience a newfound freedom in navigation:
+
+```{.bash}
+quarto render assets/_demo-tabset.qmd
+```
+
+Now, simply use the left and right arrow keys to seamlessly transition between tabs—it's like your presentation has its own rhythm!
+
+{{< revealjs "assets/_demo-tabset.html" full-screen-link="false" >}}
+
+## Exporting to PDF
+
+To export your presentation to PDF, you can use the [`decktape` tool](https://github.com/astefanutti/decktape), which is a headless Chrome utility for capturing web pages as PDFs.
+
+Your interactive masterpiece deserves to be preserved. With the [`decktape` tool](https://github.com/astefanutti/decktape), you can convert your dynamic Reveal.js  slides into a beautifully formatted PDF that retains every engaging detail and nuance of your presentation.
+
+1. Install `decktape` using [`npm`](https://www.npmjs.com/):
+
+   ```{.bash filename="bash"}
+   npm install -g decktape
+   ```
+
+2. Use the following command to generate a PDF from your Reveal.js presentation:
+
+   ```{.bash filename="bash"}
+   npx -y decktape reveal \
+     --chrome-arg=--no-sandbox \
+     --chrome-arg=--disable-setuid-sandbox \
+     --fragments \
+     "my-slides.html" "my-slides.pdf"
+   ```
+
+This command ensures every fragment and tab is captured in the PDF, preserving the aesthetic and functionality of your presentation.
+
+```{bash}
+#| label: decktape
+#| include: false
+#| echo: false
+for file in "_demo-default" "_demo-tabset"; do
+  npx -y decktape reveal \
+    --chrome-arg=--no-sandbox \
+    --chrome-arg=--disable-setuid-sandbox \
+    --fragments \
+    "assets/${file}.html" "assets/${file}.pdf"
+done
+```
+
+:::: {layout-ncol="2"}
+
+#### Default Quarto Reveal.js {.unnumbered .unlisted}
+
+{{< pdf "assets/_demo-default.pdf" download-link="false" >}}
+
+#### Tabset Quarto Reveal.js {.unnumbered .unlisted}
+
+{{< pdf "assets/_demo-tabset.pdf" download-link="false" >}}
+
+:::
+
+## Conclusion
+
+By blending Quarto's interactive Reveal.js tabset navigation with the crisp sophistication of PDF exports, you're not merely creating presentations—you're crafting immersive experiences.
+Whether delivered live or shared as a document, your slides will captivate and inspire.
+
+And now, instead of wrestling with LaTeX or Typst and losing your hard-earned theming, you can focus entirely on refining your content and delivering a presentation that truly shines.
+
+Elevate your storytelling and let your slides flow!
