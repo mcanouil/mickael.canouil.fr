@@ -25,3 +25,7 @@ quarto render posts/2024-12-30-quarto-github-pages
 
 Rscript -e "renv::activate(profile = 'default')"
 quarto render
+
+Rscript -e "renv::activate(profile = 'default')"
+quarto render posts/2025-04-21-quarto-revealjs-tabset-pdf
+bash posts/2025-04-21-quarto-revealjs-tabset-pdf/assets/featured.sh
