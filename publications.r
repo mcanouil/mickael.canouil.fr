@@ -70,7 +70,6 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
   yaml_text <- c(
     "---",
     "title: 'Publications (%s)'",
-    "page-layout: full",
     "title-block-banner: true",
     "image: /assets/images/social-profile.png",
     "date-format: 'MMMM,<br>YYYY'",
