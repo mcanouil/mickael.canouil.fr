@@ -9,6 +9,7 @@ image: featured.png
 image-alt: |
   Quarto icon and text logo above GitHub Pages logo.
 toc-depth: 5
+code-annotations: hover
 ---
 
 Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it's a breeze.  
@@ -42,7 +43,7 @@ This method is straightforward and requires minimal setup.
 quarto publish gh-pages
 ```
 
-Check out the Quarto CLI help for more details on the `publish` command.
+Check out the Quarto CLI help and [Quarto's documentation](https://quarto.org/docs/publishing/github-pages.html) for more details on the `publish` command.
 
 ```sh
 quarto publish --help
@@ -162,7 +163,7 @@ jobs:
         with:
           version: pre-release
       # Add any additional steps as needed, such as installing dependencies
-      - name: Build
+      - name: "Build" # <1>
         shell: bash
         run: |
           [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: docs" > _quarto.yml
@@ -171,7 +172,7 @@ jobs:
           else
             quarto render --output-dir docs
           fi
-      - name: Deploy
+      - name: "Deploy" # <2>
         shell: bash
         run: |
           git config --local user.name github-actions[bot]
@@ -180,6 +181,13 @@ jobs:
           git commit -m "ci: quarto render" || echo "No changes."
           git push origin || echo "No changes."
 ```
+
+1. This step creates a `_quarto.yml` project file if it doesn't exist, allowing to set the output directory to `_site`.
+   If the `_quarto.yml` file already specifies the output directory as `_site`, it simply runs `quarto render` at the project level.
+   Otherwise, it uses the `--output-dir` option to specify the output directory.
+2. This step configures Git to use the `github-actions[bot]` user for commits and pushes the changes to the `main` branch.
+   It adds the contents of the `docs` folder to Git, commits them, and pushes them to the `main` branch.
+   If there are no changes to commit, it will output "No changes."
 
 ##### Deploying From the Root (*e.g.*, `gh-pages` Branch)
 
@@ -219,7 +227,7 @@ jobs:
         with:
           version: pre-release
       # Add any additional steps as needed, such as installing dependencies
-      - name: Build
+      - name: "Build" # <1>
         shell: bash
         run: |
           [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
@@ -228,7 +236,7 @@ jobs:
           else
             quarto render --output-dir _site
           fi
-      - name: Deploy
+      - name: "Deploy" # <2>
         shell: bash
         env:
           GH_PAGES: gh-pages
@@ -249,6 +257,14 @@ jobs:
           git commit --allow-empty -m "ci: quarto render" || echo "No changes."
           git push origin "${GH_PAGES}" || echo "No changes."
 ```
+
+1. This step creates a `_quarto.yml` project file if it doesn't exist, allowing to set the output directory to `_site`.
+   If the `_quarto.yml` file already specifies the output directory as `_site`, it simply runs `quarto render` at the project level.
+   Otherwise, it uses the `--output-dir` option to specify the output directory.
+2. This step creates a temporary directory to store the build output and moves the `_site` folder to that directory.
+   It then checks if the `gh-pages` branch exists, and if so, it fetches and checks it out.
+   If the branch doesn't exist, it creates a new orphan branch named `gh-pages`.
+   Finally, it moves the contents of the temporary directory to the root of the repository, adds them to Git, commits them, and pushes them to the `gh-pages` branch.
 
 #### GitHub Actions
 
@@ -287,7 +303,7 @@ jobs:
         uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: pre-release
-      - name: Build
+      - name: "Build" # <1>
         shell: bash
         run: |
           [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
@@ -296,16 +312,26 @@ jobs:
           else
             quarto render --output-dir _site
           fi
-      - name: Configure GitHub Pages
+      - name: "Configure GitHub Pages" # <2>
         uses: actions/configure-pages@v5
-      - name: Upload Pages Artifact
+      - name: "Upload Pages Artifact" # <3>
         uses: actions/upload-pages-artifact@v3
         with:
           path: "_site"
-      - name: Deploy
+      - name: "Deploy" # <4>
         id: deployment
         uses: actions/deploy-pages@v4
 ```
+
+1. This step creates a `_quarto.yml` project file if it doesn't exist, allowing to set the output directory to `_site`.
+   If the `_quarto.yml` file already specifies the output directory as `_site`, it simply runs `quarto render` at the project level.
+   Otherwise, it uses the `--output-dir` option to specify the output directory.
+2. This step configures the GitHub Pages deployment environment using the `actions/configure-pages` action.
+   This action sets up the environment for deploying to GitHub Pages.
+3. This step uploads the contents of the `_site` directory as an artifact using the `actions/upload-pages-artifact` action.
+   This action allows you to upload files to be used in the deployment process.
+4. This step deploys the uploaded artifact to GitHub Pages using the `actions/deploy-pages` action.
+   This action handles the deployment process and makes the files available on GitHub Pages.
 
 ::: {.callout-note}
 The workflow above utilises `_site` as the output directory, which is the default output directory for Quarto website projects. You can modify the output directory as necessary, provided it aligns with the `Upload Pages Artifact` step.
@@ -323,7 +349,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-````
+```
 
 This configuration file instructs Dependabot to check for updates to GitHub Actions workflows weekly.
 
