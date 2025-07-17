@@ -104,6 +104,7 @@ jobs:
 
       - name: Create Pull Request
         if: ${{ github.event_name != 'pull_request' }}
+        id: create-pr
         env:
           BRANCH: ci/latest-quarto-updates
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -117,7 +118,7 @@ jobs:
             git checkout -b "${BRANCH}"
           fi
           git push --force origin ${BRANCH}
-          gh pr create \
+          PR_URL=$(gh pr create \
             --title "ci: quarto automatic render" \
             --body "GitHub Actions: ${{ github.workflow }} (${{ github.workflow_sha }})" \
             --base "main" \
@@ -125,10 +126,46 @@ jobs:
             --head "${BRANCH}" \
             --repo ${{ github.repository }} \
             --assignee "${{ github.actor }}" \
-            --reviewer "${{ github.actor }}"
+            --reviewer "${{ github.actor }}")
+          echo "pr-url=${PR_URL}" >> $GITHUB_OUTPUT
 
       - name: Push to Pull Request
         if: ${{ github.event_name == 'pull_request' }}
         uses: r-lib/actions/pr-push@v2
         with:
           repo-token: ${{ steps.app-token.outputs.token }}
+
+      - name: Workflow Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "# Quarto Render Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Quarto Version:** ${{ steps.quarto-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Workflow Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ **Status:** Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "## Pull Request Actions" >> $GITHUB_STEP_SUMMARY
+            echo "- Rendered Quarto project" >> $GITHUB_STEP_SUMMARY
+            echo "- Committed changes to PR branch" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## Actions Taken" >> $GITHUB_STEP_SUMMARY
+            echo "- Rendered Quarto project" >> $GITHUB_STEP_SUMMARY
+            echo "- Created/updated branch: \`ci/latest-quarto-updates\`" >> $GITHUB_STEP_SUMMARY
+            if [ -n "${{ steps.create-pr.outputs.pr-url }}" ]; then
+              echo "- Created pull request: [${{ steps.create-pr.outputs.pr-url }}](${{ steps.create-pr.outputs.pr-url }})" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- Updated existing pull request for automatic updates" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
