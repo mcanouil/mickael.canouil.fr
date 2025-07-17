@@ -19,6 +19,7 @@ concurrency:
 jobs:
   quarto-render:
     runs-on: ubuntu-latest
+    if: ${{ !(github.event_name == 'pull_request' && contains(github.actor, '[bot]')) }}
     permissions:
       contents: write
       pull-requests: write
@@ -62,7 +63,6 @@ jobs:
         uses: actions/setup-node@v4
 
       - name: Render Quarto Project
-        if: ${{ github.event_name != 'pull_request' || !contains(github.actor, '[bot]') }}
         shell: bash
         run: |
           [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
@@ -94,7 +94,6 @@ jobs:
           git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com'
 
       - name: Commit to Pull Request
-        if: ${{ github.event_name != 'pull_request' || !contains(github.actor, '[bot]') }}
         shell: bash
         run: |
           git add _site
