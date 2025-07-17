@@ -106,7 +106,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           BRANCH: ci/latest-quarto-updates
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         shell: bash
         run: |
           if git show-ref --quiet refs/heads/${BRANCH}; then
@@ -131,4 +131,4 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: r-lib/actions/pr-push@v2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ steps.app-token.outputs.token }}
