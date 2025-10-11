@@ -51,7 +51,7 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     left: 0;
     width: 0;
     height: 1px;
-    background: currentColor;
+    background: $foreground;
     transition: width 0.3s ease;
   }
 
@@ -253,7 +253,7 @@ div.sourceCode {
       left: 50%;
       width: 0;
       height: 1px;
-      background: currentColor;
+      background: $foreground;
       transition: all 0.3s ease;
       transform: translateX(-50%);
     }
@@ -704,7 +704,7 @@ body > header#title-block-header {
       border-bottom: 1px solid transparent;
 
       &:hover {
-        border-bottom-color: currentColor;
+        border-bottom-color: rgba($foreground, 0.85);
         transform: translateY(-1px);
       }
     }
@@ -806,6 +806,101 @@ body > header#title-block-header {
 
   .abstract {
     padding-bottom: 1rem;
+  }
+}
+
+// ===========================
+// Section Heading Enhancements (h2-h6)
+// ===========================
+
+// Override default heading borders with proper SASS variables
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  // Override any default border colors with theme variables
+  &[style*="border-bottom"],
+  &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *)) {
+    border-bottom-color: rgba($foreground, 0.15) !important;
+  }
+}
+
+// Default h2 border override (Quarto adds border-bottom to h2 by default)
+h2, .h2 {
+  &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *, .card-title)) {
+    border-bottom-color: rgba($foreground, 0.15);
+  }
+}
+
+main {
+  // Style h2-h5 headings with animated bottom borders
+  h2.anchored,
+  h3.anchored,
+  h4.anchored,
+  h5.anchored {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+
+    // Remove default border for animated version
+    border-bottom: none !important;
+
+    // Animated underline effect on hover
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        $foreground 0%,
+        rgba($foreground, 0.4) 100%
+      );
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
+
+    &:hover::after {
+      width: 80px;
+    }
+  }
+
+  // Different widths for different heading levels
+  h2.anchored:hover::after {
+    width: 100px;
+  }
+
+  h3.anchored:hover::after {
+    width: 80px;
+  }
+
+  h4.anchored:hover::after {
+    width: 60px;
+  }
+
+  h5.anchored:hover::after {
+    width: 50px;
+  }
+
+  // Enhance section number styling
+  h2.anchored,
+  h3.anchored,
+  h4.anchored,
+  h5.anchored {
+    .header-section-number {
+      transition: all 0.3s ease;
+      opacity: 0.7;
+      margin-right: 0.5em;
+    }
+
+    &:hover .header-section-number {
+      opacity: 1;
+      transform: translateX(-2px);
+    }
   }
 }
 
