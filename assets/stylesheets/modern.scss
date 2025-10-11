@@ -280,6 +280,295 @@ figure {
 }
 
 // ===========================
+// Table of Contents (TOC) Enhancements
+// ===========================
+
+nav#TOC {
+  position: relative;
+  transition: all 0.3s ease;
+
+  // TOC Title styling
+  #toc-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    position: relative;
+    color: rgba($foreground, 0.85);
+
+    // Animated underline
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        $foreground 0%,
+        rgba($foreground, 0.3) 100%
+      );
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 2px;
+    }
+
+    &:hover::after {
+      width: 80px;
+    }
+  }
+
+  // TOC list styling
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0.5rem;
+
+    // Nested lists
+    ul {
+      padding-left: 1rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      position: relative;
+
+      // Vertical line for nested items
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(
+          180deg,
+          rgba($foreground, 0.15) 0%,
+          rgba($foreground, 0.05) 100%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover::before {
+        opacity: 1;
+      }
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+      position: relative;
+    }
+  }
+
+  // TOC link styling
+  .nav-link {
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: rgba($foreground, 0.75);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+
+    // Section numbers
+    .header-section-number {
+      font-weight: 600;
+      margin-right: 0.5rem;
+      opacity: 0.6;
+      transition: opacity 0.25s ease;
+      font-size: 0.8em;
+    }
+
+    // Hover effect background
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: $foreground;
+      transform: scaleY(0);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 0 2px 2px 0;
+    }
+
+    // Hover state
+    &:hover {
+      color: rgba($foreground, 0.95);
+      background-color: rgba($foreground, 0.04);
+      transform: translateX(2px);
+      padding-left: 0.85rem;
+
+      .header-section-number {
+        opacity: 1;
+      }
+
+      &::before {
+        transform: scaleY(1);
+      }
+    }
+
+    // Active state
+    &.active {
+      color: $foreground;
+      background-color: rgba($foreground, 0.08);
+      font-weight: 600;
+      padding-left: 0.85rem;
+
+      .header-section-number {
+        opacity: 1;
+        font-weight: 700;
+      }
+
+      &::before {
+        transform: scaleY(1);
+        width: 4px;
+      }
+
+      // Subtle pulse animation for active item
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 4px;
+        height: 4px;
+        background: $foreground;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        animation: tocPulse 2s ease-in-out infinite;
+      }
+    }
+
+    // Focus state for accessibility
+    &:focus-visible {
+      outline: 2px solid $foreground;
+      outline-offset: 2px;
+      background-color: rgba($foreground, 0.06);
+    }
+  }
+
+  // Collapsed nested items
+  ul.collapse {
+    .nav-link {
+      font-size: 0.8125rem;
+      padding: 0.3rem 0.75rem;
+      color: rgba($foreground, 0.65);
+
+      &:hover {
+        color: rgba($foreground, 0.9);
+      }
+    }
+  }
+
+  // TOC actions (Edit/Report buttons)
+  .toc-actions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba($foreground, 0.1);
+
+    ul {
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-action {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: rgba($foreground, 0.7);
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: rgba($foreground, 0.02);
+      border: 1px solid rgba($foreground, 0.08);
+
+      i,
+      .bi {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        color: $foreground;
+        background-color: rgba($foreground, 0.06);
+        border-color: rgba($foreground, 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba($foreground, 0.08);
+
+        i,
+        .bi {
+          transform: scale(1.1);
+        }
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Sticky behavior enhancement
+  &.toc-active {
+    // Add subtle shadow when scrolling
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: linear-gradient(
+        180deg,
+        rgba($foreground, 0.03) 0%,
+        transparent 100%
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+}
+
+// Animation for active item pulse
+@keyframes tocPulse {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateY(-50%) scale(1.5);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 991px) {
+  nav#TOC {
+    #toc-title {
+      font-size: 0.8125rem;
+    }
+
+    .nav-link {
+      font-size: 0.8125rem;
+      padding: 0.35rem 0.5rem;
+    }
+  }
+}
+
+// ===========================
 // Sidebar Enhancements
 // ===========================
 
@@ -429,26 +718,6 @@ body > header#title-block-header {
     padding-bottom: 1rem;
     animation: fadeIn 0.8s ease-out 0.4s both;
 
-    // Animated separator line above metadata
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba($foreground, 0.2) 10%,
-        rgba($foreground, 0.3) 50%,
-        rgba($foreground, 0.2) 90%,
-        transparent 100%
-      );
-      opacity: 0;
-      animation: fadeInBorder 1s ease-out 0.3s forwards, pulseBorder 4s ease-in-out 1.3s infinite;
-    }
-
     .quarto-title-meta-heading {
       font-weight: 600;
       text-transform: uppercase;
@@ -477,8 +746,29 @@ body > header#title-block-header {
 
     .quarto-title-banner {
       padding-top: 1.5rem;
-      padding-bottom: 0;
+      padding-bottom: 1rem;
       margin-bottom: 0;
+      position: relative;
+
+      // Animated separator line at bottom of banner
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba($foreground, 0.2) 10%,
+          rgba($foreground, 0.3) 50%,
+          rgba($foreground, 0.2) 90%,
+          transparent 100%
+        );
+        opacity: 0;
+        animation: fadeInBorder 1s ease-out 0.3s forwards, pulseBorder 4s ease-in-out 1.3s infinite;
+      }
 
       .quarto-title {
         position: relative;
@@ -514,17 +804,8 @@ body > header#title-block-header {
     }
   }
 
-  // Special styling for the about page
-  .about-entity & {
-    padding: 1rem 0 1.25rem;
-
-    .quarto-title .title {
-      font-size: 2.25rem;
-
-      @media (max-width: 768px) {
-        font-size: 1.75rem;
-      }
-    }
+  .abstract {
+    padding-bottom: 1rem;
   }
 }
 
@@ -589,6 +870,14 @@ body > header#title-block-header {
     .quarto-title-meta::before {
       animation: none !important;
       opacity: 1 !important;
+    }
+  }
+
+  // Disable TOC animations for reduced motion
+  nav#TOC {
+    .nav-link.active::after {
+      animation: none !important;
+      opacity: 0 !important;
     }
   }
 }
