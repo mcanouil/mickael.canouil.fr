@@ -797,6 +797,157 @@ div.sourceCode {
   }
 }
 
+// Listing category section
+.quarto-listing-category-title {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+
+  // Remove default border for animated version
+  border-bottom: none !important;
+
+  // Animated underline effect on hover
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, $foreground 0%, rgba($foreground, 0.4) 100%);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:hover::after {
+    width: 50px;
+  }
+
+  // Enhanced section number styling if present
+  .header-section-number {
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    margin-right: 0.5em;
+  }
+
+  &:hover .header-section-number {
+    opacity: 1;
+    transform: translateX(-2px);
+  }
+}
+
+.quarto-listing-category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 1rem;
+  max-height: none;
+  overflow: visible;
+
+  .category {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25em 0.25em;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: rgba($foreground, 0.75);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    gap: 0.5em;
+
+    &:hover {
+      background-color: rgba($foreground, 0.05);
+      color: rgba($foreground, 0.9);
+
+      .quarto-category-count {
+        background-color: rgba($foreground, 0.1);
+        color: rgba($foreground, 0.8);
+      }
+    }
+
+    &:active {
+      background-color: rgba($foreground, 0.08);
+    }
+
+    // Active/selected state
+    &.active,
+    &[aria-current="true"] {
+      background-color: rgba($foreground, 0.1);
+      color: $foreground;
+      font-weight: 600;
+
+      .quarto-category-count {
+        background-color: rgba($foreground, 0.15);
+        color: $foreground;
+      }
+
+      &:hover {
+        background-color: rgba($foreground, 0.12);
+      }
+    }
+
+    // Focus state for accessibility
+    &:focus {
+      outline: 2px solid rgba($foreground, 0.3);
+      outline-offset: 2px;
+    }
+
+    .quarto-category-count {
+      padding: 0.1em 0.4em;
+      background-color: rgba($foreground, 0.08);
+      border-radius: 8px;
+      font-size: 0.8em;
+      font-weight: 500;
+      color: rgba($foreground, 0.6);
+      transition: all 0.2s ease;
+      min-width: 1.8em;
+      text-align: center;
+    }
+  }
+
+  // Special styling for "All" category
+  .category[data-category=""] {
+    font-weight: 600;
+    color: rgba($foreground, 0.8);
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    .category {
+      transition: none;
+    }
+  }
+}
+
+// Responsive adjustments for categories
+@media (max-width: 768px) {
+  .quarto-listing-category {
+    gap: 0.2rem;
+
+    .category {
+      font-size: 0.8em;
+      padding: 0.2em 0.4em;
+
+      .quarto-category-count {
+        font-size: 0.75em;
+        padding: 0.08em 0.35em;
+      }
+    }
+  }
+
+  .quarto-listing-category-title {
+    font-size: 0.85rem;
+  }
+}
+
 // Responsive table adjustments
 @media (max-width: 991px) {
   .quarto-listing-table {
