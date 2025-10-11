@@ -120,10 +120,18 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 .btn,
 .page-link {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  position: relative;
+
+  // Remove any inherited underline animations from main links
+  &::after {
+    display: none !important;
+  }
 
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba($foreground, 0.15);
+    text-decoration: none;
   }
 
   &:active {
@@ -359,6 +367,476 @@ div.sourceCode {
           animation-delay: #{$i * 0.05}s;
         }
       }
+    }
+  }
+}
+
+// ===========================
+// Listing Table Enhancements
+// ===========================
+
+.quarto-listing-table {
+  // Modern table styling
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba($foreground, 0.08);
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba($foreground, 0.12);
+  }
+
+  // Table header
+  thead {
+    background: linear-gradient(
+      180deg,
+      rgba($foreground, 0.08) 0%,
+      rgba($foreground, 0.05) 100%
+    );
+    border-bottom: 2px solid rgba($foreground, 0.15);
+
+    tr {
+      transition: background-color 0.3s ease;
+    }
+
+    th {
+      padding: 1rem 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: rgba($foreground, 0.85);
+      text-align: left;
+      border-bottom: 2px solid rgba($foreground, 0.15);
+      position: relative;
+      transition: all 0.3s ease;
+
+      // First column
+      &:first-child {
+        padding-left: 1.5rem;
+        border-top-left-radius: 8px;
+      }
+
+      // Last column
+      &:last-child {
+        padding-right: 1.5rem;
+        border-top-right-radius: 8px;
+      }
+
+      // Sort links
+      a.sort {
+        color: rgba($foreground, 0.85);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.3s ease;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+
+        // Remove any inherited underline animations
+        &::before {
+          display: none;
+        }
+
+        // Sort indicator
+        &::after {
+          content: '⇅';
+          font-size: 0.9em;
+          opacity: 0.5;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+        }
+
+        &:hover {
+          color: $foreground;
+
+          &::after {
+            opacity: 1;
+            transform: scale(1.2);
+          }
+        }
+
+        // Active sort states
+        &.sort-asc::after {
+          content: '↑';
+          opacity: 1;
+          color: $foreground;
+        }
+
+        &.sort-desc::after {
+          content: '↓';
+          opacity: 1;
+          color: $foreground;
+        }
+      }
+
+      &:hover {
+        background-color: rgba($foreground, 0.06);
+      }
+    }
+  }
+
+  // Table body
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba($foreground, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: transparent;
+
+      &:hover {
+        background-color: rgba($foreground, 0.04);
+        transform: scale(1.005);
+        box-shadow: 0 2px 8px rgba($foreground, 0.08);
+        position: relative;
+        z-index: 1;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      // Fade in animation for rows
+      animation: fadeInUp 0.5s ease-out;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.03}s;
+        }
+      }
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      vertical-align: middle;
+      transition: all 0.3s ease;
+
+      // First column
+      &:first-child {
+        padding-left: 1.5rem;
+        font-weight: 600;
+      }
+
+      // Last column
+      &:last-child {
+        padding-right: 1.5rem;
+      }
+    }
+  }
+
+  // Listing-specific elements
+  .listing-date {
+    font-size: 0.9em;
+    color: rgba($foreground, 0.75);
+    font-weight: 600;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .listing-title {
+    color: $foreground;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        $foreground 0%,
+        rgba($foreground, 0.4) 100%
+      );
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
+
+    &:hover {
+      color: $foreground;
+      transform: translateX(2px);
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  .listing-journal-title {
+    color: rgba($foreground, 0.8);
+    font-size: 0.95em;
+    font-style: italic;
+
+    em {
+      font-style: italic;
+    }
+  }
+
+  .listing-first,
+  .listing-position {
+    font-size: 0.9em;
+    color: rgba($foreground, 0.7);
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    padding: 0.25em 0.75em;
+    background-color: rgba($foreground, 0.05);
+    border-radius: 4px;
+    border: 1px solid rgba($foreground, 0.12);
+    transition: all 0.2s ease;
+
+    &:not(:empty) {
+      &:hover {
+        background-color: rgba($foreground, 0.08);
+        border-color: rgba($foreground, 0.2);
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// Listing actions group (filter and sort controls)
+.listing-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  // Input groups (both sort and filter)
+  .input-group {
+    flex: 1;
+    min-width: 200px;
+
+    @media (max-width: 768px) {
+      min-width: 100%;
+    }
+  }
+
+  .input-group-text {
+    background-color: rgba($foreground, 0.08);
+    border: 1px solid rgba($foreground, 0.15);
+    border-right: none;
+    color: rgba($foreground, 0.7);
+    border-radius: 6px 0 0 6px;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+
+    i {
+      font-size: 1em;
+    }
+  }
+
+  // Sort dropdown
+  .quarto-listing-sort {
+    .form-select {
+      border: 1px solid rgba($foreground, 0.15);
+      border-left: none;
+      border-radius: 0 6px 6px 0;
+      padding: 0.5rem 2.5rem 0.5rem 1rem;
+      background-color: $background;
+      color: rgba($foreground, 0.85);
+      font-size: 0.95em;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+
+      &:hover {
+        border-color: rgba($foreground, 0.3);
+        background-color: rgba($foreground, 0.02);
+        box-shadow: 0 2px 4px rgba($foreground, 0.05);
+      }
+
+      &:focus {
+        border-color: rgba($foreground, 0.4);
+        box-shadow: 0 0 0 3px rgba($foreground, 0.08);
+        outline: none;
+      }
+
+      option {
+        padding: 0.5rem;
+        background-color: $background;
+        color: $foreground;
+
+        &:hover {
+          background-color: rgba($foreground, 0.08);
+        }
+      }
+    }
+  }
+}
+
+// Listing filter input
+.quarto-listing-filter {
+  .form-control {
+    border: 1px solid rgba($foreground, 0.15);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    padding: 0.5rem 1rem;
+    background-color: $background;
+    color: rgba($foreground, 0.85);
+    transition: all 0.3s ease;
+
+    &::placeholder {
+      color: rgba($foreground, 0.4);
+      font-style: italic;
+    }
+
+    &:hover {
+      border-color: rgba($foreground, 0.3);
+      background-color: rgba($foreground, 0.02);
+      box-shadow: 0 2px 4px rgba($foreground, 0.05);
+    }
+
+    &:focus {
+      border-color: rgba($foreground, 0.4);
+      box-shadow: 0 0 0 3px rgba($foreground, 0.08);
+      outline: none;
+      background-color: $background;
+    }
+  }
+}
+
+// Pagination styling
+.listing-pagination,
+.pagination {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+
+  .page-link {
+    border: 1px solid rgba($foreground, 0.15);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    color: rgba($foreground, 0.85);
+    background-color: $background;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+
+    // Ensure no underline animations
+    &::after,
+    &::before {
+      display: none !important;
+    }
+
+    &:hover {
+      background-color: rgba($foreground, 0.08);
+      border-color: rgba($foreground, 0.25);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: $foreground;
+    }
+
+    &:focus {
+      outline: 2px solid $foreground;
+      outline-offset: 2px;
+      text-decoration: none;
+    }
+
+    &.active {
+      background-color: $foreground;
+      color: $background;
+      border-color: $foreground;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        color: $background;
+        background-color: rgba($foreground, 0.9);
+      }
+    }
+
+    &:disabled,
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+
+      &:hover {
+        transform: none;
+        background-color: $background;
+        border-color: rgba($foreground, 0.15);
+      }
+    }
+  }
+
+  // Page item wrapper
+  .page-item {
+    &.active .page-link {
+      background-color: $foreground;
+      color: $background;
+      border-color: $foreground;
+    }
+
+    &.disabled .page-link {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Responsive table adjustments
+@media (max-width: 991px) {
+  .quarto-listing-table {
+    font-size: 0.9em;
+
+    thead th,
+    tbody td {
+      padding: 0.75rem 1rem;
+
+      &:first-child {
+        padding-left: 1rem;
+      }
+
+      &:last-child {
+        padding-right: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .quarto-listing-table {
+    font-size: 0.85em;
+    border-radius: 6px;
+
+    thead th,
+    tbody td {
+      padding: 0.6rem 0.75rem;
+
+      &:first-child {
+        padding-left: 0.75rem;
+      }
+
+      &:last-child {
+        padding-right: 0.75rem;
+      }
+    }
+
+    thead th {
+      font-size: 0.75rem;
     }
   }
 }
