@@ -165,23 +165,29 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
   margin-right: calc(-50vw + 50%);
   margin-top: -2rem;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, rgba($foreground, 0.03) 0%, rgba($foreground, 0.08) 100%);
+  background:
+    radial-gradient(ellipse at top left, rgba($foreground, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba($foreground, 0.06) 0%, transparent 50%),
+    linear-gradient(135deg, rgba($foreground, 0.02) 0%, rgba($foreground, 0.05) 100%);
   border-radius: 0;
   box-shadow: 0 4px 16px rgba($foreground, 0.08);
   overflow: hidden;
 
-  // Subtle pattern overlay
+  // Gradient orbs overlay
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgba($foreground, 0.03) 1px, transparent 0);
-    background-size: 24px 24px;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background:
+      radial-gradient(circle at 30% 40%, rgba($foreground, 0.12) 0%, transparent 30%),
+      radial-gradient(circle at 70% 60%, rgba($foreground, 0.1) 0%, transparent 30%),
+      radial-gradient(circle at 50% 20%, rgba($foreground, 0.08) 0%, transparent 20%);
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.6;
+    animation: orbsMove 20s ease-in-out infinite alternate;
   }
 
   .about-entity {
@@ -312,6 +318,355 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 
     &:hover {
       filter: brightness(1.2);
+    }
+  }
+}
+
+// About body styling
+.about-body {
+  margin: 2.5rem 0;
+  max-width: 800px;
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+    color: rgba($foreground, 0.85);
+
+    @media (max-width: 768px) {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    strong {
+      color: $foreground;
+      font-weight: 600;
+    }
+
+    em {
+      color: rgba($foreground, 0.75);
+    }
+  }
+}
+
+// Subtle image styling class
+.img-styled {
+  display: block;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: linear-gradient(
+    135deg,
+    rgba($foreground, 0.02) 0%,
+    rgba($foreground, 0.04) 100%
+  );
+  border: 1px solid rgba($foreground, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba($foreground, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  // Round the image corners
+  img {
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      rgba($foreground, 0.04) 0%,
+      rgba($foreground, 0.06) 100%
+    );
+    border-color: rgba($foreground, 0.12);
+    box-shadow: 0 4px 12px rgba($foreground, 0.1);
+  }
+
+  // For images inside links
+  a & {
+    cursor: pointer;
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    margin: 1.5rem auto;
+    border-radius: 10px;
+
+    img {
+      border-radius: 5px;
+    }
+  }
+}
+
+// Highlight callout box - minimal dotted border style
+.highlight {
+  position: relative;
+  margin: 2rem 0;
+  padding: 1.5rem 2rem;
+  background: transparent;
+  border: 2px dashed rgba($foreground, 0.25);
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Corner accents
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid $foreground;
+    transition: all 0.3s ease;
+  }
+
+  // Top-left corner
+  &::before {
+    top: -2px;
+    left: -2px;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 8px 0 0 0;
+  }
+
+  // Bottom-right corner
+  &::after {
+    bottom: -2px;
+    right: -2px;
+    border-left: none;
+    border-top: none;
+    border-radius: 0 0 8px 0;
+  }
+
+  &:hover {
+    border-color: rgba($foreground, 0.4);
+    background: rgba($foreground, 0.02);
+
+    &::before,
+    &::after {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: $foreground;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+
+    strong {
+      color: $foreground;
+      position: relative;
+      padding: 0 0.2em;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0.1em;
+        left: 0;
+        right: 0;
+        height: 0.35em;
+        background: rgba($foreground, 0.12);
+        z-index: -1;
+        transition: background 0.3s ease;
+      }
+    }
+
+    em {
+      font-style: italic;
+      color: $foreground;
+    }
+  }
+
+  &:hover p strong::after {
+    background: rgba($foreground, 0.2);
+  }
+
+  // Multiple paragraphs in highlight
+  p + p {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.25rem 1.5rem;
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &::before,
+    &::after {
+      transition: none;
+    }
+  }
+}
+
+// Index page content styling
+body.quarto-about-solana,
+#quarto-content:has(.quarto-about-solana) {
+
+  // Introduction paragraphs after hero
+  > div:not(.quarto-about-solana) {
+    p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      color: rgba($foreground, 0.85);
+
+      strong {
+        color: $foreground;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Education and Interests sections
+  section.level2 {
+    padding-top: 2rem;
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: $foreground;
+      position: relative;
+      padding-bottom: 0.75rem;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, $foreground 0%, rgba($foreground, 0.3) 100%);
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      &:hover::after {
+        width: 100px;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+
+      li {
+        position: relative;
+        padding: 0.75rem 0 0.75rem 2rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+
+        &::before {
+          content: '▸';
+          position: absolute;
+          left: 0.5rem;
+          color: rgba($foreground, 0.5);
+          font-size: 1rem;
+          transition: all 0.3s ease;
+        }
+
+        &:hover {
+          padding-left: 2.25rem;
+          color: $foreground;
+
+          &::before {
+            color: $foreground;
+            left: 0.25rem;
+          }
+        }
+
+        p {
+          margin: 0;
+
+          strong {
+            color: $foreground;
+            font-weight: 600;
+          }
+
+          em {
+            color: rgba($foreground, 0.7);
+          }
+        }
+      }
+    }
+  }
+
+  // Education section specific styling
+  .education {
+    ul li {
+      background-color: rgba($foreground, 0.02);
+      border-left: 2px solid rgba($foreground, 0.15);
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1rem 1rem 2rem;
+
+      &:hover {
+        background-color: rgba($foreground, 0.05);
+        border-left-color: rgba($foreground, 0.3);
+      }
+
+      strong:last-of-type {
+        color: rgba($foreground, 0.7);
+        font-size: 0.95em;
+      }
+    }
+  }
+
+  // Interests section - more compact styling
+  .interests {
+    ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+
+      li {
+        padding: 0.5rem 1rem 0.5rem 1.75rem;
+        background-color: rgba($foreground, 0.04);
+        border-radius: 6px;
+        font-size: 0.95rem;
+
+        &::before {
+          left: 0.5rem;
+          font-size: 0.85rem;
+        }
+
+        &:hover {
+          background-color: rgba($foreground, 0.08);
+          padding-left: 2rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments for index page
+@media (max-width: 768px) {
+  body.quarto-about-solana,
+  #quarto-content:has(.quarto-about-solana) {
+    > div:not(.quarto-about-solana) p {
+      font-size: 1rem;
+    }
+
+    section.level2 {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+
+      h2 {
+        font-size: 1.5rem;
+      }
     }
   }
 }
@@ -1850,6 +2205,70 @@ main {
   }
   50% {
     opacity: 0.6;
+  }
+}
+
+// Particles floating animation
+@keyframes particlesFloat {
+  0%, 100% {
+    background-position:
+      0% 0%,
+      100% 100%,
+      50% 50%,
+      100% 0%,
+      0% 100%,
+      50% 0%,
+      25% 75%,
+      75% 25%;
+  }
+  25% {
+    background-position:
+      20% 30%,
+      80% 70%,
+      30% 70%,
+      90% 20%,
+      10% 80%,
+      60% 15%,
+      40% 60%,
+      70% 40%;
+  }
+  50% {
+    background-position:
+      30% 50%,
+      70% 50%,
+      70% 30%,
+      80% 40%,
+      20% 60%,
+      40% 30%,
+      50% 80%,
+      60% 50%;
+  }
+  75% {
+    background-position:
+      25% 70%,
+      75% 30%,
+      55% 45%,
+      85% 25%,
+      15% 75%,
+      45% 55%,
+      35% 65%,
+      65% 35%;
+  }
+}
+
+// Gradient orbs movement
+@keyframes orbsMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate(8%, 5%) rotate(120deg) scale(1.1);
+  }
+  66% {
+    transform: translate(-5%, 8%) rotate(240deg) scale(0.9);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(1);
   }
 }
 
