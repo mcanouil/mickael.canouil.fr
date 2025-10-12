@@ -35,17 +35,63 @@ defaults:
       tooltip-bg: $foreground
       btn-close-color: $foreground
     rules: |
+      // ===========================
+      // UTILITY FUNCTIONS
+      // ===========================
+      // Helper function to mix background and foreground colors
       @function body-mix($weight) {
         @return mix($background, $foreground, $weight);
       }
 
-      // Quarto Components
+      // ===========================
+      // BASE STYLES & ANIMATIONS
+      // ===========================
+      // Smooth scrolling for the entire page
+      html {
+        scroll-behavior: smooth;
+      }
+
+      // Page fade-in animation on load
+      body {
+        animation: fadeIn 0.6s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      // Enhanced focus states for accessibility
+      a:focus-visible,
+      button:focus-visible,
+      .btn:focus-visible {
+        outline: 2px solid $foreground;
+        outline-offset: 2px;
+        transition: outline-offset 0.2s ease;
+      }
+
+      // Hide empty divs and paragraphs to reduce visual clutter
+      div:empty,
+      p:empty {
+        display: none;
+      }
+
+      // ===========================
+      // QUARTO UI COMPONENTS
+      // ===========================
+
+      // Back to top button
       #quarto-back-to-top {
         box-shadow: 0 .2rem .5rem body-mix(95%), 0 0 .05rem body-mix(95%);
         color: body-mix(5%);
         bottom: 80px;
       }
 
+      // Title banner styling
       .quarto-title-banner {
         margin-bottom: 1em;
         color: $foreground;
@@ -64,13 +110,16 @@ defaults:
         }
       }
 
+      // Breadcrumb last item styling
       .quarto-title-breadcrumbs .breadcrumb li:last-of-type a,
       .quarto-secondary-nav nav.quarto-page-breadcrumbs .breadcrumb li:last-of-type a {
         color: body-mix(50%);
         font-weight: 600;
       }
 
-      // Pagination & Forms
+      // ===========================
+      // FORMS & PAGINATION
+      // ===========================
       .page-item {
         &.active .page-link,
         .page-link:hover {
@@ -96,7 +145,9 @@ defaults:
         background-color: $foreground;
       }
 
-      // Code Styling
+      // ===========================
+      // CODE STYLING
+      // ===========================
       code,
       a > code {
         color: $background;
@@ -138,6 +189,7 @@ defaults:
         margin-right: 1.5em;
       }
 
+      // Code annotation workaround
       /* TODO: remove when fixed in Quarto: https://github.com/quarto-dev/quarto-cli/pull/13429 */
       #code-annotation-line-highlight {
         margin-left: unset;
@@ -149,6 +201,10 @@ defaults:
         all: unset;
       }
 
+      // ===========================
+      // BOOTSTRAP COMPONENTS
+      // ===========================
+
       // List Groups
       .list-group-item-action {
         &:hover,
@@ -158,7 +214,33 @@ defaults:
         }
       }
 
-      // About Section
+      // Navigation Tabs
+      .nav-tabs {
+        border-bottom: 1px solid $foreground;
+
+        .nav-link.active,
+        .nav-item.show .nav-link {
+          color: $foreground;
+          background-color: $background;
+          border-color: $foreground;
+        }
+
+        .nav-link,
+        .nav-pills .nav-link {
+          color: $foreground;
+        }
+      }
+
+      // Tooltips
+      .tooltip {
+        animation: fadeIn 0.2s ease;
+      }
+
+      // ===========================
+      // ABOUT PAGE COMPONENTS
+      // ===========================
+
+      // Profile image with glow effect
       img.about-image {
         border-radius: 50%;
         border-style: solid;
@@ -192,7 +274,7 @@ defaults:
         }
       }
 
-      // About Entity Components
+      // About entity title hover effect
       .about-entity {
         #title-block-header.quarto-title-block.default .quarto-title .title:hover {
           color: $foreground;
@@ -200,6 +282,7 @@ defaults:
         }
       }
 
+      // Solana template about links
       .quarto-about-solana .about-entity {
         .about-links {
           column-gap: 0;
@@ -221,6 +304,7 @@ defaults:
         }
       }
 
+      // Trestles template about links
       .quarto-about-trestles .about-entity {
         .about-link {
           color: mix($link-color, $background, 50%);
@@ -233,7 +317,11 @@ defaults:
         }
       }
 
-      // Navbar
+      // ===========================
+      // NAVIGATION & HEADER
+      // ===========================
+
+      // Main navbar styling
       .navbar {
         text-transform: uppercase;
         letter-spacing: 0.1em;
@@ -262,7 +350,7 @@ defaults:
         }
       }
 
-      // Navigation & Footer
+      // Footer navigation
       .nav-footer {
         border-top: 1px solid body-mix(50%);
 
@@ -293,6 +381,7 @@ defaults:
         max-height: 2em;
       }
 
+      // Navbar navigation items with animated underlines
       .navbar-nav {
 
         .show>.nav-link,
@@ -357,6 +446,7 @@ defaults:
         }
       }
 
+      // Responsive navbar adjustments
       @media (max-width: 992px) {
         .navbar-expand-lg {
 
@@ -377,23 +467,7 @@ defaults:
         max-height: 2em;
       }
 
-      // Navigation Tabs
-      .nav-tabs {
-        border-bottom: 1px solid $foreground;
-
-        .nav-link.active,
-        .nav-item.show .nav-link {
-          color: $foreground;
-          background-color: $background;
-          border-color: $foreground;
-        }
-
-        .nav-link,
-        .nav-pills .nav-link {
-          color: $foreground;
-        }
-      }
-
+      // Navbar title with corner brackets animation
       .navbar-title {
         transition: all .35s ease;
         display: inline-block;
@@ -442,7 +516,11 @@ defaults:
         }
       }
 
-      // Color Scheme Toggle Icons
+      // ===========================
+      // THEME TOGGLE ICONS
+      // ===========================
+
+      // Navbar theme toggle
       .navbar .quarto-color-scheme-toggle {
         &:not(.alternate) .bi::before {
           background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#{colorToRGBA($navbar-light-color)}" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
@@ -473,7 +551,11 @@ defaults:
         }
       }
 
-      // Listing Components
+      // ===========================
+      // LISTING & BLOG COMPONENTS
+      // ===========================
+
+      // Listing category tags
       .quarto-post .listing-categories .listing-category {
         border: solid 1px $foreground;
 
@@ -496,13 +578,16 @@ defaults:
         color: $foreground;
       }
 
-      // Footer Link
+      // Footer link hover
       .footer a:hover {
         color: $link-color;
       }
 
-      // Custom Styles
+      // ===========================
+      // CUSTOM UTILITY STYLES
+      // ===========================
 
+      // Rounded picture style
       .picture {
         border-style: solid;
         border-width: 3pt;
@@ -543,39 +628,7 @@ defaults:
       }
 
       // ===========================
-      // Modern Styling Enhancements
-      // ===========================
-
-      // Smooth scrolling
-      html {
-        scroll-behavior: smooth;
-      }
-
-      // Page transitions and fade-in
-      body {
-        animation: fadeIn 0.6s ease-in;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      // Enhanced focus states for accessibility
-      a:focus-visible,
-      button:focus-visible,
-      .btn:focus-visible {
-        outline: 2px solid $foreground;
-        outline-offset: 2px;
-        transition: outline-offset 0.2s ease;
-      }
-
-      // ===========================
-      // Link Animations
+      // LINK ANIMATIONS & EFFECTS
       // ===========================
 
       // Main content links with subtle underline animation
@@ -601,10 +654,10 @@ defaults:
       }
 
       // ===========================
-      // Card Enhancements
+      // CARD & GRID ENHANCEMENTS
       // ===========================
 
-      // Blog listing cards
+      // Blog listing cards with hover effects
       .quarto-post {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 8px;
@@ -654,9 +707,10 @@ defaults:
       }
 
       // ===========================
-      // Button Enhancements
+      // BUTTON & FORM CONTROLS
       // ===========================
 
+      // Buttons and pagination links
       .btn,
       .page-link {
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -694,10 +748,10 @@ defaults:
       }
 
       // ===========================
-      // About Section Enhancements
+      // ABOUT PAGE - HERO BANNER
       // ===========================
 
-      // Hero banner styling for Solana about template (override existing)
+      // Hero banner styling for Solana about template with gradient orbs
       .quarto-about-solana {
         position: relative;
         padding: 3rem 0;
@@ -851,7 +905,11 @@ defaults:
         }
       }
 
-      // Enhanced about-entity links (outside hero section)
+      // ===========================
+      // ABOUT PAGE - CONTENT SECTIONS
+      // ===========================
+
+      // About entity links (outside hero section)
       .about-entity {
         .about-link {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1212,10 +1270,10 @@ defaults:
       }
 
       // ===========================
-      // Inline Code Enhancements
+      // CODE ENHANCEMENTS
       // ===========================
 
-      // Enhanced inline code styling
+      // Inline code styling with hover effects
       p code:not(.sourceCode),
       li code:not(.sourceCode),
       td code:not(.sourceCode),
@@ -1294,10 +1352,7 @@ defaults:
         border: 1px solid rgba($foreground, 0.12);
       }
 
-      // ===========================
-      // Code Block Enhancements
-      // ===========================
-
+      // Code blocks with hover shadow
       div.sourceCode {
         transition: box-shadow 0.3s ease;
         border-radius: 6px;
@@ -1366,9 +1421,10 @@ defaults:
       }
 
       // ===========================
-      // Navbar Enhancements
+      // SEARCH & INTERACTION
       // ===========================
 
+      // Navbar navigation items
       .navbar-nav .nav-item {
         .nav-link {
           &::after {
@@ -1377,10 +1433,7 @@ defaults:
         }
       }
 
-      // ===========================
-      // Search Enhancements
-      // ===========================
-
+      // Search form focus effect
       #quarto-search {
         .aa-Form {
           transition: all 0.3s ease;
@@ -1392,9 +1445,10 @@ defaults:
       }
 
       // ===========================
-      // Listing Page Enhancements
+      // LISTING PAGE ANIMATIONS
       // ===========================
 
+      // Staggered fade-in for listing items
       .quarto-listing {
         .list {
           .quarto-grid-item,
@@ -1412,11 +1466,11 @@ defaults:
       }
 
       // ===========================
-      // Listing Table Enhancements
+      // LISTING TABLES
       // ===========================
 
+      // Modern table styling with rounded corners and shadows
       .quarto-listing-table {
-        // Modern table styling
         border-collapse: separate;
         border-spacing: 0;
         width: 100%;
@@ -2045,9 +2099,10 @@ defaults:
       }
 
       // ===========================
-      // Footer Enhancements
+      // MEDIA & IMAGES
       // ===========================
 
+      // Footer link animations
       .nav-footer {
         a {
           transition: all 0.3s ease;
@@ -2071,10 +2126,7 @@ defaults:
         }
       }
 
-      // ===========================
-      // Image Enhancements
-      // ===========================
-
+      // Figure images with hover zoom
       figure {
         img {
           transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -2087,9 +2139,10 @@ defaults:
       }
 
       // ===========================
-      // Table of Contents (TOC) Enhancements
+      // TABLE OF CONTENTS (TOC)
       // ===========================
 
+      // TOC navigation with animated indicators
       nav#TOC {
         position: relative;
         transition: all 0.3s ease;
@@ -2376,9 +2429,10 @@ defaults:
       }
 
       // ===========================
-      // Sidebar Enhancements
+      // SIDEBAR & BREADCRUMBS
       // ===========================
 
+      // Sidebar navigation hover effects
       .sidebar-navigation {
         .sidebar-item {
           transition: all 0.2s ease;
@@ -2390,10 +2444,7 @@ defaults:
         }
       }
 
-      // ===========================
-      // Breadcrumb Enhancements
-      // ===========================
-
+      // Breadcrumb link animations
       .breadcrumb {
         .breadcrumb-item {
           a {
@@ -2407,17 +2458,10 @@ defaults:
       }
 
       // ===========================
-      // Tooltip Enhancements
+      // TITLE BLOCK & HEADERS
       // ===========================
 
-      .tooltip {
-        animation: fadeIn 0.2s ease;
-      }
-
-      // ===========================
-      // Title Block Header Enhancements
-      // ===========================
-
+      // Page title block with gradient effects
       body > header#title-block-header {
         position: relative;
         overflow: hidden;
@@ -2617,10 +2661,10 @@ defaults:
       }
 
       // ===========================
-      // Section Heading Enhancements (h2-h6)
+      // SECTION HEADINGS (H2-H6)
       // ===========================
 
-      // Override default heading borders with proper SASS variables
+      // Override default heading borders with theme variables
       h1, .h1,
       h2, .h2,
       h3, .h3,
@@ -2641,8 +2685,8 @@ defaults:
         }
       }
 
+      // Animated underlines for section headings in main content
       main {
-        // Style h2-h5 headings with animated bottom borders
         h2.anchored,
         h3.anchored,
         h4.anchored,
@@ -2711,6 +2755,10 @@ defaults:
         }
       }
 
+      // ===========================
+      // KEYFRAME ANIMATIONS
+      // ===========================
+
       // Shimmer animation for banner accent
       @keyframes shimmer {
         0%, 100% {
@@ -2762,9 +2810,10 @@ defaults:
       }
 
       // ===========================
-      // Reduced Motion Support
+      // ACCESSIBILITY & REDUCED MOTION
       // ===========================
 
+      // Disable all animations for users who prefer reduced motion
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -2798,9 +2847,4 @@ defaults:
             opacity: 0 !important;
           }
         }
-      }
-
-      div:empty,
-      p:empty {
-        display: none;
       }
