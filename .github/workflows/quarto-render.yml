@@ -47,11 +47,13 @@ jobs:
 
       - name: Set Quarto Version
         id: quarto-version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          if [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
+            echo "version=${INPUT_VERSION}" >> ${GITHUB_OUTPUT}
           else
-            echo "version=pre-release" >> $GITHUB_OUTPUT
+            echo "version=pre-release" >> ${GITHUB_OUTPUT}
           fi
 
       - name: Set up Quarto
@@ -64,7 +66,17 @@ jobs:
 
       - name: Render Quarto Project
         shell: bash
+        env:
+          GISCUS_REPO: ${{ secrets.GISCUS_REPO }}
+          GISCUS_REPO_ID: ${{ secrets.GISCUS_REPO_ID }}
+          GISCUS_CATEGORY: ${{ secrets.GISCUS_CATEGORY }}
+          GISCUS_CATEGORY_ID: ${{ secrets.GISCUS_CATEGORY_ID }}
         run: |
+          sed -i "s|{{GISCUS_REPO_ID}}|${GISCUS_REPO_ID}|g" posts/_metadata.yml
+          sed -i "s|{{GISCUS_REPO}}|${GISCUS_REPO}|g" posts/_metadata.yml
+          sed -i "s|{{GISCUS_CATEGORY_ID}}|${GISCUS_CATEGORY_ID}|g" posts/_metadata.yml
+          sed -i "s|{{GISCUS_CATEGORY}}|${GISCUS_CATEGORY}|g" posts/_metadata.yml
+
           [ ! -f _quarto.yml ] && echo -e "project:\n  output-dir: _site" > _quarto.yml
           if grep -q "output-dir: _site" _quarto.yml; then
             quarto render
