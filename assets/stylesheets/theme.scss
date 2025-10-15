@@ -1092,6 +1092,146 @@ figure:has(img.img-styled) {
   }
 }
 
+// Thanks callout box - solid border with subtle background
+.thanks {
+  position: relative;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  width: 90%;
+  background: linear-gradient(
+    135deg,
+    rgba($foreground, 0.03) 0%,
+    rgba($foreground, 0.05) 100%
+  );
+  border: 2px solid rgba($foreground, 0.2);
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba($foreground, 0.06);
+
+  // Corner accents - filled style
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: $foreground;
+    transition: all 0.3s ease;
+    opacity: 0.3;
+  }
+
+  // Top-left corner
+  &::before {
+    top: -1px;
+    left: -1px;
+    border-radius: 8px 0 0 0;
+  }
+
+  // Bottom-right corner
+  &::after {
+    bottom: -1px;
+    right: -1px;
+    border-radius: 0 0 8px 0;
+  }
+
+  &:hover {
+    border-color: rgba($foreground, 0.35);
+    background: linear-gradient(
+      135deg,
+      rgba($foreground, 0.05) 0%,
+      rgba($foreground, 0.08) 100%
+    );
+    box-shadow: 0 4px 12px rgba($foreground, 0.1);
+
+    &::before,
+    &::after {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: $foreground;
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.01em;
+
+    @media (max-width: 768px) {
+      font-size: 1.02rem;
+    }
+
+    strong {
+      color: $foreground;
+      font-weight: 700;
+      font-style: normal;
+      position: relative;
+      padding: 0 0.15em;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0.05em;
+        left: 0;
+        right: 0;
+        height: 0.4em;
+        background: rgba($foreground, 0.15);
+        z-index: -1;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+    }
+
+    em {
+      font-style: italic;
+      color: rgba($foreground, 0.85);
+      font-weight: 600;
+    }
+
+    // Links inside thanks box
+    a {
+      color: $foreground;
+      font-weight: 600;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba($foreground, 0.4);
+      transition: all 0.3s ease;
+
+      &:hover {
+        text-decoration-color: $foreground;
+        text-decoration-thickness: 2.5px;
+      }
+    }
+  }
+
+  &:hover p strong::after {
+    background: rgba($foreground, 0.25);
+    height: 0.45em;
+  }
+
+  // Multiple paragraphs in thanks
+  p + p {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.25rem 1.5rem;
+    width: 80%;
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &::before,
+    &::after {
+      transition: none;
+    }
+  }
+}
+
 // Index page content styling
 body.quarto-about-solana,
 #quarto-content:has(.quarto-about-solana) {
