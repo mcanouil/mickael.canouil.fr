@@ -41,9 +41,19 @@
 <%
 const usage = item.usage;
 const id = utils.b64encode(usage);
-partial("extension-install-modal.ejs", { id, usage });
+if (usage) {
+%>
+```{=html}
+<button type="button" class="btn btn-outline-light" style="text-align: center;" data-bs-toggle="modal" data-bs-target="#installModal-<%= id %>">Install</button>
+<%
 if (item.template === true) {
-partial("extension-use-modal.ejs", { id, usage });
+%>
+<button type="button" class="btn btn-outline-light" style="text-align: center;" data-bs-toggle="modal" data-bs-target="#useModal-<%= id %>">Use</button>
+<%
+}
+%>
+```
+<%
 }
 %>
 :::
@@ -65,3 +75,19 @@ partial("extension-use-modal.ejs", { id, usage });
 <% } %>
 
 :::
+
+```{=html}
+<!-- Modals placed at top level to avoid positioning issues -->
+<% for (const item of items) { %>
+<%
+const usage = item.usage;
+if (usage) {
+const id = utils.b64encode(usage);
+partial("extension-install-modal.ejs", { id, usage });
+if (item.template === true) {
+partial("extension-use-modal.ejs", { id, usage });
+}
+}
+%>
+<% } %>
+```
