@@ -894,7 +894,8 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
 }
 
 // Subtle image styling class
-.img-styled {
+// Targets figures containing img.img-styled
+figure:has(img.img-styled) {
   display: block;
   margin: 2rem auto;
   padding: 1rem;
@@ -907,14 +908,46 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba($foreground, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+
+  // Remove default paragraph margin around image
+  p {
+    margin: 0;
+  }
 
   // Round the image corners
-  img {
+  img.img-styled {
     border-radius: 6px;
     display: block;
     width: 100%;
     height: auto;
+    margin-bottom: 0;
+  }
+
+  // Figcaption styling - hidden by default, expands on hover
+  figcaption {
+    display: block;
+    max-height: 0;
+    margin-top: 0;
+    padding-right: 0;
+    font-size: 0.8em;
+    color: rgba($foreground, 0.6);
+    text-align: right;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1.4;
+    font-style: italic;
+
+    a {
+      color: rgba($foreground, 0.7);
+      text-decoration: underline;
+
+      &:hover {
+        color: $foreground;
+      }
+    }
   }
 
   &:hover {
@@ -925,11 +958,13 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     );
     border-color: rgba($foreground, 0.12);
     box-shadow: 0 4px 12px rgba($foreground, 0.1);
-  }
 
-  // For images inside links
-  a & {
-    cursor: pointer;
+    // Show and expand figcaption on hover
+    figcaption {
+      max-height: 100px;
+      margin-top: 0.75rem;
+      opacity: 1;
+    }
   }
 
   // Responsive
@@ -938,8 +973,12 @@ main a:not(.nav-link):not(.btn):not(.about-link):not(.listing-category):not(.qua
     margin: 1.5rem auto;
     border-radius: 10px;
 
-    img {
+    img.img-styled {
       border-radius: 5px;
+    }
+
+    figcaption {
+      font-size: 0.75em;
     }
   }
 }
