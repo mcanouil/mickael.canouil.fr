@@ -1,11 +1,17 @@
 /*-- scss:defaults --*/
 
 /*-- scss:rules --*/
+
+// ===========================
+// PROJECTS GRID STYLING
+// ===========================
+
 .projects {
   flex: 0 50%;
-  background: $dark;
-  box-shadow: 0 2px 4px 0 rgba($gray-700, 0.2), 0 5px 15px 0 rgba($gray-300, 0.15);
-  border-radius: 15px;
+  background: body-mix(99%);
+  box-shadow: 0 2px 8px rgba($foreground, 0.08);
+  border: 1px solid rgba($foreground, 0.1);
+  border-radius: 8px;
   margin: 8px;
   padding: 10px 15px;
   position: relative;
@@ -13,9 +19,11 @@
   min-height: 265px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+  // Hover effects consistent with theme.scss grid items
   &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba($gray-700, 0.25), 0 8px 20px rgba($gray-300, 0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba($foreground, 0.12);
+    border-color: rgba($foreground, 0.15);
   }
 
   .card-body {
@@ -30,6 +38,7 @@
 
   .listing-description {
     flex-grow: 1;
+    color: rgba($foreground, 0.85);
   }
 
   .listing-modal {
@@ -38,45 +47,131 @@
   }
 
   .card-footer {
-    background-color: $dark;
-    border-top: var(--bs-card-border-width) solid var(--bs-gray);
+    background-color: body-mix(99%);
+    border-top: 1px solid rgba($foreground, 0.1);
   }
 
   p {
     margin: 0;
   }
 
+  // Card title styling consistent with theme.scss
   h5.card-title {
-    transition: color 0.3s ease;
+    color: $foreground;
+    transition: all 0.3s ease;
 
     &:hover {
-      text-decoration: underline;
+      color: $foreground;
+      text-shadow: 0 0 1px rgba($foreground, 0.3);
     }
   }
 
+  // Date styling consistent with theme.scss listing styles
   .listing-date {
     font-style: italic;
+    font-size: 0.9em;
+    color: rgba($foreground, 0.7);
+    font-weight: 600;
     margin-left: auto;
   }
 
+  // Grid link styling
   .quarto-grid-link {
-    transition: color 0.3s ease;
+    color: $link-color;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        $foreground 0%,
+        rgba($foreground, 0.4) 100%
+      );
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
 
     &:hover {
-      color: $link-color;
-      text-decoration: underline;
+      color: $foreground;
+
+      &::after {
+        width: 100%;
+      }
     }
   }
 
+  // GitHub link icon hover effect
   #github-link {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgba($foreground, 0.7);
 
     &:hover {
       transform: scale(1.25);
+      color: $foreground;
     }
   }
 }
 
+// Pagination styling consistent with theme.scss
 #projects-pagination {
   padding-top: 1.5em;
+}
+
+// Fade-in animation for project items (consistent with theme.scss)
+.quarto-listing {
+  .list {
+    .projects {
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .projects {
+    margin: 6px;
+    padding: 8px 12px;
+    min-height: 240px;
+
+    h5.card-title {
+      font-size: 1rem;
+    }
+
+    .listing-description {
+      font-size: 0.9rem;
+    }
+
+    .listing-date {
+      font-size: 0.85em;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .projects {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .quarto-listing .list .projects {
+    animation: none !important;
+  }
 }
