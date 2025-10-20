@@ -28,10 +28,41 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Create GitHub App token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_KEY }}
+
+      - name: Get GitHub App User ID
+        id: get-user-id
+        if: ${{ steps.app-token.outputs.app-slug != '' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          echo "user-id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure Environment for Git User
+        env:
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+          USER_ID: ${{ steps.get-user-id.outputs.user-id }}
+        run: |
+          if [ -z "${APP_SLUG}" ]; then
+            USER_NAME="github-actions[bot]"
+            USER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
+          else
+            USER_NAME="${APP_SLUG}[bot]"
+            USER_EMAIL="${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          fi
+          git config --global user.name "${USER_NAME}"
+          git config --global user.email "${USER_EMAIL}"
+
       - if: ${{ github.event_name == 'pull_request' }}
         uses: r-lib/actions/pr-fetch@v2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ steps.app-token.outputs.token }}
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -83,38 +114,6 @@ jobs:
           else
             quarto render --output-dir _site
           fi
-
-      - name: Create GitHub App token
-        uses: actions/create-github-app-token@v2
-        id: app-token
-        if: ${{ inputs.gh-app-id != '' }}
-        with:
-          app-id: ${{ inputs.gh-app-id }}
-          private-key: ${{ secrets.APP_KEY }}
-
-      - name: Get GitHub App User ID
-        id: get-user-id
-        if: ${{ steps.app-token.outputs.app-slug != '' }}
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-        run: |
-          echo "user-id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "${GITHUB_OUTPUT}"
-
-      - name: Configure Environment for Git User
-        env:
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-          USER_ID: ${{ steps.get-user-id.outputs.user-id }}
-        run: |
-          if [ -z "${APP_SLUG}" ]; then
-            USER_NAME="github-actions[bot]"
-            USER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
-          else
-            USER_NAME="${APP_SLUG}[bot]"
-            USER_EMAIL="${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
-          fi
-          git config --global user.name "${USER_NAME}"
-          git config --global user.email "${USER_EMAIL}"
 
       - name: Commit to Pull Request
         shell: bash
