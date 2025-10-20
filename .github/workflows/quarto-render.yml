@@ -8,12 +8,9 @@ on:
         required: true
         default: "pre-release"
         type: string
-  workflow_run:
-    workflows:
-      - "Update Pull Request"
-    types:
-      - completed
   pull_request:
+    paths-ignore:
+      - "_site/**"
   schedule:
     - cron: 00 12 1 * *
 
@@ -24,7 +21,6 @@ concurrency:
 jobs:
   quarto-render:
     runs-on: ubuntu-latest
-    if: ${{ !(github.event_name == 'pull_request' && contains(github.actor, '[bot]')) }}
     permissions:
       contents: write
       pull-requests: write
