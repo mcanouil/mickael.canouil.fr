@@ -76,12 +76,16 @@ jobs:
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
         run: |
           git fetch origin "${BASE_REF}"
+          git checkout
 
           # Attempt merge with strategy to keep all changes from main in _site
           if git merge "origin/${BASE_REF}" --no-edit -X ours; then
             echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             echo "Merge completed successfully"
           else
+            git checkout --theirs _site
+            git add _site
+            git commit --amend --no-edit || echo "No changes to _site"
             # Check if there are conflicts
             if git diff --name-only --diff-filter=U | grep -q .; then
               CONFLICTS=$(git diff --name-only --diff-filter=U)
@@ -94,17 +98,6 @@ jobs:
             else
               echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             fi
-          fi
-
-      - name: Override _site with Base Branch Version
-        if: ${{ steps.merge.outputs.merge-status == 'success' }}
-        env:
-          BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
-        run: |
-          if [ -d "_site" ]; then
-            git checkout "origin/${BASE_REF}" -- _site || echo "No _site directory in base branch"
-            git add _site
-            git commit --amend --no-edit || echo "No changes to _site"
           fi
 
       - name: Push Updated Branch
