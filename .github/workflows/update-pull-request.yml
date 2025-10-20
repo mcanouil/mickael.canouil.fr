@@ -56,7 +56,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          PR_DATA=$(gh pr view ${ISSUE_NUMBER} --json headRefName,baseRefName)
+          PR_DATA=$(gh pr view ${ISSUE_NUMBER} --json headRefName,baseRefName --repo ${GITHUB_REPOSITORY})
           HEAD_REF=$(echo "${PR_DATA}" | jq -r .headRefName)
           BASE_REF=$(echo "${PR_DATA}" | jq -r .baseRefName)
 
