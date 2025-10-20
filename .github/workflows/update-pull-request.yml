@@ -114,24 +114,40 @@ jobs:
         run: |
           git push origin "${HEAD_REF}"
 
-      - name: Comment on Success
+      - name: Update Comment on Success
         if: ${{ steps.merge.outputs.merge-status == 'success' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
+          ORIGINAL_BODY: ${{ github.event.comment.body }}
         run: |
-          gh pr comment ${ISSUE_NUMBER} --body "✅ Successfully updated PR branch with \`${BASE_REF}\` (keeping all \`_site\` changes from base branch)"
+          gh api \
+            --method PATCH \
+            /repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID} \
+            -f body="${ORIGINAL_BODY}
 
-      - name: Comment on Conflict
+          ---
+
+          ✅ Successfully updated PR branch with \`${BASE_REF}\` (keeping all \`_site\` changes from base branch)"
+
+      - name: Update Comment on Conflict
         if: ${{ failure() && steps.merge.outputs.merge-status == 'conflict' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
           CONFLICTS: ${{ steps.merge.outputs.conflicts }}
+          ORIGINAL_BODY: ${{ github.event.comment.body }}
         run: |
-          gh pr comment ${ISSUE_NUMBER} --body "❌ Unable to automatically update PR branch with \`${BASE_REF}\` due to conflicts.
+          gh api \
+            --method PATCH \
+            /repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID} \
+            -f body="${ORIGINAL_BODY}
+
+          ---
+
+          ❌ Unable to automatically update PR branch with \`${BASE_REF}\` due to conflicts.
 
           **Conflicting files:**
           \`\`\`
