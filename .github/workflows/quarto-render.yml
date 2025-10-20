@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Quarto version'
+        description: "Quarto version"
         required: true
-        default: 'pre-release'
+        default: "pre-release"
         type: string
+  workflow_run:
+    workflows:
+      - "Update Pull Request"
+    types:
+      - completed
   pull_request:
   schedule:
     - cron: 00 12 1 * *
@@ -38,8 +43,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages:
-            any::knitr
+          packages: any::knitr
             any::rmarkdown
             any::downlit
             any::xml2
