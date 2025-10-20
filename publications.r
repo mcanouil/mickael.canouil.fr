@@ -1,6 +1,9 @@
 #!/usr/bin/env Rscript
 
-if (!nzchar(Sys.getenv("QUARTO_PROJECT_RENDER_ALL"))) {
+if (
+  !nzchar(Sys.getenv("QUARTO_PROJECT_RENDER_ALL")) &&
+    grepl("publications.qmd", Sys.getenv("QUARTO_PROJECT_INPUT_FILES"))
+) {
   quit()
 }
 
@@ -34,10 +37,18 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
         grep("- family:", article, value = TRUE)
       )
       if (isTRUE(grepl("first", grep("annote:", article, value = TRUE)))) {
-        first <- "  first: '*As first or co-first*'"
+        as_first <- "  first: '*As first or co-first*'"
       } else {
-        first <- sprintf(
+        as_first <- sprintf(
           "  first: '%s'",
+          paste(rep("&emsp;", 3), collapse = "")
+        )
+      }
+      if (isTRUE(grepl("last", grep("annote:", article, value = TRUE)))) {
+        as_last <- "  last: '*As last or co-last*'"
+      } else {
+        as_last <- sprintf(
+          "  last: '%s'",
           paste(rep("&emsp;", 3), collapse = "")
         )
       }
@@ -60,7 +71,8 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
           grep("doi:", article, value = TRUE)
         ),
         position,
-        first
+        as_first,
+        as_last
       )
       article
     }
@@ -80,14 +92,14 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
     "  sort: 'issued desc'",
     "  type: table",
     "  categories: false",
-    "  sort-ui: [date, title, journal-title, position, first]",
+    "  sort-ui: [date, title, journal-title, first, last]",
     "  filter-ui: [date, title, journal-title]",
-    "  fields: [date, title, journal-title, first, position]",
+    "  fields: [date, title, journal-title, first, last]",
     "  field-display-names:",
     "    date: Issued",
     "    journal-title: Journal",
-    "    position: Rank",
     "    first: 'First'",
+    "    last: 'Last'",
     "---"
   )
 
@@ -99,7 +111,9 @@ create_pub_listing <- function(bib_file, author = "Canouil") {
           factor(
             x = sapply(
               articles,
-              function(x) any(grepl("As first or co-first", x))
+              function(x) {
+                any(grepl("As first or co-first|As last or co-last", x))
+              }
             ),
             levels = c("TRUE", "FALSE")
           )
