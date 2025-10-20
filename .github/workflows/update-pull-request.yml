@@ -90,8 +90,23 @@ jobs:
         env:
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
         run: |
+          # Check if the last commit is the _site restore commit
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          HAS_RESTORE_COMMIT=false
+          if echo "${LAST_COMMIT_MSG}" | grep -q "^ci: restore _site from ${BASE_REF} before merge$"; then
+            HAS_RESTORE_COMMIT=true
+            echo "Found _site restore commit to squash"
+          fi
+
           # Attempt merge
-          if git merge "origin/${BASE_REF}" --no-edit; then
+          if git merge "origin/${BASE_REF}" --no-edit -m "ci: update PR branch with ${BASE_REF}"; then
+            # If we have the restore commit, squash it with the merge commit
+            if [ "${HAS_RESTORE_COMMIT}" = true ]; then
+              echo "Squashing _site restore commit with merge commit"
+              git reset --soft HEAD~2
+              git commit -m "ci: update PR branch with ${BASE_REF}"
+            fi
+
             echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             echo "Merge completed successfully"
           else
