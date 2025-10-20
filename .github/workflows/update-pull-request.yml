@@ -76,19 +76,13 @@ jobs:
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
         run: |
           git fetch origin "${BASE_REF}"
-          git checkout
-
-          # Attempt merge with strategy to keep all changes from main in _site
+          git restore --source="${BASE_REF}" _site
+          git add _site
+          
           if git merge "origin/${BASE_REF}" --no-edit -X ours; then
             echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             echo "Merge completed successfully"
           else
-            echo "Merge resulted in conflicts, attempting to resolve _site directory"
-            git merge "origin/${BASE_REF}" --no-edit
-            git checkout --theirs _site
-            git add _site
-            git commit --amend --no-edit || echo "No changes to _site"
-            # Check if there are conflicts
             if git diff --name-only --diff-filter=U | grep -q .; then
               CONFLICTS=$(git diff --name-only --diff-filter=U)
               echo "merge-status=conflict" >> "${GITHUB_OUTPUT}"
@@ -101,6 +95,7 @@ jobs:
               echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             fi
           fi
+          git commit --amend --no-edit || echo "No changes to _site"
 
       - name: Push Updated Branch
         if: ${{ steps.merge.outputs.merge-status == 'success' }}
