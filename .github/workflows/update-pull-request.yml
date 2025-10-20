@@ -83,6 +83,8 @@ jobs:
             echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             echo "Merge completed successfully"
           else
+            echo "Merge resulted in conflicts, attempting to resolve _site directory"
+            git merge "origin/${BASE_REF}" --no-edit
             git checkout --theirs _site
             git add _site
             git commit --amend --no-edit || echo "No changes to _site"
