@@ -2,11 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.9">
+<meta name="generator" content="quarto-1.9.10">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL, Ph.D.">
+<meta name="description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
 
 <title>Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions – MCU</title>
 <style>
@@ -74,15 +75,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-633c0b61721e7d70c51a64c1936ce206.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-e89caf09d0623b3562a1916cf63f53c8.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-633c0b61721e7d70c51a64c1936ce206.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-cd11bcd1b437ec35c0dee322a6d3547e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-ac059376ca7cf9a9a9ed953a47c2cc9d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-cd11bcd1b437ec35c0dee322a6d3547e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-55f9b0dd09916b78ae58f9480613df8f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-13a8a07f2f18ff62fbe826db3e5865f1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-55f9b0dd09916b78ae58f9480613df8f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-8f36f4515b73fe448ddc42d0fa580bee.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-95fee858cba45ba569289ac230a85951.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-8f36f4515b73fe448ddc42d0fa580bee.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -113,12 +117,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <meta property="og:title" content="Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions – MCU">
-<meta property="og:description" content="A data science blog and portfolio by Mickaël CANOUIL">
+<meta property="og:description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
 <meta property="og:image" content="https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/featured.png">
 <meta property="og:site_name" content="MCU">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:width" content="1920">
 <meta name="twitter:title" content="Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions – MCU">
-<meta name="twitter:description" content="A data science blog and portfolio by Mickaël CANOUIL">
+<meta name="twitter:description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
 <meta name="twitter:image" content="https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/featured.png">
+<meta name="twitter:image-height" content="1080">
+<meta name="twitter:image-width" content="1920">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -362,7 +370,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions</h1>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          <p>This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">quarto</div>
                 <div class="quarto-category">extensions</div>
                 <div class="quarto-category">productivity</div>
@@ -404,7 +417,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#the-foundation-structure-and-organisation" id="toc-the-foundation-structure-and-organisation" class="nav-link active" data-scroll-target="#the-foundation-structure-and-organisation">The Foundation: Structure and Organisation</a>
   <ul class="collapse">
   <li><a href="#consistent-project-structure" id="toc-consistent-project-structure" class="nav-link" data-scroll-target="#consistent-project-structure">Consistent Project Structure</a></li>
-  <li><a href="#module-loading-best-practices" id="toc-module-loading-best-practices" class="nav-link" data-scroll-target="#module-loading-best-practices">Module Loading Best Practices</a></li>
+  <li><a href="#module-loading" id="toc-module-loading" class="nav-link" data-scroll-target="#module-loading">Module Loading</a></li>
   </ul></li>
   <li><a href="#configuration-and-validation" id="toc-configuration-and-validation" class="nav-link" data-scroll-target="#configuration-and-validation">Configuration and Validation</a>
   <ul class="collapse">
@@ -421,15 +434,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#graceful-degradation" id="toc-graceful-degradation" class="nav-link" data-scroll-target="#graceful-degradation">Graceful Degradation</a></li>
   <li><a href="#informative-logging" id="toc-informative-logging" class="nav-link" data-scroll-target="#informative-logging">Informative Logging</a></li>
-  </ul></li>
-  <li><a href="#dependency-management" id="toc-dependency-management" class="nav-link" data-scroll-target="#dependency-management">Dependency Management</a>
-  <ul class="collapse">
-  <li><a href="#lazy-loading" id="toc-lazy-loading" class="nav-link" data-scroll-target="#lazy-loading">Lazy Loading</a></li>
-  </ul></li>
-  <li><a href="#testing-and-development-workflow" id="toc-testing-and-development-workflow" class="nav-link" data-scroll-target="#testing-and-development-workflow">Testing and Development Workflow</a>
-  <ul class="collapse">
-  <li><a href="#development-environment" id="toc-development-environment" class="nav-link" data-scroll-target="#development-environment">Development Environment</a></li>
-  <li><a href="#example-driven-development" id="toc-example-driven-development" class="nav-link" data-scroll-target="#example-driven-development">Example-Driven Development</a></li>
   </ul></li>
   <li><a href="#distribution-and-maintenance" id="toc-distribution-and-maintenance" class="nav-link" data-scroll-target="#distribution-and-maintenance">Distribution and Maintenance</a>
   <ul class="collapse">
@@ -449,10 +453,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="" width="600"></a></p>
+</figure>
+</div>
 <p>Quarto extensions represent one of the most powerful aspects of the publishing platform, allowing developers to extend core functionality far beyond what’s possible with configuration alone. Through extensions, you can add custom shortcodes for embedding interactive content, create filters that transform document structure, develop entirely new output formats, and integrate third-party libraries seamlessly into the rendering pipeline.</p>
 <p>Whether you’re building a simple shortcode to embed tweets, creating a sophisticated filter for academic citations, or developing a complete custom format for journal submissions, Lua serves as the extensibility layer that makes it all possible. The flexibility is remarkable: extensions can process the document’s abstract syntax tree (AST), inject CSS and JavaScript dependencies, generate format-specific output, and even interact with external systems during rendering.</p>
-<p>However, with this power comes opportunity. As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that’s maintainable, reliable, and accessible to the broader community. Drawing from patterns established in the Quarto core team’s extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.</p>
-<p><strong>A note on perspective</strong>: This guide presents opinionated recommendations based on patterns observed in successful Quarto extensions and general software development best practices. Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is choosing patterns that work for your specific context and maintaining consistency within your projects.</p>
+<div class="highlight">
+<p>With <strong>great power</strong> comes <strong>great responsibility</strong>.</p>
+</div>
+<p>As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that’s maintainable, reliable, and accessible to the broader community. Drawing from patterns established in Quarto’s extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This guide presents opinionated recommendations. Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is choosing patterns that work for your specific context and maintaining consistency within your projects.</p>
+</div>
+</div>
 <p>The difference between a working solution and a polished extension lies not just in functionality, but in attention to structure, error handling, documentation, and user experience. Well-crafted extensions anticipate edge cases, provide helpful error messages, support multiple output formats gracefully, and maintain backward compatibility as they evolve. They follow consistent patterns that make them easier to understand, modify, and debug.</p>
 <section id="the-foundation-structure-and-organisation" class="level2">
 <h2 class="anchored" data-anchor-id="the-foundation-structure-and-organisation">The Foundation: Structure and Organisation</h2>
@@ -470,10 +494,13 @@ It reduces cognitive load for contributors and makes debugging substantially eas
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        └── _modules/          # Shared utilities (personal convention)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            ├── utils.lua</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            └── validation.lua</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="highlight">
+<p>Use a dedicated <code>_modules/</code> directory for shared utility functions, following <strong>DRY</strong> principles whilst maintaining extension portability across different environments.</p>
+</div>
 <p>The <code>_modules</code> directory shown here represents a personal organisational convention rather than a Quarto requirement. This approach involves creating a dedicated folder for shared utility modules within each extension. Rather than copying utility functions between extensions or writing everything in a single file, this modular architecture follows the DRY (Don’t Repeat Yourself) principle whilst maintaining portability. You might prefer a different structure (such as <code>lib/</code>, <code>utils/</code>, or keeping everything in the main file), but the key principle remains: consistent organisation makes maintenance easier.</p>
 </section>
-<section id="module-loading-best-practices" class="level3">
-<h3 class="anchored" data-anchor-id="module-loading-best-practices">Module Loading Best Practices</h3>
+<section id="module-loading" class="level3">
+<h3 class="anchored" data-anchor-id="module-loading">Module Loading</h3>
 <p>When requiring modules in your extensions, consider using this robust path resolution pattern:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -526,46 +553,60 @@ One effective pattern is: arguments, then metadata, then defaults:</p>
 </section>
 <section id="parameter-scoping-to-avoid-conflicts" class="level3">
 <h3 class="anchored" data-anchor-id="parameter-scoping-to-avoid-conflicts">Parameter Scoping to Avoid Conflicts</h3>
-<p>To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension’s configuration parameters under your extension’s name in the document metadata.<br>
+<p>To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension’s configuration parameters under <code>extensions</code> and your extension’s name in the document metadata or in your project configuration (<em>i.e.</em>, <code>quarto.yml</code>).<br>
 This creates a clear namespace and prevents accidental collisions:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"My Document"</span></span>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="document.qmd"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "My Document"</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Recommended: Scoped under extensions namespace</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">extensions</span><span class="kw">:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my-extension</span><span class="kw">:</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> </span><span class="st">"modern"</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">colour</span><span class="kw">:</span><span class="at"> </span><span class="st">"#ff0000"</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">position</span><span class="kw">:</span><span class="at"> </span><span class="st">"top"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">extensions:</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">  my-extension:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: "modern"</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">    colour: "#ff0000"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">    position: "top"</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Consider avoiding: Top-level parameters that might conflict</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme</span><span class="kw">:</span><span class="at"> </span><span class="st">"modern"</span><span class="co">      # Could conflict with Quarto's theme system</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colour</span><span class="kw">:</span><span class="at"> </span><span class="st">"#ff0000"</span><span class="co">    # Could conflict with other extensions</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">position</span><span class="kw">:</span><span class="at"> </span><span class="st">"top"</span><span class="co">      # Too generic, high chance of conflicts</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="an">theme:</span><span class="co"> "modern"      # Could conflict with Quarto's theme system</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="an">colour:</span><span class="co"> "#ff0000"    # Could conflict with other extensions</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="an">position:</span><span class="co"> "top"      # Too generic, high chance of conflicts</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="highlight">
+<p>Always <strong>scope extension configuration</strong> under the <code>extensions</code> namespace to <strong>prevent conflicts</strong> with Quarto CLI options and other extensions in the ecosystem.</p>
+</div>
 <p>When accessing these scoped parameters in your Lua code:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> get_extension_options<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extensions_config</span> <span class="op">=</span> <span class="va">meta</span><span class="op">.</span><span class="va">extensions</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extensions_config</span> <span class="cf">then</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extension_config</span> <span class="op">=</span> <span class="va">extensions_config</span><span class="op">[</span><span class="cn">EXTENSION_NAME</span><span class="op">]</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extension_config</span> <span class="cf">then</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">options</span> <span class="op">=</span> <span class="op">{}</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">key</span><span class="op">,</span> <span class="va">value</span> <span class="kw">in</span> <span class="fu">pairs</span><span class="op">(</span><span class="va">extension_config</span><span class="op">)</span> <span class="cf">do</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">value</span><span class="op">)</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">options</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="Lua"><pre class="sourceCode lua code-annotation-code code-with-copy code-annotated"><code class="sourceCode lua"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> get_extension_options<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extensions_config</span> <span class="op">=</span> <span class="va">meta</span><span class="op">.</span><span class="va">extensions</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extensions_config</span> <span class="cf">then</span></span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-7" class="code-annotation-target"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extension_config</span> <span class="op">=</span> <span class="va">extensions_config</span><span class="op">[</span><span class="cn">EXTENSION_NAME</span><span class="op">]</span></span>
+<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extension_config</span> <span class="cf">then</span></span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">options</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">key</span><span class="op">,</span> <span class="va">value</span> <span class="kw">in</span> <span class="fu">pairs</span><span class="op">(</span><span class="va">extension_config</span><span class="op">)</span> <span class="cf">do</span></span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">value</span><span class="op">)</span></span>
+<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">options</span></span>
+<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="7" data-code-annotation="1"><code>EXTENSION_NAME</code> should be a constant defined in your extension representing its name.</span>
+</dd>
+</dl>
 <p>This approach helps ensure your extension plays nicely with Quarto’s built-in options and other extensions whilst providing clear documentation for users about which parameters belong to your extension.</p>
 </section>
 <section id="input-validation" class="level3">
@@ -575,27 +616,27 @@ This creates a clear namespace and prevents accidental collisions:</p>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Validate and process a theme option</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">theme_input</span><span class="co"> string Theme name provided by user</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> string Valid theme name</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_theme_option<span class="op">(</span><span class="va">theme_input</span><span class="op">)</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">valid_themes</span> <span class="op">=</span> <span class="op">{</span><span class="st">"light"</span><span class="op">,</span> <span class="st">"dark"</span><span class="op">,</span> <span class="st">"modern"</span><span class="op">,</span> <span class="st">"classic"</span><span class="op">}</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"No theme specified, using default"</span><span class="op">)</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"light"</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Check if theme is in our list of valid themes</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">i</span> <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> <span class="op">#</span><span class="va">valid_themes</span> <span class="cf">do</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">valid_themes</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">==</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="va">theme_input</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Invalid theme: "</span> <span class="op">..</span> <span class="va">theme_input</span> <span class="op">..</span> <span class="st">". Valid options: light, dark, modern, classic"</span><span class="op">)</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="st">"light"</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Validate and process a theme option</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">theme_input</span><span class="co"> string Theme name provided by user</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> string Valid theme name</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_theme_option<span class="op">(</span><span class="va">theme_input</span><span class="op">)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">valid_themes</span> <span class="op">=</span> <span class="op">{</span><span class="st">"light"</span><span class="op">,</span> <span class="st">"dark"</span><span class="op">,</span> <span class="st">"modern"</span><span class="op">,</span> <span class="st">"classic"</span><span class="op">}</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"No theme specified, using default"</span><span class="op">)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"light"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Check if theme is in our list of valid themes</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">i</span> <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> <span class="op">#</span><span class="va">valid_themes</span> <span class="cf">do</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">valid_themes</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">==</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="va">theme_input</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Invalid theme: "</span> <span class="op">..</span> <span class="va">theme_input</span> <span class="op">..</span> <span class="st">". Valid options: light, dark, modern, classic"</span><span class="op">)</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="st">"light"</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -603,26 +644,29 @@ This creates a clear namespace and prevents accidental collisions:</p>
 <h2 class="anchored" data-anchor-id="documentation-as-code">Documentation as Code</h2>
 <section id="luadoc-annotations" class="level3">
 <h3 class="anchored" data-anchor-id="luadoc-annotations">LuaDoc Annotations</h3>
-<p>Well-crafted extensions benefit from comprehensive LuaDoc annotations.<br>
+<p>Well-crafted extensions benefit from comprehensive <a href="https://keplerproject.github.io/luadoc/">LuaDoc</a> annotations.<br>
 These aren’t just comments. They enable IDE features, catch type errors early, and serve as living documentation:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Processes a div element and adds custom styling</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">div</span><span class="co"> Div The Pandoc div element to process</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">options</span><span class="co"> table Configuration options</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> Div|Null Modified div or null if processing failed</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_div<span class="op">(</span><span class="va">div</span><span class="op">,</span> <span class="va">options</span><span class="op">)</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Implementation here</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">---Configuration options for the extension</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@type</span><span class="co"> table</span><span class="kw">&lt;string</span><span class="ot">, any</span><span class="kw">&gt;</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">default_options</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="va">style</span> <span class="op">=</span> <span class="st">'default'</span><span class="op">,</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">position</span> <span class="op">=</span> <span class="st">'top'</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Processes a div element and adds custom styling</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">div</span><span class="co"> Div The Pandoc div element to process</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">options</span><span class="co"> table Configuration options</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> Div|Null Modified div or null if processing failed</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_div<span class="op">(</span><span class="va">div</span><span class="op">,</span> <span class="va">options</span><span class="op">)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Implementation here</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">---Configuration options for the extension</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@type</span><span class="co"> table</span><span class="kw">&lt;string</span><span class="ot">, any</span><span class="kw">&gt;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">default_options</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="va">style</span> <span class="op">=</span> <span class="st">'default'</span><span class="op">,</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">position</span> <span class="op">=</span> <span class="st">'top'</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="highlight">
+<p>Comprehensive <strong>LuaDoc annotations</strong> with <code>@param</code>, <code>@return</code>, and <code>@type</code> enable IDE features, type checking, and serve as <strong>living documentation</strong> that evolves with your code.</p>
 </div>
 <p>Modern development environments like VS Code with the Lua Language Server extension use these annotations to provide intelligent autocomplete, type checking, and hover documentation.</p>
 </section>
@@ -633,30 +677,30 @@ These aren’t just comments. They enable IDE features, catch type errors early,
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">--[[</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">MIT License header</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">]]</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension name constant</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">EXTENSION_NAME</span> <span class="op">=</span> <span class="st">"my-extension"</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">--- Load required modules</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Module loading here</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">--- Module-level constants</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">DEFAULT_THEME</span> <span class="op">=</span> <span class="st">'light'</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">--- Module-level variables</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">dependency_added</span> <span class="op">=</span> <span class="kw">false</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">--- Private helper functions</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- Internal functions here</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">--- Public API functions</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- Main extension logic here</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension registration</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- Return statement here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">--[[</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">License header</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">]]</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension name constant</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">EXTENSION_NAME</span> <span class="op">=</span> <span class="st">"my-extension"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">--- Load required modules</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Module loading here</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">--- Filter/Shortcode constants</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">DEFAULT_THEME</span> <span class="op">=</span> <span class="st">'light'</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">--- Filter/Shortcode variables</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">dependency_added</span> <span class="op">=</span> <span class="kw">false</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">--- Private helper functions</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- Internal functions here</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">--- Public API functions</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- Main extension logic here</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension registration</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- Return statement here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This structure makes it easier to navigate large extension files and understand the code’s organisation at a glance.</p>
 </section>
@@ -671,24 +715,27 @@ Consider checking for unsupported formats and returning <code>pandoc.Null()</cod
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Check format compatibility first</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html:js"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Check format compatibility first</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html:js"</span><span class="op">)</span> <span class="cf">then</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For extensions that support multiple formats, provide appropriate implementations for each:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'html'</span><span class="op">,</span> <span class="va">html_output</span><span class="op">)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elseif</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"latex"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'latex'</span><span class="op">,</span> <span class="va">latex_output</span><span class="op">)</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Unsupported format - fail gracefully</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html"</span><span class="op">)</span> <span class="cf">then</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'html'</span><span class="op">,</span> <span class="va">html_output</span><span class="op">)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elseif</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"latex"</span><span class="op">)</span> <span class="cf">then</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'latex'</span><span class="op">,</span> <span class="va">latex_output</span><span class="op">)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Unsupported format - fail gracefully</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="highlight">
+<p><strong>Check format compatibility</strong> with <code>quarto.doc.is_format()</code> and return <code>pandoc.Null()</code> for unsupported formats <strong>rather than throwing errors</strong> that break the rendering process.</p>
 </div>
 </section>
 <section id="informative-logging" class="level3">
@@ -699,110 +746,28 @@ The <code>quarto.log</code> module supports different log levels and can be acti
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- For debugging during development</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>output<span class="op">(</span><span class="st">"Processing element:"</span><span class="op">,</span> <span class="va">element</span><span class="op">)</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- For user-facing warnings</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"Deprecated configuration detected. Please update your settings."</span><span class="op">)</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- For error conditions</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Required dependency not found. Extension cannot proceed."</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- For debugging during development</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>output<span class="op">(</span><span class="st">"Processing element:"</span><span class="op">,</span> <span class="va">element</span><span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- For user-facing warnings</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"Deprecated configuration detected. Please update your settings."</span><span class="op">)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- For error conditions</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Required dependency not found. Extension cannot proceed."</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>When using shared utility modules, establishing consistent logging patterns can be helpful:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Log an error message with extension context</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">extension_name</span><span class="co"> string Name of the extension</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">message</span><span class="co"> string Error message to log</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> log_error<span class="op">(</span><span class="va">extension_name</span><span class="op">,</span> <span class="va">message</span><span class="op">)</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">full_message</span> <span class="op">=</span> <span class="st">"["</span> <span class="op">..</span> <span class="va">extension_name</span> <span class="op">..</span> <span class="st">"] "</span> <span class="op">..</span> <span class="va">message</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="va">full_message</span><span class="op">)</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Log an error message with extension context</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">extension_name</span><span class="co"> string Name of the extension</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">message</span><span class="co"> string Error message to log</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> log_error<span class="op">(</span><span class="va">extension_name</span><span class="op">,</span> <span class="va">message</span><span class="op">)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">full_message</span> <span class="op">=</span> <span class="st">"["</span> <span class="op">..</span> <span class="va">extension_name</span> <span class="op">..</span> <span class="st">"] "</span> <span class="op">..</span> <span class="va">message</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="va">full_message</span><span class="op">)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="dependency-management" class="level2">
-<h2 class="anchored" data-anchor-id="dependency-management">Dependency Management</h2>
-<section id="lazy-loading" class="level3">
-<h3 class="anchored" data-anchor-id="lazy-loading">Lazy Loading</h3>
-<p>Consider loading modules and dependencies only when actually needed:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Don't load heavy modules at the top level</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">colour_utils</span> <span class="op">=</span> <span class="kw">nil</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> get_colour_utils<span class="op">()</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">colour_utils</span> <span class="cf">then</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">path</span> <span class="op">=</span> <span class="va">quarto</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>resolve_path<span class="op">(</span><span class="st">"_modules/colour.lua"</span><span class="op">)</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">clean_path</span> <span class="op">=</span> <span class="va">path</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">"%.lua$"</span><span class="op">,</span> <span class="st">""</span><span class="op">)</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">colour_utils</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="va">clean_path</span><span class="op">)</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">colour_utils</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="testing-and-development-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="testing-and-development-workflow">Testing and Development Workflow</h2>
-<section id="development-environment" class="level3">
-<h3 class="anchored" data-anchor-id="development-environment">Development Environment</h3>
-<p>Setting up your development environment with proper tooling can be very helpful.<br>
-The <code>.luarc.json</code> file in your project root enables type checking and autocomplete<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Generator"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Quarto"</span><span class="ot">,</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"This file provides type information for Lua completion and diagnostics."</span><span class="ot">,</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Quarto will automatically update this file to reflect the current path"</span><span class="ot">,</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"of your Quarto installation, and the file will also be added to .gitignore"</span><span class="ot">,</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"since it points to the absolute path of Quarto on the local system."</span><span class="ot">,</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Remove the 'Generator' key to manage this file's contents manually."</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.runtime.version"</span><span class="fu">:</span> <span class="st">"Lua 5.3"</span><span class="fu">,</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.workspace.checkThirdParty"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.workspace.library"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-types"</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.runtime.plugin"</span><span class="fu">:</span> <span class="st">"/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-plugin/plugin.lua"</span><span class="fu">,</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.completion.showWord"</span><span class="fu">:</span> <span class="st">"Disable"</span><span class="fu">,</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.completion.keywordSnippet"</span><span class="fu">:</span> <span class="st">"Both"</span><span class="fu">,</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.diagnostics.disable"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lowercase-global"</span><span class="ot">,</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"trailing-space"</span><span class="ot">,</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"luadoc-miss-module-name"</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"Lua.workspace.ignoreDir"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">".quarto"</span><span class="ot">,</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">".venv"</span></span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="example-driven-development" class="level3">
-<h3 class="anchored" data-anchor-id="example-driven-development">Example-Driven Development</h3>
-<p>Including working examples in your extension is highly recommended. The <code>example.qmd</code> file serves multiple purposes:</p>
-<ul>
-<li><strong>Documentation</strong>: Shows users how to use your extension.</li>
-<li><strong>Testing</strong>: Provides a quick way to verify functionality.</li>
-<li><strong>Development</strong>: Enables rapid iteration with <code>quarto preview</code>.</li>
-</ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "My Extension Example"</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="an">filters:</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">  - my-extension</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="an">extensions:</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">  my-extension:</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: "modern"</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">    position: "top"</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>This document demonstrates the extension:</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>:::: {.my-class}</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>Content to be processed</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="distribution-and-maintenance" class="level2">
@@ -810,10 +775,14 @@ The <code>.luarc.json</code> file in your project root enables type checking and
 <section id="semantic-versioning" class="level3">
 <h3 class="anchored" data-anchor-id="semantic-versioning">Semantic Versioning</h3>
 <p>Using semantic versioning for your extensions helps maintain backward compatibility:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># _extension.yml</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> My Extension</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.2.0</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">quarto-required</span><span class="kw">:</span><span class="at"> </span><span class="st">"&gt;=1.2.0"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> My Extension</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.2.0</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quarto-required</span><span class="kw">:</span><span class="at"> </span><span class="st">"&gt;=1.2.0"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 <section id="deprecation-handling" class="level3">
 <h3 class="anchored" data-anchor-id="deprecation-handling">Deprecation Handling</h3>
@@ -822,23 +791,26 @@ The <code>.luarc.json</code> file in your project root enables type checking and
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> handle_deprecated_config<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">]</span> <span class="cf">then</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"'old-option' is deprecated. Use 'new-option' instead."</span><span class="op">)</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Still process the old option for compatibility</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">])</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">nil</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> handle_deprecated_config<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">]</span> <span class="cf">then</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"'old-option' is deprecated. Use 'new-option' instead."</span><span class="op">)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Still process the old option for compatibility</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">])</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">nil</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Building solid Quarto extensions is a journey of continuous improvement. Start with working code and gradually enhance structure, documentation, error handling, and user experience. The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in successful extensions and general software development principles.</p>
+<p>Building solid Quarto extensions is a journey of continuous improvement. Start with working code and gradually enhance structure, documentation, error handling, and user experience. The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in extensions and general software development principles.</p>
 <p>Remember that these are recommendations rather than rigid rules. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is finding patterns that work for your specific context and maintaining consistency within your projects.</p>
 <p>Whether you’re enhancing a simple shortcode or expanding a complex multi-format filter, investing in clarity, documentation, and robust error handling pays dividends as your extension grows and finds new users. Good code is written for humans first, computers second.</p>
-<p>Finally, consider tagging and releasing your extensions using semantic versioning. Creating releases not only provides users with stable versions to reference but also enables powerful tooling like Quarto Wizard’s update feature to automatically manage extension lifecycles. With proper releases, users can easily discover when updates are available, understand what’s changed through release notes, and confidently upgrade their extensions knowing they’re moving to a tested, stable version. This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.</p>
+<div class="highlight">
+<p><strong>Proper releases</strong> with semantic versioning enable tools like <strong>Quarto Wizard’s automatic update detection</strong> for seamless extension maintenance.</p>
+</div>
+<p>Finally, consider tagging and releasing your extensions using semantic versioning. Creating releases not only provides users with stable versions to reference but also enables powerful tooling like <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>’s update feature to automatically manage extension lifecycles. With proper releases, users can easily discover when updates are available, understand what’s changed through release notes, and confidently upgrade their extensions knowing they’re moving to a tested, stable version. This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.</p>
 <p><em>Happy extending!</em></p>
 </section>
 <section id="resources-and-further-reading" class="level2">
@@ -855,13 +827,7 @@ The <code>.luarc.json</code> file in your project root enables type checking and
 
 </section>
 
-
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>See <a href="https://quarto.org/docs/extensions/lua.html#lua-in-vs-code">Lua in VS Code</a> documentation for more details.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -1554,6 +1520,38 @@ window.document.addEventListener('DOMContentLoaded', (event) => {
     }
   });
 </script>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
