@@ -1,7 +1,10 @@
 ---
 title: "Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions"
 description: |
-  
+  Elevate your Quarto extension development with proven patterns and best practices.
+
+  Quarto extensions unlock powerful customisation capabilities, but turning working code into maintainable, robust extensions requires more than just functionality.
+  This guide explores essential practices drawn from the Quarto core team's extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.
 date: "2025-11-08"
 categories:
   - quarto
@@ -17,7 +20,24 @@ link-external-newwindow: true
 lightbox: true
 editor:
   render-on-save: true
+# include-in-header:
+#   - text: |
+#      <style>
+#       .img-featured {
+#         border-radius: 1.5rem;
+#         box-shadow: 0 4px 24px #060c37;
+#         margin-bottom: 2rem;
+#       }
+#       </style>
 ---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
 
 Quarto extensions represent one of the most powerful aspects of the publishing platform, allowing developers to extend core functionality far beyond what's possible with configuration alone.
 Through extensions, you can add custom shortcodes for embedding interactive content, create filters that transform document structure, develop entirely new output formats, and integrate third-party libraries seamlessly into the rendering pipeline.
@@ -29,10 +49,14 @@ However, with this power comes opportunity.
 As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that's maintainable, reliable, and accessible to the broader community.
 Drawing from patterns established in the Quarto core team's extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.
 
-**A note on perspective**: This guide presents opinionated recommendations based on patterns observed in successful Quarto extensions and general software development best practices.
+:::: {.callout-note}
+
+This guide presents opinionated recommendations based on patterns observed in successful Quarto extensions and general software development best practices.
 Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements.
 Quarto's flexibility means there are often multiple valid approaches to solving the same problem.
 The key is choosing patterns that work for your specific context and maintaining consistency within your projects.
+
+:::
 
 The difference between a working solution and a polished extension lies not just in functionality, but in attention to structure, error handling, documentation, and user experience.
 Well-crafted extensions anticipate edge cases, provide helpful error messages, support multiple output formats gracefully, and maintain backward compatibility as they evolve.
@@ -64,7 +88,7 @@ This approach involves creating a dedicated folder for shared utility modules wi
 Rather than copying utility functions between extensions or writing everything in a single file, this modular architecture follows the DRY (Don't Repeat Yourself) principle whilst maintaining portability.
 You might prefer a different structure (such as `lib/`, `utils/`, or keeping everything in the main file), but the key principle remains: consistent organisation makes maintenance easier.
 
-### Module Loading Best Practices
+### Module Loading
 
 When requiring modules in your extensions, consider using this robust path resolution pattern:
 
@@ -298,90 +322,6 @@ local function log_error(extension_name, message)
   local full_message = "[" .. extension_name .. "] " .. message
   quarto.log.error(full_message)
 end
-```
-
-## Dependency Management
-
-### Lazy Loading
-
-Consider loading modules and dependencies only when actually needed:
-
-```{.lua filename="Lua"}
--- Don't load heavy modules at the top level
-local colour_utils = nil
-
-local function get_colour_utils()
-  if not colour_utils then
-    local path = quarto.utils.resolve_path("_modules/colour.lua")
-    local clean_path = path:gsub("%.lua$", "")
-    colour_utils = require(clean_path)
-  end
-  return colour_utils
-end
-```
-
-## Testing and Development Workflow
-
-### Development Environment
-
-Setting up your development environment with proper tooling can be very helpful.  
-The `.luarc.json` file in your project root enables type checking and autocomplete^[See [Lua in VS Code](https://quarto.org/docs/extensions/lua.html#lua-in-vs-code) documentation for more details.]:
-
-```json
-{
-  "Generator": [
-    "Quarto",
-    "This file provides type information for Lua completion and diagnostics.",
-    "Quarto will automatically update this file to reflect the current path",
-    "of your Quarto installation, and the file will also be added to .gitignore",
-    "since it points to the absolute path of Quarto on the local system.",
-    "Remove the 'Generator' key to manage this file's contents manually."
-  ],
-  "Lua.runtime.version": "Lua 5.3",
-  "Lua.workspace.checkThirdParty": false,
-  "Lua.workspace.library": [
-    "/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-types"
-  ],
-  "Lua.runtime.plugin": "/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-plugin/plugin.lua",
-  "Lua.completion.showWord": "Disable",
-  "Lua.completion.keywordSnippet": "Both",
-  "Lua.diagnostics.disable": [
-    "lowercase-global",
-    "trailing-space",
-    "luadoc-miss-module-name"
-  ],
-  "Lua.workspace.ignoreDir": [
-    ".quarto",
-    ".venv"
-  ]
-}
-```
-
-### Example-Driven Development
-
-Including working examples in your extension is highly recommended.
-The `example.qmd` file serves multiple purposes:
-
-- **Documentation**: Shows users how to use your extension.
-- **Testing**: Provides a quick way to verify functionality.
-- **Development**: Enables rapid iteration with `quarto preview`.
-
-```markdown
----
-title: "My Extension Example"
-filters:
-  - my-extension
-extensions:
-  my-extension:
-    theme: "modern"
-    position: "top"
----
-
-This document demonstrates the extension:
-
-:::: {.my-class}
-Content to be processed
-:::
 ```
 
 ## Distribution and Maintenance
