@@ -15,7 +15,7 @@
 <title>MCU</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.9.9</generator>
+<generator>quarto-1.9.10</generator>
 <lastBuildDate>Sat, 08 Nov 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions</title>
@@ -28,10 +28,30 @@
 
 
 
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="" width="600"></a></p>
+</figure>
+</div>
 <p>Quarto extensions represent one of the most powerful aspects of the publishing platform, allowing developers to extend core functionality far beyond what’s possible with configuration alone. Through extensions, you can add custom shortcodes for embedding interactive content, create filters that transform document structure, develop entirely new output formats, and integrate third-party libraries seamlessly into the rendering pipeline.</p>
 <p>Whether you’re building a simple shortcode to embed tweets, creating a sophisticated filter for academic citations, or developing a complete custom format for journal submissions, Lua serves as the extensibility layer that makes it all possible. The flexibility is remarkable: extensions can process the document’s abstract syntax tree (AST), inject CSS and JavaScript dependencies, generate format-specific output, and even interact with external systems during rendering.</p>
-<p>However, with this power comes opportunity. As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that’s maintainable, reliable, and accessible to the broader community. Drawing from patterns established in the Quarto core team’s extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.</p>
-<p><strong>A note on perspective</strong>: This guide presents opinionated recommendations based on patterns observed in successful Quarto extensions and general software development best practices. Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is choosing patterns that work for your specific context and maintaining consistency within your projects.</p>
+<div class="highlight">
+<p>With <strong>great power</strong> comes <strong>great responsibility</strong>.</p>
+</div>
+<p>As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that’s maintainable, reliable, and accessible to the broader community. Drawing from patterns established in Quarto’s extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This guide presents opinionated recommendations. Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is choosing patterns that work for your specific context and maintaining consistency within your projects.</p>
+</div>
+</div>
 <p>The difference between a working solution and a polished extension lies not just in functionality, but in attention to structure, error handling, documentation, and user experience. Well-crafted extensions anticipate edge cases, provide helpful error messages, support multiple output formats gracefully, and maintain backward compatibility as they evolve. They follow consistent patterns that make them easier to understand, modify, and debug.</p>
 <section id="the-foundation-structure-and-organisation" class="level2">
 <h2 class="anchored" data-anchor-id="the-foundation-structure-and-organisation">The Foundation: Structure and Organisation</h2>
@@ -49,10 +69,13 @@ It reduces cognitive load for contributors and makes debugging substantially eas
 <span id="cb1-8">        └── _modules/          # Shared utilities (personal convention)</span>
 <span id="cb1-9">            ├── utils.lua</span>
 <span id="cb1-10">            └── validation.lua</span></code></pre></div></div>
+<div class="highlight">
+<p>Use a dedicated <code>_modules/</code> directory for shared utility functions, following <strong>DRY</strong> principles whilst maintaining extension portability across different environments.</p>
+</div>
 <p>The <code>_modules</code> directory shown here represents a personal organisational convention rather than a Quarto requirement. This approach involves creating a dedicated folder for shared utility modules within each extension. Rather than copying utility functions between extensions or writing everything in a single file, this modular architecture follows the DRY (Don’t Repeat Yourself) principle whilst maintaining portability. You might prefer a different structure (such as <code>lib/</code>, <code>utils/</code>, or keeping everything in the main file), but the key principle remains: consistent organisation makes maintenance easier.</p>
 </section>
-<section id="module-loading-best-practices" class="level3">
-<h3 class="anchored" data-anchor-id="module-loading-best-practices">Module Loading Best Practices</h3>
+<section id="module-loading" class="level3">
+<h3 class="anchored" data-anchor-id="module-loading">Module Loading</h3>
 <p>When requiring modules in your extensions, consider using this robust path resolution pattern:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -390,123 +413,70 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 </section>
 <section id="parameter-scoping-to-avoid-conflicts" class="level3">
 <h3 class="anchored" data-anchor-id="parameter-scoping-to-avoid-conflicts">Parameter Scoping to Avoid Conflicts</h3>
-<p>To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension’s configuration parameters under your extension’s name in the document metadata.<br>
+<p>To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension’s configuration parameters under <code>extensions</code> and your extension’s name in the document metadata or in your project configuration (<em>i.e.</em>, <code>quarto.yml</code>).<br>
 This creates a clear namespace and prevents accidental collisions:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="pp" style="color: #AD0000;
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="document.qmd" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span></span>
-<span id="cb4-2"><span class="fu" style="color: #4758AB;
+<span id="cb4-2"><span class="an" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+font-style: inherit;">title:</span><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"My Document"</span></span>
+font-style: inherit;"> "My Document"</span></span>
 <span id="cb4-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Recommended: Scoped under extensions namespace</span></span>
-<span id="cb4-4"><span class="fu" style="color: #4758AB;
+<span id="cb4-4"><span class="an" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">extensions</span><span class="kw" style="color: #003B4F;
+font-style: inherit;">extensions:</span></span>
+<span id="cb4-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb4-5"><span class="at" style="color: #657422;
+font-style: inherit;">  my-extension:</span></span>
+<span id="cb4-6"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+font-style: inherit;">    theme: "modern"</span></span>
+<span id="cb4-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">my-extension</span><span class="kw" style="color: #003B4F;
+font-style: inherit;">    colour: "#ff0000"</span></span>
+<span id="cb4-8"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb4-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"modern"</span></span>
-<span id="cb4-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">colour</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#ff0000"</span></span>
-<span id="cb4-8"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">position</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"top"</span></span>
+font-style: inherit;">    position: "top"</span></span>
 <span id="cb4-9"></span>
 <span id="cb4-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Consider avoiding: Top-level parameters that might conflict</span></span>
-<span id="cb4-11"><span class="fu" style="color: #4758AB;
+<span id="cb4-11"><span class="an" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
+font-style: inherit;">theme:</span><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
+font-style: inherit;"> "modern"      # Could conflict with Quarto's theme system</span></span>
+<span id="cb4-12"><span class="an" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
+font-style: inherit;">colour:</span><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">"modern"</span><span class="co" style="color: #5E5E5E;
+font-style: inherit;"> "#ff0000"    # Could conflict with other extensions</span></span>
+<span id="cb4-13"><span class="an" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">      # Could conflict with Quarto's theme system</span></span>
-<span id="cb4-12"><span class="fu" style="color: #4758AB;
+font-style: inherit;">position:</span><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">colour</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#ff0000"</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    # Could conflict with other extensions</span></span>
-<span id="cb4-13"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">position</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"top"</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">      # Too generic, high chance of conflicts</span></span>
-<span id="cb4-14"><span class="pp" style="color: #AD0000;
+font-style: inherit;"> "top"      # Too generic, high chance of conflicts</span></span>
+<span id="cb4-14"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span></span></code></pre></div></div>
+</div>
+<div class="highlight">
+<p>Always <strong>scope extension configuration</strong> under the <code>extensions</code> namespace to <strong>prevent conflicts</strong> with Quarto CLI options and other extensions in the ecosystem.</p>
+</div>
 <p>When accessing these scoped parameters in your Lua code:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb5-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-annotation-code code-with-copy code-annotated"><code class="sourceCode lua"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
@@ -519,7 +489,7 @@ background-color: null;
 font-style: inherit;">meta</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-2">  <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-2">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -533,7 +503,7 @@ background-color: null;
 font-style: inherit;">.</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">extensions</span></span>
-<span id="cb5-3">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-3">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
@@ -545,18 +515,18 @@ font-style: inherit;">extensions_config</span> <span class="cf" style="color: #0
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb5-4">    <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-4">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{}</span></span>
-<span id="cb5-5">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-5">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb5-6">  </span>
-<span id="cb5-7">  <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-6">  </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-7" class="code-annotation-target">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -572,7 +542,7 @@ background-color: null;
 font-style: inherit;">EXTENSION_NAME</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">]</span></span>
-<span id="cb5-8">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-8">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
@@ -584,18 +554,18 @@ font-style: inherit;">extension_config</span> <span class="cf" style="color: #00
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb5-9">    <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-9">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{}</span></span>
-<span id="cb5-10">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-10">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb5-11">  </span>
-<span id="cb5-12">  <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-11">  </span>
+<span id="annotated-cell-5-12">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -605,7 +575,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{}</span></span>
-<span id="cb5-13">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-13">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> <span class="va" style="color: #111111;
@@ -629,7 +599,7 @@ font-style: inherit;">)</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">do</span></span>
-<span id="cb5-14">    <span class="va" style="color: #111111;
+<span id="annotated-cell-5-14">    <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">options</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -654,22 +624,28 @@ background-color: null;
 font-style: inherit;">value</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-15">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-15">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb5-16">  </span>
-<span id="cb5-17">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-5-16">  </span>
+<span id="annotated-cell-5-17">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">options</span></span>
-<span id="cb5-18"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-18"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">end</span></span></code></pre></div></div>
+font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="7" data-code-annotation="1"><code>EXTENSION_NAME</code> should be a constant defined in your extension representing its name.</span>
+</dd>
+</dl>
 <p>This approach helps ensure your extension plays nicely with Quarto’s built-in options and other extensions whilst providing clear documentation for users about which parameters belong to your extension.</p>
 </section>
 <section id="input-validation" class="level3">
@@ -679,10 +655,10 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---Validate and process a theme option</span></span>
-<span id="cb6-2"><span class="co" style="color: #5E5E5E;
+<span id="cb5-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -693,14 +669,14 @@ background-color: null;
 font-style: italic;">theme_input</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> string Theme name provided by user</span></span>
-<span id="cb6-3"><span class="co" style="color: #5E5E5E;
+<span id="cb5-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@return</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> string Valid theme name</span></span>
-<span id="cb6-4"><span class="kw" style="color: #003B4F;
+<span id="cb5-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
@@ -713,7 +689,7 @@ background-color: null;
 font-style: inherit;">theme_input</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb6-5">  <span class="kw" style="color: #003B4F;
+<span id="cb5-5">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -739,8 +715,8 @@ background-color: null;
 font-style: inherit;">"classic"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb6-6">  </span>
-<span id="cb6-7">  <span class="cf" style="color: #003B4F;
+<span id="cb5-6">  </span>
+<span id="cb5-7">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
@@ -752,7 +728,7 @@ font-style: inherit;">theme_input</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb6-8">    <span class="va" style="color: #111111;
+<span id="cb5-8">    <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -767,21 +743,21 @@ background-color: null;
 font-style: inherit;">"No theme specified, using default"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb6-9">    <span class="cf" style="color: #003B4F;
+<span id="cb5-9">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"light"</span></span>
-<span id="cb6-10">  <span class="cf" style="color: #003B4F;
+<span id="cb5-10">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb6-11">  </span>
-<span id="cb6-12">  <span class="co" style="color: #5E5E5E;
+<span id="cb5-11">  </span>
+<span id="cb5-12">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Check if theme is in our list of valid themes</span></span>
-<span id="cb6-13">  <span class="cf" style="color: #003B4F;
+<span id="cb5-13">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> <span class="va" style="color: #111111;
@@ -800,7 +776,7 @@ font-style: inherit;">valid_themes</span> <span class="cf" style="color: #003B4F
 background-color: null;
 font-weight: bold;
 font-style: inherit;">do</span></span>
-<span id="cb6-14">    <span class="cf" style="color: #003B4F;
+<span id="cb5-14">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="va" style="color: #111111;
@@ -819,22 +795,22 @@ font-style: inherit;">theme_input</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb6-15">      <span class="cf" style="color: #003B4F;
+<span id="cb5-15">      <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">theme_input</span></span>
-<span id="cb6-16">    <span class="cf" style="color: #003B4F;
+<span id="cb5-16">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb6-17">  <span class="cf" style="color: #003B4F;
+<span id="cb5-17">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb6-18">  </span>
-<span id="cb6-19">  <span class="va" style="color: #111111;
+<span id="cb5-18">  </span>
+<span id="cb5-19">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -857,13 +833,13 @@ background-color: null;
 font-style: inherit;">". Valid options: light, dark, modern, classic"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb6-20">  <span class="cf" style="color: #003B4F;
+<span id="cb5-20">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"light"</span></span>
-<span id="cb6-21"><span class="kw" style="color: #003B4F;
+<span id="cb5-21"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span></code></pre></div></div>
@@ -874,16 +850,16 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 <h2 class="anchored" data-anchor-id="documentation-as-code">Documentation as Code</h2>
 <section id="luadoc-annotations" class="level3">
 <h3 class="anchored" data-anchor-id="luadoc-annotations">LuaDoc Annotations</h3>
-<p>Well-crafted extensions benefit from comprehensive LuaDoc annotations.<br>
+<p>Well-crafted extensions benefit from comprehensive <a href="https://keplerproject.github.io/luadoc/">LuaDoc</a> annotations.<br>
 These aren’t just comments. They enable IDE features, catch type errors early, and serve as living documentation:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---Processes a div element and adds custom styling</span></span>
-<span id="cb7-2"><span class="co" style="color: #5E5E5E;
+<span id="cb6-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -894,7 +870,7 @@ background-color: null;
 font-style: italic;">div</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> Div The Pandoc div element to process</span></span>
-<span id="cb7-3"><span class="co" style="color: #5E5E5E;
+<span id="cb6-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -905,14 +881,14 @@ background-color: null;
 font-style: italic;">options</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> table Configuration options</span></span>
-<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+<span id="cb6-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">@return</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> Div|Null Modified div or null if processing failed</span></span>
-<span id="cb7-5"><span class="kw" style="color: #003B4F;
+<span id="cb6-5"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
@@ -929,18 +905,18 @@ background-color: null;
 font-style: inherit;">options</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb7-6">  <span class="co" style="color: #5E5E5E;
+<span id="cb6-6">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Implementation here</span></span>
-<span id="cb7-7"><span class="kw" style="color: #003B4F;
+<span id="cb6-7"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb7-8"></span>
-<span id="cb7-9"><span class="co" style="color: #5E5E5E;
+<span id="cb6-8"></span>
+<span id="cb6-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---Configuration options for the extension</span></span>
-<span id="cb7-10"><span class="co" style="color: #5E5E5E;
+<span id="cb6-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -955,7 +931,7 @@ font-style: inherit;">, any</span><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">&gt;</span></span>
-<span id="cb7-11"><span class="kw" style="color: #003B4F;
+<span id="cb6-11"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -965,7 +941,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb7-12">  <span class="va" style="color: #111111;
+<span id="cb6-12">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">style</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -974,16 +950,19 @@ background-color: null;
 font-style: inherit;">'default'</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb7-13">  <span class="va" style="color: #111111;
+<span id="cb6-13">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">position</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'top'</span></span>
-<span id="cb7-14"><span class="op" style="color: #5E5E5E;
+<span id="cb6-14"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span></code></pre></div></div>
+</div>
+<div class="highlight">
+<p>Comprehensive <strong>LuaDoc annotations</strong> with <code>@param</code>, <code>@return</code>, and <code>@type</code> enable IDE features, type checking, and serve as <strong>living documentation</strong> that evolves with your code.</p>
 </div>
 <p>Modern development environments like VS Code with the Lua Language Server extension use these annotations to provide intelligent autocomplete, type checking, and hover documentation.</p>
 </section>
@@ -994,20 +973,20 @@ font-style: inherit;">}</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--[[</span></span>
-<span id="cb8-2"><span class="co" style="color: #5E5E5E;
+<span id="cb7-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">MIT License header</span></span>
-<span id="cb8-3"><span class="co" style="color: #5E5E5E;
+font-style: inherit;">License header</span></span>
+<span id="cb7-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">]]</span></span>
-<span id="cb8-4"></span>
-<span id="cb8-5"><span class="co" style="color: #5E5E5E;
+<span id="cb7-4"></span>
+<span id="cb7-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--- Extension name constant</span></span>
-<span id="cb8-6"><span class="kw" style="color: #003B4F;
+<span id="cb7-6"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="cn" style="color: #8f5902;
@@ -1017,18 +996,18 @@ background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"my-extension"</span></span>
-<span id="cb8-7"></span>
-<span id="cb8-8"><span class="co" style="color: #5E5E5E;
+<span id="cb7-7"></span>
+<span id="cb7-8"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--- Load required modules</span></span>
-<span id="cb8-9"><span class="co" style="color: #5E5E5E;
+<span id="cb7-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Module loading here</span></span>
-<span id="cb8-10"></span>
-<span id="cb8-11"><span class="co" style="color: #5E5E5E;
+<span id="cb7-10"></span>
+<span id="cb7-11"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">--- Module-level constants</span></span>
-<span id="cb8-12"><span class="kw" style="color: #003B4F;
+font-style: inherit;">--- Filter/Shortcode constants</span></span>
+<span id="cb7-12"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="cn" style="color: #8f5902;
@@ -1038,11 +1017,11 @@ background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'light'</span></span>
-<span id="cb8-13"></span>
-<span id="cb8-14"><span class="co" style="color: #5E5E5E;
+<span id="cb7-13"></span>
+<span id="cb7-14"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">--- Module-level variables</span></span>
-<span id="cb8-15"><span class="kw" style="color: #003B4F;
+font-style: inherit;">--- Filter/Shortcode variables</span></span>
+<span id="cb7-15"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -1053,25 +1032,25 @@ font-style: inherit;">=</span> <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">false</span></span>
-<span id="cb8-16"></span>
-<span id="cb8-17"><span class="co" style="color: #5E5E5E;
+<span id="cb7-16"></span>
+<span id="cb7-17"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--- Private helper functions</span></span>
-<span id="cb8-18"><span class="co" style="color: #5E5E5E;
+<span id="cb7-18"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Internal functions here</span></span>
-<span id="cb8-19"></span>
-<span id="cb8-20"><span class="co" style="color: #5E5E5E;
+<span id="cb7-19"></span>
+<span id="cb7-20"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--- Public API functions</span></span>
-<span id="cb8-21"><span class="co" style="color: #5E5E5E;
+<span id="cb7-21"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Main extension logic here</span></span>
-<span id="cb8-22"></span>
-<span id="cb8-23"><span class="co" style="color: #5E5E5E;
+<span id="cb7-22"></span>
+<span id="cb7-23"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--- Extension registration</span></span>
-<span id="cb8-24"><span class="co" style="color: #5E5E5E;
+<span id="cb7-24"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Return statement here</span></span></code></pre></div></div>
 </div>
@@ -1088,10 +1067,10 @@ Consider checking for unsupported formats and returning <code>pandoc.Null()</cod
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Check format compatibility first</span></span>
-<span id="cb9-2"><span class="cf" style="color: #003B4F;
+<span id="cb8-2"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
@@ -1115,7 +1094,7 @@ font-style: inherit;">)</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb9-3">  <span class="cf" style="color: #003B4F;
+<span id="cb8-3">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
@@ -1125,7 +1104,7 @@ background-color: null;
 font-style: inherit;">.</span>Null<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">()</span></span>
-<span id="cb9-4"><span class="cf" style="color: #003B4F;
+<span id="cb8-4"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span></code></pre></div></div>
@@ -1135,7 +1114,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb10-1"><span class="cf" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb9-1"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="va" style="color: #111111;
@@ -1156,7 +1135,7 @@ font-style: inherit;">)</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb10-2">  <span class="cf" style="color: #003B4F;
+<span id="cb9-2">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
@@ -1174,7 +1153,7 @@ background-color: null;
 font-style: inherit;">html_output</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb10-3"><span class="cf" style="color: #003B4F;
+<span id="cb9-3"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">elseif</span> <span class="va" style="color: #111111;
@@ -1195,7 +1174,7 @@ font-style: inherit;">)</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb10-4">  <span class="cf" style="color: #003B4F;
+<span id="cb9-4">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
@@ -1213,14 +1192,14 @@ background-color: null;
 font-style: inherit;">latex_output</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb10-5"><span class="cf" style="color: #003B4F;
+<span id="cb9-5"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span></span>
-<span id="cb10-6">  <span class="co" style="color: #5E5E5E;
+<span id="cb9-6">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Unsupported format - fail gracefully</span></span>
-<span id="cb10-7">  <span class="cf" style="color: #003B4F;
+<span id="cb9-7">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
@@ -1230,10 +1209,13 @@ background-color: null;
 font-style: inherit;">.</span>Null<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">()</span></span>
-<span id="cb10-8"><span class="cf" style="color: #003B4F;
+<span id="cb9-8"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span></code></pre></div></div>
+</div>
+<div class="highlight">
+<p><strong>Check format compatibility</strong> with <code>quarto.doc.is_format()</code> and return <code>pandoc.Null()</code> for unsupported formats <strong>rather than throwing errors</strong> that break the rendering process.</p>
 </div>
 </section>
 <section id="informative-logging" class="level3">
@@ -1244,10 +1226,10 @@ The <code>quarto.log</code> module supports different log levels and can be acti
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- For debugging during development</span></span>
-<span id="cb11-2"><span class="va" style="color: #111111;
+<span id="cb10-2"><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1266,11 +1248,11 @@ background-color: null;
 font-style: inherit;">element</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb11-3"></span>
-<span id="cb11-4"><span class="co" style="color: #5E5E5E;
+<span id="cb10-3"></span>
+<span id="cb10-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- For user-facing warnings</span></span>
-<span id="cb11-5"><span class="va" style="color: #111111;
+<span id="cb10-5"><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1285,11 +1267,11 @@ background-color: null;
 font-style: inherit;">"Deprecated configuration detected. Please update your settings."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb11-6"></span>
-<span id="cb11-7"><span class="co" style="color: #5E5E5E;
+<span id="cb10-6"></span>
+<span id="cb10-7"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- For error conditions</span></span>
-<span id="cb11-8"><span class="va" style="color: #111111;
+<span id="cb10-8"><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1310,10 +1292,10 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---Log an error message with extension context</span></span>
-<span id="cb12-2"><span class="co" style="color: #5E5E5E;
+<span id="cb11-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -1324,7 +1306,7 @@ background-color: null;
 font-style: italic;">extension_name</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> string Name of the extension</span></span>
-<span id="cb12-3"><span class="co" style="color: #5E5E5E;
+<span id="cb11-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">---</span><span class="an" style="color: #5E5E5E;
 background-color: null;
@@ -1335,7 +1317,7 @@ background-color: null;
 font-style: italic;">message</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"> string Error message to log</span></span>
-<span id="cb12-4"><span class="kw" style="color: #003B4F;
+<span id="cb11-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
@@ -1352,7 +1334,7 @@ background-color: null;
 font-style: inherit;">message</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb12-5">  <span class="kw" style="color: #003B4F;
+<span id="cb11-5">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -1374,7 +1356,7 @@ background-color: null;
 font-style: inherit;">..</span> <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">message</span></span>
-<span id="cb12-6">  <span class="va" style="color: #111111;
+<span id="cb11-6">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1389,334 +1371,11 @@ background-color: null;
 font-style: inherit;">full_message</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb12-7"><span class="kw" style="color: #003B4F;
+<span id="cb11-7"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span></code></pre></div></div>
 </div>
-</section>
-</section>
-<section id="dependency-management" class="level2">
-<h2 class="anchored" data-anchor-id="dependency-management">Dependency Management</h2>
-<section id="lazy-loading" class="level3">
-<h3 class="anchored" data-anchor-id="lazy-loading">Lazy Loading</h3>
-<p>Consider loading modules and dependencies only when actually needed:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-- Don't load heavy modules at the top level</span></span>
-<span id="cb13-2"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">local</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">colour_utils</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">nil</span></span>
-<span id="cb13-3"></span>
-<span id="cb13-4"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span> get_colour_utils<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">()</span></span>
-<span id="cb13-5">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">not</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">colour_utils</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">then</span></span>
-<span id="cb13-6">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">local</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">path</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">utils</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>resolve_path<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"_modules/colour.lua"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb13-7">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">local</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">clean_path</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">path</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">gsub</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"%.lua$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb13-8">    <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">colour_utils</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">require</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">clean_path</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb13-9">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">end</span></span>
-<span id="cb13-10">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">return</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">colour_utils</span></span>
-<span id="cb13-11"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">end</span></span></code></pre></div></div>
-</div>
-</section>
-</section>
-<section id="testing-and-development-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="testing-and-development-workflow">Testing and Development Workflow</h2>
-<section id="development-environment" class="level3">
-<h3 class="anchored" data-anchor-id="development-environment">Development Environment</h3>
-<p>Setting up your development environment with proper tooling can be very helpful.<br>
-The <code>.luarc.json</code> file in your project root enables type checking and autocomplete<sup>1</sup>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">{</span></span>
-<span id="cb14-2">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Generator"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">[</span></span>
-<span id="cb14-3">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Quarto"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-4">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"This file provides type information for Lua completion and diagnostics."</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-5">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Quarto will automatically update this file to reflect the current path"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-6">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"of your Quarto installation, and the file will also be added to .gitignore"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-7">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"since it points to the absolute path of Quarto on the local system."</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-8">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Remove the 'Generator' key to manage this file's contents manually."</span></span>
-<span id="cb14-9">  <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">]</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-10">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.runtime.version"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Lua 5.3"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-11">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.workspace.checkThirdParty"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">false</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-12">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.workspace.library"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">[</span></span>
-<span id="cb14-13">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-types"</span></span>
-<span id="cb14-14">  <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">]</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-15">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.runtime.plugin"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/Users/mcanouil/Projects/quarto-dev/quarto-cli/src/resources/lua-plugin/plugin.lua"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-16">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.completion.showWord"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Disable"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-17">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.completion.keywordSnippet"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Both"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-18">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.diagnostics.disable"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">[</span></span>
-<span id="cb14-19">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lowercase-global"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-20">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"trailing-space"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-21">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"luadoc-miss-module-name"</span></span>
-<span id="cb14-22">  <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">]</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-23">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">"Lua.workspace.ignoreDir"</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">:</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">[</span></span>
-<span id="cb14-24">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">".quarto"</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb14-25">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">".venv"</span></span>
-<span id="cb14-26">  <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">]</span></span>
-<span id="cb14-27"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">}</span></span></code></pre></div></div>
-</section>
-<section id="example-driven-development" class="level3">
-<h3 class="anchored" data-anchor-id="example-driven-development">Example-Driven Development</h3>
-<p>Including working examples in your extension is highly recommended. The <code>example.qmd</code> file serves multiple purposes:</p>
-<ul>
-<li><strong>Documentation</strong>: Shows users how to use your extension.</li>
-<li><strong>Testing</strong>: Provides a quick way to verify functionality.</li>
-<li><strong>Development</strong>: Enables rapid iteration with <code>quarto preview</code>.</li>
-</ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">---</span></span>
-<span id="cb15-2"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">title:</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"> "My Extension Example"</span></span>
-<span id="cb15-3"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">filters:</span></span>
-<span id="cb15-4"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  - my-extension</span></span>
-<span id="cb15-5"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">extensions:</span></span>
-<span id="cb15-6"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  my-extension:</span></span>
-<span id="cb15-7"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    theme: "modern"</span></span>
-<span id="cb15-8"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    position: "top"</span></span>
-<span id="cb15-9"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">---</span></span>
-<span id="cb15-10"></span>
-<span id="cb15-11">This document demonstrates the extension:</span>
-<span id="cb15-12"></span>
-<span id="cb15-13">:::: {.my-class}</span>
-<span id="cb15-14">Content to be processed</span>
-<span id="cb15-15">:::</span></code></pre></div></div>
 </section>
 </section>
 <section id="distribution-and-maintenance" class="level2">
@@ -1724,10 +1383,11 @@ font-style: inherit;">---</span></span>
 <section id="semantic-versioning" class="level3">
 <h3 class="anchored" data-anchor-id="semantic-versioning">Semantic Versioning</h3>
 <p>Using semantic versioning for your extensions helps maintain backward compatibility:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># _extension.yml</span></span>
-<span id="cb16-2"><span class="fu" style="color: #4758AB;
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="_extension.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -1735,7 +1395,7 @@ font-weight: bold;
 font-style: inherit;">:</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> My Extension</span></span>
-<span id="cb16-3"><span class="fu" style="color: #4758AB;
+<span id="cb12-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -1745,7 +1405,7 @@ background-color: null;
 font-style: inherit;"> </span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1.2.0</span></span>
-<span id="cb16-4"><span class="fu" style="color: #4758AB;
+<span id="cb12-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">quarto-required</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -1755,6 +1415,7 @@ background-color: null;
 font-style: inherit;"> </span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"&gt;=1.2.0"</span></span></code></pre></div></div>
+</div>
 </section>
 <section id="deprecation-handling" class="level3">
 <h3 class="anchored" data-anchor-id="deprecation-handling">Deprecation Handling</h3>
@@ -1763,7 +1424,7 @@ font-style: inherit;">"&gt;=1.2.0"</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>Lua</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb17-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="Lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb13-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="kw" style="color: #003B4F;
@@ -1776,7 +1437,7 @@ background-color: null;
 font-style: inherit;">meta</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb17-2">  <span class="cf" style="color: #003B4F;
+<span id="cb13-2">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> <span class="va" style="color: #111111;
@@ -1791,7 +1452,7 @@ font-style: inherit;">]</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">then</span></span>
-<span id="cb17-3">    <span class="va" style="color: #111111;
+<span id="cb13-3">    <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1806,10 +1467,10 @@ background-color: null;
 font-style: inherit;">"'old-option' is deprecated. Use 'new-option' instead."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb17-4">    <span class="co" style="color: #5E5E5E;
+<span id="cb13-4">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Still process the old option for compatibility</span></span>
-<span id="cb17-5">    <span class="cf" style="color: #003B4F;
+<span id="cb13-5">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="va" style="color: #111111;
@@ -1831,18 +1492,18 @@ background-color: null;
 font-style: inherit;">'old-option'</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">])</span></span>
-<span id="cb17-6">  <span class="cf" style="color: #003B4F;
+<span id="cb13-6">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span>
-<span id="cb17-7">  <span class="cf" style="color: #003B4F;
+<span id="cb13-7">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">nil</span></span>
-<span id="cb17-8"><span class="kw" style="color: #003B4F;
+<span id="cb13-8"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">end</span></span></code></pre></div></div>
@@ -1851,10 +1512,13 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Building solid Quarto extensions is a journey of continuous improvement. Start with working code and gradually enhance structure, documentation, error handling, and user experience. The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in successful extensions and general software development principles.</p>
+<p>Building solid Quarto extensions is a journey of continuous improvement. Start with working code and gradually enhance structure, documentation, error handling, and user experience. The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in extensions and general software development principles.</p>
 <p>Remember that these are recommendations rather than rigid rules. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is finding patterns that work for your specific context and maintaining consistency within your projects.</p>
 <p>Whether you’re enhancing a simple shortcode or expanding a complex multi-format filter, investing in clarity, documentation, and robust error handling pays dividends as your extension grows and finds new users. Good code is written for humans first, computers second.</p>
-<p>Finally, consider tagging and releasing your extensions using semantic versioning. Creating releases not only provides users with stable versions to reference but also enables powerful tooling like Quarto Wizard’s update feature to automatically manage extension lifecycles. With proper releases, users can easily discover when updates are available, understand what’s changed through release notes, and confidently upgrade their extensions knowing they’re moving to a tested, stable version. This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.</p>
+<div class="highlight">
+<p><strong>Proper releases</strong> with semantic versioning enable tools like <strong>Quarto Wizard’s automatic update detection</strong> for seamless extension maintenance.</p>
+</div>
+<p>Finally, consider tagging and releasing your extensions using semantic versioning. Creating releases not only provides users with stable versions to reference but also enables powerful tooling like <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>’s update feature to automatically manage extension lifecycles. With proper releases, users can easily discover when updates are available, understand what’s changed through release notes, and confidently upgrade their extensions knowing they’re moving to a tested, stable version. This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.</p>
 <p><em>Happy extending!</em></p>
 </section>
 <section id="resources-and-further-reading" class="level2">
@@ -1871,13 +1535,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
 
 </section>
 
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>See <a href="https://quarto.org/docs/extensions/lua.html#lua-in-vs-code">Lua in VS Code</a> documentation for more details.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
   <category>quarto</category>
   <category>extensions</category>
   <category>productivity</category>
@@ -1885,7 +1543,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
   <category>lua</category>
   <guid>https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/</guid>
   <pubDate>Sat, 08 Nov 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/featured.png" medium="image" type="image/png"/>
+  <media:content url="https://mickael.canouil.fr/posts/2025-11-08-quarto-extensions-lua/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
   <title>Quarto Wizard 1.0.0: Democratising Quarto Extension Management</title>
