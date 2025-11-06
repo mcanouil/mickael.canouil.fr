@@ -1,0 +1,404 @@
+---
+title: "Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions"
+description: |
+  This guide explores essential practices drawn from Quarto's extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.
+date: "2025-11-06"
+categories:
+  - quarto
+  - extensions
+  - productivity
+  - best practices
+  - lua
+image: featured.png
+image-alt: "Quarto logo and Lua programming language logo separated by diagonal line with a gradient."
+lang: en-GB
+number-sections: false
+link-external-newwindow: true
+lightbox: true
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+Quarto extensions represent one of the most powerful aspects of the publishing platform, allowing developers to extend core functionality far beyond what's possible with configuration alone.
+Through extensions, you can add custom shortcodes for embedding interactive content, create filters that transform document structure, develop entirely new output formats, and integrate third-party libraries seamlessly into the rendering pipeline.
+
+Whether you're building a simple shortcode to embed tweets, creating a sophisticated filter for academic citations, or developing a complete custom format for journal submissions, Lua serves as the extensibility layer that makes it all possible.
+The flexibility is remarkable: extensions can process the document's abstract syntax tree (AST), inject CSS and JavaScript dependencies, generate format-specific output, and even interact with external systems during rendering.
+
+:::: {.highlight}
+
+With **great power** comes **great responsibility**.
+
+:::
+
+As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that's maintainable, reliable, and accessible to the broader community.
+Drawing from patterns established in Quarto's extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.
+
+:::: {.callout-note}
+
+This guide presents opinionated recommendations.
+Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements.
+Quarto's flexibility means there are often multiple valid approaches to solving the same problem.
+The key is choosing patterns that work for your specific context and maintaining consistency within your projects.
+
+:::
+
+The difference between a working solution and a polished extension lies not just in functionality, but in attention to structure, error handling, documentation, and user experience.
+Well-crafted extensions anticipate edge cases, provide helpful error messages, support multiple output formats gracefully, and maintain backward compatibility as they evolve.
+They follow consistent patterns that make them easier to understand, modify, and debug.
+
+## The Foundation: Structure and Organisation
+
+### Consistent Project Structure
+
+Every well-built Quarto extension benefits from a predictable structure.
+This consistency isn't just aesthetic.  
+It reduces cognitive load for contributors and makes debugging substantially easier:
+
+```txt
+my-extension/
+├── README.md
+├── example.qmd
+└── _extensions/
+    └── my-extension/
+        ├── _extension.yml
+        ├── my-extension.lua
+        └── _modules/          # Shared utilities (personal convention)
+            ├── utils.lua
+            └── validation.lua
+```
+
+:::: {.highlight}
+
+Use a dedicated `_modules/` directory for shared utility functions, following **DRY** principles whilst maintaining extension portability across different environments.
+
+:::
+
+The `_modules` directory shown here represents a personal organisational convention rather than a Quarto requirement.
+This approach involves creating a dedicated folder for shared utility modules within each extension.
+Rather than copying utility functions between extensions or writing everything in a single file, this modular architecture follows the DRY (Don't Repeat Yourself) principle whilst maintaining portability.
+You might prefer a different structure (such as `lib/`, `utils/`, or keeping everything in the main file), but the key principle remains: consistent organisation makes maintenance easier.
+
+### Module Loading
+
+When requiring modules in your extensions, consider using this robust path resolution pattern:
+
+```{.lua filename="Lua"}
+--- Load required modules
+local utils = require(quarto.utils.resolve_path("_modules/utils.lua"):gsub("%.lua$", ""))
+local validation = require(quarto.utils.resolve_path("_modules/validation.lua"):gsub("%.lua$", ""))
+```
+
+This pattern ensures modules load correctly regardless of the execution context and handles path resolution gracefully across different operating systems.  
+If you choose a different directory structure, simply adjust the path accordingly.
+
+## Configuration and Validation
+
+### Configuration Hierarchy
+
+Implementing a consistent configuration hierarchy can provide flexibility whilst maintaining predictable behaviour.  
+One effective pattern is: arguments, then metadata, then defaults:
+
+```{.lua filename="Lua"}
+---Get configuration options with proper fallback hierarchy
+---@param args table Command line arguments
+---@param meta table Document metadata
+---@param defaults table Default configuration
+---@return table Resolved configuration
+local function get_options(args, meta, defaults)
+  local options = {}
+  
+  -- Start with defaults
+  for key, value in pairs(defaults) do
+    options[key] = value
+  end
+  
+  -- Override with metadata if present
+  if meta[key] then
+    options[key] = pandoc.utils.stringify(meta[key])
+  end
+  
+  -- Override with arguments if present (highest priority)
+  if args[key] then
+    options[key] = pandoc.utils.stringify(args[key])
+  end
+  
+  return options
+end
+```
+
+### Parameter Scoping to Avoid Conflicts
+
+To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension's configuration parameters under `extensions` and your extension's name in the document metadata or in your project configuration (*i.e.*, `quarto.yml`).  
+This creates a clear namespace and prevents accidental collisions:
+
+```{.markdown filename="document.qmd"}
+---
+title: "My Document"
+# Recommended: Scoped under extensions namespace
+extensions:
+  my-extension:
+    theme: "modern"
+    colour: "#ff0000"
+    position: "top"
+
+# Consider avoiding: Top-level parameters that might conflict
+theme: "modern"      # Could conflict with Quarto's theme system
+colour: "#ff0000"    # Could conflict with other extensions
+position: "top"      # Too generic, high chance of conflicts
+---
+```
+
+:::: {.highlight}
+
+Always **scope extension configuration** under the `extensions` namespace to **prevent conflicts** with Quarto CLI options and other extensions in the ecosystem.
+
+:::
+
+When accessing these scoped parameters in your Lua code:
+
+```{.lua filename="Lua"}
+local function get_extension_options(meta)
+  local extensions_config = meta.extensions
+  if not extensions_config then
+    return {}
+  end
+  
+  local extension_config = extensions_config[EXTENSION_NAME] -- <1>
+  if not extension_config then
+    return {}
+  end
+  
+  local options = {}
+  for key, value in pairs(extension_config) do
+    options[key] = pandoc.utils.stringify(value)
+  end
+  
+  return options
+end
+```
+
+1. `EXTENSION_NAME` should be a constant defined in your extension representing its name.
+
+This approach helps ensure your extension plays nicely with Quarto's built-in options and other extensions whilst providing clear documentation for users about which parameters belong to your extension.
+
+### Input Validation
+
+Consider validating user inputs and providing helpful error messages:
+
+```{.lua filename="Lua"}
+---Validate and process a theme option
+---@param theme_input string Theme name provided by user
+---@return string Valid theme name
+local function process_theme_option(theme_input)
+  local valid_themes = {"light", "dark", "modern", "classic"}
+  
+  if not theme_input then
+    quarto.log.warning("No theme specified, using default")
+    return "light"
+  end
+  
+  -- Check if theme is in our list of valid themes
+  for i = 1, #valid_themes do
+    if valid_themes[i] == theme_input then
+      return theme_input
+    end
+  end
+  
+  quarto.log.error("Invalid theme: " .. theme_input .. ". Valid options: light, dark, modern, classic")
+  return "light"
+end
+```
+
+## Documentation as Code
+
+### LuaDoc Annotations
+
+Well-crafted extensions benefit from comprehensive [LuaDoc](https://keplerproject.github.io/luadoc/) annotations.  
+These aren't just comments. They enable IDE features, catch type errors early, and serve as living documentation:
+
+```{.lua filename="Lua"}
+---Processes a div element and adds custom styling
+---@param div Div The Pandoc div element to process
+---@param options table Configuration options
+---@return Div|Null Modified div or null if processing failed
+local function process_div(div, options)
+  -- Implementation here
+end
+
+---Configuration options for the extension
+---@type table<string, any>
+local default_options = {
+  style = 'default',
+  position = 'top'
+}
+```
+
+:::: {.highlight}
+
+Comprehensive **LuaDoc annotations** with `@param`, `@return`, and `@type` enable IDE features, type checking, and serve as **living documentation** that evolves with your code.
+
+:::
+
+Modern development environments like VS Code with the Lua Language Server extension use these annotations to provide intelligent autocomplete, type checking, and hover documentation.
+
+### Structured Code Organisation
+
+Organising your code with clear section dividers and consistent ordering can improve maintainability:
+
+```{.lua filename="Lua"}
+--[[
+License header
+]]
+
+--- Extension name constant
+local EXTENSION_NAME = "my-extension"
+
+--- Load required modules
+-- Module loading here
+
+--- Filter/Shortcode constants
+local DEFAULT_THEME = 'light'
+
+--- Filter/Shortcode variables
+local dependency_added = false
+
+--- Private helper functions
+-- Internal functions here
+
+--- Public API functions
+-- Main extension logic here
+
+--- Extension registration
+-- Return statement here
+```
+
+This structure makes it easier to navigate large extension files and understand the code's organisation at a glance.
+
+## Error Handling and Logging
+
+### Graceful Degradation
+
+Robust extensions handle unexpected situations elegantly.  
+Consider checking for unsupported formats and returning `pandoc.Null()` rather than throwing errors:
+
+```{.lua filename="Lua"}
+-- Check format compatibility first
+if not quarto.doc.is_format("html:js") then
+  return pandoc.Null()
+end
+```
+
+For extensions that support multiple formats, provide appropriate implementations for each:
+
+```{.lua filename="Lua"}
+if quarto.doc.is_format("html") then
+  return pandoc.RawInline('html', html_output)
+elseif quarto.doc.is_format("latex") then
+  return pandoc.RawInline('latex', latex_output)
+else
+  -- Unsupported format - fail gracefully
+  return pandoc.Null()
+end
+```
+
+:::: {.highlight}
+
+**Check format compatibility** with `quarto.doc.is_format()` and return `pandoc.Null()` for unsupported formats **rather than throwing errors** that break the rendering process.
+
+:::
+
+### Informative Logging
+
+Using Quarto's logging facilities can provide helpful feedback.  
+The `quarto.log` module supports different log levels and can be activated with the `--trace` flag:
+
+```{.lua filename="Lua"}
+-- For debugging during development
+quarto.log.output("Processing element:", element)
+
+-- For user-facing warnings
+quarto.log.warning("Deprecated configuration detected. Please update your settings.")
+
+-- For error conditions
+quarto.log.error("Required dependency not found. Extension cannot proceed.")
+```
+
+When using shared utility modules, establishing consistent logging patterns can be helpful:
+
+```{.lua filename="Lua"}
+---Log an error message with extension context
+---@param extension_name string Name of the extension
+---@param message string Error message to log
+local function log_error(extension_name, message)
+  local full_message = "[" .. extension_name .. "] " .. message
+  quarto.log.error(full_message)
+end
+```
+
+## Distribution and Maintenance
+
+### Semantic Versioning
+
+Using semantic versioning for your extensions helps maintain backward compatibility:
+
+```{.yaml filename="_extension.yml"}
+title: My Extension
+version: 1.2.0
+quarto-required: ">=1.2.0"
+```
+
+### Deprecation Handling
+
+When changing extension interfaces, providing deprecation warnings helps users transition smoothly:
+```{.lua filename="Lua"}
+local function handle_deprecated_config(meta)
+  if meta['old-option'] then
+    quarto.log.warning("'old-option' is deprecated. Use 'new-option' instead.")
+    -- Still process the old option for compatibility
+    return pandoc.utils.stringify(meta['old-option'])
+  end
+  return nil
+end
+```
+
+## Conclusion
+
+Building solid Quarto extensions is a journey of continuous improvement.
+Start with working code and gradually enhance structure, documentation, error handling, and user experience.
+The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in extensions and general software development principles.
+
+Remember that these are recommendations rather than rigid rules.
+Quarto's flexibility means there are often multiple valid approaches to solving the same problem.
+The key is finding patterns that work for your specific context and maintaining consistency within your projects.
+
+Whether you're enhancing a simple shortcode or expanding a complex multi-format filter, investing in clarity, documentation, and robust error handling pays dividends as your extension grows and finds new users.
+Good code is written for humans first, computers second.
+
+:::: {.highlight}
+
+**Proper releases** with semantic versioning enable tools like **Quarto Wizard's automatic update detection** for seamless extension maintenance.
+
+:::
+
+Finally, consider tagging and releasing your extensions using semantic versioning.
+Creating releases not only provides users with stable versions to reference but also enables powerful tooling like [Quarto Wizard](https://github.com/mcanouil/quarto-wizard)'s update feature to automatically manage extension lifecycles.
+With proper releases, users can easily discover when updates are available, understand what's changed through release notes, and confidently upgrade their extensions knowing they're moving to a tested, stable version.
+This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.
+
+*Happy extending!*
+
+## Resources and Further Reading
+
+- **[Creating Extensions](https://quarto.org/docs/extensions/creating.html)** - Official Quarto guide to building extensions.
+- **[Lua Development](https://quarto.org/docs/extensions/lua.html)** - Getting started with Lua for Quarto extensions.
+- **[Writing Lua Filters](https://pandoc.org/lua-filters.html)** - Pandoc's official Lua filter documentation.
+- **[LuaDoc](https://keplerproject.github.io/luadoc/)** - Documentation generation tool for Lua code.
+- **[Learn Lua in 15 Minutes](https://tylerneylon.com/a/learn-lua/)** - Quick introduction to Lua syntax and concepts.
+- **[Quarto Wizard](https://github.com/mcanouil/quarto-wizard)** - Tool for managing and updating Quarto extensions.
