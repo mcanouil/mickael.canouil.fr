@@ -15,7 +15,7 @@
 <title>MCU</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.9.10</generator>
+<generator>quarto-1.9.12</generator>
 <lastBuildDate>Thu, 06 Nov 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions</title>
@@ -2497,7 +2497,22 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
   <title>Quarto: Unleash Dynamic Tabset Navigation &amp; Polished PDF Exports</title>
   <dc:creator>Mickaël CANOUIL, _Ph.D._</dc:creator>
   <link>https://mickael.canouil.fr/posts/2025-04-21-quarto-revealjs-tabset-pdf/</link>
-  <description><![CDATA[ <section id="introduction" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="introduction">
+  <description><![CDATA[ <div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The JavaScript solution presented in this post was updated on November 15, 2025, to enhance compatibility with nested fragments inside tabsets.</p>
+<p>It also now supports the native PDF export functionality to export tabsets correctly without needing to use the <code>decktape</code> tool.<br>
+This, however, requires to enable the “PDF separate fragments” option from Reveal.js.</p>
+</div>
+</div>
+<section id="introduction" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="introduction">
 <span class="header-section-number">1</span> Introduction</h2>
 <p>Creating presentations with Quarto’s Reveal.js format comes with great flexibility, but navigating tabsets and exporting polished PDFs can be challenging.</p>
 <p>In this post, you’ll learn how to streamline these tasks, making your workflow smoother and ensuring your slides are both interactive and well-formatted for sharing. With the right techniques, you can:</p>
@@ -2646,10 +2661,86 @@ font-style: inherit;"> id</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"panel-tabset-fragments"</span><span class="dt" style="color: #AD0000;
+font-style: inherit;">"panel-tabset-pdf-export"</span><span class="dt" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">&gt;</span></span>
-<span id="cb4-26">  Reveal<span class="op" style="color: #5E5E5E;
+<span id="cb4-26">  (<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> () {</span>
+<span id="cb4-27">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> TAB_SELECTOR <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ul.panel-tabset-tabby &gt; li"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-28">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> TAB_LINK_SELECTOR <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ul.panel-tabset-tabby &gt; li a"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-29"></span>
+<span id="cb4-30">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getTabPanes</span>(tabset) {</span>
+<span id="cb4-31">      <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabContent <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tabset<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">querySelector</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tab-content"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-32">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span> tabContent <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">?</span> tabContent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">children</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> []<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-33">    }</span>
+<span id="cb4-34"></span>
+<span id="cb4-35">    Reveal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">configure</span>({ <span class="dt" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">pdfSeparateFragments</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">false</span> })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-36"></span>
+<span id="cb4-37">    Reveal<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2661,7 +2752,7 @@ font-style: inherit;">,</span> <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span> () {</span>
-<span id="cb4-27">    <span class="kw" style="color: #003B4F;
+<span id="cb4-38">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabsetSlides <span class="op" style="color: #5E5E5E;
@@ -2677,7 +2768,7 @@ background-color: null;
 font-style: inherit;">".reveal .slides section .panel-tabset"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-28">    tabsetSlides<span class="op" style="color: #5E5E5E;
+<span id="cb4-39">      tabsetSlides<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2685,7 +2776,7 @@ font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">function</span> (tabset) {</span>
-<span id="cb4-29">      <span class="kw" style="color: #003B4F;
+<span id="cb4-40">        <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabCount <span class="op" style="color: #5E5E5E;
@@ -2694,16 +2785,49 @@ font-style: inherit;">=</span> tabset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ul.panel-tabset-tabby li"</span>)<span class="op" style="color: #5E5E5E;
+font-style: inherit;">querySelectorAll</span>(TAB_SELECTOR)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">length</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-30">      <span class="cf" style="color: #003B4F;
+<span id="cb4-41">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (tabCount <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-42"></span>
+<span id="cb4-43">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabPanes <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getTabPanes</span>(tabset)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-44">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> currentIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-45"></span>
+<span id="cb4-46">        <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> (<span class="kw" style="color: #003B4F;
@@ -2717,16 +2841,67 @@ font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span> i <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">&lt;</span> tabCount <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">&lt;</span> tabCount<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span> i<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">++</span>) {</span>
-<span id="cb4-31">        <span class="kw" style="color: #003B4F;
+<span id="cb4-47">          <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (tabPanes[i]) {</span>
+<span id="cb4-48">            <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> fragmentsInPane <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tabPanes[i]<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".fragment"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-49">            fragmentsInPane<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> (fragment) {</span>
+<span id="cb4-50">              fragment<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data-fragment-index"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> currentIndex)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-51">              currentIndex<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">++;</span></span>
+<span id="cb4-52">            })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-53">          }</span>
+<span id="cb4-54"></span>
+<span id="cb4-55">          <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (i <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> tabCount <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) {</span>
+<span id="cb4-56">            <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> fragmentDiv <span class="op" style="color: #5E5E5E;
@@ -2742,7 +2917,7 @@ background-color: null;
 font-style: inherit;">"div"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-32">        fragmentDiv<span class="op" style="color: #5E5E5E;
+<span id="cb4-57">            fragmentDiv<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
@@ -2753,7 +2928,7 @@ background-color: null;
 font-style: inherit;">"panel-tabset-fragment fragment"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-33">        fragmentDiv<span class="op" style="color: #5E5E5E;
+<span id="cb4-58">            fragmentDiv<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
@@ -2770,7 +2945,18 @@ background-color: null;
 font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-34">        fragmentDiv<span class="op" style="color: #5E5E5E;
+<span id="cb4-59">            fragmentDiv<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data-fragment-index"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> currentIndex)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-60">            fragmentDiv<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
@@ -2785,7 +2971,7 @@ background-color: null;
 font-style: inherit;">"none"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-35">        tabset<span class="op" style="color: #5E5E5E;
+<span id="cb4-61">            tabset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
@@ -2796,15 +2982,19 @@ background-color: null;
 font-style: inherit;">appendChild</span>(fragmentDiv)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-36">      }</span>
-<span id="cb4-37">    })<span class="op" style="color: #5E5E5E;
+<span id="cb4-62">            currentIndex<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">++;</span></span>
+<span id="cb4-63">          }</span>
+<span id="cb4-64">        }</span>
+<span id="cb4-65">      })<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-38">  })<span class="op" style="color: #5E5E5E;
+<span id="cb4-66">    })<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-39"></span>
-<span id="cb4-40">  Reveal<span class="op" style="color: #5E5E5E;
+<span id="cb4-67"></span>
+<span id="cb4-68">    Reveal<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2812,16 +3002,18 @@ font-style: inherit;">on</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"fragmentshown"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">,</span> (<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">event</span>) <span class="kw" style="color: #003B4F;
+font-style: inherit;">,</span> <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">=&gt;</span> {</span>
-<span id="cb4-41">    <span class="cf" style="color: #003B4F;
+font-style: inherit;">function</span> (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">event</span>) {</span>
+<span id="cb4-69">      <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">if</span> (<span class="bu" style="color: null;
+font-style: inherit;">if</span> (<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">event</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2837,8 +3029,14 @@ font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">contains</span>(<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"panel-tabset-fragment"</span>)) {</span>
-<span id="cb4-42">      <span class="kw" style="color: #003B4F;
+font-style: inherit;">"panel-tabset-fragment"</span>)) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-70"></span>
+<span id="cb4-71">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabIndex <span class="op" style="color: #5E5E5E;
@@ -2859,10 +3057,14 @@ font-style: inherit;">dataset</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">tabIndex</span>)<span class="op" style="color: #5E5E5E;
+font-style: inherit;">tabIndex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-43">      <span class="kw" style="color: #003B4F;
+<span id="cb4-72">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabset <span class="op" style="color: #5E5E5E;
@@ -2880,7 +3082,19 @@ background-color: null;
 font-style: inherit;">".panel-tabset"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-44">      <span class="kw" style="color: #003B4F;
+<span id="cb4-73">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span>tabset) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-74"></span>
+<span id="cb4-75">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabLinks <span class="op" style="color: #5E5E5E;
@@ -2889,35 +3103,26 @@ font-style: inherit;">=</span> tabset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ul.panel-tabset-tabby li a"</span>)<span class="op" style="color: #5E5E5E;
+font-style: inherit;">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-45">      <span class="cf" style="color: #003B4F;
+<span id="cb4-76">      <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">if</span> (tabIndex <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span> tabLinks<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">length</span>) {</span>
-<span id="cb4-46">        tabLinks[tabIndex]<span class="op" style="color: #5E5E5E;
+font-style: inherit;">if</span> (tabLinks[tabIndex]) {</span>
+<span id="cb4-77">        tabLinks[tabIndex]<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">click</span>()<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-47">      }</span>
-<span id="cb4-48">    }</span>
-<span id="cb4-49">  })<span class="op" style="color: #5E5E5E;
+<span id="cb4-78">      }</span>
+<span id="cb4-79">    })<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-50"></span>
-<span id="cb4-51">  Reveal<span class="op" style="color: #5E5E5E;
+<span id="cb4-80"></span>
+<span id="cb4-81">    Reveal<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2925,16 +3130,18 @@ font-style: inherit;">on</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"fragmenthidden"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">,</span> (<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">event</span>) <span class="kw" style="color: #003B4F;
+font-style: inherit;">,</span> <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">=&gt;</span> {</span>
-<span id="cb4-52">    <span class="cf" style="color: #003B4F;
+font-style: inherit;">function</span> (<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">event</span>) {</span>
+<span id="cb4-82">      <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
-font-style: inherit;">if</span> (<span class="bu" style="color: null;
+font-style: inherit;">if</span> (<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">event</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2950,8 +3157,14 @@ font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">contains</span>(<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"panel-tabset-fragment"</span>)) {</span>
-<span id="cb4-53">      <span class="kw" style="color: #003B4F;
+font-style: inherit;">"panel-tabset-fragment"</span>)) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-83"></span>
+<span id="cb4-84">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabIndex <span class="op" style="color: #5E5E5E;
@@ -2972,10 +3185,14 @@ font-style: inherit;">dataset</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">tabIndex</span>)<span class="op" style="color: #5E5E5E;
+font-style: inherit;">tabIndex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-54">      <span class="kw" style="color: #003B4F;
+<span id="cb4-85">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabset <span class="op" style="color: #5E5E5E;
@@ -2993,7 +3210,19 @@ background-color: null;
 font-style: inherit;">".panel-tabset"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-55">      <span class="kw" style="color: #003B4F;
+<span id="cb4-86">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span>tabset) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-87"></span>
+<span id="cb4-88">      <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">const</span> tabLinks <span class="op" style="color: #5E5E5E;
@@ -3002,49 +3231,429 @@ font-style: inherit;">=</span> tabset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ul.panel-tabset-tabby li a"</span>)<span class="op" style="color: #5E5E5E;
+font-style: inherit;">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-56">      <span class="cf" style="color: #003B4F;
+<span id="cb4-89">      <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> targetIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tabIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">?</span> tabIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-90">      <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (tabLinks[targetIndex]) {</span>
+<span id="cb4-91">        tabLinks[targetIndex]<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">click</span>()<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-92">      }</span>
+<span id="cb4-93">    })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-94"></span>
+<span id="cb4-95">    Reveal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">on</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pdf-ready"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> () {</span>
+<span id="cb4-96">      <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> slides <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">document</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".reveal .slides section"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-97">      slides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> (slide) {</span>
+<span id="cb4-98">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> slide<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">querySelector</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".panel-tabset"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-99">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span>tabset) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">return</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-100"></span>
+<span id="cb4-101">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> fragments <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> slide<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">querySelectorAll</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".panel-tabset-fragment"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-102">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> activeTabIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-103"></span>
+<span id="cb4-104">        fragments<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> (fragment) {</span>
+<span id="cb4-105">          <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (fragment<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contains</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"visible"</span>)) {</span>
+<span id="cb4-106">            <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabIndex <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">parseInt</span>(fragment<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dataset</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">tabIndex</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-107">            <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> (tabIndex <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+font-style: inherit;">&gt;</span> activeTabIndex) {</span>
+<span id="cb4-108">              activeTabIndex <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">0</span>) {</span>
-<span id="cb4-57">        tabLinks[tabIndex <span class="op" style="color: #5E5E5E;
+font-style: inherit;">=</span> tabIndex<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+font-style: inherit;">;</span></span>
+<span id="cb4-109">            }</span>
+<span id="cb4-110">          }</span>
+<span id="cb4-111">        })<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">1</span>]<span class="op" style="color: #5E5E5E;
+font-style: inherit;">;</span></span>
+<span id="cb4-112"></span>
+<span id="cb4-113">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabLinks <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> tabset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">click</span>()<span class="op" style="color: #5E5E5E;
+font-style: inherit;">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-58">      } <span class="cf" style="color: #003B4F;
+<span id="cb4-114">        <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> tabPanes <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getTabPanes</span>(tabset)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-115"></span>
+<span id="cb4-116">        tabLinks<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> (link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> index) {</span>
+<span id="cb4-117">          <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">const</span> li <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">parentElement</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-118">          <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">===</span> activeTabIndex) {</span>
+<span id="cb4-119">            li<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"active"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-120">            link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"aria-selected"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"true"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-121">            link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tabindex"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"0"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-122">          } <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> {</span>
-<span id="cb4-59">        tabLinks[<span class="dv" style="color: #AD0000;
+<span id="cb4-123">            li<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">0</span>]<span class="op" style="color: #5E5E5E;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">click</span>()<span class="op" style="color: #5E5E5E;
+font-style: inherit;">remove</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"active"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-60">      }</span>
-<span id="cb4-61">    }</span>
-<span id="cb4-62">  })<span class="op" style="color: #5E5E5E;
+<span id="cb4-124">            link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"aria-selected"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"false"</span>)<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">;</span></span>
-<span id="cb4-63"><span class="dt" style="color: #AD0000;
+<span id="cb4-125">            link<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setAttribute</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tabindex"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"-1"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-126">          }</span>
+<span id="cb4-127">        })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-128"></span>
+<span id="cb4-129">        <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">Array</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">from</span>(tabPanes)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span> (panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> index) {</span>
+<span id="cb4-130">          <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">===</span> activeTabIndex) {</span>
+<span id="cb4-131">            panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"active"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-132">            panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">style</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">display</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"block"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-133">          } <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> {</span>
+<span id="cb4-134">            panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">remove</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"active"</span>)<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-135">            panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">style</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">display</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"none"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-136">          }</span>
+<span id="cb4-137">        })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-138">      })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-139">    })<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-140">  })()<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">;</span></span>
+<span id="cb4-141"><span class="dt" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">&lt;/</span><span class="kw" style="color: #003B4F;
 background-color: null;
