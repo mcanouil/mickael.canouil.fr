@@ -1,0 +1,187 @@
+---
+title: "Optimising VS Code and Positron for Quarto: Essential Settings for Better Editing"
+description: |
+  Discover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.
+date: "2025-11-20"
+categories:
+  - quarto
+  - vscode
+  - positron
+  - productivity
+image: featured.png
+image-alt: "Visual Studio Code logo on the top left and Positron logo on the top right with Quarto logo in the bottom centre, connected by configuration gear icon."
+lang: en-GB
+number-sections: false
+link-external-newwindow: true
+code-annotations: hover
+editor:
+  render-on-save: true
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+After years of working with Quarto in both VS Code and Positron, I've refined a set of editor settings that significantly improve my document editing experience.
+These configurations address common pain points like div folding, Git diff readability, and workspace performance.
+
+:::: {.highlight}
+
+The path to **effortless editing** is paved with **thoughtful settings**.
+
+:::
+
+Whether you're just starting with Quarto or looking to optimise your existing setup, these settings can help streamline your workflow and reduce friction in your daily editing tasks.
+
+## Core Quarto Settings
+
+The foundation of my configuration lies in language-specific settings for Quarto documents.
+These settings ensure consistent formatting and provide visual aids for working with Quarto.
+
+```{.json filename="settings.json"}
+{
+  "[quarto]": {
+    "editor.defaultFormatter": "quarto.quarto",        // <1>
+    "editor.wordWrap": "off",                          // <2>
+    "editor.guides.bracketPairs": "active",            // <3>
+    "editor.language.brackets": [["::::", ":::"]],     // <4>
+    "editor.language.colorizedBracketPairs": [         // <5>
+      ["::::", ":::"]
+    ]
+  }
+}
+```
+
+1. Uses the official Quarto extension as the default formatter for Quarto files, ensuring consistent formatting of code blocks and code cells.
+2. Disables word wrapping to prevent markdown pipe tables from wrapping awkwardly.
+3. Shows bracket pair guides only for the active bracket pair, reducing visual clutter whilst maintaining helpful structural indicators.
+4. Defines Quarto's div syntax (`::::` for opening, `:::` for closing) as bracket pairs, enabling folding and navigation.[^div-syntax]
+5. Adds colourisation to div brackets, making it easier to match opening and closing divs in deeply nested structures.
+
+[^div-syntax]: Whilst Pandoc's div syntax doesn't require matching numbers of colons for opening and closing divs (see [Pandoc Manual: Extension fenced_divs](https://pandoc.org/MANUAL.html#extension-fenced_divs)), using four colons for opening and three for closing provides clear visual distinction and enables better editor support.
+
+:::: {.callout-tip}
+
+Disabling word wrap setting might seem counter-intuitive, but by keeping one sentence per line, Git diffs show exactly which sentences changed rather than displaying entire paragraph modifications.
+This also prevents markdown pipe tables from wrapping mid-cell, which can break table rendering.
+
+:::
+
+## Visual Line Length Guides
+
+To maintain readable line lengths whilst avoiding word wrap, I use vertical rulers as visual guides.
+
+```{.json filename="settings.json"}
+{
+  "editor.rulers": [
+    80,                                                // <1>
+    {
+      "color": "#b22222",                            // <2>
+      "column": 120                                    // <3>
+    }
+  ]
+}
+```
+
+1. Displays a subtle vertical line at 80 characters, serving as a soft guideline for line length.
+2. Sets a firebrick red colour for the second ruler to draw attention to excessively long lines.
+3. Places the warning ruler at 120 characters, indicating lines that should ideally be broken up.
+
+This two-ruler approach provides progressive feedback: the first ruler suggests an ideal/standard line length, whilst the second warns when lines become problematically long.
+
+## Workspace Performance Optimisation
+
+Quarto projects generate substantial build artefacts in the `.quarto` directory.
+Excluding this directory from file watching and search operations improves editor performance, especially in large projects.
+
+```{.json filename="settings.json"}
+{
+  "files.watcherExclude": {
+    "**/.quarto/**": true                              // <1>
+  },
+  "search.exclude": {
+    "*/.quarto": true                                  // <2>
+  }
+}
+```
+
+1. Prevents the editor from monitoring changes in `.quarto` directories, reducing unnecessary file system operations and improving responsiveness.
+2. Excludes `.quarto` directories from search results, eliminating irrelevant build artefacts from workspace searches.
+
+These exclusions are particularly beneficial in projects with frequent renders or when working with large documents that generate extensive intermediate files.
+
+:::: {.callout-tip}
+
+Another directory to consider excluding is the `_freeze` directory if you're using the freeze feature extensively, as this can also contain a large number of files.
+You can also exclude other render output directories specific to your workflow, such as `_site`, `_book`, and `_manuscript`.
+
+:::
+
+## GitHub Copilot Integration
+
+The Quarto extension disables GitHub Copilot by default for Quarto files.[^copilot-default]
+If you want to use GitHub Copilot's AI assistance whilst editing Quarto documents, you must explicitly enable it in your settings.
+
+```{.json filename="settings.json"}
+{
+  "github.copilot.enable": {
+    "quarto": true                                     // <1>
+  }
+}
+```
+
+1. Overrides the Quarto extension's default behaviour to enable GitHub Copilot suggestions in Quarto documents.
+
+[^copilot-default]: The Quarto extension disables Copilot by default in its configuration (see [quarto-dev/quarto#621](https://github.com/quarto-dev/quarto/issues/621) and [package.json](https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962)).
+This explicit enablement is required if you want to use Copilot in your Quarto workflow.
+
+## Current Limitations and Workarounds
+
+### Div Folding Support
+
+Whilst the bracket pair configuration enables basic folding for divs, native folding support in the Quarto extension remains an ongoing feature request.[^folding-issue]
+The current workaround using `editor.language.brackets` provides functional folding, though it may not be as sophisticated as built-in support would be.
+
+[^folding-issue]: See [quarto-dev/quarto#670](https://github.com/quarto-dev/quarto/issues/670) for discussion about native div folding support.
+
+### Applying These Settings
+
+To use these settings in your environment:
+
+1. Open your VS Code or Positron settings ({{< kbd win=Ctrl-, mac=Cmd-, linux=Ctrl-, >}}).
+2. Click the "**Open Settings (JSON)**" icon in the top right corner.
+3. Add these configurations to your `settings.json` file.
+4. Save the file to apply the changes immediately.
+
+Alternatively, you can add these to a workspace settings file (`.vscode/settings.json`) to apply them only to specific projects.
+
+## Conclusion
+
+These settings represent opinionated refinement in my Quarto editing workflow.
+They address practical challenges like navigating complex document structures and optimising editor performance.
+
+:::: {.highlight}
+
+The combination of **disabled word wrap**, **visual rulers**, and **div bracket pairing** creates a **more maintainable** and **visually navigable** editing experience for Quarto documents.
+
+:::
+
+I encourage you to try these settings and adjust them to match your preferences.
+What works for my workflow might need tweaking for yours, and that's perfectly fine.
+The goal is to reduce friction and let you focus on creating excellent content rather than fighting with your editor.
+
+Do you have custom settings that enhance your Quarto editing experience?
+I'd love to hear about them in the discussion below.
+
+*Happy editing!*
+
+## Resources and Further Reading
+
+- **[Quarto VS Code Extension](https://github.com/quarto-dev/quarto)** - Official extension for VS Code and Positron.
+- **[VS Code User and Workspace Settings](https://code.visualstudio.com/docs/getstarted/settings)** - Comprehensive guide to VS Code configuration.
+- **[Pandoc Fenced Divs Extension](https://pandoc.org/MANUAL.html#extension-fenced_divs)** - Documentation for Quarto's div syntax.
+- **[GitHub Copilot in VS Code](https://code.visualstudio.com/docs/editor/artificial-intelligence)** - Guide to using AI assistance in your editor.
