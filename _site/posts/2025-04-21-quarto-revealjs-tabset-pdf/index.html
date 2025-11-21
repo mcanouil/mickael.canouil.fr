@@ -421,7 +421,7 @@ Note
 <div class="callout-body-container callout-body">
 <p>The JavaScript solution presented in this post was updated on November 15, 2025, to enhance compatibility with nested fragments inside tabsets.</p>
 <p>It also now supports the native PDF export functionality to export tabsets correctly without needing to use the <code>decktape</code> tool.<br>
-This, however, requires to enable the “PDF separate fragments” option from Reveal.js.</p>
+This, however, requires to enable the “PDF separate fragments” option from Reveal.js (<em>i.e.,</em> <code>pdf-separate-fragments: true</code>).</p>
 </div>
 </div>
 <section id="introduction" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="introduction">
@@ -500,113 +500,111 @@ Save<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</s
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> tabContent <span class="op">?</span> tabContent<span class="op">.</span><span class="at">children</span> <span class="op">:</span> []<span class="op">;</span></span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">configure</span>({ <span class="dt">pdfSeparateFragments</span><span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"ready"</span><span class="op">,</span> <span class="kw">function</span> () {</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabsetSlides <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".reveal .slides section .panel-tabset"</span>)<span class="op">;</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>      tabsetSlides<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (tabset) {</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabCount <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_SELECTOR)<span class="op">.</span><span class="at">length</span><span class="op">;</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (tabCount <span class="op">&lt;=</span> <span class="dv">1</span>) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabPanes <span class="op">=</span> <span class="fu">getTabPanes</span>(tabset)<span class="op">;</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> currentIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> tabCount<span class="op">;</span> i<span class="op">++</span>) {</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (tabPanes[i]) {</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> fragmentsInPane <span class="op">=</span> tabPanes[i]<span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".fragment"</span>)<span class="op">;</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>            fragmentsInPane<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (fragment) {</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>              fragment<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"data-fragment-index"</span><span class="op">,</span> currentIndex)<span class="op">;</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>              currentIndex<span class="op">++;</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>            })<span class="op">;</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (i <span class="op">&lt;</span> tabCount <span class="op">-</span> <span class="dv">1</span>) {</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> fragmentDiv <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">"div"</span>)<span class="op">;</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">className</span> <span class="op">=</span> <span class="st">"panel-tabset-fragment fragment"</span><span class="op">;</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span> <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"data-fragment-index"</span><span class="op">,</span> currentIndex)<span class="op">;</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">;</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>            tabset<span class="op">.</span><span class="at">parentNode</span><span class="op">.</span><span class="fu">appendChild</span>(fragmentDiv)<span class="op">;</span></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>            currentIndex<span class="op">++;</span></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"fragmentshown"</span><span class="op">,</span> <span class="kw">function</span> (<span class="bu">event</span>) {</span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span><span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"panel-tabset-fragment"</span>)) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(<span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabset <span class="op">=</span> Reveal<span class="op">.</span><span class="fu">getCurrentSlide</span>()<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (tabLinks[tabIndex]) {</span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>        tabLinks[tabIndex]<span class="op">.</span><span class="fu">click</span>()<span class="op">;</span></span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"fragmenthidden"</span><span class="op">,</span> <span class="kw">function</span> (<span class="bu">event</span>) {</span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span><span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"panel-tabset-fragment"</span>)) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(<span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabset <span class="op">=</span> Reveal<span class="op">.</span><span class="fu">getCurrentSlide</span>()<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> targetIndex <span class="op">=</span> tabIndex <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> tabIndex <span class="op">-</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (tabLinks[targetIndex]) {</span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>        tabLinks[targetIndex]<span class="op">.</span><span class="fu">click</span>()<span class="op">;</span></span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"pdf-ready"</span><span class="op">,</span> <span class="kw">function</span> () {</span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> slides <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".reveal .slides section"</span>)<span class="op">;</span></span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>      slides<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (slide) {</span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabset <span class="op">=</span> slide<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> fragments <span class="op">=</span> slide<span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".panel-tabset-fragment"</span>)<span class="op">;</span></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> activeTabIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>        fragments<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (fragment) {</span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (fragment<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"visible"</span>)) {</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(fragment<span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (tabIndex <span class="op">&gt;</span> activeTabIndex) {</span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>              activeTabIndex <span class="op">=</span> tabIndex<span class="op">;</span></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabPanes <span class="op">=</span> <span class="fu">getTabPanes</span>(tabset)<span class="op">;</span></span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>        tabLinks<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (link<span class="op">,</span> index) {</span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>          <span class="kw">const</span> li <span class="op">=</span> link<span class="op">.</span><span class="at">parentElement</span><span class="op">;</span></span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (index <span class="op">===</span> activeTabIndex) {</span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>            li<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"aria-selected"</span><span class="op">,</span> <span class="st">"true"</span>)<span class="op">;</span></span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"tabindex"</span><span class="op">,</span> <span class="st">"0"</span>)<span class="op">;</span></span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>          } <span class="cf">else</span> {</span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>            li<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">remove</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"aria-selected"</span><span class="op">,</span> <span class="st">"false"</span>)<span class="op">;</span></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"tabindex"</span><span class="op">,</span> <span class="st">"-1"</span>)<span class="op">;</span></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>        <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>(tabPanes)<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (panel<span class="op">,</span> index) {</span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (index <span class="op">===</span> activeTabIndex) {</span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"block"</span><span class="op">;</span></span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>          } <span class="cf">else</span> {</span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">remove</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">;</span></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
-<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>  })()<span class="op">;</span></span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"ready"</span><span class="op">,</span> <span class="kw">function</span> () {</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabsetSlides <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".reveal .slides section .panel-tabset"</span>)<span class="op">;</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>      tabsetSlides<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (tabset) {</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabCount <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_SELECTOR)<span class="op">.</span><span class="at">length</span><span class="op">;</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (tabCount <span class="op">&lt;=</span> <span class="dv">1</span>) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabPanes <span class="op">=</span> <span class="fu">getTabPanes</span>(tabset)<span class="op">;</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> currentIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> tabCount<span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (tabPanes[i]) {</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> fragmentsInPane <span class="op">=</span> tabPanes[i]<span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".fragment"</span>)<span class="op">;</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>            fragmentsInPane<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (fragment) {</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>              fragment<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"data-fragment-index"</span><span class="op">,</span> currentIndex)<span class="op">;</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>              currentIndex<span class="op">++;</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>            })<span class="op">;</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (i <span class="op">&lt;</span> tabCount <span class="op">-</span> <span class="dv">1</span>) {</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> fragmentDiv <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">createElement</span>(<span class="st">"div"</span>)<span class="op">;</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">className</span> <span class="op">=</span> <span class="st">"panel-tabset-fragment fragment"</span><span class="op">;</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span> <span class="op">=</span> i <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"data-fragment-index"</span><span class="op">,</span> currentIndex)<span class="op">;</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>            fragmentDiv<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">;</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>            tabset<span class="op">.</span><span class="at">parentNode</span><span class="op">.</span><span class="fu">appendChild</span>(fragmentDiv)<span class="op">;</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>            currentIndex<span class="op">++;</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"fragmentshown"</span><span class="op">,</span> <span class="kw">function</span> (<span class="bu">event</span>) {</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span><span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"panel-tabset-fragment"</span>)) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(<span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabset <span class="op">=</span> Reveal<span class="op">.</span><span class="fu">getCurrentSlide</span>()<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (tabLinks[tabIndex]) {</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>        tabLinks[tabIndex]<span class="op">.</span><span class="fu">click</span>()<span class="op">;</span></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"fragmenthidden"</span><span class="op">,</span> <span class="kw">function</span> (<span class="bu">event</span>) {</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span><span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"panel-tabset-fragment"</span>)) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(<span class="bu">event</span><span class="op">.</span><span class="at">fragment</span><span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabset <span class="op">=</span> Reveal<span class="op">.</span><span class="fu">getCurrentSlide</span>()<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> targetIndex <span class="op">=</span> tabIndex <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">?</span> tabIndex <span class="op">-</span> <span class="dv">1</span> <span class="op">:</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (tabLinks[targetIndex]) {</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>        tabLinks[targetIndex]<span class="op">.</span><span class="fu">click</span>()<span class="op">;</span></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>    Reveal<span class="op">.</span><span class="fu">on</span>(<span class="st">"pdf-ready"</span><span class="op">,</span> <span class="kw">function</span> () {</span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> slides <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".reveal .slides section"</span>)<span class="op">;</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>      slides<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (slide) {</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabset <span class="op">=</span> slide<span class="op">.</span><span class="fu">querySelector</span>(<span class="st">".panel-tabset"</span>)<span class="op">;</span></span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="op">!</span>tabset) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> fragments <span class="op">=</span> slide<span class="op">.</span><span class="fu">querySelectorAll</span>(<span class="st">".panel-tabset-fragment"</span>)<span class="op">;</span></span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> activeTabIndex <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>        fragments<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (fragment) {</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (fragment<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">contains</span>(<span class="st">"visible"</span>)) {</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> tabIndex <span class="op">=</span> <span class="pp">parseInt</span>(fragment<span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">tabIndex</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (tabIndex <span class="op">&gt;</span> activeTabIndex) {</span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>              activeTabIndex <span class="op">=</span> tabIndex<span class="op">;</span></span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabLinks <span class="op">=</span> tabset<span class="op">.</span><span class="fu">querySelectorAll</span>(TAB_LINK_SELECTOR)<span class="op">;</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> tabPanes <span class="op">=</span> <span class="fu">getTabPanes</span>(tabset)<span class="op">;</span></span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>        tabLinks<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (link<span class="op">,</span> index) {</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>          <span class="kw">const</span> li <span class="op">=</span> link<span class="op">.</span><span class="at">parentElement</span><span class="op">;</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (index <span class="op">===</span> activeTabIndex) {</span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>            li<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"aria-selected"</span><span class="op">,</span> <span class="st">"true"</span>)<span class="op">;</span></span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"tabindex"</span><span class="op">,</span> <span class="st">"0"</span>)<span class="op">;</span></span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>          } <span class="cf">else</span> {</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>            li<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">remove</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"aria-selected"</span><span class="op">,</span> <span class="st">"false"</span>)<span class="op">;</span></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>            link<span class="op">.</span><span class="fu">setAttribute</span>(<span class="st">"tabindex"</span><span class="op">,</span> <span class="st">"-1"</span>)<span class="op">;</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>        <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>(tabPanes)<span class="op">.</span><span class="fu">forEach</span>(<span class="kw">function</span> (panel<span class="op">,</span> index) {</span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (index <span class="op">===</span> activeTabIndex) {</span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"block"</span><span class="op">;</span></span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>          } <span class="cf">else</span> {</span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">remove</span>(<span class="st">"active"</span>)<span class="op">;</span></span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>            panel<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">display</span> <span class="op">=</span> <span class="st">"none"</span><span class="op">;</span></span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>        })<span class="op">;</span></span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a>      })<span class="op">;</span></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>    })<span class="op">;</span></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>  })()<span class="op">;</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </li>
 <li>
 <p><strong>Embed the Script in Your YAML Header.</strong><br>
