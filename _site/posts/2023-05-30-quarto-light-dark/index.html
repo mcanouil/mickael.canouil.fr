@@ -1131,64 +1131,25 @@ This time, I will show how to have images both for light and dark theme, when sw
           }
         };
       }
-        const annoteTargets = window.document.querySelectorAll('.code-annotation-anchor');
-        for (let i=0; i<annoteTargets.length; i++) {
-          const annoteTarget = annoteTargets[i];
-          const targetCell = annoteTarget.getAttribute("data-target-cell");
-          const targetAnnotation = annoteTarget.getAttribute("data-target-annotation");
-          const contentFn = () => {
-            const content = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-            if (content) {
-              const tipContent = content.cloneNode(true);
-              tipContent.classList.add("code-annotation-tip-content");
-              return tipContent.outerHTML;
-            }
-          }
-          const config = {
-            allowHTML: true,
-            content: contentFn,
-            onShow: (instance) => {
-              selectCodeLines(instance.reference);
-              instance.reference.classList.add('code-annotation-active');
-              window.tippy.hideAll();
-            },
-            onHide: (instance) => {
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
               unselectCodeLines();
-              instance.reference.classList.remove('code-annotation-active');
-            },
-            maxWidth: 300,
-            delay: [50, 0],
-            duration: [200, 0],
-            offset: [5, 10],
-            arrow: true,
-            appendTo: function(el) {
-              return el.parentElement.parentElement.parentElement;
-            },
-            interactive: true,
-            interactiveBorder: 10,
-            theme: 'quarto',
-            placement: 'right',
-            popperOptions: {
-              modifiers: [
-              {
-                name: 'flip',
-                options: {
-                  flipVariations: false, // true by default
-                  allowedAutoPlacements: ['right'],
-                  fallbackPlacements: ['right', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left'],
-                },
-              },
-              {
-                name: 'preventOverflow',
-                options: {
-                  mainAxis: false,
-                  altAxis: false
-                }
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
               }
-              ]        
-            }      
-          };
-          window.tippy(annoteTarget, config); 
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
         }
     const findCites = (el) => {
       const parentEl = el.parentElement;
