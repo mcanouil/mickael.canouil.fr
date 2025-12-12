@@ -1,0 +1,293 @@
+---
+title: "Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions"
+description: |
+  Discover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.
+date: "2025-12-12"
+categories:
+  - Quarto
+  - GitHub Actions
+  - Extensions
+  - Automation
+  - DevOps
+image: featured.png
+image-alt: |
+  Quarto Wizard puppy wearing pointed hat and holding magic wand within glowing orange circle decorated with mystical symbols next to Quarto Cli logo and GitHub Actions text.
+lang: en-GB
+number-sections: false
+link-external-newwindow: true
+code-annotations: below
+footnotes-hover: true
+toc-depth: 4
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+Managing dependencies is a cornerstone of modern software development, and Dependabot has long been the gold standard for automating dependency updates in GitHub repositories.
+But what about Quarto extensions?
+
+I'm thrilled to introduce **[Quarto Extensions Updater](https://github.com/mcanouil/quarto-extensions-updater) 1.0.0**, a GitHub Action that brings Dependabot-style automation to Quarto extension management.
+If you maintain Quarto projects with multiple extensions, this tool will transform your maintenance workflow from tedious manual checks into an effortless, automated process.
+
+:::: {.highlight}
+
+**Quarto Extensions Updater 1.0.0** brings **Dependabot-style automation** to Quarto extension management.
+**Set it and forget it**.
+
+:::
+
+## Key Features
+
+**Quarto Extensions Updater** automates the entire extension update workflow:
+
+- **🔍 Automatic Detection**: Scans your `_extensions/` directory to discover all installed extensions.
+- **📦 Smart Updates**: Uses the Quarto CLI (`quarto add`) to update extensions with proper dependency resolution.
+- **🔄 Source Tracking**: Maintains the `source` field in extension manifests for reliable version management[^1].
+- **📝 Detailed Pull Requests**: Creates PRs with comprehensive release notes, categorised by update type (major, minor, patch).
+- **🔀 One PR Per Extension**: Each extension gets its own pull request that updates when new versions are available.
+- **🏷️ Semantic Versioning**: Automatically categorises updates and adds appropriate labels.
+- **⚡ Flexible Scheduling**: Run daily, weekly, monthly, or manually via workflow dispatch.
+- **⚙️ Highly Customisable**: Configure branch names, commit messages, PR titles, and labels to match your workflow.
+
+[^1]: Quarto CLI does not natively track installation sources as of version 1.8.24. See [quarto-dev/quarto-cli#11468](https://github.com/quarto-dev/quarto-cli/issues/11468).
+
+:::: {.highlight}
+
+Each extension gets its **own dedicated pull request** that **automatically updates** when new versions are available.
+No more blocked PRs!
+
+:::
+
+## Getting Started
+
+Create a workflow file in your repository:
+
+```{.yaml filename=".github/workflows/update-extensions.yml"}
+name: Update Quarto Extensions
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # <1>
+  workflow_dispatch: # <2>
+
+permissions:
+  contents: write # <3>
+  pull-requests: write # <4>
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Quarto # <5>
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - uses: mcanouil/quarto-extensions-updater@v1 # <6>
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+1. Runs daily at midnight UTC.
+   Adjust the cron schedule to suit your needs (weekly: `0 0 * * 0`, monthly: `0 0 1 * *`).
+2. Allows manual triggering from the Actions tab.
+3. Required to create branches and commit changes.
+4. Required to create and update pull requests.
+5. Installs Quarto CLI, which is required for the `quarto add` command.
+6. Runs the updater with default settings.
+
+:::: {.callout-tip}
+
+## First Time Setup
+
+The action works best with extensions that have proper `source` metadata in their `_extension.yml` files.
+If you installed extensions using [Quarto Wizard](https://github.com/mcanouil/quarto-wizard), this metadata is already present.
+Otherwise, you can manually add it:
+
+```{.yaml filename="_extensions/owner/name/_extension.yml"}
+title: "Extension Name"
+version: "1.0.0"
+source: "owner/repository@v1.0.0" # <1>
+```
+
+1. Add or update this line to enable tracking.
+
+:::
+
+## Configuration Options
+
+The action supports extensive customisation through input parameters:
+
+| Input                   | Description                                              | Required | Default                                                                                                        |
+| ----------------------- | -------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| `github-token`          | GitHub token for creating pull requests                  | Yes      | `${{ github.token }}`                                                                                          |
+| `workspace-path`        | Path to the workspace containing `_extensions` directory | No       | `.`                                                                                                            |
+| `registry-url`          | URL to the Quarto extensions registry JSON file          | No       | `https://raw.githubusercontent.com/mcanouil/quarto-extensions/refs/heads/quarto-wizard/quarto-extensions.json` |
+| `create-pr`             | Whether to create pull requests                          | No       | `true`                                                                                                         |
+| `branch-prefix`         | Prefix for update branches                               | No       | `chore/quarto-extensions`                                                                                      |
+| `base-branch`           | Target branch for pull requests                          | No       | `main`                                                                                                         |
+| `pr-title-prefix`       | Prefix for PR titles                                     | No       | `chore(deps):`                                                                                                 |
+| `commit-message-prefix` | Prefix for commit messages                               | No       | `chore(deps):`                                                                                                 |
+| `pr-labels`             | Comma-separated labels to add to PRs                     | No       | `dependencies,quarto-extensions`                                                                               |
+
+The action also provides output values:
+
+| Output              | Description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `updates-available` | Whether updates are available (`true`/`false`)              |
+| `update-count`      | Number of updates available                                 |
+| `updates`           | JSON array of updates (name, currentVersion, latestVersion) |
+| `pr-number`         | Pull request number (if created)                            |
+| `pr-url`            | Pull request URL (if created)                               |
+
+:::: {.callout-note}
+
+## Conventional Commits Integration
+
+Using conventional commits?
+Customise the prefixes to match your workflow:
+
+```{.yaml}
+- uses: mcanouil/quarto-extensions-updater@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    branch-prefix: "deps/quarto"
+    pr-title-prefix: "build(deps):"
+    commit-message-prefix: "build(deps):"
+    pr-labels: "dependencies,quarto,automated"
+```
+
+This creates PRs with titles like `build(deps): update owner/name extension to 1.2.3`.
+
+:::
+
+## How It Works
+
+The action follows a systematic workflow:
+
+1. **Fetch Registry**: Downloads the [Quarto Extensions registry](https://m.canouil.dev/quarto-extensions/) from GitHub.
+2. **Scan Extensions**: Discovers all installed extensions in your `_extensions/` directory.
+3. **Check Versions**: Compares installed versions with the registry using semantic versioning.
+4. **Process Each Extension**: Processes extensions individually to create separate pull requests.
+5. **Apply Updates**: Uses the Quarto CLI (`quarto add owner/repo@version --no-prompt`) to update extensions.
+6. **Track Updates**: Maintains or adds the `source` field in extension manifests.
+7. **Create/Update PR**:
+   - Creates a new pull request if none exists for the extension.
+   - Updates the existing PR if one already exists (same branch name).
+   - Ensures at most one PR per extension.
+
+## Understanding Pull Requests
+
+The action creates detailed, informative pull requests that follow Dependabot's style:
+
+````markdown
+Updates the following Quarto extension(s):
+
+## ✨ Minor Updates
+
+- **[mcanouil/quarto-iconify](https://github.com/mcanouil/quarto-iconify)**: `1.0.0` → `3.0.1`
+
+---
+
+### Release Notes
+
+**mcanouil/quarto-iconify** (1.0.0 → 3.0.1)
+
+- [Release notes](https://github.com/mcanouil/quarto-iconify/releases/tag/v3.0.1)
+- [Repository](https://github.com/mcanouil/quarto-iconify)
+
+> A shortcode extension to use Iconify icons in HTML-based Quarto documents.
+
+---
+
+🤖 This PR was automatically generated by [quarto-extensions-updater](https://github.com/mcanouil/quarto-extensions-updater)
+````
+
+Each PR includes:
+
+- **Clear Title**: Indicates the extension and version change.
+- **Categorised Updates**: Groups by major, minor, or patch changes.
+- **Release Links**: Direct links to release notes and repositories.
+- **Extension Descriptions**: Context about what the extension does.
+- **Appropriate Labels**: Automatically added based on update type.
+
+:::: {.highlight}
+
+**Automated scanning**, **semantic versioning comparison**, and **automatic pull requests** mean you'll **never miss an extension update** again.
+
+:::
+
+## Requirements
+
+:::: {.callout-important}
+
+## Essential Requirements
+
+Before using the action, ensure:
+
+1. **Quarto CLI**: Must be installed in the workflow environment.
+   Use `quarto-dev/quarto-actions/setup@v2` to install Quarto in GitHub Actions.
+2. **Extension Structure**: Extensions should be in `_extensions/owner/name/` structure with `_extension.yml` or `_extension.yaml` files.
+3. **Semantic Versioning**: Extension versions should follow semantic versioning (X.Y.Z).
+4. **Registry Listing**: Extensions should be listed in the [Quarto Extensions registry](https://m.canouil.dev/quarto-extensions/).
+5. **Permissions**: Workflow needs `contents: write` and `pull-requests: write` permissions.
+6. **Source Metadata**: Extensions should have `source` fields in their manifests for reliable version tracking.
+
+:::
+
+## Troubleshooting
+
+Common issues and solutions:
+
+- **No Updates Detected**: Verify extensions are in [m.canouil.dev/quarto-extensions/](https://m.canouil.dev/quarto-extensions/) and have version and source fields in their manifests.
+- **Permission Errors**: Check that workflow has `contents: write` and `pull-requests: write` permissions.
+- **Workflow Not Running**: Verify cron syntax and ensure GitHub Actions are enabled.
+  GitHub disables scheduled workflows in inactive repositories after 60 days.
+- **Duplicate PRs**: Ensure `branch-prefix` is consistent across workflow runs.
+
+Check the [GitHub Actions logs](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/using-workflow-run-logs) for detailed error messages.
+
+## Ecosystem Integration
+
+**Quarto Extensions Updater** complements existing tools in the Quarto ecosystem:
+
+- **[Quarto Wizard](https://github.com/mcanouil/quarto-wizard)**: A VS Code extension for installing and managing Quarto extensions with a GUI.
+  Extensions installed via Quarto Wizard include the `source` metadata needed for automated updates.
+- **[Quarto Extensions](https://github.com/mcanouil/quarto-extensions)**: The community registry that powers both Quarto Wizard and Quarto Extensions Updater.
+- **[Quarto CLI](https://quarto.org/)**: The action uses `quarto add` commands to perform updates, ensuring compatibility with Quarto's extension system.
+
+:::: {.highlight}
+
+Install extensions with **Quarto Wizard**, automate updates with **Quarto Extensions Updater**, and enjoy **seamless maintenance** across your entire Quarto project portfolio.
+
+:::
+
+## Conclusion
+
+**Quarto Extensions Updater** brings the automation and reliability of Dependabot to Quarto extension management.
+By automating the update workflow, you can focus on creating compelling content rather than tracking extension releases.
+
+The action handles checking for updates, creating pull requests, and maintaining version metadata, all whilst providing clear, detailed information about each change.
+Whether you're managing a personal blog, maintaining a collaborative research project, or overseeing a documentation website, this tool ensures your extensions stay current without demanding your constant attention.
+
+:::: {.highlight}
+
+Transform your extension maintenance from a **tedious manual process** into an **effortless automated workflow**.
+
+:::
+
+Ready to automate your Quarto extension updates?
+Add the workflow to your repository today and experience the freedom of automated maintenance.
+
+## Resources
+
+- **[Quarto Extensions Updater](https://github.com/mcanouil/quarto-extensions-updater)**: GitHub repository and documentation.
+- **[Quarto Wizard](https://github.com/mcanouil/quarto-wizard)**: VS Code / Positron extension for managing Quarto extensions.
+- **[Quarto Extensions Registry](https://m.canouil.dev/quarto-extensions/)**: Browse and install Quarto extensions.
+- **[Quarto Extensions Documentation](https://quarto.org/docs/extensions/)**: Official guide to Quarto extensions.
+- **[GitHub Actions Documentation](https://docs.github.com/en/actions)**: Learn more about GitHub Actions workflows.

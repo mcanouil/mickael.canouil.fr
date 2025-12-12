@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL, Ph.D.">
-<meta name="description" content="A Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.">
+<meta name="description" content="Discover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.">
 
-<title>A Gentle Introduction to Quarto – MCU</title>
+<title>Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions – MCU</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -49,6 +84,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/bootstrap/bootstrap-dark-95fee858cba45ba569289ac230a85951.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <link href="../../site_libs/bootstrap/bootstrap-8f36f4515b73fe448ddc42d0fa580bee.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -78,17 +116,21 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="A Gentle Introduction to Quarto – MCU">
-<meta property="og:description" content="A Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.">
-<meta property="og:image" content="https://mickael.canouil.fr/talks/2023-10-19-gentle-intro-to-quarto/featured.png">
+<meta property="og:title" content="Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions – MCU">
+<meta property="og:description" content="Discover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/featured.png">
 <meta property="og:site_name" content="MCU">
-<meta property="og:image:height" content="1080">
+<meta property="og:image:height" content="1024">
 <meta property="og:image:width" content="1920">
-<meta name="twitter:title" content="A Gentle Introduction to Quarto – MCU">
-<meta name="twitter:description" content="A Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/talks/2023-10-19-gentle-intro-to-quarto/featured.png">
-<meta name="twitter:image-height" content="1080">
+<meta property="og:image:alt" content="Quarto Wizard puppy wearing pointed hat and holding magic wand within glowing orange circle decorated with mystical symbols next to Quarto Cli logo and GitHub Actions text.
+">
+<meta name="twitter:title" content="Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions – MCU">
+<meta name="twitter:description" content="Discover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/featured.png">
+<meta name="twitter:image-height" content="1024">
 <meta name="twitter:image-width" content="1920">
+<meta name="twitter:image:alt" content="Quarto Wizard puppy wearing pointed hat and holding magic wand within glowing orange circle decorated with mystical symbols next to Quarto Cli logo and GitHub Actions text.
+">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -331,61 +373,63 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">A Gentle Introduction to Quarto</h1>
+      <h1 class="title">Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions</h1>
                   <div>
         <div class="description">
-          <p>A Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.</p>
+          <p>Discover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.</p>
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">quarto</div>
-                <div class="quarto-category">publishing</div>
-                <div class="quarto-category">reproducibility</div>
-                <div class="quarto-category">markdown</div>
-                <div class="quarto-category">english</div>
+                <div class="quarto-category">Quarto</div>
+                <div class="quarto-category">GitHub Actions</div>
+                <div class="quarto-category">Extensions</div>
+                <div class="quarto-category">Automation</div>
+                <div class="quarto-category">DevOps</div>
               </div>
                   </div>
   </div>
     
-  <div class="quarto-title-meta-author">
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-heading">Affiliation</div>
-    
-      <div class="quarto-title-meta-contents">
-      <p class="author"><a href="https://mickael.canouil.fr">Mickaël CANOUIL, <em>Ph.D.</em></a> <a href="https://orcid.org/0000-0002-3396-4549" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
-    </div>
-    <div class="quarto-title-meta-contents">
-          <p class="affiliation">
-              Online (Lille, France) – IT&amp;M Stats / Astek
-            </p>
-        </div>
-    </div>
-
+  
   <div class="quarto-title-meta">
 
-        
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://mickael.canouil.fr">Mickaël CANOUIL, <em>Ph.D.</em></a> <a href="https://orcid.org/0000-0002-3396-4549" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+            </div>
+    </div>
+      
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Thursday, the 19th of October, 2023</p>
+        <p class="date">Friday, the 12th of December, 2025</p>
       </div>
     </div>
     
       
     </div>
     
-  <div>
-    <div class="abstract">
-      <div class="block-title">Abstract</div>
-      <p>In this talk, I provide a gentle introduction to Quarto, an open-source scientific and technical publishing system built on Pandoc. Quarto allows you to create dynamic content with Python, R, Julia, and Observable, and publish high-quality articles, reports, presentations, websites, blogs, and books in HTML, PDF, MS Word, ePub, and more.</p>
-    </div>
-  </div>
   
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#key-features" id="toc-key-features" class="nav-link active" data-scroll-target="#key-features">Key Features</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#configuration-options" id="toc-configuration-options" class="nav-link" data-scroll-target="#configuration-options">Configuration Options</a></li>
+  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link" data-scroll-target="#how-it-works">How It Works</a></li>
+  <li><a href="#understanding-pull-requests" id="toc-understanding-pull-requests" class="nav-link" data-scroll-target="#understanding-pull-requests">Understanding Pull Requests</a></li>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
+  <li><a href="#ecosystem-integration" id="toc-ecosystem-integration" class="nav-link" data-scroll-target="#ecosystem-integration">Ecosystem Integration</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">Resources</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-12-12-quarto-extensions-updater/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -395,14 +439,379 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard puppy wearing pointed hat and holding magic wand within glowing orange circle decorated with mystical symbols next to Quarto Cli logo and GitHub Actions text." width="600"></a></p>
+</figure>
+</div>
+<p>Managing dependencies is a cornerstone of modern software development, and Dependabot has long been the gold standard for automating dependency updates in GitHub repositories. But what about Quarto extensions?</p>
+<p>I’m thrilled to introduce <strong><a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a> 1.0.0</strong>, a GitHub Action that brings Dependabot-style automation to Quarto extension management. If you maintain Quarto projects with multiple extensions, this tool will transform your maintenance workflow from tedious manual checks into an effortless, automated process.</p>
+<div class="highlight">
+<p><strong>Quarto Extensions Updater 1.0.0</strong> brings <strong>Dependabot-style automation</strong> to Quarto extension management. <strong>Set it and forget it</strong>.</p>
+</div>
+<section id="key-features" class="level2">
+<h2 class="anchored" data-anchor-id="key-features">Key Features</h2>
+<p><strong>Quarto Extensions Updater</strong> automates the entire extension update workflow:</p>
 <ul>
-<li>Slides: <a href="https://m.canouil.dev/gentle-intro-to-quarto/" class="uri">https://m.canouil.dev/gentle-intro-to-quarto/</a>.</li>
-<li>Code: <a href="https://github.com/mcanouil/gentle-intro-to-quarto" class="uri">https://github.com/mcanouil/gentle-intro-to-quarto</a>.</li>
+<li><strong>🔍 Automatic Detection</strong>: Scans your <code>_extensions/</code> directory to discover all installed extensions.</li>
+<li><strong>📦 Smart Updates</strong>: Uses the Quarto CLI (<code>quarto add</code>) to update extensions with proper dependency resolution.</li>
+<li><strong>🔄 Source Tracking</strong>: Maintains the <code>source</code> field in extension manifests for reliable version management<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</li>
+<li><strong>📝 Detailed Pull Requests</strong>: Creates PRs with comprehensive release notes, categorised by update type (major, minor, patch).</li>
+<li><strong>🔀 One PR Per Extension</strong>: Each extension gets its own pull request that updates when new versions are available.</li>
+<li><strong>🏷️ Semantic Versioning</strong>: Automatically categorises updates and adds appropriate labels.</li>
+<li><strong>⚡ Flexible Scheduling</strong>: Run daily, weekly, monthly, or manually via workflow dispatch.</li>
+<li><strong>⚙️ Highly Customisable</strong>: Configure branch names, commit messages, PR titles, and labels to match your workflow.</li>
+</ul>
+<div class="highlight">
+<p>Each extension gets its <strong>own dedicated pull request</strong> that <strong>automatically updates</strong> when new versions are available. No more blocked PRs!</p>
+</div>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<p>Create a workflow file in your repository:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/update-extensions.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename=".github/workflows/update-extensions.yml"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Update Quarto Extensions</span></span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">permissions</span><span class="kw">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-9" class="code-annotation-target"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-10" class="code-annotation-target"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pull-requests</span><span class="kw">:</span><span class="at"> write</span></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">update</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-18" class="code-annotation-target"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Setup Quarto</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-1-21" class="code-annotation-target"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> mcanouil/quarto-extensions-updater@v1</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">github-token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="1">Runs daily at midnight UTC. Adjust the cron schedule to suit your needs (weekly: <code>0 0 * * 0</code>, monthly: <code>0 0 1 * *</code>).</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">Allows manual triggering from the Actions tab.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="9" data-code-annotation="3">Required to create branches and commit changes.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="4">Required to create and update pull requests.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="18" data-code-annotation="5">Installs Quarto CLI, which is required for the <code>quarto add</code> command.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="21" data-code-annotation="6">Runs the updater with default settings.</span>
+</dd>
+</dl>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>First Time Setup
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The action works best with extensions that have proper <code>source</code> metadata in their <code>_extension.yml</code> files. If you installed extensions using <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>, this metadata is already present. Otherwise, you can manually add it:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/owner/name/_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="_extensions/owner/name/_extension.yml"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Extension Name"</span></span>
+<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"1.0.0"</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span><span class="kw">:</span><span class="at"> </span><span class="st">"owner/repository@v1.0.0"</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">Add or update this line to enable tracking.</span>
+</dd>
+</dl>
+</div>
+</div>
+</section>
+<section id="configuration-options" class="level2">
+<h2 class="anchored" data-anchor-id="configuration-options">Configuration Options</h2>
+<p>The action supports extensive customisation through input parameters:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 28%">
+<col style="width: 4%">
+<col style="width: 55%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Input</th>
+<th>Description</th>
+<th>Required</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>github-token</code></td>
+<td>GitHub token for creating pull requests</td>
+<td>Yes</td>
+<td><code>${{ github.token }}</code></td>
+</tr>
+<tr class="even">
+<td><code>workspace-path</code></td>
+<td>Path to the workspace containing <code>_extensions</code> directory</td>
+<td>No</td>
+<td><code>.</code></td>
+</tr>
+<tr class="odd">
+<td><code>registry-url</code></td>
+<td>URL to the Quarto extensions registry JSON file</td>
+<td>No</td>
+<td><code>https://raw.githubusercontent.com/mcanouil/quarto-extensions/refs/heads/quarto-wizard/quarto-extensions.json</code></td>
+</tr>
+<tr class="even">
+<td><code>create-pr</code></td>
+<td>Whether to create pull requests</td>
+<td>No</td>
+<td><code>true</code></td>
+</tr>
+<tr class="odd">
+<td><code>branch-prefix</code></td>
+<td>Prefix for update branches</td>
+<td>No</td>
+<td><code>chore/quarto-extensions</code></td>
+</tr>
+<tr class="even">
+<td><code>base-branch</code></td>
+<td>Target branch for pull requests</td>
+<td>No</td>
+<td><code>main</code></td>
+</tr>
+<tr class="odd">
+<td><code>pr-title-prefix</code></td>
+<td>Prefix for PR titles</td>
+<td>No</td>
+<td><code>chore(deps):</code></td>
+</tr>
+<tr class="even">
+<td><code>commit-message-prefix</code></td>
+<td>Prefix for commit messages</td>
+<td>No</td>
+<td><code>chore(deps):</code></td>
+</tr>
+<tr class="odd">
+<td><code>pr-labels</code></td>
+<td>Comma-separated labels to add to PRs</td>
+<td>No</td>
+<td><code>dependencies,quarto-extensions</code></td>
+</tr>
+</tbody>
+</table>
+<p>The action also provides output values:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Output</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>updates-available</code></td>
+<td>Whether updates are available (<code>true</code>/<code>false</code>)</td>
+</tr>
+<tr class="even">
+<td><code>update-count</code></td>
+<td>Number of updates available</td>
+</tr>
+<tr class="odd">
+<td><code>updates</code></td>
+<td>JSON array of updates (name, currentVersion, latestVersion)</td>
+</tr>
+<tr class="even">
+<td><code>pr-number</code></td>
+<td>Pull request number (if created)</td>
+</tr>
+<tr class="odd">
+<td><code>pr-url</code></td>
+<td>Pull request URL (if created)</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Conventional Commits Integration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using conventional commits? Customise the prefixes to match your workflow:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> mcanouil/quarto-extensions-updater@v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">github-token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branch-prefix</span><span class="kw">:</span><span class="at"> </span><span class="st">"deps/quarto"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pr-title-prefix</span><span class="kw">:</span><span class="at"> </span><span class="st">"build(deps):"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">commit-message-prefix</span><span class="kw">:</span><span class="at"> </span><span class="st">"build(deps):"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pr-labels</span><span class="kw">:</span><span class="at"> </span><span class="st">"dependencies,quarto,automated"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This creates PRs with titles like <code>build(deps): update owner/name extension to 1.2.3</code>.</p>
+</div>
+</div>
+</section>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How It Works</h2>
+<p>The action follows a systematic workflow:</p>
+<ol type="1">
+<li><strong>Fetch Registry</strong>: Downloads the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions registry</a> from GitHub.</li>
+<li><strong>Scan Extensions</strong>: Discovers all installed extensions in your <code>_extensions/</code> directory.</li>
+<li><strong>Check Versions</strong>: Compares installed versions with the registry using semantic versioning.</li>
+<li><strong>Process Each Extension</strong>: Processes extensions individually to create separate pull requests.</li>
+<li><strong>Apply Updates</strong>: Uses the Quarto CLI (<code>quarto add owner/repo@version --no-prompt</code>) to update extensions.</li>
+<li><strong>Track Updates</strong>: Maintains or adds the <code>source</code> field in extension manifests.</li>
+<li><strong>Create/Update PR</strong>:
+<ul>
+<li>Creates a new pull request if none exists for the extension.</li>
+<li>Updates the existing PR if one already exists (same branch name).</li>
+<li>Ensures at most one PR per extension.</li>
+</ul></li>
+</ol>
+</section>
+<section id="understanding-pull-requests" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-pull-requests">Understanding Pull Requests</h2>
+<p>The action creates detailed, informative pull requests that follow Dependabot’s style:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Updates the following Quarto extension(s):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## ✨ Minor Updates</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[mcanouil/quarto-iconify](https://github.com/mcanouil/quarto-iconify)**: <span class="in">`1.0.0`</span> → <span class="in">`3.0.1`</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">### Release Notes</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>**mcanouil/quarto-iconify** (1.0.0 → 3.0.1)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Release notes</span><span class="co">](https://github.com/mcanouil/quarto-iconify/releases/tag/v3.0.1)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Repository</span><span class="co">](https://github.com/mcanouil/quarto-iconify)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; A shortcode extension to use Iconify icons in HTML-based Quarto documents.</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>🤖 This PR was automatically generated by <span class="co">[</span><span class="ot">quarto-extensions-updater</span><span class="co">](https://github.com/mcanouil/quarto-extensions-updater)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each PR includes:</p>
+<ul>
+<li><strong>Clear Title</strong>: Indicates the extension and version change.</li>
+<li><strong>Categorised Updates</strong>: Groups by major, minor, or patch changes.</li>
+<li><strong>Release Links</strong>: Direct links to release notes and repositories.</li>
+<li><strong>Extension Descriptions</strong>: Context about what the extension does.</li>
+<li><strong>Appropriate Labels</strong>: Automatically added based on update type.</li>
+</ul>
+<div class="highlight">
+<p><strong>Automated scanning</strong>, <strong>semantic versioning comparison</strong>, and <strong>automatic pull requests</strong> mean you’ll <strong>never miss an extension update</strong> again.</p>
+</div>
+</section>
+<section id="requirements" class="level2">
+<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Essential Requirements
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before using the action, ensure:</p>
+<ol type="1">
+<li><strong>Quarto CLI</strong>: Must be installed in the workflow environment. Use <code>quarto-dev/quarto-actions/setup@v2</code> to install Quarto in GitHub Actions.</li>
+<li><strong>Extension Structure</strong>: Extensions should be in <code>_extensions/owner/name/</code> structure with <code>_extension.yml</code> or <code>_extension.yaml</code> files.</li>
+<li><strong>Semantic Versioning</strong>: Extension versions should follow semantic versioning (X.Y.Z).</li>
+<li><strong>Registry Listing</strong>: Extensions should be listed in the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions registry</a>.</li>
+<li><strong>Permissions</strong>: Workflow needs <code>contents: write</code> and <code>pull-requests: write</code> permissions.</li>
+<li><strong>Source Metadata</strong>: Extensions should have <code>source</code> fields in their manifests for reliable version tracking.</li>
+</ol>
+</div>
+</div>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<p>Common issues and solutions:</p>
+<ul>
+<li><strong>No Updates Detected</strong>: Verify extensions are in <a href="https://m.canouil.dev/quarto-extensions/">m.canouil.dev/quarto-extensions/</a> and have version and source fields in their manifests.</li>
+<li><strong>Permission Errors</strong>: Check that workflow has <code>contents: write</code> and <code>pull-requests: write</code> permissions.</li>
+<li><strong>Workflow Not Running</strong>: Verify cron syntax and ensure GitHub Actions are enabled. GitHub disables scheduled workflows in inactive repositories after 60 days.</li>
+<li><strong>Duplicate PRs</strong>: Ensure <code>branch-prefix</code> is consistent across workflow runs.</li>
+</ul>
+<p>Check the <a href="https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/using-workflow-run-logs">GitHub Actions logs</a> for detailed error messages.</p>
+</section>
+<section id="ecosystem-integration" class="level2">
+<h2 class="anchored" data-anchor-id="ecosystem-integration">Ecosystem Integration</h2>
+<p><strong>Quarto Extensions Updater</strong> complements existing tools in the Quarto ecosystem:</p>
+<ul>
+<li><strong><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></strong>: A VS Code extension for installing and managing Quarto extensions with a GUI. Extensions installed via Quarto Wizard include the <code>source</code> metadata needed for automated updates.</li>
+<li><strong><a href="https://github.com/mcanouil/quarto-extensions">Quarto Extensions</a></strong>: The community registry that powers both Quarto Wizard and Quarto Extensions Updater.</li>
+<li><strong><a href="https://quarto.org/">Quarto CLI</a></strong>: The action uses <code>quarto add</code> commands to perform updates, ensuring compatibility with Quarto’s extension system.</li>
+</ul>
+<div class="highlight">
+<p>Install extensions with <strong>Quarto Wizard</strong>, automate updates with <strong>Quarto Extensions Updater</strong>, and enjoy <strong>seamless maintenance</strong> across your entire Quarto project portfolio.</p>
+</div>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p><strong>Quarto Extensions Updater</strong> brings the automation and reliability of Dependabot to Quarto extension management. By automating the update workflow, you can focus on creating compelling content rather than tracking extension releases.</p>
+<p>The action handles checking for updates, creating pull requests, and maintaining version metadata, all whilst providing clear, detailed information about each change. Whether you’re managing a personal blog, maintaining a collaborative research project, or overseeing a documentation website, this tool ensures your extensions stay current without demanding your constant attention.</p>
+<div class="highlight">
+<p>Transform your extension maintenance from a <strong>tedious manual process</strong> into an <strong>effortless automated workflow</strong>.</p>
+</div>
+<p>Ready to automate your Quarto extension updates? Add the workflow to your repository today and experience the freedom of automated maintenance.</p>
+</section>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<ul>
+<li><strong><a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a></strong>: GitHub repository and documentation.</li>
+<li><strong><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></strong>: VS Code / Positron extension for managing Quarto extensions.</li>
+<li><strong><a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions Registry</a></strong>: Browse and install Quarto extensions.</li>
+<li><strong><a href="https://quarto.org/docs/extensions/">Quarto Extensions Documentation</a></strong>: Official guide to Quarto extensions.</li>
+<li><strong><a href="https://docs.github.com/en/actions">GitHub Actions Documentation</a></strong>: Learn more about GitHub Actions workflows.</li>
 </ul>
 
 
+</section>
 
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Quarto CLI does not natively track installation sources as of version 1.8.24. See <a href="https://github.com/quarto-dev/quarto-cli/issues/11468">quarto-dev/quarto-cli#11468</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -872,6 +1281,38 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "mcanouil/mickael.canouil.fr";
+    script.dataset.repoId = "MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=";
+    script.dataset.category = "Blog posts";
+    script.dataset.categoryId = "DIC_kwDOFLAkg84CwnxO";
+    script.dataset.mapping = "title";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -880,7 +1321,7 @@ ul.task-list li input[type="checkbox"] {
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year"></span> Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/talks/2023-10-19-gentle-intro-to-quarto/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-12-12-quarto-extensions-updater/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
 </div>
@@ -1063,6 +1504,38 @@ window.document.addEventListener('DOMContentLoaded', (event) => {
     }
   });
 </script>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
