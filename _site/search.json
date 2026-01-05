@@ -378,39 +378,81 @@
     "text": "4 Conclusion\nBy following these methods, you’ll be able to publish your Quarto projects to GitHub Pages efficiently.\nChoose the approach that best suits your needs and workflow.\nHappy publishing!"
   },
   {
-    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
-    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
-    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
     "section": "",
-    "text": "I decided to start small blog posts with answers/solutions to questions I have seen and answered on Twitter, Mastodon, and Quarto GitHub Issues & Discussions."
+    "text": "Quarto Wizard 2.0.0 is here with a major architectural overhaul and powerful new features for managing your Quarto extensions."
   },
   {
-    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
-    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
-    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
-    "section": "\n1 The Question/Problem",
-    "text": "1 The Question/Problem\n\nSuppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx. G is unknown apriori, but will be at least 1.\nIs there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?\n\nSource: https://mastodon.ie/@DToher/109915736491084825"
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#from-1.0.0-to-2.0.0",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#from-1.0.0-to-2.0.0",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "From 1.0.0 to 2.0.0",
+    "text": "From 1.0.0 to 2.0.0\nVersion 1.0.0 was not around for long. As I worked on improving Quarto Wizard and enabling features beyond what the Quarto CLI offers, what started as small enhancements quickly grew into a major internal refactoring. The result is a more powerful and self-contained extension."
   },
   {
-    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
-    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
-    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
-    "section": "\n2 The Answer/Solution",
-    "text": "2 The Answer/Solution\nThe trick is, within a code cell with output: asis, to use knitr::knit_child() to create code cells with label, caption (tbl-cap), or whatever option you might want or need.\n\n\nQuarto Input\nQuarto Output\n\n\n\n---\nformat: html\n---\n\n```{r}\n#| include: false\nfor (ipkg in c(\"palmerpenguins\", \"gt\", \"dplyr\")) {\n  if (!require(ipkg, character.only = TRUE)) {\n    install.packages(ipkg)\n    library(ipkg, character.only = TRUE)\n  }\n}\n```\n\nBelow are tables of the first six rows of the Palmer penguins dataset by species:\n\n```{r}\n#| echo: false\n#| output: asis\ncat(\n  sprintf(\n    \"- `%s` (@tbl-%s)\",\n    levels(penguins[[\"species\"]]),\n    levels(penguins[[\"species\"]])\n  ),\n  sep = \"\\n\"\n)\n\nfor (ispecies in levels(penguins[[\"species\"]])) {\n  tab &lt;- penguins |&gt;\n    filter(species %in% ispecies) |&gt;\n    select(-species) |&gt;\n    head() |&gt;\n    gt() |&gt;\n    tab_header(title = ispecies)\n  cat(sep = \"\\n\", knitr::knit_child(quiet = TRUE, text = c(\n    \"```{r}\",\n    \"#| echo: false\",\n    sprintf(\"#| tbl-cap: %s\", ispecies),\n    sprintf(\"#| label: tbl-%s\", ispecies),\n    \"tab\",\n    \"```\"\n  )))\n}\n```"
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#no-more-cli-dependency",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#no-more-cli-dependency",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "No More CLI Dependency",
+    "text": "No More CLI Dependency\nThe biggest change in 2.0.0: Quarto Wizard no longer requires the Quarto CLI for extension management. The extension now handles everything natively, including:\n\nDownloading and extracting extension archives directly.\nGitHub API integration for repository access.\nProxy support via environment variables (HTTP_PROXY, HTTPS_PROXY, NO_PROXY).\n\nThis means faster installations and fewer external dependencies."
   },
   {
-    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#references",
-    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#references",
-    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
-    "section": "\n3 References",
-    "text": "3 References\nReferences:\n\nhttps://bookdown.org/yihui/rmarkdown-cookbook/child-document.html\nhttps://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html\nhttps://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html"
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#whats-new",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#whats-new",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "What’s New",
+    "text": "What’s New\n\nExtension Type Filtering\nQuickly filter extensions by type when browsing the registry.\n \n\n\nMulti-Extension Selection\nWhen installing from repositories containing multiple extensions, select exactly which ones you need.\n \n\n\nTemplate File Selection\nChoose which files to copy when using templates, with support for target subdirectories.\n \n\n\nPrivate Repositories\nAccess private GitHub repositories with improved authentication support.\n \nAuthentication priority: Manual token &gt; VS Code GitHub session &gt; Environment variables.\n\n\nQuarto Version Validation\nGet warned before installing extensions that require a newer Quarto version.\n \n\n\n\n\n\n\nNote\n\n\n\nRequires to have Quarto VSCode/Positron extension and Quarto CLI installed for version detection.\n\n\n\n\nInstall from Specific References\nInstall extensions from specific commits, tags, or branches using the format owner/repo@reference."
   },
   {
-    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#examples",
-    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#examples",
-    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
-    "section": "\n4 Examples",
-    "text": "4 Examples\n\nhttps://github.com/quarto-dev/quarto-examples"
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#new-commands",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#new-commands",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "New Commands",
+    "text": "New Commands\n\nInstall Extension from Registry - Direct registry installation.\nInstall Extension from URL - Install from archive URLs.\nInstall Extension from Local - Install from local directories or archives.\nUpdate All Extensions - Batch update all outdated extensions.\nRemove Multiple Extensions - Batch removal of extensions.\nClear Extension Cache - Force registry refresh.\nSet GitHub Token (Manual) - Configure authentication.\nClear GitHub Token - Remove stored token."
+  },
+  {
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#new-configuration-options",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#new-configuration-options",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "New Configuration Options",
+    "text": "New Configuration Options\n\nquartoWizard.cache.ttlMinutes - Configure cache duration.\nquartoWizard.registry.url - Use a custom registry URL."
+  },
+  {
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#documentation-website",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#documentation-website",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "Documentation Website",
+    "text": "Documentation Website\nA new comprehensive documentation website is now available at m.canouil.dev/quarto-wizard, featuring:\n\nUser guide with step-by-step instructions.\nCommand and configuration reference.\nAPI documentation for developers."
+  },
+  {
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#breaking-changes",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#breaking-changes",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "Breaking Changes",
+    "text": "Breaking Changes\n\nRemoved quartoWizard.quarto.path setting (no longer needed).\nQuarto CLI is no longer required for extension operations.\n\n\nReady to upgrade? Install  Quarto Wizard 2.0.0 from the VS Code Marketplace or Open VSX Registry."
+  },
+  {
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#whats-next",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#whats-next",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "What’s Next",
+    "text": "What’s Next\nThis major refactoring introduced @quarto-wizard/core1, a platform-agnostic package for extension management. Next on the roadmap: a new version of the Quarto Extensions Updater GitHub Action that will leverage this core package, bringing the same native installation capabilities to your CI/CD workflows."
+  },
+  {
+    "objectID": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#footnotes",
+    "href": "posts/2026-01-19-quarto-wizard-2-0-0/index.html#footnotes",
+    "title": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nNot published.↩︎"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Talks",
+    "section": "",
+    "text": "Introduction to Development Containers\n\n\nIntroduction to Development Containers. An introduction to using development containers for reproducible development environments.\n\n\n\n\n\nWednesday, the 8th of October, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA Gentle Introduction to Quarto\n\n\nA Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.\n\n\n\n\n\nThursday, the 19th of October, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nR Lille Meetup\n\n\nMy Journey To Transparency And Reproducibility. A journey towards a more transparent and reproducible work environment using Docker and renv.\n\n\n\n\n\nThursday, the 15th of April, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nMin 2 Rien (French)\n\n\nMy Journey To Transparency And Reproducibility. A journey towards a more transparent and reproducible work environment using Docker and renv.\n\n\n\n\n\nWednesday, the 14th of April, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nR Lille Meetup (French)\n\n\n“Débuter” avec R en Commençant par le Début … Tips and advices to start well with R (and RStudio).\n\n\n\n\n\nThursday, the 7th of January, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nResearch Seminar\n\n\nNACHO: an R package for quality control of NanoString nCounter data. DOI: 10.1093/bioinformatics/btz647.\n\n\n\n\n\nFriday, the 6th of September, 2019\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA Statistical Seminar Applied on Type 2 Diabetes (Host: Pr. Paul Franks)\n\n\nJointly Modelling Single Nucleotide Polymorphisms With Longitudinal and Time-to-Event Trait: An Application to Type 2 Diabetes and Fasting Plasma Glucose. DOI: 10.3389/fgene.2018.00210.\n\n\n\n\n\nMonday, the 21st of January, 2019\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nPh.D. Defense (French)\n\n\nDevelopment and Application of Statistical Methods for Multi-omics Studies in Type 2 Diabetes: Beyond the Genome-wide Association Studies Era.\n\n\n\n\n\nFriday, the 29th of September, 2017\n\n\nMickaël CANOUIL, Ph.D., Mickaël CANOUIL, M.Sc.\n\n\n\n\n\n\n\n\n\n\n\n\nStatistical Methods for Post Genomic Data (SMPGD)\n\n\nRevisiting Associations of SNPs Associated with Blood Fasting Glucose in Normoglycemic Individuals.\n\n\n\n\n\nThursday, the 11th of February, 2016\n\n\nMickaël CANOUIL, Ph.D., Mickaël CANOUIL, M.Sc.\n\n\n\n\n\nNo matching items\n Back to top"
   },
   {
     "objectID": "index.html",
@@ -476,11 +518,39 @@
     "text": "Footnotes\n\n\nGenome-Wide Association Studies.↩︎"
   },
   {
-    "objectID": "talks.html",
-    "href": "talks.html",
-    "title": "Talks",
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
     "section": "",
-    "text": "Introduction to Development Containers\n\n\nIntroduction to Development Containers. An introduction to using development containers for reproducible development environments.\n\n\n\n\n\nWednesday, the 8th of October, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA Gentle Introduction to Quarto\n\n\nA Gentle Introduction to Quarto. An introduction to Quarto, the next-generation scientific and technical publishing system.\n\n\n\n\n\nThursday, the 19th of October, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nR Lille Meetup\n\n\nMy Journey To Transparency And Reproducibility. A journey towards a more transparent and reproducible work environment using Docker and renv.\n\n\n\n\n\nThursday, the 15th of April, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nMin 2 Rien (French)\n\n\nMy Journey To Transparency And Reproducibility. A journey towards a more transparent and reproducible work environment using Docker and renv.\n\n\n\n\n\nWednesday, the 14th of April, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nR Lille Meetup (French)\n\n\n“Débuter” avec R en Commençant par le Début … Tips and advices to start well with R (and RStudio).\n\n\n\n\n\nThursday, the 7th of January, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nResearch Seminar\n\n\nNACHO: an R package for quality control of NanoString nCounter data. DOI: 10.1093/bioinformatics/btz647.\n\n\n\n\n\nFriday, the 6th of September, 2019\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA Statistical Seminar Applied on Type 2 Diabetes (Host: Pr. Paul Franks)\n\n\nJointly Modelling Single Nucleotide Polymorphisms With Longitudinal and Time-to-Event Trait: An Application to Type 2 Diabetes and Fasting Plasma Glucose. DOI: 10.3389/fgene.2018.00210.\n\n\n\n\n\nMonday, the 21st of January, 2019\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nPh.D. Defense (French)\n\n\nDevelopment and Application of Statistical Methods for Multi-omics Studies in Type 2 Diabetes: Beyond the Genome-wide Association Studies Era.\n\n\n\n\n\nFriday, the 29th of September, 2017\n\n\nMickaël CANOUIL, Ph.D., Mickaël CANOUIL, M.Sc.\n\n\n\n\n\n\n\n\n\n\n\n\nStatistical Methods for Post Genomic Data (SMPGD)\n\n\nRevisiting Associations of SNPs Associated with Blood Fasting Glucose in Normoglycemic Individuals.\n\n\n\n\n\nThursday, the 11th of February, 2016\n\n\nMickaël CANOUIL, Ph.D., Mickaël CANOUIL, M.Sc.\n\n\n\n\n\nNo matching items\n Back to top"
+    "text": "I decided to start small blog posts with answers/solutions to questions I have seen and answered on Twitter, Mastodon, and Quarto GitHub Issues & Discussions."
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-questionproblem",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n1 The Question/Problem",
+    "text": "1 The Question/Problem\n\nSuppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx. G is unknown apriori, but will be at least 1.\nIs there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?\n\nSource: https://mastodon.ie/@DToher/109915736491084825"
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#the-answersolution",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n2 The Answer/Solution",
+    "text": "2 The Answer/Solution\nThe trick is, within a code cell with output: asis, to use knitr::knit_child() to create code cells with label, caption (tbl-cap), or whatever option you might want or need.\n\n\nQuarto Input\nQuarto Output\n\n\n\n---\nformat: html\n---\n\n```{r}\n#| include: false\nfor (ipkg in c(\"palmerpenguins\", \"gt\", \"dplyr\")) {\n  if (!require(ipkg, character.only = TRUE)) {\n    install.packages(ipkg)\n    library(ipkg, character.only = TRUE)\n  }\n}\n```\n\nBelow are tables of the first six rows of the Palmer penguins dataset by species:\n\n```{r}\n#| echo: false\n#| output: asis\ncat(\n  sprintf(\n    \"- `%s` (@tbl-%s)\",\n    levels(penguins[[\"species\"]]),\n    levels(penguins[[\"species\"]])\n  ),\n  sep = \"\\n\"\n)\n\nfor (ispecies in levels(penguins[[\"species\"]])) {\n  tab &lt;- penguins |&gt;\n    filter(species %in% ispecies) |&gt;\n    select(-species) |&gt;\n    head() |&gt;\n    gt() |&gt;\n    tab_header(title = ispecies)\n  cat(sep = \"\\n\", knitr::knit_child(quiet = TRUE, text = c(\n    \"```{r}\",\n    \"#| echo: false\",\n    sprintf(\"#| tbl-cap: %s\", ispecies),\n    sprintf(\"#| label: tbl-%s\", ispecies),\n    \"tab\",\n    \"```\"\n  )))\n}\n```"
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#references",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#references",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n3 References",
+    "text": "3 References\nReferences:\n\nhttps://bookdown.org/yihui/rmarkdown-cookbook/child-document.html\nhttps://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html\nhttps://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html"
+  },
+  {
+    "objectID": "posts/2023-03-05-quarto-auto-table-crossref/index.html#examples",
+    "href": "posts/2023-03-05-quarto-auto-table-crossref/index.html#examples",
+    "title": "Quarto Q&A: How to have labels and captions for an unknown number of tables?",
+    "section": "\n4 Examples",
+    "text": "4 Examples\n\nhttps://github.com/quarto-dev/quarto-examples"
   },
   {
     "objectID": "posts/2025-05-19-quarto-codespaces/index.html",
@@ -774,7 +844,7 @@
     "href": "blog.html",
     "title": "Blog",
     "section": "",
-    "text": "Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions\n\n\n\nQuarto\n\nGitHub Actions\n\nExtensions\n\nAutomation\n\nDevOps\n\n\n\nDiscover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.\n\n\n\n\n\nFriday, the 12th of December, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nOptimising VS Code and Positron for Quarto: Essential Settings for Better Editing\n\n\n\nquarto\n\nvscode\n\npositron\n\nproductivity\n\n\n\nDiscover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.\n\n\n\n\n\nThursday, the 20th of November, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nLua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions\n\n\n\nquarto\n\nextensions\n\nproductivity\n\nbest practices\n\nlua\n\n\n\nThis guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.\n\n\n\n\n\nThursday, the 6th of November, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Wizard 1.0.0: Democratising Quarto Extension Management\n\n\n\nquarto\n\nvscode\n\npositron\n\nextensions\n\nproductivity\n\n\n\nIntroducing a game-changing extension for VS Code and Positron that transforms Quarto extensions management with an intuitive GUI for extensions and templates.\n\n\n\n\n\nMonday, the 20th of October, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nHow to use GitHub Codespaces to simplify your Quarto workshops\n\n\n\nQuarto\n\nGitHub Codespaces\n\nTeaching\n\nDev Container\n\n\n\nIn this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.\n\n\n\n\n\nMonday, the 19th of May, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto: Unleash Dynamic Tabset Navigation & Polished PDF Exports\n\n\n\nQuarto\n\nReveal.js\n\nPDF\n\nPresentations\n\nDecktape\n\n\n\nDiscover how to supercharge your Quarto presentations with interactive tabset navigation in Reveal.js and create stunning, professional PDFs. Get ready to dazzle your audience!\n\n\n\n\n\nMonday, the 21st of April, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto: Publishing to GitHub Pages\n\n\n\nQuarto\n\nGitHub Pages\n\nPublishing\n\nDeployment\n\nGitHub Actions\n\n\n\nIn this guide, I’ll explore various methods to publish your Quarto projects to GitHub Pages. I’ll cover both manual and automated approaches to help you choose the best fit for your workflow.\n\n\n\n\n\nMonday, the 30th of December, 2024\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to have images for both light and dark theme?\n\n\n\nQuarto\n\nQ&A\n\nJavaScript\n\ntheme\n\ndark mode\n\nlight mode\n\n\n\nIn this blog post of the “Quarto Q&A” series you will learn how to generate images for light and dark theme using knitr and switch between them when changing theme.\n\n\n\n\n\nTuesday, the 30th of May, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to publish your Quarto content as a Docker container?\n\n\n\nQuarto\n\nQ&A\n\nDocker\n\n\n\nIn this blog post of the “Quarto Q&A” series you will learn how to publish your Quarto project as a Docker container.\n\n\n\n\n\nSunday, the 7th of May, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to use non-default LaTeX packages/macros in MathJax?\n\n\n\nQuarto\n\nQ&A\n\nMathJax\n\nLaTeX\n\n\n\nA second blog post of the “Quarto Q&A” series on how to activate additional MathJax packages in a Quarto document.\n\n\n\n\n\nSunday, the 12th of March, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to have labels and captions for an unknown number of tables?\n\n\n\nQuarto\n\nQ&A\n\nR\n\nknitr\n\n\n\nA small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.\n\n\n\n\n\nSunday, the 5th of March, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nAdd a Floating Table of Contents in blogdown\n\n\n\nR\n\nblogdown\n\nrmarkdown\n\nHUGO\n\nWebsite\n\n\n\nHow to have a table of contents (TOC) on either the left or the right side of a post? I have an answer!\n\n\n\n\n\nThursday, the 6th of May, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA ggplot2 and gganimate Version of Pac-Man\n\n\n\nR\n\nVisualisation\n\nggplot2\n\ngganimate\n\nFun\n\n\n\nThe story of ggpacman. Or how to build a useless but fun R package to make a GIF of the game Pac-Man.\n\n\n\n\n\nWednesday, the 6th of May, 2020\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\nNo matching items\n Back to top"
+    "text": "Quarto Wizard 2.0.0: Native Extension Management and Batch Operations\n\n\n\nquarto\n\nvscode\n\npositron\n\nextensions\n\nproductivity\n\n\n\nQuarto Wizard 2.0.0 brings native extension management without CLI dependency, batch operations, multi-extension selection, and a new documentation website.\n\n\n\n\n\nMonday, the 19th of January, 2026\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Extensions Updater: Automating Extension Maintenance with GitHub Actions\n\n\n\nQuarto\n\nGitHub Actions\n\nExtensions\n\nAutomation\n\nDevOps\n\n\n\nDiscover how to automate Quarto extension updates in your repositories using a Dependabot-style GitHub Action that keeps your extensions current with zero manual effort.\n\n\n\n\n\nFriday, the 12th of December, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nOptimising VS Code and Positron for Quarto: Essential Settings for Better Editing\n\n\n\nquarto\n\nvscode\n\npositron\n\nproductivity\n\n\n\nDiscover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.\n\n\n\n\n\nThursday, the 20th of November, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nLua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions\n\n\n\nquarto\n\nextensions\n\nproductivity\n\nbest practices\n\nlua\n\n\n\nThis guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.\n\n\n\n\n\nThursday, the 6th of November, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Wizard 1.0.0: Democratising Quarto Extension Management\n\n\n\nquarto\n\nvscode\n\npositron\n\nextensions\n\nproductivity\n\n\n\nIntroducing a game-changing extension for VS Code and Positron that transforms Quarto extensions management with an intuitive GUI for extensions and templates.\n\n\n\n\n\nMonday, the 20th of October, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nHow to use GitHub Codespaces to simplify your Quarto workshops\n\n\n\nQuarto\n\nGitHub Codespaces\n\nTeaching\n\nDev Container\n\n\n\nIn this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.\n\n\n\n\n\nMonday, the 19th of May, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto: Unleash Dynamic Tabset Navigation & Polished PDF Exports\n\n\n\nQuarto\n\nReveal.js\n\nPDF\n\nPresentations\n\nDecktape\n\n\n\nDiscover how to supercharge your Quarto presentations with interactive tabset navigation in Reveal.js and create stunning, professional PDFs. Get ready to dazzle your audience!\n\n\n\n\n\nMonday, the 21st of April, 2025\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto: Publishing to GitHub Pages\n\n\n\nQuarto\n\nGitHub Pages\n\nPublishing\n\nDeployment\n\nGitHub Actions\n\n\n\nIn this guide, I’ll explore various methods to publish your Quarto projects to GitHub Pages. I’ll cover both manual and automated approaches to help you choose the best fit for your workflow.\n\n\n\n\n\nMonday, the 30th of December, 2024\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to have images for both light and dark theme?\n\n\n\nQuarto\n\nQ&A\n\nJavaScript\n\ntheme\n\ndark mode\n\nlight mode\n\n\n\nIn this blog post of the “Quarto Q&A” series you will learn how to generate images for light and dark theme using knitr and switch between them when changing theme.\n\n\n\n\n\nTuesday, the 30th of May, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to publish your Quarto content as a Docker container?\n\n\n\nQuarto\n\nQ&A\n\nDocker\n\n\n\nIn this blog post of the “Quarto Q&A” series you will learn how to publish your Quarto project as a Docker container.\n\n\n\n\n\nSunday, the 7th of May, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to use non-default LaTeX packages/macros in MathJax?\n\n\n\nQuarto\n\nQ&A\n\nMathJax\n\nLaTeX\n\n\n\nA second blog post of the “Quarto Q&A” series on how to activate additional MathJax packages in a Quarto document.\n\n\n\n\n\nSunday, the 12th of March, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nQuarto Q&A: How to have labels and captions for an unknown number of tables?\n\n\n\nQuarto\n\nQ&A\n\nR\n\nknitr\n\n\n\nA small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.\n\n\n\n\n\nSunday, the 5th of March, 2023\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nAdd a Floating Table of Contents in blogdown\n\n\n\nR\n\nblogdown\n\nrmarkdown\n\nHUGO\n\nWebsite\n\n\n\nHow to have a table of contents (TOC) on either the left or the right side of a post? I have an answer!\n\n\n\n\n\nThursday, the 6th of May, 2021\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\n\n\n\n\n\n\n\nA ggplot2 and gganimate Version of Pac-Man\n\n\n\nR\n\nVisualisation\n\nggplot2\n\ngganimate\n\nFun\n\n\n\nThe story of ggpacman. Or how to build a useless but fun R package to make a GIF of the game Pac-Man.\n\n\n\n\n\nWednesday, the 6th of May, 2020\n\n\nMickaël CANOUIL, Ph.D.\n\n\n\n\n\nNo matching items\n Back to top"
   },
   {
     "objectID": "projects.html",
