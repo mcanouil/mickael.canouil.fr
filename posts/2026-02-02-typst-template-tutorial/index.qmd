@@ -184,7 +184,9 @@ _extensions/my-extension/
 │   ├── _modules/            # Shared Lua utilities
 │   │   ├── utils.lua
 │   │   ├── config.lua
-│   │   └── wrapper.lua
+│   │   ├── wrapper.lua
+│   │   ├── typst-utils.lua
+│   │   └── content-extraction.lua
 │   └── partials/
 │       ├── typst-show.typ   # Wrapper functions
 │       └── libs/
@@ -375,7 +377,7 @@ The Lua filter checks if a span has the `badge` class, extracts its content and 
 ### Using the Wrapper Module
 
 As your extension grows, you will want to abstract common patterns.
-The quarto-mcanouil extension uses a wrapper module to handle attribute conversion and function call generation:
+The quarto-mcanouil extension uses a [wrapper module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/wrapper.lua) to handle attribute conversion and function call generation:
 
 ```{.lua filename="badges.lua (production)"}
 local wrapper = require( -- <1>
@@ -620,10 +622,12 @@ These factories let you declare handlers concisely:
 
 ```{.lua filename="typst-markdown.lua"}
 local DIV_HANDLERS = {
-  ['panel'] = wrapper.create_wrapped_handler(true),   -- Extract title
-  ['divider'] = wrapper.create_wrapped_handler(false), -- No title
-  ['value-box'] = wrapper.create_atomic_handler(),     -- No content
-  ['progress'] = wrapper.create_atomic_handler(),      -- No content
+  ['panel'] = wrapper.create_wrapped_handler(true),            -- Extract title
+  ['divider'] = wrapper.create_wrapped_handler(false),         -- No title
+  ['executive-summary'] = wrapper.create_wrapped_handler(true), -- Extract title
+  ['value-box'] = wrapper.create_atomic_handler(),              -- No content
+  ['progress'] = wrapper.create_atomic_handler(),               -- No content
+  ['horizontal-timeline'] = timeline.process_div,               -- Custom handler
 }
 ```
 
@@ -758,59 +762,44 @@ We need a custom handler.
 
 ### Extracting Structured Data
 
-The card extraction function demonstrates several patterns for parsing nested content:
+The card extraction function uses the [`content-extraction` module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/content-extraction.lua) to parse nested content.
+This module provides `parse_sections()`, which handles the common pattern of extracting header, body, and footer sections separated by horizontal rules.
 
 ```{.lua filename="card-grid.lua"}
+local content_extraction = require( -- <1>
+  quarto.utils.resolve_path('../_modules/content-extraction.lua'):gsub('%.lua$', '')
+)
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
+
+--- Extract card data from a div.
 local function extract_card(div)
-  local card = {}
+  local parsed = content_extraction.parse_sections(div.content) -- <2>
 
-  -- Get style and colour from attributes
-  card.style = div.attributes.style
-  card.colour = div.attributes.colour
-
-  local blocks = pandoc.List(div.content) -- <1>
-  local content_blocks = pandoc.List()
-  local footer_blocks = pandoc.List()
-  local in_footer = false -- <2>
-
-  -- Process blocks to separate title, content, footer
-  for i, block in ipairs(blocks) do
-    if block.t == 'Header' and not card.title then -- <3>
-      -- First heading becomes title
-      card.title = pandoc.utils.stringify(block.content)
-    elseif block.t == 'HorizontalRule' then -- <4>
-      -- Horizontal rule splits content and footer
-      in_footer = true
-    elseif in_footer then
-      footer_blocks:insert(block)
-    else
-      content_blocks:insert(block)
-    end
-  end
-
-  -- Convert block lists to strings
-  if #content_blocks > 0 then
-    card.content = pandoc.utils.stringify(content_blocks) -- <5>
-  end
-  if #footer_blocks > 0 then
-    card.footer = pandoc.utils.stringify(footer_blocks)
-  end
-
-  return card
+  return {
+    title = parsed.header_text, -- <3>
+    content = parsed.body_blocks and #parsed.body_blocks > 0
+      and utils.stringify(parsed.body_blocks) or nil, -- <4>
+    footer = parsed.footer_blocks and #parsed.footer_blocks > 0
+      and utils.stringify(parsed.footer_blocks) or nil,
+    style = div.attributes.style,
+    colour = div.attributes.colour
+  }
 end
 ```
 
-1. [`pandoc.List`](https://pandoc.org/lua-filters.html#type-list) provides list methods like `:insert()`.
-2. State machine flag tracks position relative to the horizontal rule separator.
-3. Only first header becomes title; subsequent headers remain in content.
-4. `---` in markdown becomes a `HorizontalRule` AST element.
-5. Flattens rich content to plain text for the Typst function.
+1. Load the content extraction module for reusable parsing utilities.
+2. `parse_sections()` parses content into header, body, and footer sections.
+3. `header_text` contains the first heading's text; `header_level` contains its level.
+4. `body_blocks` contains content before `---`; `footer_blocks` contains content after.
 
-Key patterns:
+The `parse_sections()` function returns a table with:
 
-- **State machine**: The `in_footer` flag tracks whether we are before or after the horizontal rule.
-- **First-match extraction**: The title is taken from the first header encountered.
-- **List accumulation**: Content and footer blocks are collected separately.
+- **`header_text`**: Text from the first heading (or nil if none).
+- **`header_level`**: Level of the first heading (defaults to 2).
+- **`body_blocks`**: Array of blocks before the horizontal rule.
+- **`footer_blocks`**: Array of blocks after the horizontal rule.
 
 ### Building Typst Data Structures
 
@@ -857,12 +846,21 @@ local function process_div(div, config)
       table.insert(card_parts,
         string.format('style: %s', typst_utils.typst_value(card.style)))
     end
+    if card.colour then -- <5>
+      if card.colour:match('^#') then
+        table.insert(card_parts,
+          string.format('colour: rgb(%s)', typst_utils.typst_value(card.colour)))
+      else
+        table.insert(card_parts,
+          string.format('colour: %s', typst_utils.typst_value(card.colour)))
+      end
+    end
 
-    table.insert(card_items, '(' .. table.concat(card_parts, ', ') .. ')') -- <5>
+    table.insert(card_items, '(' .. table.concat(card_parts, ', ') .. ')') -- <6>
   end
 
   -- Build final Typst function call
-  local typst_code = string.format( -- <6>
+  local typst_code = string.format( -- <7>
     '#mcanouil-card-grid(\n  (%s),\n  columns: %d\n)',
     table.concat(card_items, ',\n    '),
     columns
@@ -876,8 +874,9 @@ end
 2. [`:includes()`](https://pandoc.org/lua-filters.html#type-list) checks if class list contains the target class.
 3. [`pandoc.Null()`](https://pandoc.org/lua-filters.html#type-null) removes the element from output if no cards found.
 4. `typst_value()` handles proper quoting and escaping (see @sec-value-conversion).
-5. Each card becomes a Typst dictionary literal: `(title: "...", content: "...")`.
-6. Final output is a Typst array of dictionaries passed to the grid function.
+5. Hex colours need `rgb()` wrapper in Typst; other values use `typst_value()` directly.
+6. Each card becomes a Typst dictionary literal: `(title: "...", content: "...")`.
+7. Final output is a Typst array of dictionaries passed to the grid function.
 
 The generated Typst code looks like:
 
@@ -999,7 +998,7 @@ This flexibility makes components more user-friendly by supporting both explicit
 
 A key design goal for reusable extensions is extensibility.
 Users should be able to add their own components or override built-in ones without modifying the extension's source code.
-The configuration system enables this through metadata-driven element mappings.
+The [configuration system](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua) enables this through metadata-driven element mappings.
 
 ### Built-in Mappings
 
@@ -1014,8 +1013,10 @@ local function get_builtin_mappings()
       ['panel'] = { wrapper = 'mcanouil-panel', arguments = true },
       ['divider'] = { wrapper = 'mcanouil-divider', arguments = true },
       ['progress'] = { wrapper = 'mcanouil-progress', arguments = true },
+      ['executive-summary'] = { wrapper = 'mcanouil-executive-summary', arguments = true },
       ['card-grid'] = { wrapper = 'mcanouil-card-grid', arguments = true },
       ['timeline'] = { wrapper = 'mcanouil-timeline', arguments = true },
+      ['horizontal-timeline'] = { wrapper = 'mcanouil-horizontal-timeline', arguments = true },
     },
     span = {
       ['badge'] = { wrapper = 'mcanouil-badge', arguments = true }
@@ -1231,6 +1232,7 @@ The configuration maps the class to a function, and the factory handlers do the 
 ## Value Conversion and Type Safety
 
 When generating Typst code from Lua, you must convert Lua values to valid Typst syntax.
+The [`typst-utils` module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/typst-utils.lua) provides utilities for this.
 This seemingly simple task has nuances that, if handled incorrectly, lead to subtle bugs.
 
 ### The `typst_value` Function
