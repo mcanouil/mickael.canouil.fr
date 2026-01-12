@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.16">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mickaël CANOUIL, Ph.D.">
+<meta name="description" content="Quarto Wizard 2.0.0 brings native extension management without CLI dependency, batch operations, multi-extension selection, and a new documentation website.">
+
+<title>Quarto Wizard 2.0.0: Native Extension Management and Batch Operations – MCU</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../..//assets/images/logo-light-path.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-3ae586159be244f9b7da5612ca3882f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4bdbedee417e7c90344270729bc2963b.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-3ae586159be244f9b7da5612ca3882f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-75f04274c6783327f3e80f1147d20098.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-60a5566b691e7941d1e942fd0a95f8e4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-75f04274c6783327f3e80f1147d20098.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+.quarto-wizard {
+   display: inline-block;
+   aspect-ratio: 1 / 1;
+   height: 1em;
+   margin-bottom: -0.15em;
+   mask-image: url('assets/media/quarto-wizard.svg');
+   mask-size: contain;
+   mask-repeat: no-repeat;
+   mask-position: center;
+   background-color: currentColor;
+   vertical-align: baseline;
+ }
+ </style>
+
+
+<meta property="og:title" content="Quarto Wizard 2.0.0: Native Extension Management and Batch Operations – MCU">
+<meta property="og:description" content="Quarto Wizard 2.0.0 brings native extension management without CLI dependency, batch operations, multi-extension selection, and a new documentation website.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png">
+<meta property="og:site_name" content="MCU">
+<meta property="og:image:height" content="640">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:alt" content="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene.">
+<meta name="twitter:title" content="Quarto Wizard 2.0.0: Native Extension Management and Batch Operations – MCU">
+<meta name="twitter:description" content="Quarto Wizard 2.0.0 brings native extension management without CLI dependency, batch operations, multi-extension selection, and a new documentation website.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png">
+<meta name="twitter:image-height" content="640">
+<meta name="twitter:image-width" content="1280">
+<meta name="twitter:image:alt" content="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene.">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../assets/images/logo-dark-path.svg" alt="" class="navbar-logo light-content">
+    <img src="../../assets/images/logo-light-path.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">MCU</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://bsky.app/profile/mickael.canouil.fr"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:bluesky" aria-label="BlueSky" title="BlueSky"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.linkedin.com/in/mickaelcanouil"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:linkedin" aria-label="LinkedIn" title="LinkedIn"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://fosstodon.org/@MickaelCanouil" rel="me"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:mastodon" aria-label="Mastodon" title="Mastodon"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://x.com/MickaelCanouil"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:x-twitter" aria-label="X" title="X"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/mcanouil"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:mark-github-16" aria-label="GitHub" title="GitHub"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/sponsors/mcanouil?o=esb"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="GitHub Sponsor" title="GitHub Sponsor"></iconify-icon></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Quarto Wizard 2.0.0: Native Extension Management and Batch Operations</h1>
+                  <div>
+        <div class="description">
+          <p>Quarto Wizard 2.0.0 brings native extension management without CLI dependency, batch operations, multi-extension selection, and a new documentation website.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">vscode</div>
+                <div class="quarto-category">positron</div>
+                <div class="quarto-category">extensions</div>
+                <div class="quarto-category">productivity</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://mickael.canouil.fr">Mickaël CANOUIL, <em>Ph.D.</em></a> <a href="https://orcid.org/0000-0002-3396-4549" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Monday, the 12th of January, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#from-1.0.0-to-2.0.0" id="toc-from-1.0.0-to-2.0.0" class="nav-link active" data-scroll-target="#from-1.0.0-to-2.0.0">From 1.0.0 to 2.0.0</a></li>
+  <li><a href="#whats-new" id="toc-whats-new" class="nav-link" data-scroll-target="#whats-new">What’s New</a>
+  <ul class="collapse">
+  <li><a href="#extension-type-filtering" id="toc-extension-type-filtering" class="nav-link" data-scroll-target="#extension-type-filtering">Extension Type Filtering</a></li>
+  <li><a href="#multi-extension-selection" id="toc-multi-extension-selection" class="nav-link" data-scroll-target="#multi-extension-selection">Multi-Extension Selection</a></li>
+  <li><a href="#template-file-selection" id="toc-template-file-selection" class="nav-link" data-scroll-target="#template-file-selection">Template File Selection</a></li>
+  <li><a href="#private-repositories" id="toc-private-repositories" class="nav-link" data-scroll-target="#private-repositories">Private Repositories</a></li>
+  <li><a href="#quarto-version-validation" id="toc-quarto-version-validation" class="nav-link" data-scroll-target="#quarto-version-validation">Quarto Version Validation</a></li>
+  <li><a href="#install-from-specific-references" id="toc-install-from-specific-references" class="nav-link" data-scroll-target="#install-from-specific-references">Install from Specific References</a></li>
+  </ul></li>
+  <li><a href="#new-commands" id="toc-new-commands" class="nav-link" data-scroll-target="#new-commands">New Commands</a></li>
+  <li><a href="#new-configuration-options" id="toc-new-configuration-options" class="nav-link" data-scroll-target="#new-configuration-options">New Configuration Options</a></li>
+  <li><a href="#documentation-website" id="toc-documentation-website" class="nav-link" data-scroll-target="#documentation-website">Documentation Website</a></li>
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking Changes</a></li>
+  <li><a href="#whats-next" id="toc-whats-next" class="nav-link" data-scroll-target="#whats-next">What’s Next</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-12-quarto-wizard-2-0-0/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene." width="600"></a></p>
+</figure>
+</div>
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is here with a major architectural overhaul and powerful new features for managing your Quarto extensions.</p>
+<div class="highlight">
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is now available!</p>
+<p>Upgrade today from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
+</div>
+<section id="from-1.0.0-to-2.0.0" class="level2">
+<h2 class="anchored" data-anchor-id="from-1.0.0-to-2.0.0">From 1.0.0 to 2.0.0</h2>
+<p>Version 1.0.0 was not around for long. As I worked on improving Quarto Wizard and enabling features beyond what the Quarto CLI offers, what started as small enhancements quickly grew into a major internal refactoring. The result is a more powerful and self-contained extension.</p>
+<div class="highlight">
+<p>No more Quarto CLI dependency.</p>
+</div>
+<p>The biggest change in 2.0.0: <strong>Quarto Wizard no longer requires the Quarto CLI</strong> for extension management. The extension now handles everything natively, including:</p>
+<ul>
+<li>Downloading and extracting extension archives directly.</li>
+<li>GitHub API integration for repository access.</li>
+<li>Proxy support via environment variables (<code>HTTP_PROXY</code>, <code>HTTPS_PROXY</code>, <code>NO_PROXY</code>).</li>
+</ul>
+<p>This means faster installations and fewer external dependencies.</p>
+</section>
+<section id="whats-new" class="level2">
+<h2 class="anchored" data-anchor-id="whats-new">What’s New</h2>
+<section id="extension-type-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="extension-type-filtering">Extension Type Filtering</h3>
+<p>Quickly filter extensions by type when browsing the registry.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/extension-browser-1-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/extension-browser-1-dark.png" title="Extension Type Filtering" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The extension browser interface showing extension type filters with options for Shortcodes, Filters, Formats, Reveal.js Plugins, and Projects." width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/extension-browser-1-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/extension-browser-1-light.png" title="Extension Type Filtering" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The extension browser interface showing extension type filters with options for Shortcodes, Filters, Formats, Reveal.js Plugins, and Projects." width="500"></a></p>
+</figure>
+</div>
+</section>
+<section id="multi-extension-selection" class="level3">
+<h3 class="anchored" data-anchor-id="multi-extension-selection">Multi-Extension Selection</h3>
+<p>When installing from repositories containing multiple extensions, select exactly which ones you need.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/extension-selection-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/extension-selection-dark.png" title="Extension Selection Dialog" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing a list of discovered extensions with checkboxes for multi-selection when installing from a repository containing multiple extensions." width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/extension-selection-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/extension-selection-light.png" title="Extension Selection Dialog" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing a list of discovered extensions with checkboxes for multi-selection when installing from a repository containing multiple extensions." width="500"></a></p>
+</figure>
+</div>
+</section>
+<section id="template-file-selection" class="level3">
+<h3 class="anchored" data-anchor-id="template-file-selection">Template File Selection</h3>
+<p>Choose which files to copy when using templates, with support for target subdirectories.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/template-files-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/template-files-dark.png" title="Template Files Selection" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing available template files to copy with checkboxes for selective file installation." width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/template-files-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/template-files-light.png" title="Template Files Selection" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing available template files to copy with checkboxes for selective file installation." width="500"></a></p>
+</figure>
+</div>
+</section>
+<section id="private-repositories" class="level3">
+<h3 class="anchored" data-anchor-id="private-repositories">Private Repositories</h3>
+<p>Access private GitHub repositories with improved authentication support.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/github-token-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/github-token-dark.png" title="GitHub Token Setup" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The input dialog for entering a GitHub personal access token for private repository access." width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/github-token-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/github-token-light.png" title="GitHub Token Setup" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The input dialog for entering a GitHub personal access token for private repository access." width="500"></a></p>
+</figure>
+</div>
+<p>Authentication priority: Manual token &gt; VS Code GitHub session &gt; Environment variables.</p>
+</section>
+<section id="quarto-version-validation" class="level3">
+<h3 class="anchored" data-anchor-id="quarto-version-validation">Quarto Version Validation</h3>
+<p>Get warned before installing extensions that require a newer Quarto version.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/version-validation-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/version-validation-dark.png" title="Version Validation Warning" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The warning dialog indicating that the extension version requirement is not met, showing the required and current Quarto versions with options to Install Anyway or Cancel." width="250"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/version-validation-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/version-validation-light.png" title="Version Validation Warning" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The warning dialog indicating that the extension version requirement is not met, showing the required and current Quarto versions with options to Install Anyway or Cancel." width="250"></a></p>
+</figure>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Requires to have Quarto VSCode/Positron extension and Quarto CLI installed for version detection.</p>
+</div>
+</div>
+</section>
+<section id="install-from-specific-references" class="level3">
+<h3 class="anchored" data-anchor-id="install-from-specific-references">Install from Specific References</h3>
+<p>Install extensions from specific commits, tags, or branches using the format <code>owner/repo@reference</code>.</p>
+</section>
+</section>
+<section id="new-commands" class="level2">
+<h2 class="anchored" data-anchor-id="new-commands">New Commands</h2>
+<ul>
+<li><strong>Install Extension from Registry</strong> - Direct registry installation.</li>
+<li><strong>Install Extension from URL</strong> - Install from archive URLs.</li>
+<li><strong>Install Extension from Local</strong> - Install from local directories or archives.</li>
+<li><strong>Update All Extensions</strong> - Batch update all outdated extensions.</li>
+<li><strong>Remove Multiple Extensions</strong> - Batch removal of extensions.</li>
+<li><strong>Clear Extension Cache</strong> - Force registry refresh.</li>
+<li><strong>Set GitHub Token (Manual)</strong> - Configure authentication.</li>
+<li><strong>Clear GitHub Token</strong> - Remove stored token.</li>
+</ul>
+</section>
+<section id="new-configuration-options" class="level2">
+<h2 class="anchored" data-anchor-id="new-configuration-options">New Configuration Options</h2>
+<ul>
+<li><code>quartoWizard.cache.ttlMinutes</code> - Configure cache duration.</li>
+<li><code>quartoWizard.registry.url</code> - Use a custom registry URL.</li>
+</ul>
+</section>
+<section id="documentation-website" class="level2">
+<h2 class="anchored" data-anchor-id="documentation-website">Documentation Website</h2>
+<p>A new comprehensive documentation website is now available at <a href="https://m.canouil.dev/quarto-wizard">m.canouil.dev/quarto-wizard</a>, featuring:</p>
+<ul>
+<li>User guide with step-by-step instructions.</li>
+<li>Command and configuration reference.</li>
+<li>API documentation for developers.</li>
+</ul>
+</section>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
+<ul>
+<li>Removed <code>quartoWizard.quarto.path</code> setting (no longer needed).</li>
+<li>Quarto CLI is no longer required for extension operations.</li>
+</ul>
+<div class="highlight">
+<p>Ready to upgrade? Install <strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code Marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
+</div>
+</section>
+<section id="whats-next" class="level2">
+<h2 class="anchored" data-anchor-id="whats-next">What’s Next</h2>
+<p>This major refactoring introduced <code>@quarto-wizard/core</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, a platform-agnostic package for extension management.</p>
+<p>Next on the roadmap: a new version of the <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater GitHub Action</a> that will leverage this core package, bringing the same native installation capabilities to your CI/CD workflows.</p>
+
+
+</section>
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Not published on any registry.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/mickael\.canouil\.fr");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "mcanouil/mickael.canouil.fr";
+    script.dataset.repoId = "MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=";
+    script.dataset.category = "Blog posts";
+    script.dataset.categoryId = "DIC_kwDOFLAkg84CwnxO";
+    script.dataset.mapping = "title";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Powered by <a href="https://quarto.org"><iconify-icon role="img" inline="" icon="simple-icons:quarto" aria-label="Quarto Logo" title="Quarto Logo"></iconify-icon> Quarto</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+<p>© <span id="current-year"></span> Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-12-quarto-wizard-2-0-0/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
+</div>
+  </div>
+</footer>
+<script type="text/javascript">
+const dateElements = document.querySelectorAll("p.date, p.date-modified, div.listing-date, div.listing-file-modified");
+dateElements.forEach((el) => {
+  el.innerHTML = el.innerHTML.replace(
+    /(\d+)(st|nd|rd|th)/g,
+    "$1<sup style='font-size:0.5em;font-style:italic;'>$2</sup>"
+  );
+});
+</script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+  const currentYear = new Date().getFullYear();
+  document.getElementById('current-year').textContent = currentYear;
+});
+</script>
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    const categories = document.querySelectorAll(".quarto-listing-category .category");
+    const container = document.querySelector(".quarto-listing-category");
+
+    const categoryMap = {};
+
+    categories.forEach(category => {
+      const dataCategory = category.getAttribute("data-category");
+      const decodedCategory = atob(dataCategory);
+      const firstLetter = decodedCategory.charAt(0).toUpperCase();
+      if (!categoryMap[firstLetter]) {
+        categoryMap[firstLetter] = [];
+      }
+      categoryMap[firstLetter].push(category);
+    });
+
+    Object.keys(categoryMap).sort().forEach(letter => {
+      const groupDiv = document.createElement("div");
+      groupDiv.classList.add("category-group");
+      const button = document.createElement("div");
+      button.classList.add("category", "collapsed");
+      button.setAttribute("data-bs-toggle", "collapse");
+      button.setAttribute("data-bs-target", `#collapse-category-${letter}`);
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", `Toggle ${letter} categories`);
+      button.setAttribute("aria-controls", `collapse-category-${letter}`);
+      button.setAttribute("role", "button");
+      button.innerHTML = `<div style="font-style: italic;">${letter}</div>`;
+      const collapseDiv = document.createElement("div");
+      collapseDiv.classList.add("collapse");
+      collapseDiv.id = `collapse-category-${letter}`;
+
+      if (letter.length === 0) {
+        categoryMap[letter].forEach(category => {
+          container.appendChild(category);
+        });
+      } else {
+        categoryMap[letter].forEach(category => {
+          collapseDiv.appendChild(category);
+        });
+        groupDiv.appendChild(button);
+        groupDiv.appendChild(collapseDiv);
+        container.appendChild(groupDiv);
+      }
+    });
+  });
+</script>
+<!-- Custom JavaScript for clipboard.js to properly access code inside modals -->
+<script id="quarto-extensions-listing-clipboardjs" type="text/javascript">
+// General clipboard.js setup for modals
+window.document.addEventListener('DOMContentLoaded', (event) => {
+  /**
+  * Initialise clipboard functionality for any modal
+  */
+  const initialiseModalClipboard = () => {
+    // Find all modals in the document
+    const modals = document.querySelectorAll('.modal');
+    
+    modals.forEach((modal) => {
+      const modalId = modal.getAttribute('id');
+      if (!modalId) return;
+      
+      // Find code copy buttons within this modal
+      const copyButtons = modal.querySelectorAll('.code-copy-button');
+      if (copyButtons.length === 0) return;
+      
+      // Add data-in-quarto-modal attribute to buttons in this modal
+      copyButtons.forEach((button) => {
+        button.setAttribute('data-in-quarto-modal', modalId);
+      });
+      
+      console.log(`Initialising clipboard for modal: ${modalId}`);
+      
+      // Create clipboard instance for this modal
+      const clipboardModal = new window.ClipboardJS(
+        `.code-copy-button[data-in-quarto-modal="${modalId}"]`, 
+        {
+          text: (trigger) => {
+            // Get text from the code element, excluding annotations
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            const annotations = codeEl.querySelectorAll('[class*="code-annotation-"]');
+            annotations.forEach((annotation) => annotation.remove());
+            return codeEl.innerText;
+          },
+          container: modal // Set the modal as container for clipboard operations
+        }
+      );
+      
+      // Success handler with visual feedback
+      clipboardModal.on('success', (e) => {
+        const button = e.trigger;
+        button.blur();
+        
+        // Visual feedback
+        button.classList.add('code-copy-button-checked');
+        const currentTitle = button.getAttribute('title');
+        button.setAttribute('title', 'Copied!');
+        
+        // Bootstrap tooltip feedback
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute('data-bs-toggle', 'tooltip');
+          button.setAttribute('data-bs-placement', 'left');
+          button.setAttribute('data-bs-title', 'Copied!');
+          tooltip = new bootstrap.Tooltip(button, { 
+            trigger: 'manual', 
+            customClass: 'code-copy-button-tooltip',
+            offset: [0, -8]
+          });
+          tooltip.show();    
+        }
+        
+        // Reset after 1 second
+        setTimeout(() => {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute('data-bs-title');
+            button.removeAttribute('data-bs-toggle');
+            button.removeAttribute('data-bs-placement');
+          }
+          button.setAttribute('title', currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        
+        e.clearSelection();
+        console.log(`Copied from modal ${modalId}:`, e.text);
+      });
+      
+      // Error handler
+      clipboardModal.on('error', (e) => {
+        console.error(`Clipboard error in modal ${modalId}:`, e);
+        const button = e.trigger;
+        button.setAttribute('title', 'Press Ctrl+C to copy');
+        
+        // Visual feedback for error
+        button.style.backgroundColor = '#f8d7da';
+        setTimeout(() => {
+          button.style.backgroundColor = '';
+          button.setAttribute('title', 'Copy to Clipboard');
+        }, 2000);
+      });
+    });
+  };
+  
+  // Initialise clipboard for modals
+  initialiseModalClipboard();
+  
+  // Also initialise when modals are shown (in case of dynamic content)
+  document.addEventListener('shown.bs.modal', () => {
+    initialiseModalClipboard();
+  });
+});
+</script>
+<script>
+  document.querySelectorAll('header#title-block-header div, header#title-block-header p').forEach(function(el) {
+    if (!el.textContent.trim()) {
+      el.style.display = 'none';
+      el.textContent = "";
+    }
+  });
+</script>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>
