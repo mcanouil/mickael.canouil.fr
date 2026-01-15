@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <title>Quarto × Typst - Part 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Buenard:wght@700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --quarto-blue: #74AADB;
+      --quarto-text: #4F789E;
+      --typst-teal: #239dad;
+      --typst-alt: #22B3C6;
+      --bg-dark: #0d1117;
+      --bg-surface: #161b22;
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Open Graph standard: 1200x630px (1.91:1 ratio) */
+    .feature-container {
+      width: 1200px;
+      height: 630px;
+      background: var(--bg-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(117, 170, 219, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(117, 170, 219, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* Floating code snippets */
+    .code-float {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      opacity: 0.25;
+      white-space: pre;
+      line-height: 1.6;
+      pointer-events: none;
+    }
+
+    .code-float.qmd {
+      top: 60px;
+      left: 40px;
+      animation: floatUp 12s ease-in-out infinite;
+    }
+
+    .code-float.typ {
+      bottom: 80px;
+      right: 40px;
+      animation: floatUp 12s ease-in-out infinite 2s;
+    }
+
+    .code-float.yaml {
+      top: 180px;
+      right: 120px;
+      animation: floatUp 12s ease-in-out infinite 4s;
+    }
+
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0); opacity: 0.25; }
+      50% { transform: translateY(-15px); opacity: 0.4; }
+    }
+
+    /* Gradient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+    }
+
+    .orb-quarto {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--quarto-blue) 0%, transparent 70%);
+      top: -100px;
+      left: -100px;
+      animation: orbFloat 10s ease-in-out infinite;
+    }
+
+    .orb-typst {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, var(--typst-teal) 0%, transparent 70%);
+      bottom: -80px;
+      right: -80px;
+      animation: orbFloat 10s ease-in-out infinite 3s;
+    }
+
+    .orb-accent {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, var(--typst-alt) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orbPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: scale(1) translate(0, 0); }
+      50% { transform: scale(1.1) translate(20px, -20px); }
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+      50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
+    }
+
+    /* Main content */
+    .content {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+    }
+
+    /* Logo container */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+      margin-bottom: 32px;
+    }
+
+    .logo-mark {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Official Quarto logo */
+    .quarto-logo {
+      height: 70px;
+      opacity: 0;
+      animation: logoEnter 1s ease-out forwards;
+    }
+
+    .quarto-logo svg {
+      height: 100%;
+      width: auto;
+    }
+
+    /* Official Typst logo - wordmark in Buenard Bold */
+    .typst-logo {
+      font-family: 'Buenard', serif;
+      font-weight: 700;
+      font-size: 56px;
+      color: var(--typst-teal);
+      letter-spacing: -1px;
+      opacity: 0;
+      animation: logoEnter 1s ease-out 0.2s forwards;
+    }
+
+    @keyframes logoEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .connector {
+      font-family: 'Instrument Serif', serif;
+      font-size: 48px;
+      font-style: italic;
+      color: var(--text-secondary);
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out 0.4s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.6; }
+    }
+
+    /* Title section */
+    .title-section {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .part-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 42px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+      opacity: 0;
+      animation: titleSlide 0.8s ease-out 0.5s forwards;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: titleSlide 0.8s ease-out 0.7s forwards;
+    }
+
+    @keyframes titleSlide {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tags */
+    .tags {
+      display: flex;
+      gap: 16px;
+      opacity: 0;
+      animation: titleSlide 0.8s ease-out 0.9s forwards;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 10px 18px;
+      border-radius: 4px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .tag.quarto {
+      border-color: rgba(116, 170, 219, 0.3);
+      color: var(--quarto-blue);
+    }
+
+    .tag.typst {
+      border-color: rgba(35, 157, 173, 0.3);
+      color: var(--typst-teal);
+    }
+
+    .tag.arrow {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    /* Document preview shapes */
+    .doc-preview {
+      position: absolute;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .doc-left {
+      width: 160px;
+      height: 220px;
+      left: 60px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-6deg);
+      opacity: 0;
+      animation: docSlideInLeft 1s ease-out 1s forwards;
+    }
+
+    .doc-right {
+      width: 160px;
+      height: 220px;
+      right: 60px;
+      top: 50%;
+      transform: translateY(-50%) rotate(6deg);
+      opacity: 0;
+      animation: docSlideInRight 1s ease-out 1.2s forwards;
+    }
+
+    @keyframes docSlideInLeft {
+      from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-30px) rotate(0deg);
+      }
+      to {
+        opacity: 0.85;
+        transform: translateY(-50%) rotate(-6deg);
+      }
+    }
+
+    @keyframes docSlideInRight {
+      from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(30px) rotate(0deg);
+      }
+      to {
+        opacity: 0.85;
+        transform: translateY(-50%) rotate(6deg);
+      }
+    }
+
+    .doc-header {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      gap: 6px;
+    }
+
+    .doc-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .doc-left .doc-dot:first-child { background: rgba(116, 170, 219, 0.6); }
+    .doc-right .doc-dot:first-child { background: rgba(35, 157, 173, 0.6); }
+
+    .doc-content {
+      padding: 16px;
+    }
+
+    .doc-line {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+
+    .doc-line.short { width: 60%; }
+    .doc-line.medium { width: 85%; }
+    .doc-line.long { width: 100%; }
+
+    .doc-left .doc-line:nth-child(1) { background: rgba(116, 170, 219, 0.25); width: 50%; }
+    .doc-right .doc-line:nth-child(1) { background: rgba(35, 157, 173, 0.25); width: 50%; }
+
+    /* Decorative elements */
+    .deco-circle {
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .deco-circle-1 {
+      width: 300px;
+      height: 300px;
+      top: -150px;
+      right: 200px;
+      animation: spin 60s linear infinite;
+    }
+
+    .deco-circle-2 {
+      width: 200px;
+      height: 200px;
+      bottom: -100px;
+      left: 300px;
+      animation: spin 45s linear infinite reverse;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="feature-container">
+    <!-- Background elements -->
+    <div class="grid-bg"></div>
+    <div class="orb orb-quarto"></div>
+    <div class="orb orb-typst"></div>
+    <div class="orb orb-accent"></div>
+    
+    <!-- Decorative circles -->
+    <div class="deco-circle deco-circle-1"></div>
+    <div class="deco-circle deco-circle-2"></div>
+
+    <!-- Floating code snippets -->
+    <div class="code-float qmd">---
+title: "Analysis"
+format: typst
+---
+
+## Introduction
+Quarto enables...</div>
+
+    <div class="code-float typ">#set page(paper: "a4")
+#set text(font: "Linux")
+
+= Results
+#lorem(50)</div>
+
+    <div class="code-float yaml">format:
+  typst:
+    toc: true
+    number-sections: true</div>
+
+    <!-- Document previews -->
+    <div class="doc-preview doc-left">
+      <div class="doc-header">
+        <div class="doc-dot"></div>
+        <div class="doc-dot"></div>
+        <div class="doc-dot"></div>
+      </div>
+      <div class="doc-content">
+        <div class="doc-line short"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line medium"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line short"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line medium"></div>
+      </div>
+    </div>
+
+    <div class="doc-preview doc-right">
+      <div class="doc-header">
+        <div class="doc-dot"></div>
+        <div class="doc-dot"></div>
+        <div class="doc-dot"></div>
+      </div>
+      <div class="doc-content">
+        <div class="doc-line short"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line medium"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line short"></div>
+        <div class="doc-line long"></div>
+        <div class="doc-line medium"></div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="logo-container">
+        <!-- Official Quarto Logo -->
+        <div class="logo-mark quarto-logo">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 599 125.4">
+            <g>
+              <path fill-rule="evenodd" clip-rule="evenodd" fill="#74AADB" d="M56,54.4V1.5C27.9,3.5,5.6,26.2,4.1,54.4H56z"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" fill="#74AADB" d="M63,54.4h52.9C114.4,25.9,91.5,3,63,1.5V54.4z"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" fill="#74AADB" d="M56,61.4H4.2c2,27.7,24.1,49.9,51.8,51.8V61.4z"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" fill="#74AADB" d="M63,61.4v51.9c28.2-1.5,50.9-23.8,52.8-51.9H63z"/>
+            </g>
+            <path fill="#f0f6fc" d="M214.6,24.8v13.1c-5.8-10.1-16-16.6-29.4-16.6c-21.3,0-36.2,16.2-36.2,38.1c0,22.1,14.9,37.9,36.2,37.9
+              c13.4,0,23.7-6.4,29.4-16.5V123c0,1.4,1,2.4,2.4,2.4h4c1.4,0,2.4-1,2.4-2.4V24.8c0-1.4-1-2.4-2.4-2.4h-4
+              C215.6,22.4,214.6,23.4,214.6,24.8z M186.1,88.8c-17.1,0-28.6-12.2-28.6-29.4s11.5-29.8,28.6-29.8c17.3,0,28.5,12.5,28.5,29.8
+              S203.4,88.8,186.1,88.8z"/>
+            <path fill="#f0f6fc" d="M298.4,24.8v42.1c0,14.6-9.9,22.7-22.7,22.7c-12.6,0-22.7-8.2-22.7-22.7V24.8c0-1.4-1-2.4-2.4-2.4h-4
+              c-1.4,0-2.4,1-2.4,2.4V68c0,20.2,14.4,29.3,29.6,29.3c9.8,0,19.2-3.8,24.6-12.2v8.5c0,1.4,1,2.4,2.4,2.4h4c1.4,0,2.4-1,2.4-2.4V24.8
+              c0-1.4-1-2.4-2.4-2.4h-4C299.4,22.4,298.4,23.4,298.4,24.8z"/>
+            <path fill="#f0f6fc" d="M391.7,24.8v13c-5.8-10.1-16-16.5-29.4-16.5c-21.3,0-36.2,15.8-36.2,37.9c0,21.9,14.9,38.1,36.2,38.1
+              c13.4,0,23.7-6.6,29.4-16.6v13c0,1.4,1,2.4,2.4,2.4h4c1.4,0,2.4-1,2.4-2.4V24.8c0-1.4-1-2.4-2.4-2.4h-4
+              C392.7,22.4,391.7,23.4,391.7,24.8z M363.2,88.8c-17.1,0-28.6-12.3-28.6-29.6s11.5-29.6,28.6-29.6c17.3,0,28.5,12.3,28.5,29.6
+              S380.5,88.8,363.2,88.8z"/>
+            <path fill="#f0f6fc" d="M430.1,36V24.8c0-1.4-1-2.4-2.4-2.4h-4c-1.4,0-2.4,1-2.4,2.4v68.8c0,1.4,1,2.4,2.4,2.4h4
+              c1.4,0,2.4-1,2.4-2.4V54.4c0-16,11.5-23.5,23.7-24.6c1.4-0.2,2.2-1.1,2.2-2.6v-3.5c0-1.6-0.8-2.4-2.4-2.2
+              C443.9,22.2,435.1,27,430.1,36z"/>
+            <path fill="#f0f6fc" d="M505,27v-2.2c0-1.4-1-2.4-2.4-2.4h-16v-20c0-1.4-1-2.4-2.4-2.4h-4c-1.4,0-2.4,1-2.4,2.4v20h-8.2
+              c-1.4,0-2.4,1-2.4,2.4V27c0,1.4,1,2.4,2.4,2.4h8.2v50.2c0,10.4,6.4,16.3,16.5,16.3h7.5c1.4,0,2.4-1,2.4-2.4V91c0-1.4-1-2.4-2.4-2.4
+              H497c-5.6,0-10.4-2.6-10.4-10.1V29.4h16C504,29.4,505,28.5,505,27z"/>
+            <path fill="#f0f6fc" d="M552.7,97.4c22.1,0,37.1-16.3,37.1-38.2c0-22.1-15-38.1-37.1-38.1s-37.3,16-37.3,38.1
+              C515.4,81.1,530.6,97.4,552.7,97.4z M552.7,88.8c-17,0-28.5-12.6-28.5-29.6s11.5-29.6,28.5-29.6c17,0,28.2,12.6,28.2,29.6
+              S569.6,88.8,552.7,88.8z"/>
+          </svg>
+        </div>
+        
+        <span class="connector">+</span>
+        
+        <!-- Official Typst Logo - wordmark in Buenard Bold #239dad -->
+        <div class="logo-mark">
+          <span class="typst-logo">typst</span>
+        </div>
+      </div>
+
+      <div class="title-section">
+        <h1 class="part-title">Part 2</h1>
+        <p class="subtitle">Modern Scientific Publishing</p>
+      </div>
+
+      <div class="tags">
+        <span class="tag quarto">.qmd</span>
+        <span class="tag arrow">→</span>
+        <span class="tag typst">.typ</span>
+        <span class="tag arrow">→</span>
+        <span class="tag">.pdf</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -12,11 +12,17 @@ categories:
   - lua
   - pdf
 image: featured.png
-image-alt: "Quarto logo and Typst logo connected by flowing lines representing the Lua bridge between them."
+image-alt: |
+  Feature image for "Quarto + Typst Part 1" blog post.
+  Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+  Below, "Part 1" in serif font with subtitle "Modern Scientific Publishing".
+  File format pipeline shows .qmd → .typ → .pdf.
+  Decorative elements include floating code snippets and gradient orbs in blue and teal.
 lang: en-GB
 number-sections: true
 link-external-newwindow: true
 lightbox: true
+draft: true
 ---
 
 ![](featured.png){
@@ -56,7 +62,7 @@ David Keyes wrote a comprehensive introduction to using Typst with Quarto at [R 
 If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.
 
 This tutorial builds upon that foundation.
-Where David's post shows how to use Typst templates with Quarto, this tutorial explores how to *build* sophisticated templates that pair Lua filters with Typst rendering functions.
+Where David's post shows how to use Typst templates with Quarto, this tutorial explores how to _build_ sophisticated templates that pair Lua filters with Typst rendering functions.
 What does this mean in practice?
 It means creating reusable components like badges, panels, and card grids that authors can invoke with simple markdown syntax instead of writing Typst code directly.
 
@@ -81,7 +87,7 @@ The task is [Completed]{.badge colour="success"} and ready for review.
 
 This should produce a styled badge in the PDF output.
 But here is the challenge: Typst templates alone cannot intercept and transform markdown elements.
-Typst receives content *after* Quarto and Pandoc have processed it, so by the time your template sees the document, that `.badge` span has already been converted to plain text.
+Typst receives content _after_ Quarto and Pandoc have processed it, so by the time your template sees the document, that `.badge` span has already been converted to plain text.
 
 The solution requires two layers working in concert:
 
@@ -111,8 +117,8 @@ This tutorial explores a dual-layer architecture where Lua handles document tran
 Lua filters operate on Pandoc's Abstract Syntax Tree (AST), the intermediate representation of your document after Quarto parses the markdown.
 At this stage, you can:
 
-- Identify elements by their classes (*e.g.*, `.badge`, `.panel`).
-- Extract attributes (*e.g.*, `colour="success"`).
+- Identify elements by their classes (_e.g._, `.badge`, `.panel`).
+- Extract attributes (_e.g._, `colour="success"`).
 - Generate raw Typst code to replace those elements.
 
 The key Pandoc functions for this bridge are:
@@ -367,9 +373,9 @@ When you write a fenced div in Quarto:
 This panel contains **rich content** including:
 
 - Bullet points.
-- *Formatted text*.
+- _Formatted text_.
 - And more.
-:::
+  :::
 ```
 
 Pandoc parses this into a Div element with:
@@ -462,6 +468,7 @@ You can let them write:
 
 ```markdown
 ::: {.panel}
+
 # My Title
 
 Content here.

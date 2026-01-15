@@ -3,14 +3,19 @@ title: "Document-Type Dispatching in Quarto Typst Extensions"
 description: |
   Learn how to build a central dispatcher function that routes to different Typst templates based on document type.
   This pattern enables clean separation between document types like reports, letters, and CVs.
-date: "2026-02-16"
+date: "2026-01-19"
 categories:
   - quarto
   - extensions
   - typst
   - pdf
 image: featured.png
-image-alt: "Diagram showing a dispatcher routing to different document templates."
+image-alt: |
+  Feature image for "Quarto + Typst Document Dispatcher" blog post.
+  Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+  Below, "Document Dispatcher" in serif font with subtitle "Modern Scientific Publishing".
+  File format pipeline shows .qmd → .typ → .pdf.
+  Decorative elements include floating code snippets and gradient orbs in blue and teal.
 lang: en-GB
 number-sections: true
 link-external-newwindow: true
@@ -30,6 +35,10 @@ lightbox: true
 When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs.
 Each type has distinct layouts, headers, and styling requirements.
 
+However, Quarto extensions can only contribute one format per output type.
+You cannot define separate `my-extension-report`, `my-extension-letter`, and `my-extension-cv` formats within a single extension.
+This means you need another approach to support multiple document types.
+
 Without a clear architecture, you end up with:
 
 - Monolithic templates cluttered with conditional logic.
@@ -44,25 +53,25 @@ Before building a dispatcher, it helps to understand how Quarto generates Typst 
 
 Quarto provides a set of [default Typst partials](https://quarto.org/docs/journals/templates.html#typst-partials) that handle different aspects of document generation:
 
-| Partial | Purpose |
-|---------|---------|
-| `definitions.typ` | Pandoc/Quarto features (callouts, block quotes, subfloats). |
-| `typst-template.typ` | The main template function applied to document content. |
-| `typst-show.typ` | Show rules that capture metadata and call the template. |
-| `page.typ` | Page properties (size, margins, numbering, background). |
-| `notes.typ` | Footnote rendering. |
-| `biblio.typ` | Bibliography formatting. |
+| Partial              | Purpose                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `definitions.typ`    | Pandoc/Quarto features (callouts, block quotes, subfloats). |
+| `typst-template.typ` | The main template function applied to document content.     |
+| `typst-show.typ`     | Show rules that capture metadata and call the template.     |
+| `page.typ`           | Page properties (size, margins, numbering, background).     |
+| `notes.typ`          | Footnote rendering.                                         |
+| `biblio.typ`         | Bibliography formatting.                                    |
 
 :::: {.callout-important}
 
 The `definitions.typ` partial is essential and must always be included in custom templates.
-It provides the foundation for Pandoc features like callouts.
+It provides the foundation for Quarto features like callouts.
 
 :::
 
 ### Overriding Partials
 
-Extensions override default partials by providing replacement files via `template-partials` in `_extension.yml`.
+Extensions override default partials by providing replacement files via `template-partials` in `_extension.yml` (or document YAML front matter).
 When you list a partial, Quarto uses your version instead of the built-in one.
 
 The dispatcher pattern requires customising two partials:
