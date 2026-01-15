@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL, Ph.D.">
-<meta name="description" content="In this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.">
+<meta name="description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
 
-<title>How to use GitHub Codespaces to simplify your Quarto workshops – MCU</title>
+<title>Document-Type Dispatching in Quarto Typst Extensions – MCU</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -116,20 +116,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="How to use GitHub Codespaces to simplify your Quarto workshops – MCU">
-<meta property="og:description" content="In this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2025-05-19-quarto-codespaces/featured.png">
+<meta property="og:title" content="Document-Type Dispatching in Quarto Typst Extensions – MCU">
+<meta property="og:description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png">
 <meta property="og:site_name" content="MCU">
-<meta property="og:image:height" content="1080">
-<meta property="og:image:width" content="1920">
-<meta property="og:image:alt" content="Quarto icon and text above GitHub Codespaces.
+<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:alt" content="Feature image for &quot;Quarto + Typst Document Dispatcher&quot; blog post.
+Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+Below, &quot;Document Dispatcher&quot; in serif font with subtitle &quot;Modern Scientific Publishing&quot;.
+File format pipeline shows .qmd → .typ → .pdf.
+Decorative elements include floating code snippets and gradient orbs in blue and teal.
 ">
-<meta name="twitter:title" content="How to use GitHub Codespaces to simplify your Quarto workshops – MCU">
-<meta name="twitter:description" content="In this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2025-05-19-quarto-codespaces/featured.png">
-<meta name="twitter:image-height" content="1080">
-<meta name="twitter:image-width" content="1920">
-<meta name="twitter:image:alt" content="Quarto icon and text above GitHub Codespaces.
+<meta name="twitter:title" content="Document-Type Dispatching in Quarto Typst Extensions – MCU">
+<meta name="twitter:description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png">
+<meta name="twitter:image-height" content="1260">
+<meta name="twitter:image-width" content="2400">
+<meta name="twitter:image:alt" content="Feature image for &quot;Quarto + Typst Document Dispatcher&quot; blog post.
+Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+Below, &quot;Document Dispatcher&quot; in serif font with subtitle &quot;Modern Scientific Publishing&quot;.
+File format pipeline shows .qmd → .typ → .pdf.
+Decorative elements include floating code snippets and gradient orbs in blue and teal.
 ">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -373,17 +381,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">How to use GitHub Codespaces to simplify your Quarto workshops</h1>
+      <h1 class="title">Document-Type Dispatching in Quarto Typst Extensions</h1>
                   <div>
         <div class="description">
-          <p>In this post, I’ll teach you the basics of GitHub Codespaces and how to use them to make it easier to teach using Quarto.</p>
+          <p>Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.</p>
         </div>
       </div>
                           <div class="quarto-categories">
-                <div class="quarto-category">Quarto</div>
-                <div class="quarto-category">GitHub Codespaces</div>
-                <div class="quarto-category">Teaching</div>
-                <div class="quarto-category">Dev Container</div>
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">extensions</div>
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">pdf</div>
               </div>
                   </div>
   </div>
@@ -401,7 +409,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Monday, the 19th of May, 2025</p>
+        <p class="date">Monday, the 19th of January, 2026</p>
       </div>
     </div>
     
@@ -417,19 +425,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-is-github-codespaces" id="toc-what-is-github-codespaces" class="nav-link active" data-scroll-target="#what-is-github-codespaces"><span class="header-section-number">1</span> What Is GitHub Codespaces?</a></li>
-  <li><a href="#the-power-of-combining-quarto-cli-with-codespaces" id="toc-the-power-of-combining-quarto-cli-with-codespaces" class="nav-link" data-scroll-target="#the-power-of-combining-quarto-cli-with-codespaces"><span class="header-section-number">2</span> The Power of Combining Quarto CLI with Codespaces</a></li>
-  <li><a href="#setting-up-your-own-quarto-codespaces-environment" id="toc-setting-up-your-own-quarto-codespaces-environment" class="nav-link" data-scroll-target="#setting-up-your-own-quarto-codespaces-environment"><span class="header-section-number">3</span> Setting Up Your Own Quarto-Codespaces Environment</a>
+  <li><a href="#the-problem-multiple-document-types" id="toc-the-problem-multiple-document-types" class="nav-link active" data-scroll-target="#the-problem-multiple-document-types"><span class="header-section-number">1</span> The Problem: Multiple Document Types</a></li>
+  <li><a href="#quartos-default-typst-partials" id="toc-quartos-default-typst-partials" class="nav-link" data-scroll-target="#quartos-default-typst-partials"><span class="header-section-number">2</span> Quarto’s Default Typst Partials</a>
   <ul class="collapse">
-  <li><a href="#use-existing-docker-image" id="toc-use-existing-docker-image" class="nav-link" data-scroll-target="#use-existing-docker-image"><span class="header-section-number">3.1</span> Use an Existing Docker Image</a></li>
-  <li><a href="#configure-the-development-container" id="toc-configure-the-development-container" class="nav-link" data-scroll-target="#configure-the-development-container"><span class="header-section-number">3.2</span> Configure the Development Container</a></li>
+  <li><a href="#overriding-partials" id="toc-overriding-partials" class="nav-link" data-scroll-target="#overriding-partials"><span class="header-section-number">2.1</span> Overriding Partials</a></li>
   </ul></li>
-  <li><a href="#benefits-for-workshops-and-teaching" id="toc-benefits-for-workshops-and-teaching" class="nav-link" data-scroll-target="#benefits-for-workshops-and-teaching"><span class="header-section-number">4</span> Benefits for Workshops and Teaching</a></li>
-  <li><a href="#final-thoughts-and-future-directions" id="toc-final-thoughts-and-future-directions" class="nav-link" data-scroll-target="#final-thoughts-and-future-directions"><span class="header-section-number">5</span> Final Thoughts and Future Directions</a></li>
-  
-  
+  <li><a href="#the-dispatcher-pattern" id="toc-the-dispatcher-pattern" class="nav-link" data-scroll-target="#the-dispatcher-pattern"><span class="header-section-number">3</span> The Dispatcher Pattern</a>
+  <ul class="collapse">
+  <li><a href="#core-implementation" id="toc-core-implementation" class="nav-link" data-scroll-target="#core-implementation"><span class="header-section-number">3.1</span> Core Implementation</a></li>
+  <li><a href="#key-patterns" id="toc-key-patterns" class="nav-link" data-scroll-target="#key-patterns"><span class="header-section-number">3.2</span> Key Patterns</a></li>
+  </ul></li>
+  <li><a href="#configuration-via-yaml" id="toc-configuration-via-yaml" class="nav-link" data-scroll-target="#configuration-via-yaml"><span class="header-section-number">4</span> Configuration via YAML</a>
+  <ul class="collapse">
+  <li><a href="#user-facing-configuration" id="toc-user-facing-configuration" class="nav-link" data-scroll-target="#user-facing-configuration"><span class="header-section-number">4.1</span> User-Facing Configuration</a></li>
+  <li><a href="#bridging-quarto-and-typst" id="toc-bridging-quarto-and-typst" class="nav-link" data-scroll-target="#bridging-quarto-and-typst"><span class="header-section-number">4.2</span> Bridging Quarto and Typst</a></li>
+  </ul></li>
+  <li><a href="#file-organisation" id="toc-file-organisation" class="nav-link" data-scroll-target="#file-organisation"><span class="header-section-number">5</span> File Organisation</a>
+  <ul class="collapse">
+  <li><a href="#directory-structure" id="toc-directory-structure" class="nav-link" data-scroll-target="#directory-structure"><span class="header-section-number">5.1</span> Directory Structure</a></li>
+  <li><a href="#extension-manifest" id="toc-extension-manifest" class="nav-link" data-scroll-target="#extension-manifest"><span class="header-section-number">5.2</span> Extension Manifest</a></li>
+  <li><a href="#main-template" id="toc-main-template" class="nav-link" data-scroll-target="#main-template"><span class="header-section-number">5.3</span> Main Template</a></li>
+  </ul></li>
+  <li><a href="#adding-new-document-types" id="toc-adding-new-document-types" class="nav-link" data-scroll-target="#adding-new-document-types"><span class="header-section-number">6</span> Adding New Document Types</a></li>
+  <li><a href="#benefits-of-this-pattern" id="toc-benefits-of-this-pattern" class="nav-link" data-scroll-target="#benefits-of-this-pattern"><span class="header-section-number">7</span> Benefits of This Pattern</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">8</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#further-resources" id="toc-further-resources" class="nav-link" data-scroll-target="#further-resources"><span class="header-section-number">8.1</span> Further Resources</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-05-19-quarto-codespaces/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-19-typst-document-dispatcher/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -439,235 +463,390 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><span style="font-style: italic; opacity: 0.8;">Originally published on <a href="https://quarto.org/docs/blog/posts/2025-05-19-quarto-codespaces/">quarto.org</a>.</span></p>
-<section id="what-is-github-codespaces" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="what-is-github-codespaces"><span class="header-section-number">1</span> What Is GitHub Codespaces?</h2>
-<p><a href="https://github.com/features/codespaces">GitHub Codespaces</a> is a cloud-powered, on-demand development environment that runs either in your browser or in Visual Studio Code via the <a href="https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces">GitHub Codespaces extension</a>. It eliminates the need for lengthy local setup by providing a fully configured development container, complete with all necessary dependencies and tools. This means that whether you’re an instructor or a developer, you can start coding immediately with a consistent environment tailored to your specific project, right on your web browser.</p>
-<p>More importantly, the participants of your workshops can use GitHub Codespaces just as easily as you can. With Codespaces, you and your participants all work on identical environments, minimising the “it doesn’t work on my machine” problems we are all too aware of.</p>
-<p>In this post, I am assuming the case of a workshop instructor and a room full of participants with different laptops and operating systems. Codespaces are also useful for development, though, as you will notice reading on.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Feature image for “Quarto + Typst Document Dispatcher” blog post. Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top. Below, “Document Dispatcher” in serif font with subtitle “Modern Scientific Publishing”. File format pipeline shows .qmd → .typ → .pdf. Decorative elements include floating code snippets and gradient orbs in blue and teal." width="600"></a></p>
+</figure>
+</div>
+<section id="the-problem-multiple-document-types" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-problem-multiple-document-types"><span class="header-section-number">1</span> The Problem: Multiple Document Types</h2>
+<p>When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs. Each type has distinct layouts, headers, and styling requirements.</p>
+<p>However, Quarto extensions can only contribute one format per output type. You cannot define separate <code>my-extension-report</code>, <code>my-extension-letter</code>, and <code>my-extension-cv</code> formats within a single extension. This means you need another approach to support multiple document types.</p>
+<p>Without a clear architecture, you end up with:</p>
+<ul>
+<li>Monolithic templates cluttered with conditional logic.</li>
+<li>Duplicated code across separate template files.</li>
+<li>Difficult maintenance as document types multiply.</li>
+</ul>
+<p>The solution is a <strong>dispatcher pattern</strong>: a central function that routes to the appropriate template based on document type.</p>
 </section>
-<section id="the-power-of-combining-quarto-cli-with-codespaces" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="the-power-of-combining-quarto-cli-with-codespaces"><span class="header-section-number">2</span> The Power of Combining Quarto CLI with Codespaces</h2>
-<p>Imagine a world where your participants are instantly equipped with the same environment with all the tools, libraries, and sample projects ready to go in the cloud. That’s the magic of using Codespaces:</p>
+<section id="quartos-default-typst-partials" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="quartos-default-typst-partials"><span class="header-section-number">2</span> Quarto’s Default Typst Partials</h2>
+<p>Before building a dispatcher, it helps to understand how Quarto generates Typst documents.</p>
+<p>Quarto provides a set of <a href="https://quarto.org/docs/journals/templates.html#typst-partials">default Typst partials</a> that handle different aspects of document generation:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Partial</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>definitions.typ</code></td>
+<td>Pandoc/Quarto features (callouts, block quotes, subfloats).</td>
+</tr>
+<tr class="even">
+<td><code>typst-template.typ</code></td>
+<td>The main template function applied to document content.</td>
+</tr>
+<tr class="odd">
+<td><code>typst-show.typ</code></td>
+<td>Show rules that capture metadata and call the template.</td>
+</tr>
+<tr class="even">
+<td><code>page.typ</code></td>
+<td>Page properties (size, margins, numbering, background).</td>
+</tr>
+<tr class="odd">
+<td><code>notes.typ</code></td>
+<td>Footnote rendering.</td>
+</tr>
+<tr class="even">
+<td><code>biblio.typ</code></td>
+<td>Bibliography formatting.</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>definitions.typ</code> partial is essential and must always be included in custom templates. It provides the foundation for Quarto features like callouts.</p>
+</div>
+</div>
+<section id="overriding-partials" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="overriding-partials"><span class="header-section-number">2.1</span> Overriding Partials</h3>
+<p>Extensions override default partials by providing replacement files via <code>template-partials</code> in <code>_extension.yml</code> (or document YAML front matter). When you list a partial, Quarto uses your version instead of the built-in one.</p>
+<p>The dispatcher pattern requires customising two partials:</p>
+<ul>
+<li><strong><code>template.typ</code></strong>: Load document-type templates and the dispatcher function.</li>
+<li><strong><code>typst-show.typ</code></strong>: Route document content through the dispatcher based on configuration.</li>
+</ul>
+<p>See the <a href="https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto">Quarto source</a> for the default partial implementations.</p>
+</section>
+</section>
+<section id="the-dispatcher-pattern" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-dispatcher-pattern"><span class="header-section-number">3</span> The Dispatcher Pattern</h2>
+<p>The dispatcher acts as a routing hub. It receives a document type parameter, validates it, and calls the corresponding template function.</p>
+<section id="core-implementation" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="core-implementation"><span class="header-section-number">3.1</span> Core Implementation</h3>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document-dispatcher.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="document-dispatcher.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="co">/// Supported document types.</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-2" class="code-annotation-target"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">DOCUMENT_TYPES</span> <span class="op">=</span> <span class="op">(</span><span class="st">"report"</span><span class="op">,</span> <span class="st">"letter"</span><span class="op">,</span> <span class="st">"cv"</span><span class="op">)</span></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a><span class="co">/// Main document dispatcher function.</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="co">/// Routes to the appropriate template based on document-type.</span></span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">document-dispatcher</span><span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>  document-type<span class="op">:</span> <span class="st">"report"</span><span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-7" class="code-annotation-target"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>  ..args<span class="op">,</span></span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Validate and normalise document type</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-10" class="code-annotation-target"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">doc-type</span> <span class="op">=</span> <span class="cf">if</span> document-type <span class="op">in</span> DOCUMENT_TYPES <span class="op">{</span></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>    document-type</span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fall back to report with warning</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"report"</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Dispatch to appropriate template</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> doc-type <span class="op">==</span> <span class="st">"letter"</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>    render-letter<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> doc-type <span class="op">==</span> <span class="st">"cv"</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>    render-cv<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Default: report</span></span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>    render-report<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-1-26"><a href="#annotated-cell-1-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="2" data-code-annotation="1">Define supported types as an <a href="https://typst.app/docs/reference/foundations/array/">array</a>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">Default document type; used when not specified.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="3"><a href="https://typst.app/docs/reference/foundations/arguments/">Variadic arguments</a> capture all other parameters.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="4"><code>in</code> operator checks array membership.</span>
+</dd>
+</dl>
+</section>
+<section id="key-patterns" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="key-patterns"><span class="header-section-number">3.2</span> Key Patterns</h3>
+<p><strong>Pattern 1: Type Validation</strong></p>
+<p>The dispatcher validates the document type against a known list before routing. Invalid types fall back gracefully to a default (report) rather than failing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>let doc-type = if document-type in DOCUMENT_TYPES {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  document-type</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>} else {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  "report"  <span class="co">// Safe fallback</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Pattern 2: Variadic Argument Forwarding</strong></p>
+<p>Each document type may accept different parameters. Rather than listing every possible parameter, the dispatcher captures them all with <code>..args</code> and forwards them to the target function.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">document-dispatcher</span><span class="op">(</span>document-type<span class="op">:</span> <span class="st">"report"</span><span class="op">,</span> ..args<span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  render-report<span class="op">(</span>..args<span class="op">)</span>  <span class="co">// Forward all arguments</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This means:</p>
+<ul>
+<li>The dispatcher does not need to know about each template’s specific parameters.</li>
+<li>Adding new parameters to a template requires no changes to the dispatcher.</li>
+<li>Each template function handles only its own parameters.</li>
+</ul>
+<p><strong>Pattern 3: Conditional Routing</strong></p>
+<p>Typst’s <code>if-else</code> statements handle the routing logic. For more document types, this could be extended with a dictionary lookup:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">TEMPLATE_FUNCTIONS</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"report"</span>: render-report<span class="op">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"letter"</span>: render-letter<span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cv"</span>: render-cv<span class="op">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Then dispatch with:</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>let template-fn = TEMPLATE_FUNCTIONS.at(doc-type, default: render-report)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>template-fn(..args)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="configuration-via-yaml" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="configuration-via-yaml"><span class="header-section-number">4</span> Configuration via YAML</h2>
+<p>Users specify the document type in their Quarto document’s YAML front matter.</p>
+<section id="user-facing-configuration" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="user-facing-configuration"><span class="header-section-number">4.1</span> User-Facing Configuration</h3>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="document.qmd"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"My Report"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my-extension-typst</span><span class="kw">:</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">document-type</span><span class="kw">:</span><span class="at"> report</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The extension’s format name (<code>my-extension-typst</code>) comes from <code>_extension.yml</code>. The <code>document-type</code> key is passed through Quarto’s template processing.</p>
+</section>
+<section id="bridging-quarto-and-typst" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="bridging-quarto-and-typst"><span class="header-section-number">4.2</span> Bridging Quarto and Typst</h3>
+<p>The <code>typst-show.typ</code> partial connects YAML metadata to the Typst dispatcher:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename="typst-show.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> document-dispatcher<span class="op">.</span>with<span class="op">(</span></span>
+<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Document type selection</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-3" class="code-annotation-target"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>  document-type<span class="op">:</span> <span class="ss">$if(document-type)$</span><span class="st">"$document-type$"</span><span class="ss">$else$</span><span class="st">"report"</span><span class="ss">$endif$</span><span class="op">,</span></span>
+<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Pass through other parameters</span></span>
+<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>  author<span class="op">:</span> <span class="op">[</span><span class="ss">$for(author)$$author$$sep$</span>, <span class="ss">$endfor$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="op">[</span><span class="ss">$date$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... additional parameters</span></span>
+<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="1">Pandoc template syntax (<code>$if()$</code>) checks if the metadata key exists and provides a default.</span>
+</dd>
+</dl>
+<p>The <code>$if(document-type)$...$else$...$endif$</code> pattern:</p>
+<ul>
+<li>Uses the user-provided value if present.</li>
+<li>Falls back to “report” if not specified.</li>
+<li>Ensures the dispatcher always receives a valid string.</li>
+</ul>
+</section>
+</section>
+<section id="file-organisation" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="file-organisation"><span class="header-section-number">5</span> File Organisation</h2>
+<p>A well-organised extension separates document types into distinct files.</p>
+<section id="directory-structure" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="directory-structure"><span class="header-section-number">5.1</span> Directory Structure</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode txt code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>_extensions/my-extension/</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>├── _extension.yml</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>├── template.typ              # Main entry point</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>├── typst-show.typ            # Quarto-Typst bridge</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>└── partials/</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    ├── document-dispatcher.typ</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    └── document-types/</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        ├── report.typ</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        ├── letter.typ</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        └── cv.typ</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="extension-manifest" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="extension-manifest"><span class="header-section-number">5.2</span> Extension Manifest</h3>
+<p>The <code>_extension.yml</code> declares template partials in loading order:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> My Extension</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0.0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">contributes</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">my-extension-typst</span><span class="kw">:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template</span><span class="kw">:</span><span class="at"> template.typ</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/report.typ</span><span class="co">    # Load document types first</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/letter.typ</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/cv.typ</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-dispatcher.typ</span><span class="co">      # Dispatcher last (uses the above)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="main-template" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="main-template"><span class="header-section-number">5.3</span> Main Template</h3>
+<p>The <code>template.typ</code> file serves as the entry point that assembles all components. It must include Quarto’s essential definitions and load your custom partials in the correct order.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>template.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="template.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Essential: Quarto/Pandoc feature definitions (callouts, quotes, etc.)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ss">$definitions.typ()$</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Load document type templates</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ss">$report.typ()$</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$letter.typ()$</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$cv.typ()$</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Load dispatcher (must come after document types)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$document-dispatcher.typ()$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The loading order matters:</p>
 <ol type="1">
-<li><p><strong>Immediate Onboarding:</strong> Workshop participants or students can bypass the hassle of local setup. They simply launch a Codespace (running on their web browser of choice, independently of operating system), and the pre-configured environment is available immediately.</p></li>
-<li><p><strong>A Consistent Environment:</strong> Ensuring that everyone has the same tools and dependencies can be challenging. Codespaces lets you pre-define your environment with container configurations, reducing the risk of discrepancies in software versions or settings.</p></li>
-<li><p><strong>Reproducible Workflows:</strong> Whether you’re teaching a data science workshop or collaborating on a research paper, reproducibility is crucial. Because GitHub Codespaces uses the <a href="https://containers.dev/">Dev Container specification</a>, you can ensure that your code can be run in the same environment. When participants are ready to run their projects locally, they can use Codespace to build an equivalent Docker container.</p></li>
+<li><strong><code>definitions.typ</code></strong> must come first; it provides Quarto features like callouts.</li>
+<li><strong>Document type templates</strong> define the rendering functions (<code>render-report</code>, etc.).</li>
+<li><strong>Dispatcher</strong> comes last because it references the document type functions.</li>
 </ol>
-<p>GitHub provides <a href="https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/setting-up-your-repository/facilitating-quick-creation-and-resumption-of-codespaces">“deep link”</a> to Codespaces, allowing you to create a link you can share with your students or workshop participants.</p>
-<p>For example, the <a href="https://github.com/mcanouil/quarto-codespaces"><code>quarto-codespaces</code> repository</a> provides several Dev Container / Codespaces configurations. The following link will create a new Codespace using the <code>.devcontainer/universal/devcontainer.json</code> configuration file instead of the default <code>.devcontainer/devcontainer.json</code> file.</p>
-<div style="text-align: center;">
-<p><a href="https://codespaces.new/mcanouil/quarto-codespaces?quickstart=1&amp;devcontainer_path=.devcontainer%2Funiversal%2Fdevcontainer.json"><img src="https://github.com/codespaces/badge.svg" class="img-fluid"></a></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)</span><span class="co">](https://codespaces.new/mcanouil/quarto-codespaces?quickstart=1&amp;devcontainer_path=.devcontainer%2Funiversal%2Fdevcontainer.json)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The link can include a specific branch, a particular file, or even a specific line in a file, allowing you to guide participants directly to the relevant content and setup. By doing nothing more than clicking that one link, participants create or resume an existing execution environment.</p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="quarto-codespaces-new-001-dark.png" class="lightbox" data-gallery="codespaces-dark"><img src="quarto-codespaces-new-001-dark.png" class="img-fluid" alt="GitHub Codespaces interface showing the 'Create codespace' page. The page includes a section with the repository 'mcanouil/quarto-codespaces' and a message stating 'No codespace to resume'. There are two buttons: 'Change options' and 'Create new codespace'."></a></p>
+<div class="callout-title-container flex-fill">
+Tip
 </div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><a href="quarto-codespaces-new-002-dark.png" class="lightbox" data-gallery="codespaces-dark"><img src="quarto-codespaces-new-002-dark.png" class="img-fluid" alt="image_url"></a></p>
 </div>
+<div class="callout-body-container callout-body">
+<p>The <code>$partial-name.typ()$</code> syntax is Quarto’s template interpolation. It inserts the contents of the corresponding partial file at that location.</p>
 </div>
 </div>
 </section>
-<section id="setting-up-your-own-quarto-codespaces-environment" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="setting-up-your-own-quarto-codespaces-environment"><span class="header-section-number">3</span> Setting Up Your Own Quarto-Codespaces Environment</h2>
-<p>If you’re considering using Codespaces with Quarto CLI for your next workshop or teaching module, here’s how to get started:</p>
-<p>Leverage the example provided by the <a href="https://github.com/mcanouil/quarto-codespaces"><code>quarto-codespaces</code> repository</a> or <a href="https://github.com/codespaces/new/">create your own Codespaces using the default</a>.</p>
-<section id="use-existing-docker-image" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="use-existing-docker-image"><span class="header-section-number">3.1</span> Use an Existing Docker Image</h3>
-<p>The easiest way to get started is to use an existing Docker image that has Quarto CLI and all the dependencies you need. There are several pre-built images available with or without the Quarto CLI:</p>
+</section>
+<section id="adding-new-document-types" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="adding-new-document-types"><span class="header-section-number">6</span> Adding New Document Types</h2>
+<p>To add a new document type (e.g., “memo”):</p>
+<p><strong>Step 1: Create the template function.</strong></p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>partials/document-types/memo.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/document-types/memo.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">render-memo</span><span class="op">(</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  to<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  from<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  body<span class="op">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Memo-specific layout</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> <span class="va">page</span><span class="op">(</span>paper<span class="op">:</span> <span class="st">"a4"</span><span class="op">,</span> margin<span class="op">:</span> <span class="fl">2cm</span><span class="op">)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Header</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  grid<span class="op">(</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">:</span> <span class="op">(</span><span class="fl">1fr</span><span class="op">,</span> <span class="fl">1fr</span><span class="op">),</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>*TO:* <span class="kw">#</span>to<span class="op">],</span> <span class="op">[</span>*DATE:* <span class="kw">#</span>date<span class="op">],</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>*FROM:* <span class="kw">#</span>from<span class="op">],</span> <span class="op">[],</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  line<span class="op">(</span>length<span class="op">:</span> <span class="fl">100%</span><span class="op">)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Subject</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> title <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    align<span class="op">(</span>center<span class="op">,</span> text<span class="op">(</span>weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> size<span class="op">:</span> <span class="fl">14pt</span><span class="op">,</span> title<span class="op">))</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Body</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  body</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Step 2: Register in the dispatcher.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">DOCUMENT_TYPES</span> <span class="op">=</span> <span class="op">(</span><span class="st">"report"</span><span class="op">,</span> <span class="st">"letter"</span><span class="op">,</span> <span class="st">"cv"</span><span class="op">,</span> <span class="st">"memo"</span><span class="op">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Add routing case</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>if doc-type == "memo" {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  render-memo(..args)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Step 3: Add to extension manifest.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> partials/document-types/memo.typ</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">  # ... other partials</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Step 4: Load in template.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ss">$memo.typ()$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="benefits-of-this-pattern" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="benefits-of-this-pattern"><span class="header-section-number">7</span> Benefits of This Pattern</h2>
+<p><strong>Clean Separation</strong></p>
+<p>Each document type lives in its own file with its own logic. Changes to one type do not affect others.</p>
+<p><strong>Extensibility</strong></p>
+<p>Adding new document types requires minimal changes to existing code. The dispatcher’s validation list and routing logic are the only modifications needed.</p>
+<p><strong>Graceful Fallbacks</strong></p>
+<p>Invalid document types fall back to a sensible default rather than failing. Users receive working output even with typos in their configuration.</p>
+<p><strong>Parameter Isolation</strong></p>
+<p>Each template function defines only its own parameters. The dispatcher does not need to understand every possible parameter combination.</p>
+</section>
+<section id="conclusion" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
+<p>The document-type dispatcher pattern provides a clean architecture for Quarto Typst extensions that support multiple document types.</p>
+<p>Key takeaways:</p>
+<ol type="1">
+<li><strong>Central routing</strong>: A single dispatcher function routes to appropriate templates.</li>
+<li><strong>Validation with fallbacks</strong>: Check document types against a known list; default gracefully.</li>
+<li><strong>Variadic forwarding</strong>: Use <code>..args</code> to pass parameters without coupling.</li>
+<li><strong>YAML integration</strong>: Bridge Quarto metadata to Typst via <code>typst-show.typ</code>.</li>
+<li><strong>Modular organisation</strong>: Separate files for each document type.</li>
+</ol>
+<div class="highlight">
+<p>The dispatcher pattern scales well as your extension grows. Start with one or two document types, and the architecture supports adding more without refactoring.</p>
+</div>
+<section id="further-resources" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="further-resources"><span class="header-section-number">8.1</span> Further Resources</h3>
 <ul>
-<li>Official Docker images:
-<ul>
-<li><a href="https://github.com/quarto-dev/quarto-cli/pkgs/container/quarto"><code>ghcr.io/quarto-dev/quarto</code></a></li>
-<li><a href="https://github.com/quarto-dev/quarto-cli/pkgs/container/quarto-full"><code>ghcr.io/quarto-dev/quarto-full</code></a></li>
-</ul></li>
-<li>Community Docker images:
-<ul>
-<li><a href="https://github.com/mcanouil/quarto-codespaces/pkgs/container/quarto-codespaces"><code>ghcr.io/mcanouil/quarto-codespaces</code></a></li>
-</ul></li>
-<li>Default Codespaces image:
-<ul>
-<li><a href="https://github.com/devcontainers/images/tree/main/src/universal"><code>mcr.microsoft.com/devcontainers/universal</code></a></li>
-</ul></li>
+<li><a href="https://typst.app/docs/reference/foundations/function/">Typst Documentation: Functions</a>.</li>
+<li><a href="https://quarto.org/docs/journals/templates.html#typst-partials">Quarto Documentation: Typst Partials</a>.</li>
+<li><a href="https://github.com/mcanouil/quarto-mcanouil">quarto-mcanouil Extension</a> - demonstrates this pattern in production.</li>
 </ul>
-<p>You can use any of these images as a base for your Codespace. Inside the <code>.devcontainer/devcontainer.json</code> file, you can specify the image you want to use. The <code>.devcontainer/devcontainer.json</code> file serves as the blueprint for your Codespace.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"My Workshop Setup"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"image"</span><span class="fu">:</span> <span class="st">"ghcr.io/mcanouil/quarto-codespaces:latest"</span><span class="fu">,</span></span>
-<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"remoteUser"</span><span class="fu">:</span> <span class="st">"vscode"</span><span class="fu">,</span></span>
-<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"customizations"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"vscode"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"extensions"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-8" class="code-annotation-target"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"quarto.quarto"</span><span class="ot">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-9" class="code-annotation-target"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mcanouil.quarto-wizard"</span></span>
-<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span></span>
-<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
-<span id="annotated-cell-2-12"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"codespaces"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-2-13" class="code-annotation-target"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"openFiles"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"exercises/intro-to-quarto.qmd"</span><span class="ot">,</span></span>
-<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"exercises/computation.qmd"</span></span>
-<span id="annotated-cell-2-16"><a href="#annotated-cell-2-16" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span></span>
-<span id="annotated-cell-2-17"><a href="#annotated-cell-2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="annotated-cell-2-18"><a href="#annotated-cell-2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="annotated-cell-2-19"><a href="#annotated-cell-2-19" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">The Docker image is specified in the <code>image</code> field. It’s built using a Dev Container specification that you can find in <a href="https://github.com/mcanouil/quarto-codespaces/tree/main/.github/.devcontainer"><code>.github/.devcontainer</code></a>.</span>
-</dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="8" data-code-annotation="2">The <a href="https://github.com/quarto-dev/quarto"><code>quarto</code> extension</a> for Visual Studio Code / Positron to provide support for Quarto documents.</span>
-</dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="9" data-code-annotation="3">The <a href="https://github.com/mcanouil/quarto-wizard"><code>quarto-wizard</code> extension</a> for Visual Studio Code / Positron to provide assistance in managing Quarto extensions</span>
-</dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="13" data-code-annotation="4">The <code>openFiles</code> field specifies the files to open when the Codespace is created. This is useful for guiding participants to the right files or folders. See the <a href="https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/configuring-dev-containers/automatically-opening-files-in-the-codespaces-for-a-repository">Codespaces documentation</a> for more information.</span>
-</dd>
-</dl>
-</section>
-<section id="configure-the-development-container" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="configure-the-development-container"><span class="header-section-number">3.2</span> Configure the Development Container</h3>
-<p>You can fork the <a href="https://github.com/mcanouil/quarto-codespaces"><code>quarto-codespaces</code> repository</a> as a starting point for your own Codespaces. This repository includes the Dev Container configuration file (<em>i.e.</em>, <code>.devcontainer/devcontainer.json</code>) that instruct Codespaces on how to set up an environment complete with Quarto CLI and other essential tools.</p>
-<p>The <code>.devcontainer/devcontainer.json</code> configuration file ensures that every instance of your Codespace is identical, capturing everything from the Quarto CLI version to additional libraries or extensions you might need.</p>
-<p>The <a href="https://github.com/mcanouil/quarto-codespaces"><code>quarto-codespaces</code> repository</a> is a great starting point as it provides a prebuilt Docker image with the latest Quarto CLI, Python, R, and Julia installed (<em>i.e.</em>, <a href="https://github.com/mcanouil/quarto-codespaces/pkgs/container/quarto-codespaces"><code>ghcr.io/mcanouil/quarto-codespaces</code></a> using <a href="https://github.com/mcanouil/quarto-codespaces/tree/main/.github/.devcontainer"><code>.github/.devcontainer/devcontainer.json</code></a>).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"Quarto"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>  <span class="er">//</span> <span class="dt">"image"</span><span class="fu">:</span> <span class="st">"buildpack-deps:jammy-curl"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"build"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"dockerfile"</span><span class="fu">:</span> <span class="st">"./Dockerfile"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-6"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"context"</span><span class="fu">:</span> <span class="st">"."</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"VARIANT"</span><span class="fu">:</span> <span class="st">"jammy"</span></span>
-<span id="annotated-cell-3-9"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
-<span id="annotated-cell-3-11"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"remoteUser"</span><span class="fu">:</span> <span class="st">"vscode"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-12" class="code-annotation-target"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"features"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-13" class="code-annotation-target"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"./quarto-computing-dependencies"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-14"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"rDeps"</span><span class="fu">:</span> <span class="st">"rmarkdown,languageserver,nx10/httpgd@v2.0.3,prompt,lintr"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"pythonDeps"</span><span class="fu">:</span> <span class="st">"jupyter,papermill"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-16"><a href="#annotated-cell-3-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"juliaDeps"</span><span class="fu">:</span> <span class="st">"IJulia"</span></span>
-<span id="annotated-cell-3-17"><a href="#annotated-cell-3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-3-18" class="code-annotation-target"><a href="#annotated-cell-3-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"./uv"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-19"><a href="#annotated-cell-3-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"version"</span><span class="fu">:</span> <span class="st">"latest"</span></span>
-<span id="annotated-cell-3-20"><a href="#annotated-cell-3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-3-21" class="code-annotation-target"><a href="#annotated-cell-3-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-22"><a href="#annotated-cell-3-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"version"</span><span class="fu">:</span> <span class="st">"release"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-23"><a href="#annotated-cell-3-23" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"installTinyTex"</span><span class="fu">:</span> <span class="st">"true"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-24"><a href="#annotated-cell-3-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"installChromium"</span><span class="fu">:</span> <span class="st">"false"</span></span>
-<span id="annotated-cell-3-25"><a href="#annotated-cell-3-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="annotated-cell-3-26"><a href="#annotated-cell-3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-3-27" class="code-annotation-target"><a href="#annotated-cell-3-27" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"customizations"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-28"><a href="#annotated-cell-3-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"vscode"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-29"><a href="#annotated-cell-3-29" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"extensions"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="annotated-cell-3-30"><a href="#annotated-cell-3-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"quarto.quarto"</span><span class="ot">,</span></span>
-<span id="annotated-cell-3-31"><a href="#annotated-cell-3-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mcanouil.quarto-wizard"</span><span class="ot">,</span></span>
-<span id="annotated-cell-3-32"><a href="#annotated-cell-3-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">"REditorSupport.r"</span><span class="ot">,</span></span>
-<span id="annotated-cell-3-33"><a href="#annotated-cell-3-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Posit.air-vscode"</span></span>
-<span id="annotated-cell-3-34"><a href="#annotated-cell-3-34" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-35"><a href="#annotated-cell-3-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"settings"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-36"><a href="#annotated-cell-3-36" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"r.rterm.option"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="annotated-cell-3-37"><a href="#annotated-cell-3-37" aria-hidden="true" tabindex="-1"></a>          <span class="st">"--no-save"</span><span class="ot">,</span></span>
-<span id="annotated-cell-3-38"><a href="#annotated-cell-3-38" aria-hidden="true" tabindex="-1"></a>          <span class="st">"--no-restore-data"</span><span class="ot">,</span></span>
-<span id="annotated-cell-3-39"><a href="#annotated-cell-3-39" aria-hidden="true" tabindex="-1"></a>          <span class="st">"--quiet"</span></span>
-<span id="annotated-cell-3-40"><a href="#annotated-cell-3-40" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-41"><a href="#annotated-cell-3-41" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"[r]"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="annotated-cell-3-42"><a href="#annotated-cell-3-42" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"editor.defaultFormatter"</span><span class="fu">:</span> <span class="st">"Posit.air-vscode"</span><span class="fu">,</span></span>
-<span id="annotated-cell-3-43"><a href="#annotated-cell-3-43" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"editor.formatOnSave"</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="annotated-cell-3-44"><a href="#annotated-cell-3-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="annotated-cell-3-45"><a href="#annotated-cell-3-45" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
-<span id="annotated-cell-3-46"><a href="#annotated-cell-3-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="annotated-cell-3-47"><a href="#annotated-cell-3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="annotated-cell-3-48"><a href="#annotated-cell-3-48" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">The <code>image</code> field specifies the base image for the container. You can customise this to suit your needs.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="12" data-code-annotation="2">The <code>features</code> section allows you to add additional tools or libraries. See the <a href="https://containers.dev/features/">Dev Container Features available</a> for a comprehensive list of available features.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="13" data-code-annotation="3">The <code>quarto-computing-dependencies</code> feature is a “local” custom feature that installs the computing dependencies: R, Python, and Julia. This is a great way to ensure that your Codespace has everything it needs to run Quarto documents.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="18" data-code-annotation="4">The <code>uv</code> feature installs the <a href="https://docs.astral.sh/uv/"><code>uv</code> tool</a> to manage Python packages and project dependencies.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="21" data-code-annotation="5">The <code>quarto-cli</code> feature installs the Quarto CLI. You can specify the version you want to install, and it will be automatically downloaded and installed in your Codespace. You can see the code for this feature in the source repository: <a href="https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli" class="uri">https://github.com/rocker-org/devcontainer-features/tree/main/src/quarto-cli</a>.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="27" data-code-annotation="6">The <code>customizations</code> section allows you to specify settings and extensions for Visual Studio Code.</span>
-</dd>
-</dl>
-<p>You can also add additional features to the <code>devcontainer.json</code> to suit your needs or start directly using the image as is as shown in <a href="#use-existing-docker-image">Use an Existing Docker Image</a>.</p>
-<p>For example, you might want to add additional R packages or Python libraries. You can do this by using the <code>quarto-computing-dependencies</code> custom feature and changing the <code>rDeps</code>, <code>pythonDeps</code>, and <code>juliaDeps</code> fields to include the packages you want to install globally, or by using the <code>postStartCommand</code> field to run a script that installs the packages you need.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"My Workshop Setup"</span><span class="fu">,</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"image"</span><span class="fu">:</span> <span class="st">"ghcr.io/mcanouil/quarto-codespaces:latest"</span><span class="fu">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"remoteUser"</span><span class="fu">:</span> <span class="st">"vscode"</span><span class="fu">,</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"postStartCommand"</span><span class="fu">:</span> <span class="st">"uv venv &amp;&amp; source .venv/bin/activate &amp;&amp; uv pip install -r requirements.txt"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>You can also use the <code>postStartCommand</code> field to run a script that installs the packages you need.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"My Workshop Setup"</span><span class="fu">,</span></span>
-<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"image"</span><span class="fu">:</span> <span class="st">"ghcr.io/mcanouil/quarto-codespaces:latest"</span><span class="fu">,</span></span>
-<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"remoteUser"</span><span class="fu">:</span> <span class="st">"vscode"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-5" class="code-annotation-target"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"postStartCommand"</span><span class="fu">:</span> <span class="st">"bash ./init-env.sh --what all --force"</span></span>
-<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="5" data-code-annotation="1">The <code>postStartCommand</code> field specifies a command to run after the Codespace is started. In this case, it runs the <a href="https://github.com/mcanouil/quarto-codespaces/blob/main/init-env.sh"><code>init-env.sh</code> script</a> from <a href="https://github.com/mcanouil/quarto-codespaces"><code>quarto-codespaces</code> repository</a> with the <code>--what all</code> and <code>--force</code> options.</span>
-</dd>
-</dl>
+
+
 </section>
 </section>
-<section id="benefits-for-workshops-and-teaching" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="benefits-for-workshops-and-teaching"><span class="header-section-number">4</span> Benefits for Workshops and Teaching</h2>
-<p>When it comes to educational sessions, consistency and ease-of-use are paramount. Pairing Codespaces with Quarto CLI brings many direct benefits to a teaching environment:</p>
-<ul>
-<li><strong>Streamlined Onboarding:</strong> Students and workshop attendees can get right to work without spending time installing and configuring local environments.</li>
-<li><strong>Live, Interactive Sessions:</strong> Instructors can demonstrate live edits to Quarto documents. Changes can be rendered instantly and reflect in each participant’s environment: perfect for a hands-on, interactive learning experience.</li>
-<li><strong>Collaboration and Version Control:</strong> All changes can be recorded in Git, making it easy to track progress, handle peer reviews, and manage collaborative projects, all within a single hosted environment.</li>
-<li><strong>Elimination of “Dependency Hell”:</strong> With containerised development, all attendees work from the same baseline, ensuring that version conflicts or missing libraries don’t derail a session.</li>
-</ul>
-</section>
-<section id="final-thoughts-and-future-directions" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="final-thoughts-and-future-directions"><span class="header-section-number">5</span> Final Thoughts and Future Directions</h2>
-<p>Whether you’re running a workshop, teaching a class, or collaborating on research, using Codespaces can reduce setup hassles, foster reproducibility, and encourage interactive learning.</p>
-<p>In addition to the benefits mentioned above, other features further enhance your experience with Codespaces and Quarto CLI:</p>
-<ul>
-<li><strong>Automated Pipelines:</strong> Integrating CI/CD tools to automatically validate Quarto document renders and catch errors using the exact same environment. See <a href="https://docs.github.com/en/actions/writing-workflows/choosing-where-your-workflow-runs/running-jobs-in-a-container">GitHub Actions: Running jobs in a container</a></li>
-<li><strong>Real-Time Co-Editing Features:</strong> Enhancing collaborative sessions with simultaneous multi-user editing directly in Codespaces. See <a href="https://docs.github.com/en/codespaces/developing-in-a-codespace/working-collaboratively-in-a-codespace">GitHub Codespaces: Real-time collaboration</a></li>
-</ul>
-<p>This post covered the basics of using Codespaces and Quarto together, but there’s much more to Codespaces. Learn more by <a href="https://docs.github.com/en/codespaces">consulting their documentation</a>.</p>
-<p>Happy teaching!</p>
-</section>
 
-
-
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="disclaimer" class="level2 appendix unnumbered"><h2 class="anchored quarto-appendix-heading">Disclaimer</h2><div class="quarto-appendix-contents">
-
-<p>GitHub Codespaces is a product of GitHub, Inc.&nbsp;and comes with a quota of free usage, including CPU hours and storage. Be sure to check the <a href="https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-codespaces/about-billing-for-github-codespaces">GitHub Codespaces billing documentation</a> and your current GitHub plan to avoid unexpected charges. If you are a student or an educator, you can explore the <a href="https://education.github.com/pack">GitHub Education program</a> and <a href="https://docs.github.com/en/education/manage-coursework-with-github-classroom/integrate-github-classroom-with-an-ide/using-github-codespaces-with-github-classroom">GitHub Classroom</a>.</p>
-</div></section><section id="acknowledgements" class="level2 appendix unnumbered"><h2 class="anchored quarto-appendix-heading">Acknowledgements</h2><div class="quarto-appendix-contents">
-
-<p>Thanks to <a href="https://github.com/cscheid">Carlos Scheidegger</a>, <a href="https://github.com/juliasilge">Julia Silge</a>, and <a href="https://github.com/coatless">James J. Balamuta</a> for their feedback and suggestions on this post.</p>
-
-
-</div></section></div></main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -1177,7 +1356,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year"></span> Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-05-19-quarto-codespaces/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-19-typst-document-dispatcher/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
 </div>
