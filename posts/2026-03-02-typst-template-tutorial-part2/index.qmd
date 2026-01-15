@@ -1,0 +1,858 @@
+---
+title: "Building Quarto Typst Templates: Advanced Patterns (Part 2)"
+subtitle: "Part 2"
+description: |
+  This tutorial continues from Part 1, exploring advanced patterns for Quarto Typst extensions.
+  You will learn handler factories, complex component extraction, configuration systems, and type-safe value conversion.
+date: "2026-03-02"
+categories:
+  - quarto
+  - extensions
+  - typst
+  - lua
+  - pdf
+image: featured.png
+image-alt: "Quarto logo and Typst logo connected by flowing lines representing advanced Lua patterns."
+lang: en-GB
+number-sections: true
+link-external-newwindow: true
+lightbox: true
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+## Continuing from Part 1
+
+[Part 1](/posts/2026-02-02-typst-template-tutorial-part1/) introduced the dual-layer architecture for building Quarto Typst templates.
+You learned how Lua filters transform markdown elements into Typst function calls, and how wrapper functions inject runtime context.
+
+This tutorial builds on those foundations with advanced patterns for production-quality extensions.
+
+:::: {.callout-note}
+
+This is **Part 2** of a two-part series.
+If you have not read [Part 1](/posts/2026-02-02-typst-template-tutorial-part1/), start there first to understand the basic concepts of Lua filters, Typst functions, and wrapper patterns.
+
+The ['mcanouil' Quarto extension](https://github.com/mcanouil/quarto-mcanouil) demonstrates all patterns covered in this tutorial.
+
+:::
+
+## Handler Factories: Reducing Repetition
+
+As you build more components, you will notice patterns repeating.
+Instead of writing similar handlers for each component, you can create factory functions that generate handlers.
+
+### The Factory Pattern
+
+A factory function returns another function configured with specific behaviour:
+
+```{.lua filename="wrapper.lua"}
+--- Create handler for wrapped content components
+local function create_wrapped_handler(extract_title) -- <1>
+  return function(div, config) -- <2>
+    return build_wrapped_content(div, config, extract_title)
+  end
+end
+
+--- Create handler for atomic components (no content wrapping)
+local function create_atomic_handler() -- <3>
+  return function(div, config)
+    local attrs = attributes_to_table(div)
+    return build_atomic_function_call(config, attrs) -- <4>
+  end
+end
+```
+
+1. Factory function; `extract_title` is captured in the returned [closure](https://www.lua.org/pil/6.1.html).
+2. Returned handler matches the signature expected by the filter dispatcher.
+3. Atomic handlers ignore div content; useful for decorative elements like dividers.
+4. Generates `#function-name(attrs)[]` without wrapping content.
+
+### Using Factories
+
+These factories let you declare handlers concisely:
+
+```{.lua filename="typst-markdown.lua"}
+local DIV_HANDLERS = {
+  ['panel'] = wrapper.create_wrapped_handler(true),             -- Extract title
+  ['divider'] = wrapper.create_wrapped_handler(false),          -- No title
+  ['executive-summary'] = wrapper.create_wrapped_handler(true), -- Extract title
+  ['value-box'] = wrapper.create_atomic_handler(),              -- No content
+  ['progress'] = wrapper.create_atomic_handler(),               -- No content
+  ['horizontal-timeline'] = timeline.process_div,               -- Custom handler
+}
+```
+
+:::: {.highlight}
+
+**Handler factories** encapsulate common patterns.
+Use `create_wrapped_handler(true)` for components with titles, `create_wrapped_handler(false)` for content-only wrappers, and `create_atomic_handler()` for components without content.
+
+:::
+
+### Choosing Your Approach
+
+When building a new component, consider:
+
+- **No handler (default)**: Simple wrapper around content; just add a mapping in document YAML.
+- **`create_wrapped_handler(true)`**: Wraps content and extracts title from first heading (e.g., panels with titles).
+- **`create_wrapped_handler(false)`**: Wraps content without title extraction (e.g., simple content wrappers).
+- **`create_atomic_handler()`**: No content; generates function call with attributes only (e.g., dividers, progress bars).
+- **Custom handler**: Complex data extraction from nested elements (e.g., card grids, timelines).
+- **Shortcode**: No natural markdown syntax; uses explicit `{{< shortcode >}}` syntax.
+
+## Complex Components: Card Grids
+
+Sometimes the factory patterns are not enough.
+Card grids demonstrate a complex component that requires custom data extraction from nested structures.
+
+### When Factories Fall Short
+
+Consider this card grid markup:
+
+```markdown
+::: {.card-grid columns="3"}
+::: {.card style="info"}
+# Card Title
+
+Card content goes here.
+
+---
+
+Footer text
+:::
+
+::: {.card style="success"}
+# Another Card
+
+More content.
+:::
+:::
+```
+
+This requires:
+
+1. Finding nested `.card` divs within the `.card-grid` div.
+2. Extracting the title from each card's first heading.
+3. Splitting content from footer (separated by horizontal rule).
+4. Building a Typst array data structure to pass all cards to the rendering function.
+
+No simple wrapper pattern handles this complexity.
+We need a custom handler.
+
+### Extracting Structured Data
+
+The card extraction function uses the [`content-extraction` module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/content-extraction.lua) to parse nested content.
+This module provides `parse_sections()`, which handles the common pattern of extracting header, body, and footer sections separated by horizontal rules.
+
+```{.lua filename="card-grid.lua"}
+local content_extraction = require( -- <1>
+  quarto.utils.resolve_path('../_modules/content-extraction.lua'):gsub('%.lua$', '')
+)
+local utils = require(
+  quarto.utils.resolve_path('../_modules/utils.lua'):gsub('%.lua$', '')
+)
+
+--- Extract card data from a div.
+local function extract_card(div)
+  local parsed = content_extraction.parse_sections(div.content) -- <2>
+
+  return {
+    title = parsed.header_text, -- <3>
+    content = parsed.body_blocks and #parsed.body_blocks > 0
+      and utils.stringify(parsed.body_blocks) or nil, -- <4>
+    footer = parsed.footer_blocks and #parsed.footer_blocks > 0
+      and utils.stringify(parsed.footer_blocks) or nil,
+    style = div.attributes.style,
+    colour = div.attributes.colour
+  }
+end
+```
+
+1. Load the content extraction module for reusable parsing utilities.
+2. `parse_sections()` parses content into header, body, and footer sections.
+3. `header_text` contains the first heading's text; `header_level` contains its level.
+4. `body_blocks` contains content before `---`; `footer_blocks` contains content after.
+
+The `parse_sections()` function returns a table with:
+
+- **`header_text`**: Text from the first heading (or nil if none).
+- **`header_level`**: Level of the first heading (defaults to 2).
+- **`body_blocks`**: Array of blocks before the horizontal rule.
+- **`footer_blocks`**: Array of blocks after the horizontal rule.
+
+### Building Typst Data Structures
+
+Once cards are extracted, we need to build a Typst array:
+
+```{.lua filename="card-grid.lua"}
+local function process_div(div, config)
+  local cards = pandoc.List()
+  local columns = div.attributes.columns
+    and tonumber(div.attributes.columns) or 3 -- <1>
+
+  -- Extract cards from child divs
+  for _, block in ipairs(div.content) do
+    if block.t == 'Div' and block.classes:includes('card') then -- <2>
+      local card = extract_card(block)
+      if card.title or card.content or card.footer then
+        cards:insert(card)
+      end
+    end
+  end
+
+  if #cards == 0 then
+    return pandoc.Null() -- <3>
+  end
+
+  -- Build cards array for Typst
+  local card_items = {}
+  for _, card in ipairs(cards) do
+    local card_parts = {}
+
+    if card.title then
+      table.insert(card_parts,
+        string.format('title: %s', typst_utils.typst_value(card.title))) -- <4>
+    end
+    if card.content then
+      table.insert(card_parts,
+        string.format('content: %s', typst_utils.typst_value(card.content)))
+    end
+    if card.footer then
+      table.insert(card_parts,
+        string.format('footer: %s', typst_utils.typst_value(card.footer)))
+    end
+    if card.style then
+      table.insert(card_parts,
+        string.format('style: %s', typst_utils.typst_value(card.style)))
+    end
+    if card.colour then -- <5>
+      if card.colour:match('^#') then
+        table.insert(card_parts,
+          string.format('colour: rgb(%s)', typst_utils.typst_value(card.colour)))
+      else
+        table.insert(card_parts,
+          string.format('colour: %s', typst_utils.typst_value(card.colour)))
+      end
+    end
+
+    table.insert(card_items, '(' .. table.concat(card_parts, ', ') .. ')') -- <6>
+  end
+
+  -- Build final Typst function call
+  local typst_code = string.format( -- <7>
+    '#card-grid(\n  (%s),\n  columns: %d\n)',
+    table.concat(card_items, ',\n    '),
+    columns
+  )
+
+  return pandoc.RawBlock('typst', typst_code)
+end
+```
+
+1. [`tonumber()`](https://www.lua.org/manual/5.4/manual.html#pdf-tonumber) converts string attribute to number; defaults to 3.
+2. [`:includes()`](https://pandoc.org/lua-filters.html#type-list) checks if class list contains the target class.
+3. [`pandoc.Null()`](https://pandoc.org/lua-filters.html#type-null) removes the element from output if no cards found.
+4. `typst_value()` handles proper quoting and escaping (see @sec-value-conversion).
+5. Hex colours need `rgb()` wrapper in Typst; other values use `typst_value()` directly.
+6. Each card becomes a Typst dictionary literal: `(title: "...", content: "...")`.
+7. Final output is a Typst array of dictionaries passed to the grid function.
+
+The generated Typst code looks like:
+
+```typst
+#card-grid(
+  ((title: "Card Title", content: "Card content", footer: "Footer text", style: "info"),
+   (title: "Another Card", content: "More content", style: "success")),
+  columns: 3
+)
+```
+
+:::: {.highlight}
+
+**Complex components** require custom handlers that extract structured data from nested elements and build Typst data structures (arrays, dictionaries) that the rendering function can consume.
+
+:::
+
+### The Typst Grid Renderer
+
+On the Typst side, the card grid renderer uses Typst's `grid` function:
+
+```{.typst filename="card-grid.typ"}
+#let render-card-grid(cards, colours, columns: 3, gutter: 1em) = {
+  // Build grid cells from card data
+  let cells = cards.map(card => { // <1>
+    let card-colours = get-card-colours(card.at("style", default: "subtle"), colours) // <2>
+
+    block(
+      width: 100%,
+      fill: card-colours.background,
+      stroke: 1pt + card-colours.border,
+      radius: 8pt,
+      inset: 1em,
+      {
+        // Title
+        if "title" in card { // <3>
+          text(weight: "bold", card.title)
+          v(0.5em)
+        }
+        // Content
+        if "content" in card {
+          card.content
+        }
+        // Footer
+        if "footer" in card {
+          v(0.5em)
+          line(length: 100%, stroke: 0.5pt + card-colours.border)
+          v(0.3em)
+          text(size: 0.9em, fill: colours.muted, card.footer)
+        }
+      }
+    )
+  })
+
+  // Render as grid
+  grid( // <4>
+    columns: (1fr,) * columns, // <5>
+    gutter: gutter,
+    ..cells.flatten() // <6>
+  )
+}
+```
+
+1. [`.map()`](https://typst.app/docs/reference/foundations/array/#definitions-map) transforms each card dictionary into rendered content.
+2. [`.at()`](https://typst.app/docs/reference/foundations/dictionary/#definitions-at) safely accesses dictionary keys with a default value.
+3. `in` operator checks if key exists in dictionary.
+4. [`grid`](https://typst.app/docs/reference/layout/grid/) creates a multi-column layout.
+5. `(1fr,) * columns` creates an array of equal fractional widths, *e.g.*, `(1fr, 1fr, 1fr)` for 3 columns.
+6. [Spread operator](https://typst.app/docs/reference/foundations/arguments/#spreading) `..` expands array into positional arguments.
+
+## The Configuration System {#sec-config}
+
+A key design goal for reusable extensions is extensibility.
+Users should be able to add their own components or override built-in ones without modifying the extension's source code.
+The [configuration system](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua) enables this through metadata-driven element mappings.
+
+### Built-in Mappings
+
+The extension defines default mappings for all its components:
+
+```{.lua filename="config.lua"}
+local function get_builtin_mappings()
+  return {
+    div = { -- <1>
+      ['highlight'] = { wrapper = 'highlight', arguments = false }, -- <2>
+      ['value-box'] = { wrapper = 'value-box', arguments = true }, -- <3>
+      ['panel'] = { wrapper = 'panel', arguments = true },
+      ['divider'] = { wrapper = 'divider', arguments = true },
+      ['progress'] = { wrapper = 'progress', arguments = true },
+      ['executive-summary'] = { wrapper = 'executive-summary', arguments = true },
+      ['card-grid'] = { wrapper = 'card-grid', arguments = true },
+    },
+    span = {
+      ['badge'] = { wrapper = 'badge', arguments = true }
+    },
+    table = {}, -- <4>
+    image = {}
+  }
+end
+```
+
+1. Mappings organised by element type: div, span, table, image.
+2. `arguments = false` means attributes only passed when present.
+3. `arguments = true` means always generate parameter list (even if empty).
+4. Empty tables for future extensibility; table and image handlers not yet implemented.
+
+Each mapping specifies:
+
+- **`wrapper`**: The Typst function name to call.
+- **`arguments`**: Whether to always pass attributes (even if empty).
+
+### User Configuration via Metadata
+
+Users can extend or override mappings through document metadata:
+
+```{.yaml filename="document.qmd"}
+---
+title: "My Document"
+extensions:
+  typst-markdown:
+    divs:
+      my-callout: my-custom-callout
+      my-box:
+        function: my-custom-box
+        arguments: true
+    spans:
+      my-highlight: my-text-highlight
+---
+```
+
+Two formats are supported:
+
+- **Simple**: `class-name: typst-function-name`.
+- **Detailed**: `class-name: {function: typst-function-name, arguments: true}`.
+
+### Loading User Configuration
+
+The configuration module parses user settings from metadata:
+
+```{.lua filename="config.lua"}
+local function load_element_mappings(meta) -- <1>
+  local user_mappings = { div = {}, span = {}, table = {}, image = {} }
+
+  -- Read from extensions.typst-markdown namespace
+  local extension_config = meta.extensions and meta.extensions['typst-markdown'] -- <2>
+  if not extension_config then
+    return user_mappings
+  end
+
+  -- Process each element type (divs, spans, tables, images)
+  local element_types = { -- <3>
+    { config_key = 'divs',   mappings_key = 'div' },
+    { config_key = 'spans',  mappings_key = 'span' },
+    { config_key = 'tables', mappings_key = 'table' },
+    { config_key = 'images', mappings_key = 'image' }
+  }
+
+  for _, element_type in ipairs(element_types) do
+    if extension_config[element_type.config_key] then
+      for class, config in pairs(extension_config[element_type.config_key]) do -- <4>
+        local parsed = parse_and_validate_config(config, class)
+        if parsed then
+          user_mappings[element_type.mappings_key][class] = parsed
+        end
+      end
+    end
+  end
+
+  return user_mappings
+end
+```
+
+1. `meta` is the [document metadata](https://pandoc.org/lua-filters.html#type-meta) from YAML front matter.
+2. Short-circuit evaluation: returns nil if `meta.extensions` is nil.
+3. Data-driven approach avoids repetitive if/else blocks for each element type.
+4. [`pairs()`](https://www.lua.org/manual/5.4/manual.html#pdf-pairs) iterates over all key-value pairs in the table.
+
+### Merging Configurations
+
+User configuration overrides built-in defaults:
+
+```{.lua filename="config.lua"}
+local function merge_configurations(builtin, user)
+  local merged = {}
+
+  -- Start with built-in configuration
+  for class, config in pairs(builtin) do -- <1>
+    merged[class] = config
+  end
+
+  -- Override with user configuration
+  for class, config in pairs(user) do -- <2>
+    merged[class] = config
+  end
+
+  return merged
+end
+```
+
+1. Copy all built-in mappings first.
+2. User mappings overwrite built-in ones with same key; new keys are added.
+
+## Value Conversion and Type Safety {#sec-value-conversion}
+
+When passing values from Lua to Typst, type conversion matters.
+Strings need quoting.
+Numbers should not.
+Booleans map to Typst's `true`/`false`.
+Getting this wrong produces syntax errors or unexpected behaviour.
+
+### The `typst_value` Function
+
+The [`typst-utils` module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/typst-utils.lua) provides a `typst_value` function that handles conversion:
+
+```{.lua filename="typst-utils.lua"}
+local function typst_value(value) -- <1>
+  if value == nil then
+    return 'none'
+  elseif type(value) == 'boolean' then
+    return value and 'true' or 'false' -- <2>
+  elseif type(value) == 'number' then
+    return tostring(value)
+  elseif type(value) == 'string' then
+    -- Check for special Typst values that should not be quoted
+    if value == 'none' or value == 'auto' or value == 'true' or value == 'false' then -- <3>
+      return value
+    end
+    -- Check for Typst length units
+    if value:match('^%-?%d+%.?%d*[a-z]+$') then -- <4>
+      return value  -- e.g., "1em", "2pt", "100%"
+    end
+    -- Quote strings, escaping internal quotes
+    return '"' .. value:gsub('"', '\\"') .. '"' -- <5>
+  else
+    return '"' .. tostring(value):gsub('"', '\\"') .. '"'
+  end
+end
+```
+
+1. Entry point handles all Lua types.
+2. Ternary pattern: `condition and true_value or false_value`.
+3. Typst keywords passed through without quotes.
+4. [Lua pattern](https://www.lua.org/manual/5.4/manual.html#6.4.1) matches values like `1em`, `2.5pt`, `100%`.
+5. Escape double quotes inside string values.
+
+### Usage Examples
+
+```lua
+typst_value(nil)         -- Returns: none
+typst_value(true)        -- Returns: true
+typst_value(42)          -- Returns: 42
+typst_value("hello")     -- Returns: "hello"
+typst_value("1em")       -- Returns: 1em
+typst_value('none')      -- Returns: none
+typst_value('Say "hi"')  -- Returns: "Say \"hi\""
+```
+
+### Building Attribute Strings
+
+When generating Typst function calls, attributes need proper formatting:
+
+```{.lua filename="wrapper.lua"}
+local function build_attribute_string(attrs)
+  local parts = {}
+  for key, value in pairs(attrs) do -- <1>
+    local typst_key = key:gsub('%-', '-') -- <2>
+    local typst_val = typst_utils.typst_value(value)
+    table.insert(parts, string.format('%s: %s', typst_key, typst_val))
+  end
+  return table.concat(parts, ', ') -- <3>
+end
+```
+
+1. Iterate over all attribute key-value pairs.
+2. Lua uses hyphens; Typst accepts them in identifiers.
+3. Join with comma separator for Typst function arguments.
+
+## WCAG Compliance for Badges
+
+Production-quality badges need accessible colour contrast.
+The WCAG AA standard requires 4.5:1 contrast ratio for small text.
+
+### Colour Calculation
+
+```{.typst filename="badges.typ"}
+/// Get badge colours with dark mode support
+#let get-badge-colours(colour, colours) = {
+  // Detect dark mode from the colour scheme
+  let fg-components = colours.foreground.components()
+  let is-dark-mode = fg-components.at(0, default: 0%) > 50% // <1>
+
+  let base = if colour == "success" { callout-colour("tip") }
+    else if colour == "warning" { callout-colour("warning") }
+    else if colour == "danger" { callout-colour("important") }
+    else if colour == "info" { callout-colour("note") }
+    else { colours.muted }
+
+  // Adjust background based on mode
+  let background = if is-dark-mode { base.darken(60%) } // <2>
+    else { base.lighten(80%) }
+
+  // Ensure text meets WCAG AA (4.5:1 for small text)
+  let text-colour = ensure-contrast(base, background, min-ratio: 4.5) // <3>
+
+  (background: background, border: base, text: text-colour)
+}
+```
+
+1. Check lightness of foreground colour to detect dark mode.
+2. Darken base colour for dark mode backgrounds; lighten for light mode.
+3. Adjust text colour to ensure 4.5:1 contrast ratio.
+
+:::: {.highlight}
+
+**WCAG AA compliance** requires 4.5:1 contrast ratio for small text (below 14pt bold or 18pt regular).
+Badge text at 0.85em typically falls into this category.
+
+:::
+
+## Shortcodes: An Alternative Approach
+
+For components without a natural markdown representation, shortcodes provide explicit syntax.
+
+### When to Use Shortcodes
+
+Shortcodes work well for:
+
+- Components with many required parameters.
+- Elements that do not map naturally to divs or spans.
+- Functionality that needs explicit invocation.
+
+### Basic Shortcode Structure
+
+```{.lua filename="my-shortcode.lua"}
+return {
+  ['my-component'] = function(args, kwargs, meta) -- <1>
+    local title = pandoc.utils.stringify(kwargs['title'] or '') -- <2>
+    local style = pandoc.utils.stringify(kwargs['style'] or 'default')
+
+    local typst_code = string.format(
+      '#my-component(title: %s, style: %s)',
+      typst_utils.typst_value(title),
+      typst_utils.typst_value(style)
+    )
+
+    return pandoc.RawInline('typst', typst_code) -- <3>
+  end
+}
+```
+
+1. Shortcode name maps to handler function; `args` are positional, `kwargs` are named.
+2. Always stringify metadata values to handle Pandoc's MetaInlines type.
+3. Return raw Typst code; use `RawBlock` for block-level output.
+
+### Usage
+
+```markdown
+{{< my-component title="Hello" style="info" >}}
+```
+
+## Complete Example: Quote Card
+
+Let us build a complete quote card component from scratch, demonstrating all patterns covered.
+
+### Step 1: Design the Markdown Syntax
+
+```markdown
+::: {.quote-card author="Alan Kay" source="1971"}
+The best way to predict the future is to invent it.
+:::
+```
+
+Alternatively, support heading-based author attribution:
+
+```markdown
+::: {.quote-card source="1971"}
+The best way to predict the future is to invent it.
+
+## Alan Kay
+:::
+```
+
+### Step 2: Create the Typst Rendering Function
+
+```{.typst filename="quote-card.typ"}
+#let QUOTE-CARD-RADIUS = 8pt
+#let QUOTE-CARD-INSET = 1.5em
+#let QUOTE-MARK-SIZE = 3em
+
+/// Render a styled quote card.
+#let render-quote-card(
+  content,
+  author: none,
+  source: none,
+  colours: (:),
+) = {
+  let bg = colours.at("background", default: luma(250))
+  let fg = colours.at("foreground", default: luma(50))
+  let muted = colours.at("muted", default: luma(128))
+  let accent = callout-colour("note")
+
+  block(
+    width: 100%,
+    fill: bg,
+    stroke: (left: 4pt + accent), // <1>
+    radius: (right: QUOTE-CARD-RADIUS), // <2>
+    inset: QUOTE-CARD-INSET,
+    {
+      // Opening quote mark
+      place( // <3>
+        top + left,
+        dx: -0.5em,
+        dy: -0.3em,
+        text(size: QUOTE-MARK-SIZE, fill: accent.lighten(60%), sym.quote.l.double)
+      )
+
+      // Quote content
+      pad(left: 1em, right: 1em)[
+        #text(style: "italic", fill: fg, content)
+      ]
+
+      // Attribution line
+      if author != none or source != none {
+        v(0.8em)
+        align(right)[
+          #text(fill: muted)[
+            #sym.dash.em
+            #if author != none { [ #author] }
+            #if source != none { [, #emph(source)] }
+          ]
+        ]
+      }
+    }
+  )
+}
+```
+
+1. [Directional stroke](https://typst.app/docs/reference/visualize/stroke/): only left edge has a border.
+2. [Directional radius](https://typst.app/docs/reference/layout/block/#parameters-radius): rounds only right corners.
+3. [`place`](https://typst.app/docs/reference/layout/place/) positions content absolutely within the container.
+
+### Step 3: Create the Wrapper Function
+
+```{.typst filename="typst-show.typ"}
+#let quote-card(content, ..args) = {
+  render-quote-card(
+    content,
+    colours: get-colours(mode: effective-brand-mode),
+    ..args
+  )
+}
+```
+
+### Step 4: Create the Lua Handler
+
+```{.lua filename="quote-card.lua"}
+local wrapper = require(
+  quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '')
+)
+
+local function process_div(div, config)
+  local attrs = wrapper.attributes_to_table(div)
+
+  -- Extract author from last heading if not in attributes
+  if not attrs['author'] and #div.content > 0 then
+    local last_elem = div.content[#div.content]
+    if last_elem.t == 'Header' then
+      attrs['author'] = pandoc.utils.stringify(last_elem.content)
+      -- Remove the heading from content
+      local new_content = {}
+      for i = 1, #div.content - 1 do
+        table.insert(new_content, div.content[i])
+      end
+      div.content = new_content
+    end
+  end
+
+  -- Build wrapped content
+  local opening, closing = wrapper.build_typst_block_wrappers(config, attrs)
+  local result = { pandoc.RawBlock('typst', opening) }
+  for _, item in ipairs(div.content) do
+    table.insert(result, item)
+  end
+  table.insert(result, pandoc.RawBlock('typst', closing))
+
+  return result
+end
+
+return {
+  process_div = process_div
+}
+```
+
+### Step 5: Register the Component
+
+Add the mapping in `config.lua`:
+
+```{.lua filename="config.lua"}
+['quote-card'] = {
+  wrapper = 'quote-card',
+  arguments = true
+}
+```
+
+Register the handler in `typst-markdown.lua`:
+
+```{.lua filename="typst-markdown.lua"}
+local quote_card = require(
+  quarto.utils.resolve_path('../_modules/quote-card.lua'):gsub('%.lua$', '')
+)
+
+local DIV_HANDLERS = {
+  -- Existing handlers...
+  ['quote-card'] = quote_card.process_div,
+}
+```
+
+## Advanced Topics
+
+### Checking Output Format
+
+Filters should only run for Typst output:
+
+```{.lua filename="typst-markdown.lua"}
+function Div(div)
+  if not quarto.doc.is_format('typst') then -- <1>
+    return div
+  end
+  -- Process the div...
+end
+```
+
+1. [`quarto.doc.is_format()`](https://quarto.org/docs/extensions/lua-api.html#quarto.doc.is_format) checks the target format.
+
+### Module Loading
+
+Load shared modules using Quarto's path resolution:
+
+```{.lua filename="Loading modules"}
+local wrapper = require(
+  quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '') -- <1>
+)
+```
+
+1. [`resolve_path`](https://quarto.org/docs/extensions/lua-api.html#quarto.utils.resolve_path) handles relative paths; `gsub` removes `.lua` extension for `require`.
+
+### Filter Ordering
+
+When using multiple filters, order matters.
+Declare filters in `_extension.yml`:
+
+```{.yaml filename="_extension.yml"}
+filters:
+  - typst/filters/setup.lua      # Runs first: initialise configuration
+  - typst/filters/transform.lua  # Runs second: transform elements
+  - typst/filters/cleanup.lua    # Runs last: final adjustments
+```
+
+### Debugging Tips
+
+Use `quarto.log.warning()` to inspect values during development:
+
+```{.lua filename="Debugging"}
+quarto.log.warning('Processing div with classes: ' .. table.concat(div.classes, ', '))
+quarto.log.warning('Attributes: ' .. pandoc.utils.stringify(pandoc.MetaMap(attrs)))
+```
+
+Output appears in the Quarto render log.
+
+## Conclusion
+
+This tutorial covered advanced patterns for building production-quality Quarto Typst extensions:
+
+1. **Handler factories** reduce repetition by generating handlers with configured behaviour.
+2. **Complex components** like card grids require custom data extraction and Typst data structure generation.
+3. **Configuration systems** enable user extensibility through metadata-driven mappings.
+4. **Type-safe value conversion** prevents syntax errors when passing values between Lua and Typst.
+5. **WCAG compliance** ensures accessible colour contrast in styled components.
+6. **Shortcodes** provide explicit syntax for components without natural markdown representation.
+
+:::: {.highlight}
+
+The separation of concerns between Lua (transformation) and Typst (rendering) enables flexibility, testability, and maintainability as your extension grows.
+
+:::
+
+### Further Resources
+
+- [Quarto Documentation: Creating Extensions](https://quarto.org/docs/extensions/creating.html).
+- [Pandoc Lua Filters](https://pandoc.org/lua-filters.html).
+- [Typst Documentation](https://typst.app/docs/).
+- [quarto-mcanouil Extension](https://github.com/mcanouil/quarto-mcanouil).
+- [Part 1: The Lua-Typst Bridge](/posts/2026-02-02-typst-template-tutorial-part1/).
