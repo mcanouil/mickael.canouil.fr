@@ -15,8 +15,973 @@
 <title>MCU</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.9.16</generator>
-<lastBuildDate>Mon, 12 Jan 2026 00:00:00 GMT</lastBuildDate>
+<generator>quarto-99.9.9</generator>
+<lastBuildDate>Sun, 18 Jan 2026 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Document-Type Dispatching in Quarto Typst Extensions</title>
+  <dc:creator>Mickaël CANOUIL, _Ph.D._</dc:creator>
+  <link>https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Feature image for “Quarto + Typst Document Dispatcher” blog post. Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top. Below, “Document Dispatcher” in serif font with subtitle “Modern Scientific Publishing”. File format pipeline shows .qmd → .typ → .pdf. Decorative elements include floating code snippets and gradient orbs in blue and teal." width="600"></a></p>
+</figure>
+</div>
+<section id="the-problem-multiple-document-types" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-problem-multiple-document-types"><span class="header-section-number">1</span> The Problem: Multiple Document Types</h2>
+<p>When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs. Each type has distinct layouts, headers, and styling requirements.</p>
+<p>However, Quarto extensions can only contribute one format per output type. You cannot define separate <code>my-extension-report</code>, <code>my-extension-letter</code>, and <code>my-extension-cv</code> formats within a single extension. This means you need another approach to support multiple document types.</p>
+<p>Without a clear architecture, you end up with:</p>
+<ul>
+<li>Monolithic templates cluttered with conditional logic.</li>
+<li>Duplicated code across separate template files.</li>
+<li>Difficult maintenance as document types multiply.</li>
+</ul>
+<p>The solution is a <strong>dispatcher pattern</strong>: a central function that routes to the appropriate template based on document type.</p>
+</section>
+<section id="quartos-default-typst-partials" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="quartos-default-typst-partials"><span class="header-section-number">2</span> Quarto’s Default Typst Partials</h2>
+<p>Before building a dispatcher, it helps to understand how Quarto generates Typst documents.</p>
+<p>Quarto provides a set of <a href="https://quarto.org/docs/journals/templates.html#typst-partials">default Typst partials</a> that handle different aspects of document generation:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Partial</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>definitions.typ</code></td>
+<td>Pandoc/Quarto features (callouts, block quotes, subfloats).</td>
+</tr>
+<tr class="even">
+<td><code>typst-template.typ</code></td>
+<td>The main template function applied to document content.</td>
+</tr>
+<tr class="odd">
+<td><code>typst-show.typ</code></td>
+<td>Show rules that capture metadata and call the template.</td>
+</tr>
+<tr class="even">
+<td><code>page.typ</code></td>
+<td>Page properties (size, margins, numbering, background).</td>
+</tr>
+<tr class="odd">
+<td><code>notes.typ</code></td>
+<td>Footnote rendering.</td>
+</tr>
+<tr class="even">
+<td><code>biblio.typ</code></td>
+<td>Bibliography formatting.</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>definitions.typ</code> partial is essential and must always be included in custom templates. It provides the foundation for Quarto features like callouts.</p>
+</div>
+</div>
+<section id="overriding-partials" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="overriding-partials"><span class="header-section-number">2.1</span> Overriding Partials</h3>
+<p>Extensions override default partials by providing replacement files via <code>template-partials</code> in <code>_extension.yml</code> (or document YAML front matter). When you list a partial, Quarto uses your version instead of the built-in one.</p>
+<p>The dispatcher pattern requires customising two partials:</p>
+<ul>
+<li><strong><code>template.typ</code></strong>: Load document-type templates and the dispatcher function.</li>
+<li><strong><code>typst-show.typ</code></strong>: Route document content through the dispatcher based on configuration.</li>
+</ul>
+<p>See the <a href="https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto">Quarto source</a> for the default partial implementations.</p>
+</section>
+</section>
+<section id="the-dispatcher-pattern" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-dispatcher-pattern"><span class="header-section-number">3</span> The Dispatcher Pattern</h2>
+<p>The dispatcher acts as a routing hub. It receives a document type parameter, validates it, and calls the corresponding template function.</p>
+<section id="core-implementation" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="core-implementation"><span class="header-section-number">3.1</span> Core Implementation</h3>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document-dispatcher.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="document-dispatcher.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/// Supported document types.</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-2" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">DOCUMENT_TYPES</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"letter"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cv"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/// Main document dispatcher function.</span></span>
+<span id="annotated-cell-1-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/// Routes to the appropriate template based on document-type.</span></span>
+<span id="annotated-cell-1-5"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">document-dispatcher</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target">  document-type<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-7" class="code-annotation-target">  ..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-8"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-9">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Validate and normalise document type</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-10" class="code-annotation-target">  <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">doc-type</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> document-type <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">in</span> DOCUMENT_TYPES <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-11">    document-type</span>
+<span id="annotated-cell-1-12">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-13">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Fall back to report with warning</span></span>
+<span id="annotated-cell-1-14">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span></span>
+<span id="annotated-cell-1-15">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="annotated-cell-1-16"></span>
+<span id="annotated-cell-1-17">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Dispatch to appropriate template</span></span>
+<span id="annotated-cell-1-18">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> doc-type <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"letter"</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-19">    render-letter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-1-20">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> doc-type <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cv"</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-21">    render-cv<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-1-22">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-1-23">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Default: report</span></span>
+<span id="annotated-cell-1-24">    render-report<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-1-25">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="annotated-cell-1-26"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="2" data-code-annotation="1">Define supported types as an <a href="https://typst.app/docs/reference/foundations/array/">array</a>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">Default document type; used when not specified.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="3"><a href="https://typst.app/docs/reference/foundations/arguments/">Variadic arguments</a> capture all other parameters.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="4"><code>in</code> operator checks array membership.</span>
+</dd>
+</dl>
+</section>
+<section id="key-patterns" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="key-patterns"><span class="header-section-number">3.2</span> Key Patterns</h3>
+<p><strong>Pattern 1: Type Validation</strong></p>
+<p>The dispatcher validates the document type against a known list before routing. Invalid types fall back gracefully to a default (report) rather than failing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb1-1">let doc-type = if document-type in DOCUMENT_TYPES {</span>
+<span id="cb1-2">  document-type</span>
+<span id="cb1-3">} else {</span>
+<span id="cb1-4">  "report"  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Safe fallback</span></span>
+<span id="cb1-5">}</span></code></pre></div></div>
+<p><strong>Pattern 2: Variadic Argument Forwarding</strong></p>
+<p>Each document type may accept different parameters. Rather than listing every possible parameter, the dispatcher captures them all with <code>..args</code> and forwards them to the target function.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">document-dispatcher</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>document-type<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> ..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb2-2">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ...</span></span>
+<span id="cb2-3">  render-report<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span>  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Forward all arguments</span></span>
+<span id="cb2-4"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span></code></pre></div></div>
+<p>This means:</p>
+<ul>
+<li>The dispatcher does not need to know about each template’s specific parameters.</li>
+<li>Adding new parameters to a template requires no changes to the dispatcher.</li>
+<li>Each template function handles only its own parameters.</li>
+</ul>
+<p><strong>Pattern 3: Conditional Routing</strong></p>
+<p>Typst’s <code>if-else</code> statements handle the routing logic. For more document types, this could be extended with a dictionary lookup:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">TEMPLATE_FUNCTIONS</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb3-2">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span>: render-report<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"letter"</span>: render-letter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cv"</span>: render-cv<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb3-6"></span>
+<span id="cb3-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Then dispatch with:</span></span>
+<span id="cb3-8">let template-fn = TEMPLATE_FUNCTIONS.at(doc-type, default: render-report)</span>
+<span id="cb3-9">template-fn(..args)</span></code></pre></div></div>
+</section>
+</section>
+<section id="configuration-via-yaml" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="configuration-via-yaml"><span class="header-section-number">4</span> Configuration via YAML</h2>
+<p>Users specify the document type in their Quarto document’s YAML front matter.</p>
+<section id="user-facing-configuration" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="user-facing-configuration"><span class="header-section-number">4.1</span> User-Facing Configuration</h3>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="document.qmd" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">---</span></span>
+<span id="cb4-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"My Report"</span></span>
+<span id="cb4-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">format</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb4-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">my-extension-typst</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb4-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">document-type</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> report</span></span>
+<span id="cb4-6"><span class="pp" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">---</span></span></code></pre></div></div>
+</div>
+<p>The extension’s format name (<code>my-extension-typst</code>) comes from <code>_extension.yml</code>. The <code>document-type</code> key is passed through Quarto’s template processing.</p>
+</section>
+<section id="bridging-quarto-and-typst" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="bridging-quarto-and-typst"><span class="header-section-number">4.2</span> Bridging Quarto and Typst</h3>
+<p>The <code>typst-show.typ</code> partial connects YAML metadata to the Typst dispatcher:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> document-dispatcher<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>with<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-6-2">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Document type selection</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-3" class="code-annotation-target">  document-type<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(document-type)$</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$document-type$"</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$else$</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-4">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Pass through other parameters</span></span>
+<span id="annotated-cell-6-5">  title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$title$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="annotated-cell-6-6">  author<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$for(author)$$author$$sep$</span>, <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endfor$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="annotated-cell-6-7">  date<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$date$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="annotated-cell-6-8">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ... additional parameters</span></span>
+<span id="annotated-cell-6-9"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="1">Pandoc template syntax (<code>$if()$</code>) checks if the metadata key exists and provides a default.</span>
+</dd>
+</dl>
+<p>The <code>$if(document-type)$...$else$...$endif$</code> pattern:</p>
+<ul>
+<li>Uses the user-provided value if present.</li>
+<li>Falls back to “report” if not specified.</li>
+<li>Ensures the dispatcher always receives a valid string.</li>
+</ul>
+</section>
+</section>
+<section id="file-organisation" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="file-organisation"><span class="header-section-number">5</span> File Organisation</h2>
+<p>A well-organised extension separates document types into distinct files.</p>
+<section id="directory-structure" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="directory-structure"><span class="header-section-number">5.1</span> Directory Structure</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode txt code-with-copy"><code class="sourceCode default"><span id="cb5-1">_extensions/my-extension/</span>
+<span id="cb5-2">├── _extension.yml</span>
+<span id="cb5-3">├── template.typ              # Main entry point</span>
+<span id="cb5-4">├── typst-show.typ            # Quarto-Typst bridge</span>
+<span id="cb5-5">└── partials/</span>
+<span id="cb5-6">    ├── document-dispatcher.typ</span>
+<span id="cb5-7">    └── document-types/</span>
+<span id="cb5-8">        ├── report.typ</span>
+<span id="cb5-9">        ├── letter.typ</span>
+<span id="cb5-10">        └── cv.typ</span></code></pre></div></div>
+</section>
+<section id="extension-manifest" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="extension-manifest"><span class="header-section-number">5.2</span> Extension Manifest</h3>
+<p>The <code>_extension.yml</code> declares template partials in loading order:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="_extension.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> My Extension</span></span>
+<span id="cb6-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.0.0</span></span>
+<span id="cb6-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contributes</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb6-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formats</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb6-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">my-extension-typst</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb6-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">template</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> template.typ</span></span>
+<span id="cb6-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">template-partials</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb6-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> partials/document-types/report.typ</span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">    # Load document types first</span></span>
+<span id="cb6-9"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> partials/document-types/letter.typ</span></span>
+<span id="cb6-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> partials/document-types/cv.typ</span></span>
+<span id="cb6-11"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> partials/document-dispatcher.typ</span><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">      # Dispatcher last (uses the above)</span></span></code></pre></div></div>
+</div>
+</section>
+<section id="main-template" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="main-template"><span class="header-section-number">5.3</span> Main Template</h3>
+<p>The <code>template.typ</code> file serves as the entry point that assembles all components. It must include Quarto’s essential definitions and load your custom partials in the correct order.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>template.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="template.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Essential: Quarto/Pandoc feature definitions (callouts, quotes, etc.)</span></span>
+<span id="cb7-2"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$definitions.typ()$</span></span>
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Load document type templates</span></span>
+<span id="cb7-5"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$report.typ()$</span></span>
+<span id="cb7-6"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$letter.typ()$</span></span>
+<span id="cb7-7"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cv.typ()$</span></span>
+<span id="cb7-8"></span>
+<span id="cb7-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Load dispatcher (must come after document types)</span></span>
+<span id="cb7-10"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$document-dispatcher.typ()$</span></span></code></pre></div></div>
+</div>
+<p>The loading order matters:</p>
+<ol type="1">
+<li><strong><code>definitions.typ</code></strong> must come first; it provides Quarto features like callouts.</li>
+<li><strong>Document type templates</strong> define the rendering functions (<code>render-report</code>, etc.).</li>
+<li><strong>Dispatcher</strong> comes last because it references the document type functions.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>$partial-name.typ()$</code> syntax is Quarto’s template interpolation. It inserts the contents of the corresponding partial file at that location.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="adding-new-document-types" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="adding-new-document-types"><span class="header-section-number">6</span> Adding New Document Types</h2>
+<p>To add a new document type (e.g., “memo”):</p>
+<p><strong>Step 1: Create the template function.</strong></p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>partials/document-types/memo.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/document-types/memo.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">render-memo</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-2">  title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-3">  to<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-4">  from<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-5">  date<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-6">  body<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-7"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb8-8">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Memo-specific layout</span></span>
+<span id="cb8-9">  <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">page</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>paper<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"a4"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> margin<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb8-10"></span>
+<span id="cb8-11">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Header</span></span>
+<span id="cb8-12">  grid<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-13">    columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-14">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span>*TO:* <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>to<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span>*DATE:* <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>date<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="cb8-15">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span>*FROM:* <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>from<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[],</span></span>
+<span id="cb8-16">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb8-17"></span>
+<span id="cb8-18">  line<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb8-19"></span>
+<span id="cb8-20">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Subject</span></span>
+<span id="cb8-21">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> title <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb8-22">    align<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>center<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>weight<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">14pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="cb8-23">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb8-24"></span>
+<span id="cb8-25">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Body</span></span>
+<span id="cb8-26">  body</span>
+<span id="cb8-27"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span></code></pre></div></div>
+</div>
+<p><strong>Step 2: Register in the dispatcher.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">DOCUMENT_TYPES</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"letter"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cv"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"memo"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb9-2"></span>
+<span id="cb9-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Add routing case</span></span>
+<span id="cb9-4">if doc-type == "memo" {</span>
+<span id="cb9-5">  render-memo(..args)</span>
+<span id="cb9-6">}</span></code></pre></div></div>
+<p><strong>Step 3: Add to extension manifest.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">template-partials</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb10-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> partials/document-types/memo.typ</span></span>
+<span id="cb10-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">  # ... other partials</span></span></code></pre></div></div>
+<p><strong>Step 4: Load in template.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$memo.typ()$</span></span></code></pre></div></div>
+</section>
+<section id="benefits-of-this-pattern" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="benefits-of-this-pattern"><span class="header-section-number">7</span> Benefits of This Pattern</h2>
+<p><strong>Clean Separation</strong></p>
+<p>Each document type lives in its own file with its own logic. Changes to one type do not affect others.</p>
+<p><strong>Extensibility</strong></p>
+<p>Adding new document types requires minimal changes to existing code. The dispatcher’s validation list and routing logic are the only modifications needed.</p>
+<p><strong>Graceful Fallbacks</strong></p>
+<p>Invalid document types fall back to a sensible default rather than failing. Users receive working output even with typos in their configuration.</p>
+<p><strong>Parameter Isolation</strong></p>
+<p>Each template function defines only its own parameters. The dispatcher does not need to understand every possible parameter combination.</p>
+</section>
+<section id="conclusion" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
+<p>The document-type dispatcher pattern provides a clean architecture for Quarto Typst extensions that support multiple document types.</p>
+<p>Key takeaways:</p>
+<ol type="1">
+<li><strong>Central routing</strong>: A single dispatcher function routes to appropriate templates.</li>
+<li><strong>Validation with fallbacks</strong>: Check document types against a known list; default gracefully.</li>
+<li><strong>Variadic forwarding</strong>: Use <code>..args</code> to pass parameters without coupling.</li>
+<li><strong>YAML integration</strong>: Bridge Quarto metadata to Typst via <code>typst-show.typ</code>.</li>
+<li><strong>Modular organisation</strong>: Separate files for each document type.</li>
+</ol>
+<div class="highlight">
+<p>The dispatcher pattern scales well as your extension grows. Start with one or two document types, and the architecture supports adding more without refactoring.</p>
+</div>
+<section id="further-resources" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="further-resources"><span class="header-section-number">8.1</span> Further Resources</h3>
+<ul>
+<li><a href="https://typst.app/docs/reference/foundations/function/">Typst Documentation: Functions</a>.</li>
+<li><a href="https://quarto.org/docs/journals/templates.html#typst-partials">Quarto Documentation: Typst Partials</a>.</li>
+<li><a href="https://github.com/mcanouil/quarto-mcanouil">quarto-mcanouil Extension</a> - demonstrates this pattern in production.</li>
+</ul>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a> ]]></description>
+  <category>quarto</category>
+  <category>extensions</category>
+  <category>typst</category>
+  <category>pdf</category>
+  <guid>https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/</guid>
+  <pubDate>Sun, 18 Jan 2026 23:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Quarto Wizard 2.0.0: Native Extension Management and Batch Operations</title>
   <dc:creator>Mickaël CANOUIL, _Ph.D._</dc:creator>
@@ -203,7 +1168,7 @@ Note
   <category>extensions</category>
   <category>productivity</category>
   <guid>https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/</guid>
-  <pubDate>Mon, 12 Jan 2026 00:00:00 GMT</pubDate>
+  <pubDate>Sun, 11 Jan 2026 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png" medium="image" type="image/png" height="72" width="144"/>
 </item>
 <item>
@@ -889,7 +1854,7 @@ font-style: inherit;">](https://github.com/mcanouil/quarto-extensions-updater)</
   <category>Automation</category>
   <category>DevOps</category>
   <guid>https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
+  <pubDate>Thu, 11 Dec 2025 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/featured.png" medium="image" type="image/png" height="77" width="144"/>
 </item>
 <item>
@@ -1273,7 +2238,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
   <category>positron</category>
   <category>productivity</category>
   <guid>https://mickael.canouil.fr/posts/2025-11-20-quarto-editor-settings/</guid>
-  <pubDate>Thu, 20 Nov 2025 00:00:00 GMT</pubDate>
+  <pubDate>Wed, 19 Nov 2025 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-11-20-quarto-editor-settings/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -2801,7 +3766,7 @@ font-style: inherit;">end</span></span></code></pre></div></div>
   <category>best practices</category>
   <category>lua</category>
   <guid>https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/</guid>
-  <pubDate>Thu, 06 Nov 2025 00:00:00 GMT</pubDate>
+  <pubDate>Wed, 05 Nov 2025 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -3106,7 +4071,7 @@ Install <strong>Quarto Wizard</strong> today and discover how <strong>effortless
   <category>extensions</category>
   <category>productivity</category>
   <guid>https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/</guid>
-  <pubDate>Mon, 20 Oct 2025 00:00:00 GMT</pubDate>
+  <pubDate>Sun, 19 Oct 2025 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/featured.png" medium="image" type="image/png" height="96" width="144"/>
 </item>
 <item>
@@ -3749,7 +4714,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
   <category>Teaching</category>
   <category>Dev Container</category>
   <guid>https://mickael.canouil.fr/posts/2025-05-19-quarto-codespaces/</guid>
-  <pubDate>Mon, 19 May 2025 00:00:00 GMT</pubDate>
+  <pubDate>Sun, 18 May 2025 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-05-19-quarto-codespaces/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -5109,7 +6074,7 @@ font-style: inherit;">"my-slides.pdf"</span></span></code></pre></div></div>
   <category>Presentations</category>
   <category>Decktape</category>
   <guid>https://mickael.canouil.fr/posts/2025-04-21-quarto-revealjs-tabset-pdf/</guid>
-  <pubDate>Mon, 21 Apr 2025 00:00:00 GMT</pubDate>
+  <pubDate>Sun, 20 Apr 2025 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-04-21-quarto-revealjs-tabset-pdf/featured.gif" medium="image" type="image/gif"/>
 </item>
 <item>
@@ -6730,7 +7695,7 @@ Choose the approach that best suits your needs and workflow.</p>
   <category>Deployment</category>
   <category>GitHub Actions</category>
   <guid>https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/</guid>
-  <pubDate>Mon, 30 Dec 2024 00:00:00 GMT</pubDate>
+  <pubDate>Sun, 29 Dec 2024 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -7964,7 +8929,7 @@ font-style: inherit;">"Penguin Species"</span></span>
 background-color: null;
 font-style: inherit;">```</span></span></code></pre></div></div>
 </details>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
@@ -8013,7 +8978,7 @@ font-style: inherit;">```</span></span></code></pre></div></div>
   <category>dark mode</category>
   <category>light mode</category>
   <guid>https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/</guid>
-  <pubDate>Tue, 30 May 2023 00:00:00 GMT</pubDate>
+  <pubDate>Mon, 29 May 2023 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/featured.gif" medium="image" type="image/gif"/>
 </item>
 <item>
@@ -8489,7 +9454,7 @@ font-style: inherit;">\</span></span>
   <category>Q&amp;A</category>
   <category>Docker</category>
   <guid>https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/</guid>
-  <pubDate>Sun, 07 May 2023 00:00:00 GMT</pubDate>
+  <pubDate>Sat, 06 May 2023 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -8599,7 +9564,7 @@ font-style: inherit;">---</span></span>
   <category>MathJax</category>
   <category>LaTeX</category>
   <guid>https://mickael.canouil.fr/posts/2023-03-12-quarto-mathjax-packages/</guid>
-  <pubDate>Sun, 12 Mar 2023 00:00:00 GMT</pubDate>
+  <pubDate>Sat, 11 Mar 2023 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2023-03-12-quarto-mathjax-packages/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -8852,7 +9817,7 @@ font-style: inherit;">```</span></span></code></pre></div></div>
   <category>R</category>
   <category>knitr</category>
   <guid>https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/</guid>
-  <pubDate>Sun, 05 Mar 2023 00:00:00 GMT</pubDate>
+  <pubDate>Sat, 04 Mar 2023 23:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -8894,7 +9859,7 @@ font-style: inherit;">blogdown</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">new_site</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://pkgs.rstudio.com/blogdown/reference/hugo_cmd.html">new_site</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>theme <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -9231,7 +10196,7 @@ The reason for this small modification comes from the default configuration of H
 </section><section id="default-with-a-toc" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="default-with-a-toc">
 <span class="header-section-number">4</span> Default with a TOC</h2>
 <p>First, let’s edit the default <code>index.en.Rmd</code> file by adding three lines. in the YAML header as we would have done in a regular <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/html_document.html">rmarkdown::html_document()</a></code> to add a TOC.<br>
-For a <code>blogdown</code> post, the output format is <code>blogdown::html_page()</code>.<br>
+For a <code>blogdown</code> post, the output format is <code><a href="https://pkgs.rstudio.com/blogdown/reference/html_page.html">blogdown::html_page()</a></code>.<br>
 This output format produces a headless HTML file (<em>i.e.</em>,&nbsp;there is no need for header/body part, since the file is going to be included as a part of another HTML file).</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -9723,7 +10688,7 @@ background-color: null;
 font-style: inherit;">&gt;</span></span>
 <span id="cb11-33"></span>
 <span id="cb11-34">{{- end -}}</span></code></pre></div></div>
-<p>Again, we need to render the <code>index.en.Rmd</code> file, or to restart the website (<code>blogdown::stop_server()</code>/<code>blogdown::serve_site()</code>) to ensure all modifications are taken into account.</p>
+<p>Again, we need to render the <code>index.en.Rmd</code> file, or to restart the website (<code><a href="https://pkgs.rstudio.com/blogdown/reference/serve_site.html">blogdown::stop_server()</a></code>/<code><a href="https://pkgs.rstudio.com/blogdown/reference/serve_site.html">blogdown::serve_site()</a></code>) to ensure all modifications are taken into account.</p>
 <p><a href="assets/rmd_default_toc_single_post.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="https://mickael.canouil.fr/posts/2021-05-06-floating-toc-in-blogdown/assets/rmd_default_toc_single_post.png" class="img-fluid"></a></p>
 <p>Not quite, what we could have expected …</p>
 <p>The TOC from the Rmarkdown (HTML) file is still at the top, but there is a “Contents” on the right side (as define in <code>layouts/_default/single.html</code>).<br>
@@ -10590,7 +11555,7 @@ font-style: inherit;">;</span></span>
   <category>HUGO</category>
   <category>Website</category>
   <guid>https://mickael.canouil.fr/posts/2021-05-06-floating-toc-in-blogdown/</guid>
-  <pubDate>Thu, 06 May 2021 00:00:00 GMT</pubDate>
+  <pubDate>Wed, 05 May 2021 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2021-05-06-floating-toc-in-blogdown/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 <item>
@@ -10737,7 +11702,7 @@ font-style: inherit;">base_layer</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -10746,7 +11711,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">theme_void</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -10755,7 +11720,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">theme</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    legend.position <span class="op" style="color: #5E5E5E;
@@ -10767,7 +11732,7 @@ font-style: inherit;">"none"</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_rect</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>fill <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -10784,7 +11749,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_rect</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>fill <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -10804,7 +11769,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -10996,7 +11961,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_size_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>values <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11043,7 +12008,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_fill_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11066,7 +12031,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_colour_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11103,7 +12068,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_x_continuous</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11117,7 +12082,7 @@ font-style: inherit;">21</span>, sec.axis <span class="op" style="color: #5E5E5E
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">dup_axis</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11128,7 +12093,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_y_continuous</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11142,7 +12107,7 @@ font-style: inherit;">26</span>, sec.axis <span class="op" style="color: #5E5E5E
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">dup_axis</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/sec_axis.html">dup_axis</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11153,14 +12118,14 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">theme</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    panel.grid.major <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_line</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_line</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>colour <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11173,7 +12138,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_text</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>colour <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11189,7 +12154,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">annotate</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -11437,7 +12402,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -11449,7 +12414,7 @@ font-style: inherit;">left_vertical_segments</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11785,7 +12750,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -11797,7 +12762,7 @@ font-style: inherit;">left_segments</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11901,7 +12866,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -11921,7 +12886,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12122,7 +13087,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -12134,7 +13099,7 @@ font-style: inherit;">maze_walls</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12189,7 +13154,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -12201,7 +13166,7 @@ font-style: inherit;">maze_walls</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12658,7 +13623,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -12670,7 +13635,7 @@ font-style: inherit;">maze_walls</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12716,7 +13681,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_point</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -12728,7 +13693,7 @@ font-style: inherit;">maze_points</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12857,7 +13822,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_point</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -12885,7 +13850,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -13126,7 +14091,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -13147,7 +14112,7 @@ font-style: inherit;">pacman_state</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -13193,11 +14158,11 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">facet_wrap</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">vars</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -13616,7 +14581,7 @@ font-style: inherit;">pacman_moves</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -13697,7 +14662,7 @@ font-style: inherit;">pacman_moves</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14022,7 +14987,7 @@ font-style: inherit;">top</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14049,7 +15014,7 @@ font-style: inherit;">]</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14085,7 +15050,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14127,7 +15092,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
 </div>
 </div>
-<p>I retrieved the coordinates of the created polygon, using <code>ggplot_build()</code>.</p>
+<p>I retrieved the coordinates of the created polygon, using <code><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build()</a></code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va" style="color: #111111;
 background-color: null;
@@ -14135,7 +15100,7 @@ font-style: inherit;">top_polygon</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot_build</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -14177,7 +15142,7 @@ font-style: inherit;">bottom</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14206,7 +15171,7 @@ font-style: inherit;">]</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14242,7 +15207,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14291,7 +15256,7 @@ font-style: inherit;">bottom_polygon</span> <span class="op" style="color: #5E5E
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot_build</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot_build.html">ggplot_build</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -14440,7 +15405,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14449,7 +15414,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14486,7 +15451,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_polygon</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -14498,7 +15463,7 @@ font-style: inherit;">ghost_body</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14918,7 +15883,7 @@ background-color: null;
 font-style: inherit;">)</span></span>
 <span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14927,7 +15892,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14964,7 +15929,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_fill_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -14987,7 +15952,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_colour_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15022,7 +15987,7 @@ font-style: inherit;">ghost_eyes</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15064,11 +16029,11 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">facet_wrap</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">vars</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -15095,7 +16060,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15104,7 +16069,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15141,7 +16106,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_fill_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15164,7 +16129,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_colour_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15187,7 +16152,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_polygon</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -15215,7 +16180,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15268,7 +16233,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -15310,11 +16275,11 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">facet_wrap</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">vars</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/vars.html">vars</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -15810,7 +16775,7 @@ font-style: inherit;">(</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">pmap</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://purrr.tidyverse.org/reference/pmap.html">pmap</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>      .l <span class="op" style="color: #5E5E5E;
@@ -15911,7 +16876,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">pmap</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://purrr.tidyverse.org/reference/pmap.html">pmap</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>      .l <span class="op" style="color: #5E5E5E;
@@ -16152,7 +17117,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -16189,7 +17154,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_polygon</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -16209,7 +17174,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -16266,7 +17231,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -16442,7 +17407,7 @@ font-style: inherit;">(</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">map2</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://purrr.tidyverse.org/reference/map2.html">map2</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -16609,11 +17574,11 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
 </div>
 </div>
-<p>I could have change this geometry (<em>i.e.</em>, <code>geom_point()</code>), but I did not, and draw a new geometry on top of the previous ones. Do you remember the values of the scale for the size aesthetic?</p>
+<p>I could have change this geometry (<em>i.e.</em>, <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>), but I did not, and draw a new geometry on top of the previous ones. Do you remember the values of the scale for the size aesthetic?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48" style="background: #f1f3f5;"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_size_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>values <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -16669,7 +17634,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_point</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -16681,7 +17646,7 @@ font-style: inherit;">bonus_points_eaten</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -16830,7 +17795,7 @@ font-style: inherit;">(</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">map</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="va" style="color: #111111;
 background-color: null;
@@ -17589,7 +18554,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -17624,7 +18589,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_polygon</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -17644,7 +18609,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -17701,7 +18666,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x0 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18107,7 +19072,7 @@ font-style: inherit;">base_grid</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">ggplot</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18116,7 +19081,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">theme_void</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_void</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18125,7 +19090,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">theme</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    legend.position <span class="op" style="color: #5E5E5E;
@@ -18137,7 +19102,7 @@ font-style: inherit;">"none"</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_rect</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>fill <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18154,7 +19119,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">element_rect</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>fill <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18174,7 +19139,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_size_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_size_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>values <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18221,7 +19186,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_fill_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18244,7 +19209,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">scale_colour_manual</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_colour_manual</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>breaks <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18267,7 +19232,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">coord_fixed</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>xlim <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18300,7 +19265,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_segment</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -18312,7 +19277,7 @@ font-style: inherit;">maze_walls</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18358,7 +19323,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_point</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -18370,7 +19335,7 @@ font-style: inherit;">maze_points</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18403,7 +19368,7 @@ background-color: null;
 font-style: inherit;">+</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_text</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html">geom_text</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -18439,7 +19404,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18498,7 +19463,7 @@ background-color: null;
 font-style: inherit;">(</span></span>
 <span>  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_point</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>    data <span class="op" style="color: #5E5E5E;
@@ -18510,7 +19475,7 @@ font-style: inherit;">bonus_points_eaten</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18588,7 +19553,7 @@ font-style: inherit;">pacman_moves</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>      x0 <span class="op" style="color: #5E5E5E;
@@ -18671,7 +19636,7 @@ font-style: inherit;">p_ghosts</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">map</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>.x <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -18725,7 +19690,7 @@ background-color: null;
 font-style: inherit;">(</span></span>
 <span>    <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">geom_polygon</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/geom_polygon.html">geom_polygon</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>      data <span class="op" style="color: #5E5E5E;
@@ -18745,7 +19710,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>        x <span class="op" style="color: #5E5E5E;
@@ -18804,7 +19769,7 @@ font-style: inherit;">)</span>,</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">aes</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
 <span>        x0 <span class="op" style="color: #5E5E5E;
@@ -18945,7 +19910,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
   <category>gganimate</category>
   <category>Fun</category>
   <guid>https://mickael.canouil.fr/posts/2020-05-06-ggpacman/</guid>
-  <pubDate>Wed, 06 May 2020 00:00:00 GMT</pubDate>
+  <pubDate>Tue, 05 May 2020 22:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2020-05-06-ggpacman/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 </channel>
