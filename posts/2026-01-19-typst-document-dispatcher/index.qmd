@@ -35,9 +35,28 @@ lightbox: true
 When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs.
 Each type has distinct layouts, headers, and styling requirements.
 
-However, Quarto extensions can only contribute one format per output type.
-You cannot define separate `my-extension-report`, `my-extension-letter`, and `my-extension-cv` formats within a single extension.
-This means you need another approach to support multiple document types.
+While Quarto extensions can contribute multiple variants of the same base format[^variants], this approach requires either sharing metadata across all contributed elements or duplicating it for each variant.
+
+The dispatcher pattern offers an alternative: a single format entry point with document-type routing handled entirely in Typst code.
+This centralises shared logic and avoids metadata duplication.
+
+[^variants]: Format variants use the `+` syntax in `_extension.yml`:
+
+    ```{.yaml filename="_extension.yml"}
+    contributes:
+      formats:
+        typst+report:
+          title: "Typst Report"
+        typst+article:
+          title: "Typst Article"
+    ```
+
+    Then in a document:
+
+    ```{.yaml filename="YAML"}
+    format:
+      myformat-typst+report: default
+    ```
 
 Without a clear architecture, you end up with:
 
