@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mickaël CANOUIL, Ph.D.">
-<meta name="description" content="Discover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.">
+<meta name="description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
 
-<title>Optimising VS Code and Positron for Quarto: Essential Settings for Better Editing – MCU</title>
+<title>Document-Type Dispatching in Quarto Typst Extensions – MCU</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -84,8 +84,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/bootstrap/bootstrap-dark-44242774c29937dc40b1b3ab13cc4c7b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <link href="../../site_libs/bootstrap/bootstrap-0ed75e6e0b9315c3532f6e3acdf91255.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
-<script src="../../site_libs/quarto-contrib/kbd/kbd.js"></script>
-<link href="../../site_libs/quarto-contrib/kbd/kbd.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -118,19 +116,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Optimising VS Code and Positron for Quarto: Essential Settings for Better Editing – MCU">
-<meta property="og:description" content="Discover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2025-11-20-quarto-editor-settings/featured.png">
+<meta property="og:title" content="Document-Type Dispatching in Quarto Typst Extensions – MCU">
+<meta property="og:description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png">
 <meta property="og:site_name" content="MCU">
-<meta property="og:image:height" content="1080">
-<meta property="og:image:width" content="1920">
-<meta property="og:image:alt" content="Visual Studio Code logo on the top left and Positron logo on the top right with Quarto logo in the bottom centre, connected by configuration gear icon.">
-<meta name="twitter:title" content="Optimising VS Code and Positron for Quarto: Essential Settings for Better Editing – MCU">
-<meta name="twitter:description" content="Discover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2025-11-20-quarto-editor-settings/featured.png">
-<meta name="twitter:image-height" content="1080">
-<meta name="twitter:image-width" content="1920">
-<meta name="twitter:image:alt" content="Visual Studio Code logo on the top left and Positron logo on the top right with Quarto logo in the bottom centre, connected by configuration gear icon.">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:alt" content="Feature image for &quot;Quarto + Typst Document Dispatcher&quot; blog post.
+Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+Below, &quot;Document Dispatcher&quot; in serif font with subtitle &quot;Modern Scientific Publishing&quot;.
+File format pipeline shows .qmd → .typ → .pdf.
+Decorative elements include floating code snippets and gradient orbs in blue and teal.
+">
+<meta name="twitter:title" content="Document-Type Dispatching in Quarto Typst Extensions – MCU">
+<meta name="twitter:description" content="Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png">
+<meta name="twitter:image-height" content="1260">
+<meta name="twitter:image-width" content="2400">
+<meta name="twitter:image:alt" content="Feature image for &quot;Quarto + Typst Document Dispatcher&quot; blog post.
+Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+Below, &quot;Document Dispatcher&quot; in serif font with subtitle &quot;Modern Scientific Publishing&quot;.
+File format pipeline shows .qmd → .typ → .pdf.
+Decorative elements include floating code snippets and gradient orbs in blue and teal.
+">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -373,17 +381,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Optimising VS Code and Positron for Quarto: Essential Settings for Better Editing</h1>
+      <h1 class="title">Document-Type Dispatching in Quarto Typst Extensions</h1>
                   <div>
         <div class="description">
-          <p>Discover the custom settings I use in VS Code and Positron to enhance my Quarto document editing workflow, from improved Git diffs to better visual guides for nested divs.</p>
+          <p>Learn how to build a central dispatcher function that routes to different Typst templates based on document type. This pattern enables clean separation between document types like reports, letters, and CVs.</p>
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">quarto</div>
-                <div class="quarto-category">vscode</div>
-                <div class="quarto-category">positron</div>
-                <div class="quarto-category">productivity</div>
+                <div class="quarto-category">extensions</div>
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">pdf</div>
               </div>
                   </div>
   </div>
@@ -401,7 +409,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Thursday, the 20th of November, 2025</p>
+        <p class="date">Monday, the 19th of January, 2026</p>
       </div>
     </div>
     
@@ -417,19 +425,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#core-quarto-settings" id="toc-core-quarto-settings" class="nav-link active" data-scroll-target="#core-quarto-settings">Core Quarto Settings</a></li>
-  <li><a href="#visual-line-length-guides" id="toc-visual-line-length-guides" class="nav-link" data-scroll-target="#visual-line-length-guides">Visual Line Length Guides</a></li>
-  <li><a href="#workspace-performance-optimisation" id="toc-workspace-performance-optimisation" class="nav-link" data-scroll-target="#workspace-performance-optimisation">Workspace Performance Optimisation</a></li>
-  <li><a href="#github-copilot-integration" id="toc-github-copilot-integration" class="nav-link" data-scroll-target="#github-copilot-integration">GitHub Copilot Integration</a></li>
-  <li><a href="#current-limitations-and-workarounds" id="toc-current-limitations-and-workarounds" class="nav-link" data-scroll-target="#current-limitations-and-workarounds">Current Limitations and Workarounds</a>
+  <li><a href="#the-problem-multiple-document-types" id="toc-the-problem-multiple-document-types" class="nav-link active" data-scroll-target="#the-problem-multiple-document-types"><span class="header-section-number">1</span> The Problem: Multiple Document Types</a></li>
+  <li><a href="#quartos-default-typst-partials" id="toc-quartos-default-typst-partials" class="nav-link" data-scroll-target="#quartos-default-typst-partials"><span class="header-section-number">2</span> Quarto’s Default Typst Partials</a>
   <ul class="collapse">
-  <li><a href="#div-folding-support" id="toc-div-folding-support" class="nav-link" data-scroll-target="#div-folding-support">Div Folding Support</a></li>
-  <li><a href="#applying-these-settings" id="toc-applying-these-settings" class="nav-link" data-scroll-target="#applying-these-settings">Applying These Settings</a></li>
+  <li><a href="#overriding-partials" id="toc-overriding-partials" class="nav-link" data-scroll-target="#overriding-partials"><span class="header-section-number">2.1</span> Overriding Partials</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
-  <li><a href="#resources-and-further-reading" id="toc-resources-and-further-reading" class="nav-link" data-scroll-target="#resources-and-further-reading">Resources and Further Reading</a></li>
+  <li><a href="#the-dispatcher-pattern" id="toc-the-dispatcher-pattern" class="nav-link" data-scroll-target="#the-dispatcher-pattern"><span class="header-section-number">3</span> The Dispatcher Pattern</a>
+  <ul class="collapse">
+  <li><a href="#core-implementation" id="toc-core-implementation" class="nav-link" data-scroll-target="#core-implementation"><span class="header-section-number">3.1</span> Core Implementation</a></li>
+  <li><a href="#key-patterns" id="toc-key-patterns" class="nav-link" data-scroll-target="#key-patterns"><span class="header-section-number">3.2</span> Key Patterns</a></li>
+  </ul></li>
+  <li><a href="#configuration-via-yaml" id="toc-configuration-via-yaml" class="nav-link" data-scroll-target="#configuration-via-yaml"><span class="header-section-number">4</span> Configuration via YAML</a>
+  <ul class="collapse">
+  <li><a href="#user-facing-configuration" id="toc-user-facing-configuration" class="nav-link" data-scroll-target="#user-facing-configuration"><span class="header-section-number">4.1</span> User-Facing Configuration</a></li>
+  <li><a href="#bridging-quarto-and-typst" id="toc-bridging-quarto-and-typst" class="nav-link" data-scroll-target="#bridging-quarto-and-typst"><span class="header-section-number">4.2</span> Bridging Quarto and Typst</a></li>
+  </ul></li>
+  <li><a href="#file-organisation" id="toc-file-organisation" class="nav-link" data-scroll-target="#file-organisation"><span class="header-section-number">5</span> File Organisation</a>
+  <ul class="collapse">
+  <li><a href="#directory-structure" id="toc-directory-structure" class="nav-link" data-scroll-target="#directory-structure"><span class="header-section-number">5.1</span> Directory Structure</a></li>
+  <li><a href="#extension-manifest" id="toc-extension-manifest" class="nav-link" data-scroll-target="#extension-manifest"><span class="header-section-number">5.2</span> Extension Manifest</a></li>
+  <li><a href="#main-template" id="toc-main-template" class="nav-link" data-scroll-target="#main-template"><span class="header-section-number">5.3</span> Main Template</a></li>
+  </ul></li>
+  <li><a href="#adding-new-document-types" id="toc-adding-new-document-types" class="nav-link" data-scroll-target="#adding-new-document-types"><span class="header-section-number">6</span> Adding New Document Types</a></li>
+  <li><a href="#benefits-of-this-pattern" id="toc-benefits-of-this-pattern" class="nav-link" data-scroll-target="#benefits-of-this-pattern"><span class="header-section-number">7</span> Benefits of This Pattern</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">8</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#further-resources" id="toc-further-resources" class="nav-link" data-scroll-target="#further-resources"><span class="header-section-number">8.1</span> Further Resources</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-11-20-quarto-editor-settings/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-19-typst-document-dispatcher/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -441,210 +465,413 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Visual Studio Code logo on the top left and Positron logo on the top right with Quarto logo in the bottom centre, connected by configuration gear icon." width="600"></a></p>
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Feature image for “Quarto + Typst Document Dispatcher” blog post. Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top. Below, “Document Dispatcher” in serif font with subtitle “Modern Scientific Publishing”. File format pipeline shows .qmd → .typ → .pdf. Decorative elements include floating code snippets and gradient orbs in blue and teal." width="600"></a></p>
 </figure>
 </div>
-<p>After years of working with Quarto in both VS Code and Positron, I’ve refined a set of editor settings that significantly improve my document editing experience. These configurations address common pain points like div folding, Git diff readability, and workspace performance.</p>
-<div class="highlight">
-<p>The path to <strong>effortless editing</strong> is paved with <strong>thoughtful settings</strong>.</p>
+<section id="the-problem-multiple-document-types" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-problem-multiple-document-types"><span class="header-section-number">1</span> The Problem: Multiple Document Types</h2>
+<p>When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs. Each type has distinct layouts, headers, and styling requirements.</p>
+<p>While Quarto extensions can contribute multiple variants of the same base format<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, this approach requires either sharing metadata across all contributed elements or duplicating it for each variant.</p>
+<p>The dispatcher pattern offers an alternative: a single format entry point with document-type routing handled entirely in Typst code. This centralises shared logic and avoids metadata duplication.</p>
+<p>Without a clear architecture, you end up with:</p>
+<ul>
+<li>Monolithic templates cluttered with conditional logic.</li>
+<li>Duplicated code across separate template files.</li>
+<li>Difficult maintenance as document types multiply.</li>
+</ul>
+<p>The solution is a <strong>dispatcher pattern</strong>: a central function that routes to the appropriate template based on document type.</p>
+</section>
+<section id="quartos-default-typst-partials" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="quartos-default-typst-partials"><span class="header-section-number">2</span> Quarto’s Default Typst Partials</h2>
+<p>Before building a dispatcher, it helps to understand how Quarto generates Typst documents.</p>
+<p>Quarto provides a set of <a href="https://quarto.org/docs/journals/templates.html#typst-partials">default Typst partials</a> that handle different aspects of document generation:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Partial</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>definitions.typ</code></td>
+<td>Pandoc/Quarto features (callouts, block quotes, subfloats).</td>
+</tr>
+<tr class="even">
+<td><code>typst-template.typ</code></td>
+<td>The main template function applied to document content.</td>
+</tr>
+<tr class="odd">
+<td><code>typst-show.typ</code></td>
+<td>Show rules that capture metadata and call the template.</td>
+</tr>
+<tr class="even">
+<td><code>page.typ</code></td>
+<td>Page properties (size, margins, numbering, background).</td>
+</tr>
+<tr class="odd">
+<td><code>notes.typ</code></td>
+<td>Footnote rendering.</td>
+</tr>
+<tr class="even">
+<td><code>biblio.typ</code></td>
+<td>Bibliography formatting.</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p>Whether you’re just starting with Quarto or looking to optimise your existing setup, these settings can help streamline your workflow and reduce friction in your daily editing tasks.</p>
-<section id="core-quarto-settings" class="level2">
-<h2 class="anchored" data-anchor-id="core-quarto-settings">Core Quarto Settings</h2>
-<p>The foundation of my configuration lies in language-specific settings for Quarto documents. These settings ensure consistent formatting and provide visual aids for working with Quarto.</p>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>definitions.typ</code> partial is essential and must always be included in custom templates. It provides the foundation for Quarto features like callouts.</p>
+</div>
+</div>
+<section id="overriding-partials" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="overriding-partials"><span class="header-section-number">2.1</span> Overriding Partials</h3>
+<p>Extensions override default partials by providing replacement files via <code>template-partials</code> in <code>_extension.yml</code> (or document YAML front matter). When you list a partial, Quarto uses your version instead of the built-in one.</p>
+<p>The dispatcher pattern requires customising two partials:</p>
+<ul>
+<li><strong><code>template.typ</code></strong>: Load document-type templates and the dispatcher function.</li>
+<li><strong><code>typst-show.typ</code></strong>: Route document content through the dispatcher based on configuration.</li>
+</ul>
+<p>See the <a href="https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto">Quarto source</a> for the default partial implementations.</p>
+</section>
+</section>
+<section id="the-dispatcher-pattern" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-dispatcher-pattern"><span class="header-section-number">3</span> The Dispatcher Pattern</h2>
+<p>The dispatcher acts as a routing hub. It receives a document type parameter, validates it, and calls the corresponding template function.</p>
+<section id="core-implementation" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="core-implementation"><span class="header-section-number">3.1</span> Core Implementation</h3>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>settings.json</strong></pre>
+<pre><strong>document-dispatcher.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="settings.json"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"[quarto]"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.defaultFormatter"</span><span class="fu">:</span> <span class="st">"quarto.quarto"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-4" class="code-annotation-target"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.wordWrap"</span><span class="fu">:</span> <span class="st">"off"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.guides.bracketPairs"</span><span class="fu">:</span> <span class="st">"active"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.language.brackets"</span><span class="fu">:</span> <span class="ot">[[</span><span class="st">"::::"</span><span class="ot">,</span> <span class="st">":::"</span><span class="ot">]]</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-7" class="code-annotation-target"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"editor.language.colorizedBracketPairs"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>      <span class="ot">[</span><span class="st">"::::"</span><span class="ot">,</span> <span class="st">":::"</span><span class="ot">]</span></span>
-<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
-<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="document-dispatcher.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="co">/// Supported document types.</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-2" class="code-annotation-target"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">DOCUMENT_TYPES</span> <span class="op">=</span> <span class="op">(</span><span class="st">"report"</span><span class="op">,</span> <span class="st">"letter"</span><span class="op">,</span> <span class="st">"cv"</span><span class="op">)</span></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a><span class="co">/// Main document dispatcher function.</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="co">/// Routes to the appropriate template based on document-type.</span></span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">document-dispatcher</span><span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>  document-type<span class="op">:</span> <span class="st">"report"</span><span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-7" class="code-annotation-target"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>  ..args<span class="op">,</span></span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Validate and normalise document type</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-10" class="code-annotation-target"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">doc-type</span> <span class="op">=</span> <span class="cf">if</span> document-type <span class="op">in</span> DOCUMENT_TYPES <span class="op">{</span></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>    document-type</span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Fall back to report with warning</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"report"</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Dispatch to appropriate template</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> doc-type <span class="op">==</span> <span class="st">"letter"</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>    render-letter<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> doc-type <span class="op">==</span> <span class="st">"cv"</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>    render-cv<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Default: report</span></span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>    render-report<span class="op">(</span>..args<span class="op">)</span></span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-1-26"><a href="#annotated-cell-1-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Uses the official Quarto extension as the default formatter for Quarto files, ensuring consistent formatting of code blocks and code cells.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="2" data-code-annotation="1">Define supported types as an <a href="https://typst.app/docs/reference/foundations/array/">array</a>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Disables word wrapping to prevent markdown pipe tables from wrapping awkwardly.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">Default document type; used when not specified.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="3">Shows bracket pair guides only for the active bracket pair, reducing visual clutter whilst maintaining helpful structural indicators.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="3"><a href="https://typst.app/docs/reference/foundations/arguments/">Variadic arguments</a> capture all other parameters.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="4">Defines Quarto’s div syntax (<code>::::</code> for opening, <code>:::</code> for closing) as bracket pairs, enabling folding and navigation.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="7" data-code-annotation="5">Adds colourisation to div brackets, making it easier to match opening and closing divs in deeply nested structures.</span>
-</dd>
-</dl>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Disabling word wrap setting might seem counter-intuitive, but by keeping one sentence per line, Git diffs show exactly which sentences changed rather than displaying entire paragraph modifications. This also prevents markdown pipe tables from wrapping mid-cell, which can break table rendering.</p>
-</div>
-</div>
-</section>
-<section id="visual-line-length-guides" class="level2">
-<h2 class="anchored" data-anchor-id="visual-line-length-guides">Visual Line Length Guides</h2>
-<p>To maintain readable line lengths whilst avoiding word wrap, I use vertical rulers as visual guides.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>settings.json</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="settings.json"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"editor.rulers"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">80</span><span class="ot">,</span></span>
-<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"color"</span><span class="fu">:</span> <span class="st">"#b22222"</span><span class="fu">,</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-6" class="code-annotation-target"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"column"</span><span class="fu">:</span> <span class="dv">120</span></span>
-<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
-<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">Displays a subtle vertical line at 80 characters, serving as a soft guideline for line length.</span>
-</dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="2">Sets a firebrick red colour for the second ruler to draw attention to excessively long lines.</span>
-</dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="6" data-code-annotation="3">Places the warning ruler at 120 characters, indicating lines that should ideally be broken up.</span>
-</dd>
-</dl>
-<p>This two-ruler approach provides progressive feedback: the first ruler suggests an ideal/standard line length, whilst the second warns when lines become problematically long.</p>
-</section>
-<section id="workspace-performance-optimisation" class="level2">
-<h2 class="anchored" data-anchor-id="workspace-performance-optimisation">Workspace Performance Optimisation</h2>
-<p>Quarto projects generate substantial build artefacts in the <code>.quarto</code> directory. Excluding this directory from file watching and search operations improves editor performance, especially in large projects.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>settings.json</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="settings.json"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"files.watcherExclude"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"**/.quarto/**"</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
-<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"search.exclude"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-6" class="code-annotation-target"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"*/.quarto"</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">Prevents the editor from monitoring changes in <code>.quarto</code> directories, reducing unnecessary file system operations and improving responsiveness.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="6" data-code-annotation="2">Excludes <code>.quarto</code> directories from search results, eliminating irrelevant build artefacts from workspace searches.</span>
-</dd>
-</dl>
-<p>These exclusions are particularly beneficial in projects with frequent renders or when working with large documents that generate extensive intermediate files.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Another directory to consider excluding is the <code>_freeze</code> directory if you’re using the freeze feature extensively, as this can also contain a large number of files. You can also exclude other render output directories specific to your workflow, such as <code>_site</code>, <code>_book</code>, and <code>_manuscript</code>.</p>
-</div>
-</div>
-</section>
-<section id="github-copilot-integration" class="level2">
-<h2 class="anchored" data-anchor-id="github-copilot-integration">GitHub Copilot Integration</h2>
-<p>The Quarto extension disables GitHub Copilot by default for Quarto files.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> If you want to use GitHub Copilot’s AI assistance whilst editing Quarto documents, you must explicitly enable it in your settings.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>settings.json</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-4" data-filename="settings.json"><pre class="sourceCode json code-annotation-code code-with-copy code-annotated"><code class="sourceCode json"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"github.copilot.enable"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"quarto"</span><span class="fu">:</span> <span class="kw">true</span></span>
-<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="annotated-cell-4-5"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-4" data-code-lines="3" data-code-annotation="1">Overrides the Quarto extension’s default behaviour to enable GitHub Copilot suggestions in Quarto documents.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="4"><code>in</code> operator checks array membership.</span>
 </dd>
 </dl>
 </section>
-<section id="current-limitations-and-workarounds" class="level2">
-<h2 class="anchored" data-anchor-id="current-limitations-and-workarounds">Current Limitations and Workarounds</h2>
-<section id="div-folding-support" class="level3">
-<h3 class="anchored" data-anchor-id="div-folding-support">Div Folding Support</h3>
-<p>Whilst the bracket pair configuration enables basic folding for divs, native folding support in the Quarto extension remains an ongoing feature request.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The current workaround using <code>editor.language.brackets</code> provides functional folding, though it may not be as sophisticated as built-in support would be.</p>
-</section>
-<section id="applying-these-settings" class="level3">
-<h3 class="anchored" data-anchor-id="applying-these-settings">Applying These Settings</h3>
-<p>To use these settings in your environment:</p>
-<ol type="1">
-<li>Open your VS Code or Positron settings (<kbd title="linux: Ctrl-,, mac: Cmd-,, windows: Ctrl-," aria-hidden="true" data-linux="Ctrl-," data-mac="Cmd-," data-windows="Ctrl-,"></kbd><span class="visually-hidden"></span>).</li>
-<li>Click the “<strong>Open Settings (JSON)</strong>” icon in the top right corner.</li>
-<li>Add these configurations to your <code>settings.json</code> file.</li>
-<li>Save the file to apply the changes immediately.</li>
-</ol>
-<p>Alternatively, you can add these to a workspace settings file (<code>.vscode/settings.json</code>) to apply them only to specific projects.</p>
-</section>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>These settings represent opinionated refinement in my Quarto editing workflow. They address practical challenges like navigating complex document structures and optimising editor performance.</p>
-<div class="highlight">
-<p>The combination of <strong>disabled word wrap</strong>, <strong>visual rulers</strong>, and <strong>div bracket pairing</strong> creates a <strong>more maintainable</strong> and <strong>visually navigable</strong> editing experience for Quarto documents.</p>
-</div>
-<p>I encourage you to try these settings and adjust them to match your preferences. What works for my workflow might need tweaking for yours, and that’s perfectly fine. The goal is to reduce friction and let you focus on creating excellent content rather than fighting with your editor.</p>
-<p>Do you have custom settings that enhance your Quarto editing experience? I’d love to hear about them in the discussion below.</p>
-<p><em>Happy editing!</em></p>
-</section>
-<section id="resources-and-further-reading" class="level2">
-<h2 class="anchored" data-anchor-id="resources-and-further-reading">Resources and Further Reading</h2>
+<section id="key-patterns" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="key-patterns"><span class="header-section-number">3.2</span> Key Patterns</h3>
+<p><strong>Pattern 1: Type Validation</strong></p>
+<p>The dispatcher validates the document type against a known list before routing. Invalid types fall back gracefully to a default (report) rather than failing.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>let doc-type = if document-type in DOCUMENT_TYPES {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  document-type</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>} else {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  "report"  <span class="co">// Safe fallback</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Pattern 2: Variadic Argument Forwarding</strong></p>
+<p>Each document type may accept different parameters. Rather than listing every possible parameter, the dispatcher captures them all with <code>..args</code> and forwards them to the target function.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">document-dispatcher</span><span class="op">(</span>document-type<span class="op">:</span> <span class="st">"report"</span><span class="op">,</span> ..args<span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  render-report<span class="op">(</span>..args<span class="op">)</span>  <span class="co">// Forward all arguments</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This means:</p>
 <ul>
-<li><strong><a href="https://github.com/quarto-dev/quarto">Quarto VS Code Extension</a></strong> - Official extension for VS Code and Positron.</li>
-<li><strong><a href="https://code.visualstudio.com/docs/getstarted/settings">VS Code User and Workspace Settings</a></strong> - Comprehensive guide to VS Code configuration.</li>
-<li><strong><a href="https://pandoc.org/MANUAL.html#extension-fenced_divs">Pandoc Fenced Divs Extension</a></strong> - Documentation for Quarto’s div syntax.</li>
-<li><strong><a href="https://code.visualstudio.com/docs/editor/artificial-intelligence">GitHub Copilot in VS Code</a></strong> - Guide to using AI assistance in your editor.</li>
+<li>The dispatcher does not need to know about each template’s specific parameters.</li>
+<li>Adding new parameters to a template requires no changes to the dispatcher.</li>
+<li>Each template function handles only its own parameters.</li>
+</ul>
+<p><strong>Pattern 3: Conditional Routing</strong></p>
+<p>Typst’s <code>if-else</code> statements handle the routing logic. For more document types, this could be extended with a dictionary lookup:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">TEMPLATE_FUNCTIONS</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"report"</span>: render-report<span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"letter"</span>: render-letter<span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cv"</span>: render-cv<span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Then dispatch with:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>let template-fn = TEMPLATE_FUNCTIONS.at(doc-type, default: render-report)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>template-fn(..args)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="configuration-via-yaml" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="configuration-via-yaml"><span class="header-section-number">4</span> Configuration via YAML</h2>
+<p>Users specify the document type in their Quarto document’s YAML front matter.</p>
+<section id="user-facing-configuration" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="user-facing-configuration"><span class="header-section-number">4.1</span> User-Facing Configuration</h3>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>document.qmd</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="document.qmd"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"My Report"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my-extension-typst</span><span class="kw">:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">document-type</span><span class="kw">:</span><span class="at"> report</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The extension’s format name (<code>my-extension-typst</code>) comes from <code>_extension.yml</code>. The <code>document-type</code> key is passed through Quarto’s template processing.</p>
+</section>
+<section id="bridging-quarto-and-typst" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="bridging-quarto-and-typst"><span class="header-section-number">4.2</span> Bridging Quarto and Typst</h3>
+<p>The <code>typst-show.typ</code> partial connects YAML metadata to the Typst dispatcher:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename="typst-show.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> document-dispatcher<span class="op">.</span>with<span class="op">(</span></span>
+<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Document type selection</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-3" class="code-annotation-target"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>  document-type<span class="op">:</span> <span class="ss">$if(document-type)$</span><span class="st">"$document-type$"</span><span class="ss">$else$</span><span class="st">"report"</span><span class="ss">$endif$</span><span class="op">,</span></span>
+<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Pass through other parameters</span></span>
+<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>  author<span class="op">:</span> <span class="op">[</span><span class="ss">$for(author)$$author$$sep$</span>, <span class="ss">$endfor$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="op">[</span><span class="ss">$date$</span><span class="op">],</span></span>
+<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... additional parameters</span></span>
+<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="1">Pandoc template syntax (<code>$if()$</code>) checks if the metadata key exists and provides a default.</span>
+</dd>
+</dl>
+<p>The <code>$if(document-type)$...$else$...$endif$</code> pattern:</p>
+<ul>
+<li>Uses the user-provided value if present.</li>
+<li>Falls back to “report” if not specified.</li>
+<li>Ensures the dispatcher always receives a valid string.</li>
+</ul>
+</section>
+</section>
+<section id="file-organisation" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="file-organisation"><span class="header-section-number">5</span> File Organisation</h2>
+<p>A well-organised extension separates document types into distinct files.</p>
+<section id="directory-structure" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="directory-structure"><span class="header-section-number">5.1</span> Directory Structure</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode txt code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>_extensions/my-extension/</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>├── _extension.yml</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>├── template.typ              # Main entry point</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>├── typst-show.typ            # Quarto-Typst bridge</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>└── partials/</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    ├── document-dispatcher.typ</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    └── document-types/</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        ├── report.typ</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        ├── letter.typ</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        └── cv.typ</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="extension-manifest" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="extension-manifest"><span class="header-section-number">5.2</span> Extension Manifest</h3>
+<p>The <code>_extension.yml</code> declares template partials in loading order:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> My Extension</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.0.0</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">contributes</span><span class="kw">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">my-extension-typst</span><span class="kw">:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template</span><span class="kw">:</span><span class="at"> template.typ</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/report.typ</span><span class="co">    # Load document types first</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/letter.typ</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-types/cv.typ</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> partials/document-dispatcher.typ</span><span class="co">      # Dispatcher last (uses the above)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="main-template" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="main-template"><span class="header-section-number">5.3</span> Main Template</h3>
+<p>The <code>template.typ</code> file serves as the entry point that assembles all components. It must include Quarto’s essential definitions and load your custom partials in the correct order.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>template.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="template.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Essential: Quarto/Pandoc feature definitions (callouts, quotes, etc.)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ss">$definitions.typ()$</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Load document type templates</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ss">$report.typ()$</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$letter.typ()$</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$cv.typ()$</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Load dispatcher (must come after document types)</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$document-dispatcher.typ()$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The loading order matters:</p>
+<ol type="1">
+<li><strong><code>definitions.typ</code></strong> must come first; it provides Quarto features like callouts.</li>
+<li><strong>Document type templates</strong> define the rendering functions (<code>render-report</code>, etc.).</li>
+<li><strong>Dispatcher</strong> comes last because it references the document type functions.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>$partial-name.typ()$</code> syntax is Quarto’s template interpolation. It inserts the contents of the corresponding partial file at that location.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="adding-new-document-types" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="adding-new-document-types"><span class="header-section-number">6</span> Adding New Document Types</h2>
+<p>To add a new document type (e.g., “memo”):</p>
+<p><strong>Step 1: Create the template function.</strong></p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>partials/document-types/memo.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="partials/document-types/memo.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">render-memo</span><span class="op">(</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  to<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  from<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  body<span class="op">,</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Memo-specific layout</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> <span class="va">page</span><span class="op">(</span>paper<span class="op">:</span> <span class="st">"a4"</span><span class="op">,</span> margin<span class="op">:</span> <span class="fl">2cm</span><span class="op">)</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Header</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  grid<span class="op">(</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">:</span> <span class="op">(</span><span class="fl">1fr</span><span class="op">,</span> <span class="fl">1fr</span><span class="op">),</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>*TO:* <span class="kw">#</span>to<span class="op">],</span> <span class="op">[</span>*DATE:* <span class="kw">#</span>date<span class="op">],</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span>*FROM:* <span class="kw">#</span>from<span class="op">],</span> <span class="op">[],</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  line<span class="op">(</span>length<span class="op">:</span> <span class="fl">100%</span><span class="op">)</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Subject</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> title <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    align<span class="op">(</span>center<span class="op">,</span> text<span class="op">(</span>weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> size<span class="op">:</span> <span class="fl">14pt</span><span class="op">,</span> title<span class="op">))</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Body</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  body</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Step 2: Register in the dispatcher.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">DOCUMENT_TYPES</span> <span class="op">=</span> <span class="op">(</span><span class="st">"report"</span><span class="op">,</span> <span class="st">"letter"</span><span class="op">,</span> <span class="st">"cv"</span><span class="op">,</span> <span class="st">"memo"</span><span class="op">)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">// Add routing case</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>if doc-type == "memo" {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  render-memo(..args)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Step 3: Add to extension manifest.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> partials/document-types/memo.typ</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">  # ... other partials</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Step 4: Load in template.</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ss">$memo.typ()$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="benefits-of-this-pattern" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="benefits-of-this-pattern"><span class="header-section-number">7</span> Benefits of This Pattern</h2>
+<p><strong>Clean Separation</strong></p>
+<p>Each document type lives in its own file with its own logic. Changes to one type do not affect others.</p>
+<p><strong>Extensibility</strong></p>
+<p>Adding new document types requires minimal changes to existing code. The dispatcher’s validation list and routing logic are the only modifications needed.</p>
+<p><strong>Graceful Fallbacks</strong></p>
+<p>Invalid document types fall back to a sensible default rather than failing. Users receive working output even with typos in their configuration.</p>
+<p><strong>Parameter Isolation</strong></p>
+<p>Each template function defines only its own parameters. The dispatcher does not need to understand every possible parameter combination.</p>
+</section>
+<section id="conclusion" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
+<p>The document-type dispatcher pattern provides a clean architecture for Quarto Typst extensions that support multiple document types.</p>
+<p>Key takeaways:</p>
+<ol type="1">
+<li><strong>Central routing</strong>: A single dispatcher function routes to appropriate templates.</li>
+<li><strong>Validation with fallbacks</strong>: Check document types against a known list; default gracefully.</li>
+<li><strong>Variadic forwarding</strong>: Use <code>..args</code> to pass parameters without coupling.</li>
+<li><strong>YAML integration</strong>: Bridge Quarto metadata to Typst via <code>typst-show.typ</code>.</li>
+<li><strong>Modular organisation</strong>: Separate files for each document type.</li>
+</ol>
+<div class="highlight">
+<p>The dispatcher pattern scales well as your extension grows. Start with one or two document types, and the architecture supports adding more without refactoring.</p>
+</div>
+<section id="further-resources" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="further-resources"><span class="header-section-number">8.1</span> Further Resources</h3>
+<ul>
+<li><a href="https://typst.app/docs/reference/foundations/function/">Typst Documentation: Functions</a>.</li>
+<li><a href="https://quarto.org/docs/journals/templates.html#typst-partials">Quarto Documentation: Typst Partials</a>.</li>
+<li><a href="https://github.com/mcanouil/quarto-mcanouil">quarto-mcanouil Extension</a> - demonstrates this pattern in production.</li>
 </ul>
 
 
+</section>
 </section>
 
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Whilst Pandoc’s div syntax doesn’t require matching numbers of colons for opening and closing divs (see <a href="https://pandoc.org/MANUAL.html#extension-fenced_divs">Pandoc Manual: Extension fenced_divs</a>), using four colons for opening and three for closing provides clear visual distinction and enables better editor support.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>The Quarto extension disables Copilot by default in its configuration (see <a href="https://github.com/quarto-dev/quarto/issues/621">quarto-dev/quarto#621</a> and <a href="https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962">package.json</a>). This explicit enablement is required if you want to use Copilot in your Quarto workflow.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>See <a href="https://github.com/quarto-dev/quarto/issues/670">quarto-dev/quarto#670</a> for discussion about native div folding support.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Format variants use the <code>+</code> syntax in <code>_extension.yml</code>:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contributes</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">typst+report</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Typst Report"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">typst+article</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Typst Article"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Then in a document:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>YAML</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="YAML"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">myformat-typst+report</span><span class="kw">:</span><span class="at"> default</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1156,7 +1383,7 @@ Tip
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year"></span> Mickaël CANOUIL. <a href="https://github.com/sponsors/mcanouil?o=esb"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-11-20-quarto-editor-settings/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-01-19-typst-document-dispatcher/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY NC SA 4.0</a>.</p>
 </div>
