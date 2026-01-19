@@ -1,0 +1,412 @@
+---
+title: "Document-Type Dispatching in Quarto Typst Extensions"
+description: |
+  Learn how to build a central dispatcher function that routes to different Typst templates based on document type.
+  This pattern enables clean separation between document types like reports, letters, and CVs.
+date: "2026-01-19"
+categories:
+  - quarto
+  - extensions
+  - typst
+  - pdf
+image: featured.png
+image-alt: |
+  Feature image for "Quarto + Typst Document Dispatcher" blog post.
+  Dark background with the official Quarto logo (four blue quadrants with wordmark) and Typst logo (teal wordmark) centered at the top.
+  Below, "Document Dispatcher" in serif font with subtitle "Modern Scientific Publishing".
+  File format pipeline shows .qmd → .typ → .pdf.
+  Decorative elements include floating code snippets and gradient orbs in blue and teal.
+lang: en-GB
+number-sections: true
+link-external-newwindow: true
+lightbox: true
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+## The Problem: Multiple Document Types
+
+When building a Quarto Typst extension, you may want to support multiple document types: reports, letters, CVs.
+Each type has distinct layouts, headers, and styling requirements.
+
+While Quarto extensions can contribute multiple variants of the same base format[^variants], this approach requires either sharing metadata across all contributed elements or duplicating it for each variant.
+
+The dispatcher pattern offers an alternative: a single format entry point with document-type routing handled entirely in Typst code.
+This centralises shared logic and avoids metadata duplication.
+
+[^variants]: Format variants use the `+` syntax in `_extension.yml`:
+
+    ```{.yaml filename="_extension.yml"}
+    contributes:
+      formats:
+        typst+report:
+          title: "Typst Report"
+        typst+article:
+          title: "Typst Article"
+    ```
+
+    Then in a document:
+
+    ```{.yaml filename="YAML"}
+    format:
+      myformat-typst+report: default
+    ```
+
+Without a clear architecture, you end up with:
+
+- Monolithic templates cluttered with conditional logic.
+- Duplicated code across separate template files.
+- Difficult maintenance as document types multiply.
+
+The solution is a **dispatcher pattern**: a central function that routes to the appropriate template based on document type.
+
+## Quarto's Default Typst Partials
+
+Before building a dispatcher, it helps to understand how Quarto generates Typst documents.
+
+Quarto provides a set of [default Typst partials](https://quarto.org/docs/journals/templates.html#typst-partials) that handle different aspects of document generation:
+
+| Partial              | Purpose                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `definitions.typ`    | Pandoc/Quarto features (callouts, block quotes, subfloats). |
+| `typst-template.typ` | The main template function applied to document content.     |
+| `typst-show.typ`     | Show rules that capture metadata and call the template.     |
+| `page.typ`           | Page properties (size, margins, numbering, background).     |
+| `notes.typ`          | Footnote rendering.                                         |
+| `biblio.typ`         | Bibliography formatting.                                    |
+
+:::: {.callout-important}
+
+The `definitions.typ` partial is essential and must always be included in custom templates.
+It provides the foundation for Quarto features like callouts.
+
+:::
+
+### Overriding Partials
+
+Extensions override default partials by providing replacement files via `template-partials` in `_extension.yml` (or document YAML front matter).
+When you list a partial, Quarto uses your version instead of the built-in one.
+
+The dispatcher pattern requires customising two partials:
+
+- **`template.typ`**: Load document-type templates and the dispatcher function.
+- **`typst-show.typ`**: Route document content through the dispatcher based on configuration.
+
+See the [Quarto source](https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto) for the default partial implementations.
+
+## The Dispatcher Pattern
+
+The dispatcher acts as a routing hub.
+It receives a document type parameter, validates it, and calls the corresponding template function.
+
+### Core Implementation
+
+```{.typst filename="document-dispatcher.typ"}
+/// Supported document types.
+#let DOCUMENT_TYPES = ("report", "letter", "cv") // <1>
+
+/// Main document dispatcher function.
+/// Routes to the appropriate template based on document-type.
+#let document-dispatcher(
+  document-type: "report", // <2>
+  ..args, // <3>
+) = {
+  // Validate and normalise document type
+  let doc-type = if document-type in DOCUMENT_TYPES { // <4>
+    document-type
+  } else {
+    // Fall back to report with warning
+    "report"
+  }
+
+  // Dispatch to appropriate template
+  if doc-type == "letter" {
+    render-letter(..args)
+  } else if doc-type == "cv" {
+    render-cv(..args)
+  } else {
+    // Default: report
+    render-report(..args)
+  }
+}
+```
+
+1. Define supported types as an [array](https://typst.app/docs/reference/foundations/array/).
+2. Default document type; used when not specified.
+3. [Variadic arguments](https://typst.app/docs/reference/foundations/arguments/) capture all other parameters.
+4. `in` operator checks array membership.
+
+### Key Patterns
+
+**Pattern 1: Type Validation**
+
+The dispatcher validates the document type against a known list before routing.
+Invalid types fall back gracefully to a default (report) rather than failing.
+
+```typst
+let doc-type = if document-type in DOCUMENT_TYPES {
+  document-type
+} else {
+  "report"  // Safe fallback
+}
+```
+
+**Pattern 2: Variadic Argument Forwarding**
+
+Each document type may accept different parameters.
+Rather than listing every possible parameter, the dispatcher captures them all with `..args` and forwards them to the target function.
+
+```typst
+#let document-dispatcher(document-type: "report", ..args) = {
+  // ...
+  render-report(..args)  // Forward all arguments
+}
+```
+
+This means:
+
+- The dispatcher does not need to know about each template's specific parameters.
+- Adding new parameters to a template requires no changes to the dispatcher.
+- Each template function handles only its own parameters.
+
+**Pattern 3: Conditional Routing**
+
+Typst's `if-else` statements handle the routing logic.
+For more document types, this could be extended with a dictionary lookup:
+
+```typst
+#let TEMPLATE_FUNCTIONS = (
+  "report": render-report,
+  "letter": render-letter,
+  "cv": render-cv,
+)
+
+// Then dispatch with:
+let template-fn = TEMPLATE_FUNCTIONS.at(doc-type, default: render-report)
+template-fn(..args)
+```
+
+## Configuration via YAML
+
+Users specify the document type in their Quarto document's YAML front matter.
+
+### User-Facing Configuration
+
+```{.yaml filename="document.qmd"}
+---
+title: "My Report"
+format:
+  my-extension-typst:
+    document-type: report
+---
+```
+
+The extension's format name (`my-extension-typst`) comes from `_extension.yml`.
+The `document-type` key is passed through Quarto's template processing.
+
+### Bridging Quarto and Typst
+
+The `typst-show.typ` partial connects YAML metadata to the Typst dispatcher:
+
+```{.typst filename="typst-show.typ"}
+#show: document-dispatcher.with(
+  // Document type selection
+  document-type: $if(document-type)$"$document-type$"$else$"report"$endif$, // <1>
+
+  // Pass through other parameters
+  title: [$title$],
+  author: [$for(author)$$author$$sep$, $endfor$],
+  date: [$date$],
+  // ... additional parameters
+)
+```
+
+1. Pandoc template syntax (`$if()$`) checks if the metadata key exists and provides a default.
+
+The `$if(document-type)$...$else$...$endif$` pattern:
+
+- Uses the user-provided value if present.
+- Falls back to "report" if not specified.
+- Ensures the dispatcher always receives a valid string.
+
+## File Organisation
+
+A well-organised extension separates document types into distinct files.
+
+### Directory Structure
+
+```txt
+_extensions/my-extension/
+├── _extension.yml
+├── template.typ              # Main entry point
+├── typst-show.typ            # Quarto-Typst bridge
+└── partials/
+    ├── document-dispatcher.typ
+    └── document-types/
+        ├── report.typ
+        ├── letter.typ
+        └── cv.typ
+```
+
+### Extension Manifest
+
+The `_extension.yml` declares template partials in loading order:
+
+```{.yaml filename="_extension.yml"}
+title: My Extension
+version: 1.0.0
+contributes:
+  formats:
+    my-extension-typst:
+      template: template.typ
+      template-partials:
+        - partials/document-types/report.typ    # Load document types first
+        - partials/document-types/letter.typ
+        - partials/document-types/cv.typ
+        - partials/document-dispatcher.typ      # Dispatcher last (uses the above)
+```
+
+### Main Template
+
+The `template.typ` file serves as the entry point that assembles all components.
+It must include Quarto's essential definitions and load your custom partials in the correct order.
+
+```{.typst filename="template.typ"}
+// Essential: Quarto/Pandoc feature definitions (callouts, quotes, etc.)
+$definitions.typ()$
+
+// Load document type templates
+$report.typ()$
+$letter.typ()$
+$cv.typ()$
+
+// Load dispatcher (must come after document types)
+$document-dispatcher.typ()$
+```
+
+The loading order matters:
+
+1. **`definitions.typ`** must come first; it provides Quarto features like callouts.
+2. **Document type templates** define the rendering functions (`render-report`, etc.).
+3. **Dispatcher** comes last because it references the document type functions.
+
+:::: {.callout-tip}
+
+The `$partial-name.typ()$` syntax is Quarto's template interpolation.
+It inserts the contents of the corresponding partial file at that location.
+
+:::
+
+## Adding New Document Types
+
+To add a new document type (e.g., "memo"):
+
+**Step 1: Create the template function.**
+
+```{.typst filename="partials/document-types/memo.typ"}
+#let render-memo(
+  title: none,
+  to: none,
+  from: none,
+  date: none,
+  body,
+) = {
+  // Memo-specific layout
+  set page(paper: "a4", margin: 2cm)
+
+  // Header
+  grid(
+    columns: (1fr, 1fr),
+    [*TO:* #to], [*DATE:* #date],
+    [*FROM:* #from], [],
+  )
+
+  line(length: 100%)
+
+  // Subject
+  if title != none {
+    align(center, text(weight: "bold", size: 14pt, title))
+  }
+
+  // Body
+  body
+}
+```
+
+**Step 2: Register in the dispatcher.**
+
+```typst
+#let DOCUMENT_TYPES = ("report", "letter", "cv", "memo")
+
+// Add routing case
+if doc-type == "memo" {
+  render-memo(..args)
+}
+```
+
+**Step 3: Add to extension manifest.**
+
+```yaml
+template-partials:
+  - partials/document-types/memo.typ
+  # ... other partials
+```
+
+**Step 4: Load in template.**
+
+```typst
+$memo.typ()$
+```
+
+## Benefits of This Pattern
+
+**Clean Separation**
+
+Each document type lives in its own file with its own logic.
+Changes to one type do not affect others.
+
+**Extensibility**
+
+Adding new document types requires minimal changes to existing code.
+The dispatcher's validation list and routing logic are the only modifications needed.
+
+**Graceful Fallbacks**
+
+Invalid document types fall back to a sensible default rather than failing.
+Users receive working output even with typos in their configuration.
+
+**Parameter Isolation**
+
+Each template function defines only its own parameters.
+The dispatcher does not need to understand every possible parameter combination.
+
+## Conclusion
+
+The document-type dispatcher pattern provides a clean architecture for Quarto Typst extensions that support multiple document types.
+
+Key takeaways:
+
+1. **Central routing**: A single dispatcher function routes to appropriate templates.
+2. **Validation with fallbacks**: Check document types against a known list; default gracefully.
+3. **Variadic forwarding**: Use `..args` to pass parameters without coupling.
+4. **YAML integration**: Bridge Quarto metadata to Typst via `typst-show.typ`.
+5. **Modular organisation**: Separate files for each document type.
+
+:::: {.highlight}
+
+The dispatcher pattern scales well as your extension grows.
+Start with one or two document types, and the architecture supports adding more without refactoring.
+
+:::
+
+### Further Resources
+
+- [Typst Documentation: Functions](https://typst.app/docs/reference/foundations/function/).
+- [Quarto Documentation: Typst Partials](https://quarto.org/docs/journals/templates.html#typst-partials).
+- [quarto-mcanouil Extension](https://github.com/mcanouil/quarto-mcanouil) - demonstrates this pattern in production.
