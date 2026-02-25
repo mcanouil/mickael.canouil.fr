@@ -4,7 +4,7 @@ subtitle: "Part 1"
 description: |
   This tutorial introduces the dual-layer architecture for building Quarto Typst templates.
   You will learn how Lua filters and Typst functions work together to transform markdown elements into styled PDF components.
-date: "2026-02-02"
+date: "2026-02-27"
 categories:
   - quarto
   - extensions
@@ -22,7 +22,23 @@ lang: en-GB
 number-sections: true
 link-external-newwindow: true
 lightbox: true
-draft: true
+code-links:
+  - text: Tutorial Part 1 (zip)
+    href: ./tutorial-part1.zip
+    target: _brank
+    rel: noopener noreferrer
+    icon: file-zip
+mermaid:
+  theme: neutral
+include-in-header:
+  - text: |
+      <style>
+      .quarto-code-links{
+        h2 {
+          display: unset;
+        }
+      }
+      </style>
 ---
 
 ![](featured.png){
@@ -221,7 +237,7 @@ The Span contains:
 
 - **`span.content`**: The text content ("Completed").
 - **`span.classes`**: A list of classes (["badge"]).
-- **`span.attributes`**: A table of key-value pairs ({colour = "success"}).
+- **`span.attributes`**: A table of key-value pairs (`{colour="success"}`).
 
 A Lua filter can inspect these properties and decide how to transform the element.
 
@@ -334,27 +350,26 @@ See [Typst partials](https://quarto.org/docs/journals/templates.html#typst-parti
 // Define brand mode with default fallback
 #let effective-brand-mode = "$if(brand-mode)$$brand-mode$$else$light$endif$" // <1>
 
-// Wrapper for .badge spans - injects colours at render time
+// Wrapper for .badge spans
 #let my-badge(content, colour: "neutral") = { // <2>
   simple-badge(
     content,
     colour: colour,
-    colours: get-colours(mode: effective-brand-mode) // <3>
   )
 }
 ```
 
 1. Quarto template syntax (`$if()$`) resolves at render time; see [Typst partials](https://quarto.org/docs/journals/templates.html#typst-partials).
-2. Wrapper function receives the same parameters as the Lua filter generates.
-3. Inject the colour scheme based on current brand mode (light/dark).
+2. Wrapper delegates to `simple-badge`, which uses `get-badge-colour` internally for colour lookup.
 
 The Lua filter generates `#my-badge(colour: "success")[Completed]`.
-At render time, `my-badge` calls `simple-badge` with the appropriate colour scheme.
+At render time, `my-badge` delegates to `simple-badge` which resolves the colour internally via `get-badge-colour`.
+For block components like panels, the wrapper pattern becomes more important as it injects the document's colour scheme.
 
 :::: {.highlight}
 
 **Wrapper functions** bridge the gap between parse-time code generation (Lua) and render-time colour resolution (Typst).
-They inject runtime context that Lua cannot know in advance.
+For block components, they inject runtime context (such as the colour scheme) that Lua cannot know in advance.
 
 :::
 
@@ -558,6 +573,18 @@ The `breakable: false` default prevents panels from splitting across pages, avoi
 This tutorial introduced the dual-layer architecture for building Quarto Typst templates.
 You have learned how Lua filters and Typst functions work together to transform markdown elements into styled PDF components.
 
+You can download the complete code for this part of the tutorial as a zip file containing a minimal extension with badges and panels.
+
+::: {style="text-align: center;"}
+[Part 1 (ZIP)](./tutorial-part1.zip){
+  .btn
+  .btn-outline-light
+  .btn-
+  target="_blank"
+  rel="noopener noreferrer"
+}
+:::
+
 ### Key Concepts Recap
 
 The dual-layer architecture separates concerns effectively:
@@ -571,7 +598,7 @@ For block elements like panels, Lua wraps the content with opening and closing T
 
 ### What Comes Next
 
-[Part 2](/posts/2026-03-02-typst-template-tutorial-part2/) builds on these foundations with advanced patterns:
+Part 2 builds on these foundations with advanced patterns:
 
 - Handler factories for reducing repetitive code.
 - Complex components like card grids with nested data extraction.
@@ -584,5 +611,5 @@ For block elements like panels, Lua wraps the content with opening and closing T
 - [Quarto Documentation: Creating Extensions](https://quarto.org/docs/extensions/creating.html).
 - [Pandoc Lua Filters](https://pandoc.org/lua-filters.html).
 - [Typst Documentation](https://typst.app/docs/).
-- [quarto-mcanouil Extension](https://github.com/mcanouil/quarto-mcanouil).
+- [`mcanouil` Extension](https://github.com/mcanouil/quarto-mcanouil).
 - [R for the Rest of Us: Typst + Quarto](https://rfortherestofus.com/2025/11/quarto-typst-pdf).
