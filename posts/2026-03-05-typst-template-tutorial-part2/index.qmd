@@ -173,7 +173,7 @@ return M
 ```
 
 1. `should_extract_title` is captured in the returned closure; each call to `create_wrapped_handler` produces a distinct handler locked to that flag value.
-2. The returned function takes `div` (the Pandoc div element passed by the dispatcher) and `config` (the mapping entry for this class, e.g., `{ wrapper = 'my-panel', arguments = true }`); this signature matches exactly what the dispatcher passes when it calls `DIV_FACTORY_HANDLERS[class](div, class_config)`.
+2. The returned function takes `div` (the Pandoc div element passed by the dispatcher) and `config` (the mapping entry for this class, e.g., `{ wrapper='my-panel', arguments=true }`); this signature matches exactly what the dispatcher passes when it calls `DIV_FACTORY_HANDLERS[class](div, class_config)`.
 
 ### Using Factories
 
@@ -904,77 +904,14 @@ quarto.log.warning('Attributes: ' .. pandoc.utils.stringify(pandoc.MetaMap(attrs
 Output appears in the Quarto render log.
 
 ::: {layout-ncol="2"}
-![](assets/example.png){
-  .img-fluid
-  fig-align="center"
-  fig-alt="Example output showing a badge and a panel rendered in a PDF document. The badge is a green box with the text 'Completed'. The panel has a light blue background, a title 'Important Note', and body text describing the panel content."
-}
-
 ```{.markdown include="assets/_example.qmd" filename="example.qmd"}
----
-title: "Part 2 Extension Demo"
-format:
-  my-extension-typst:
-    syntax-highlighting: idiomatic
-extensions:
-  typst-markdown:
-    divs:
-      custom-highlight: my-custom-highlight
----
-
-## Badges (WCAG-Aware)
-
-Inline badges with accessible colours:
-[Completed]{.badge colour="success"},
-[Pending]{.badge colour="warning"},
-[Failed]{.badge colour="danger"},
-[Information]{.badge colour="info"},
-and [Default]{.badge}.
-
-## Highlight (Factory Handler, No Title)
-
-::: {.highlight}
-This highlight block uses the factory handler **without** title extraction.
-It simply wraps content in a styled container.
-:::
-
-## Panel (Factory Handler)
-
-::: {.panel style="info"}
-
-# Status Summary
-
-This panel uses the **info** style.
-The first heading is extracted as the title via the factory handler.
-
-:::
-
-## Quote Card (Attribute-Based Author)
-
-::: {.quote-card author="Alan Kay" source="1971"}
-The best way to predict the future is to invent it.
-:::
-
-## Quote Card (Heading-Based Author)
-
-::: {.quote-card source="1971"}
-The best way to predict the future is to invent it.
-
-## Alan Kay
-
-:::
-
-## Shortcode
-
-A live status indicator: {{< status-badge label="Live" style="success" >}}.
-
-## User-Defined Component (Config System)
-
-::: {.custom-highlight}
-This block uses a **user-defined mapping** declared in the YAML front matter.
-The `custom-highlight` class maps to the `my-custom-highlight` Typst function via the configuration system.
-:::
 ```
+
+![](assets/example.png){
+  .img-fluid .img-thumbnail .rounded-3 .border-light
+  fig-align="center"
+  fig-alt="PDF render showing seven sections. Badges (WCAG-Aware): five WCAG-compliant inline badges labelled Completed, Pending, Failed, Information, and Default. Highlight: a light green content block with text explaining the factory handler requires no title extraction. Panel (Factory Handler): a blue info panel titled Status Summary, where the title was extracted from the first heading. Two Quote Card sections: each displays the quote The best way to predict the future is to invent it in italic with a left blue accent border, attributed to Alan Kay, 1971 — one using an attribute-based author, one using a heading-based author. Shortcode: a green Live badge inline in a sentence. User-Defined Component: an orange highlight block demonstrating a user-defined class mapped to a custom Typst function via the configuration system."
+}
 :::
 
 ## Conclusion
