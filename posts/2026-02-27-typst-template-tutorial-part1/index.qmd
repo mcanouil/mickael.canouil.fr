@@ -105,7 +105,8 @@ The task is [Completed]{.badge colour="success"} and ready for review.
 
 This should produce a styled badge in the PDF output.
 But here is the challenge: Typst templates alone cannot intercept and transform markdown elements.
-Typst receives content _after_ Quarto and Pandoc have processed it, so by the time your template sees the document, that `.badge` span has already been converted to plain text.
+Typst receives content _after_ Quarto and Pandoc have processed it.
+Without a Lua filter, Pandoc's default Typst writer simply drops the `.badge` class and outputs the text content with no styling; your Typst template never sees the class at all.
 
 The solution requires two layers working in concert:
 
@@ -219,6 +220,38 @@ contributes:
         - filter.lua
 ```
 
+The `template.typ` file is the main Typst entry point.
+It includes the component definitions and wrapper functions via Pandoc template syntax, and defines any shared helpers.
+For this tutorial, it defines the `get-colours` helper that the wrapper functions rely on:
+
+```{.typst filename="_extensions/my-extension/template.typ"}
+// Include component definitions via template partial
+$components.typ()$ // <1>
+
+// Colour scheme for the document
+#let get-colours(mode: "light") = { // <2>
+  if mode == "dark" {
+    (background: luma(30), foreground: luma(230), muted: luma(150))
+  } else {
+    (background: luma(255), foreground: luma(30), muted: luma(100))
+  }
+}
+
+// Include wrapper functions via template partial
+$typst-show.typ()$ // <3>
+
+$for(header-includes)$
+$header-includes$
+$endfor$ // <4>
+
+$body$
+```
+
+1. Pandoc template syntax `$partial()$` includes another file; `components.typ` must be declared before `typst-show.typ` so the rendering functions are in scope when the wrappers reference them.
+2. `get-colours` returns a dictionary with `background`, `foreground`, and `muted` keys; `typst-show.typ`'s wrapper functions call this at render time.
+3. Wrapper functions are included after `get-colours` is defined so they can call it.
+4. Pandoc's template loop injects any per-document Typst preamble content (e.g., items declared via `include-in-header` in document YAML) before the body.
+
 ::: {.highlight}
 
 Production extensions like [quarto-mcanouil](https://github.com/mcanouil/quarto-mcanouil) use more elaborate structures with shared modules and component libraries.
@@ -294,7 +327,7 @@ Next, let us add colour support with predefined semantic colours:
 }
 ```
 
-1. Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from `_brand.yml` using the Quarto Brand Lua API (see @nte-brand-lua).
+1. Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from `_brand.yml` (Quarto's brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see @nte-brand-lua).
 
 Now users can specify `colour: "success"` and get a green badge.
 The `mode` parameter selects light or dark colour palettes.
@@ -302,6 +335,9 @@ The `mode` parameter selects light or dark colour palettes.
 ### Building the Lua Handler
 
 With the Typst function ready, we need a Lua handler to generate calls to it.
+In Typst, function calls use the pattern `#function-name(named-arg: value)[content]`: `#` marks a function call, named arguments go in parentheses, and the content the function wraps goes in square brackets.
+Unlike a plain string, square brackets in Typst create a *content block*: a distinct type that Typst renders as formatted output, preserving nested markup such as bold, italic, and inner function calls.
+The Lua handler builds this string and hands it to Pandoc as raw Typst code.
 Here is the simplest approach:
 
 ```{.lua filename="(conceptual) badges.lua v1"}
@@ -330,13 +366,26 @@ end
 
 1. [Span filter function](https://pandoc.org/lua-filters.html#type-span) receives each span element.
 2. Check if span has the target class; return unchanged if not.
-3. [`stringify`](https://pandoc.org/lua-filters.html#pandoc.utils.stringify) converts AST content to plain text.
+3. [`stringify`](https://pandoc.org/lua-filters.html#pandoc.utils.stringify) converts AST content to plain text, stripping all inline formatting (bold, italic, links); for badge labels this is intentional because short status words do not need inline formatting.
 4. Access attributes as a Lua table; provide default value.
-5. Build the Typst function call string with parameters.
+5. Build the Typst function call string with parameters; `effective-brand-mode` is a Typst variable name defined in `typst-show.typ` via Pandoc template syntax. Quarto resolves it before passing the file to Typst, so its value is never known to Lua. It is introduced and explained in the next section.
 6. Return raw Typst code that Pandoc passes through unchanged.
 
 This works for our simple use case.
 The Lua filter checks if a span has the `badge` class, extracts its content and attributes, and generates a Typst function call.
+
+::: {.callout-note}
+
+The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings.
+Typst syntax distinguishes strings (`"hello"`), numbers (`42`), and keywords (`none`, `true`); passing the wrong form produces a syntax error.
+The `wrapper.lua` module includes a minimal `typst_value` helper that handles these common cases: string pass-through for Typst keywords (`"none"`, `"true"`, `"false"`), passing Lua numbers as bare values (so `42` becomes `42` in Typst, not `"42"`), and wrapping everything else in quotes.
+Part 2 replaces this with a more robust implementation that also handles actual Lua booleans, `nil`, and Typst measurement units like `1em` or `2.5pt`.
+
+This handler also does not escape Typst special characters in `content`.
+Badge labels containing `[`, `]`, or `#` would produce broken Typst syntax because Typst interprets those characters as markup inside `[...]` content blocks.
+For typical short labels like `"Completed"` or `"v1.2.0"` this is not an issue, but a production implementation would *escape* those characters before inserting content into the generated code: replacing `]` with `\]`, `[` with `\[`, and `#` with `\#` so Typst does not treat them as markup.
+
+:::
 
 ### Resolving Brand Mode at Render Time
 
@@ -364,7 +413,10 @@ See [Typst partials](https://quarto.org/docs/journals/templates.html#typst-parti
 #let effective-brand-mode = "$if(brand-mode)$$brand-mode$$else$light$endif$" // <1>
 ```
 
-1. Quarto template syntax (`$if()$`) resolves at render time; see [Typst partials](https://quarto.org/docs/journals/templates.html#typst-partials).
+1. Quarto template syntax (`$if()$`) resolves at render time.
+If `brand-mode` is not set in the document's YAML front matter, this expression falls back to `"light"`.
+To use dark mode, add `brand-mode: dark` to the document YAML.
+See [Typst partials](https://quarto.org/docs/journals/templates.html#typst-partials).
 
 The Lua filter generates code that references `effective-brand-mode` by name (_e.g._, `#simple-badge(colour: "success", mode: effective-brand-mode)[Completed]`).
 At render time, Typst resolves the variable and `simple-badge` passes it to `get-badge-colour` to select the right colour palette.
@@ -390,6 +442,8 @@ Quarto also exposes a `quarto.brand` Lua module that lets filters query `_brand.
 
 This approach is useful when you need brand values _inside_ the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code.
 In this tutorial, we pass the mode to Typst instead, keeping colour logic in a single layer.
+
+As a rule of thumb: use `quarto.brand` when the Lua filter itself needs to act on a brand value (computation, branching); use a template variable when the Typst rendering function should resolve the value at render time.
 
 :::
 
@@ -440,53 +494,76 @@ local result = {
 }
 ```
 
+For example, given this markdown:
+
+```markdown
+::: {.panel style="info"}
+This note contains **bold** text.
+:::
+```
+
+The filter builds this structure, with Pandoc converting the inner content to Typst:
+
+```typst
+#my-panel(style: "info")[
+  This note contains *bold* text.
+]
+```
+
 This approach lets Pandoc continue processing the inner content (converting markdown to Typst), whilst our wrapper provides the styling context.
 
 ### Building the Wrapped Content Handler
 
-The wrapper module provides utilities for this pattern:
+`wrapper.lua` uses the standard Lua module pattern.
+A `local M = {}` table is created at the top of the file, public functions are attached to it as `function M.fn_name(...)`, and `return M` at the end exports them.
+When `filter.lua` loads the module with `require_local("wrapper.lua")`, it gets back that table and calls `wrapper.build_wrapped_content(...)`.
+Private helper functions (like `attributes_to_table` and `build_attribute_string`) remain as plain `local function` inside the file and are not visible outside it.
 
-```{.lua filename="_extensions/my-extension/wrapper.lua"}
+The wrapper module provides two public utilities for this pattern:
+
+```{.lua filename="_extensions/my-extension/wrapper.lua (excerpt)"}
+local M = {}
+
 --- Build Typst block wrappers with optional attributes
-local function build_typst_block_wrappers(config, attrs)
+function M.build_typst_block_wrappers(config, attrs)
   local has_attributes = next(attrs) ~= nil
-  local should_pass = config.arguments or has_attributes
 
-  if should_pass and has_attributes then
+  if has_attributes or config.arguments then -- <1>
     local attr_string = build_attribute_string(attrs)
-    return string.format('#%s(%s)[', config.wrapper, attr_string), ']' -- <1>
+    return string.format('#%s(%s)[', config.wrapper, attr_string), ']' -- <2>
   else
     return string.format('#%s[', config.wrapper), ']'
   end
 end
 
 --- Build wrapped content for components
-local function build_wrapped_content(div, config, extract_title)
+function M.build_wrapped_content(div, config, extract_title)
   local attrs = attributes_to_table(div)
 
   -- Optionally extract first heading as title attribute
   if extract_title then
-    extract_first_heading_as_title(div, attrs) -- <2>
+    M.extract_first_heading_as_title(div, attrs) -- <3>
   end
 
-  local opening, closing = build_typst_block_wrappers(config, attrs)
+  local opening, closing = M.build_typst_block_wrappers(config, attrs)
 
   -- Build result: opening wrapper, content, closing wrapper
-  local result = { pandoc.RawBlock('typst', opening) } -- <3>
-  for _, item in ipairs(div.content) do -- <4>
+  local result = { pandoc.RawBlock('typst', opening) } -- <4>
+  for _, item in ipairs(div.content) do -- <5>
     table.insert(result, item)
   end
-  table.insert(result, pandoc.RawBlock('typst', closing)) -- <5>
+  table.insert(result, pandoc.RawBlock('typst', closing)) -- <6>
 
   return result
 end
 ```
 
-1. Returns two values: opening bracket with function call, closing bracket.
-2. Mutates `attrs` table, adding extracted title and removing header from `div.content`.
-3. Opening wrapper becomes first element in result list.
-4. Original content passes through; Pandoc continues processing nested markdown.
-5. Closing bracket completes the Typst function call.
+1. Generate parameter list when attributes exist _or_ when the config mandates it (`arguments = true`); without the `or config.arguments` branch, an empty attribute list would never be generated even when the Typst function expects it.
+2. Returns two values: opening bracket with function call, closing bracket.
+3. Public functions within the module call each other via `M.fn_name`; this ensures the call always hits the module's own implementation.
+4. Opening wrapper becomes first element in result list.
+5. Original content passes through; Pandoc continues processing nested markdown.
+6. Closing bracket completes the Typst function call.
 
 ### Title Extraction: A Useful Pattern
 
@@ -512,8 +589,8 @@ Content here.
 
 The `extract_first_heading_as_title` function handles this:
 
-```{.lua filename="_extensions/my-extension/wrapper.lua"}
-local function extract_first_heading_as_title(el, attrs)
+```{.lua filename="_extensions/my-extension/wrapper.lua (excerpt)"}
+function M.extract_first_heading_as_title(el, attrs)
   if not attrs['title'] and #el.content > 0 then -- <1>
     local first_elem = el.content[1]
     if first_elem.t == 'Header' then -- <2>
@@ -528,6 +605,8 @@ local function extract_first_heading_as_title(el, attrs)
     end
   end
 end
+
+return M
 ```
 
 1. Skip if title already provided via attributes or div is empty.
@@ -548,7 +627,7 @@ On the Typst side, the panel function receives the attributes and content:
   colours: (:), // <2>
   breakable: false,
 ) = {
-  let panel-colours = get-panel-colours(style, colours) // <3>
+  let panel-colours = get-panel-colours(style) // <3>
 
   // Build optional title display
   let title-display = if has-content(title) { // <4>
@@ -580,8 +659,8 @@ On the Typst side, the panel function receives the attributes and content:
 ```
 
 1. First positional parameter receives the wrapped content from the Lua filter.
-2. Empty dictionary `(:)` as default; wrapper function injects actual colours.
-3. Returns a [dictionary](https://typst.app/docs/reference/foundations/dictionary/) with background, border, title, and content colours.
+2. Empty dictionary `(:)` as default; the parameter is declared now to keep the function signature stable, so Part 2 can add colour-aware logic without changing any call sites. The wrapper function in `typst-show.typ` injects the actual colour scheme, but this simplified Part 1 version of `get-panel-colours` ignores it.
+3. Returns a [dictionary](https://typst.app/docs/reference/foundations/dictionary/) with background, border, title, and content colours based purely on the `style` name; Part 2 upgrades this to also use the injected `colours` for theme-aware text.
 4. Conditional returns `none` if title is empty; Typst's `if` is an expression.
 5. [`block`](https://typst.app/docs/reference/layout/block/) creates a block-level container with styling.
 6. `breakable: false` prevents the panel from splitting across page breaks.
@@ -616,6 +695,60 @@ For panels, a **wrapper function** injects a full colour dictionary that depends
 Choose the simpler approach when it works; use a wrapper when the rendering function needs derived values the Lua filter cannot provide.
 
 :::
+
+### The Filter Entrypoint
+
+The conceptual snippets from earlier sections are real code from `filter.lua`, the Pandoc entrypoint that registers the `Span` and `Div` filter functions and loads `wrapper.lua`.
+
+```{.lua filename="_extensions/my-extension/filter.lua"}
+local function require_local(path) -- <1>
+  return require(quarto.utils.resolve_path(path):gsub('%.lua$', ''))
+end
+
+local wrapper = require_local("wrapper.lua") -- <2>
+
+--- Badge handler for inline .badge spans
+function Span(span) -- <3>
+  if not quarto.doc.is_format('typst') then
+    return span
+  end
+
+  if not span.classes:includes('badge') then
+    return span
+  end
+
+  local content = pandoc.utils.stringify(span.content)
+  local colour = span.attributes.colour or 'neutral'
+
+  local typst_code = string.format(
+    '#simple-badge(colour: "%s", mode: effective-brand-mode)[%s]',
+    colour,
+    content
+  )
+
+  return pandoc.RawInline('typst', typst_code)
+end
+
+--- Panel handler for block .panel divs
+function Div(div) -- <4>
+  if not quarto.doc.is_format('typst') then
+    return div
+  end
+
+  if not div.classes:includes('panel') then
+    return div
+  end
+
+  local config = { wrapper = 'my-panel', arguments = true } -- <5>
+  return wrapper.build_wrapped_content(div, config, true)
+end
+```
+
+1. `require_local` wraps `quarto.utils.resolve_path` so paths resolve relative to the extension root regardless of where Quarto is run from.
+2. `wrapper.lua` is required at the top level; Lua caches the module, so every filter function shares the same instance.
+3. `Span` is the Pandoc filter hook; Pandoc calls it for every span in the document.
+4. `Div` is the Pandoc filter hook for block-level divs; both hooks are defined in the same file.
+5. The `config` table matches the shape used in Part 2's configuration system: `wrapper` is the Typst function name, `arguments = true` ensures the parameter list is always generated.
 
 ::: {layout-ncol="2"}
 ![](assets/example.png){
