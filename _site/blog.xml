@@ -89,7 +89,7 @@ font-style: inherit;">]</span>{.badge colour="success"} and ready for review.</s
 <pre class="mermaid mermaid-js" data-label="fig-bridge">flowchart LR
     A["[Completed]{.badge colour='success'}"] --&gt; B[Pandoc AST]
     B --&gt; C[Lua Filter]
-    C --&gt; D["#my-badge(colour: 'success')[Completed]"]
+    C --&gt; D["#simple-badge(colour: 'success', mode: effective-brand-mode)[Completed]"]
     D --&gt; E[Typst Function]
     E --&gt; F[Styled Badge]
 </pre>
@@ -187,7 +187,7 @@ background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
 background-color: null;
-font-style: inherit;">my-badge</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">simple-badge</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>content<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -280,7 +280,8 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 <span id="cb2-3">├── template.typ         # Main Typst template</span>
 <span id="cb2-4">├── typst-show.typ       # Wrapper functions for components</span>
 <span id="cb2-5">├── components.typ       # Component rendering functions</span>
-<span id="cb2-6">└── filter.lua           # Lua filter for element transformation</span></code></pre></div></div>
+<span id="cb2-6">├── wrapper.lua          # Shared wrapper helpers loaded by filter.lua</span>
+<span id="cb2-7">└── filter.lua           # Lua filter entrypoint</span></code></pre></div></div>
 <p>The <code>_extension.yml</code> manifest declares how these pieces fit together:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -469,7 +470,7 @@ font-style: inherit;">}</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>badges.typ (v2 - with colours)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="badges.typ (v2 - with colours)" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-7" data-filename="badges.typ (v2 - with colours)" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-1" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -478,12 +479,30 @@ font-style: inherit;">get-badge-colour</span><span class="op" style="color: #5E5
 background-color: null;
 font-style: inherit;">(</span>colour-name<span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">,</span> mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"light"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb5-2">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-7-2">  <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">is-dark</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> mode <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dark"</span></span>
+<span id="annotated-cell-7-3">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> colour-name <span class="op" style="color: #5E5E5E;
@@ -491,6 +510,25 @@ background-color: null;
 font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"success"</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-7-4">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> is-dark <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#33cc88"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -501,7 +539,9 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-3">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-7-5">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
@@ -513,6 +553,25 @@ font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"warning"</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-7-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> is-dark <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#ee9944"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
@@ -522,7 +581,9 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-4">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-7-7">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
@@ -534,6 +595,25 @@ font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"danger"</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-7-8">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> is-dark <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#ff5555"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
@@ -543,7 +623,9 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-5">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-7-9">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
@@ -555,6 +637,25 @@ font-style: inherit;">==</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"info"</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-7-10">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> is-dark <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#5599ee"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">{</span> rgb<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
@@ -564,7 +665,28 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-6">  <span class="cf" style="color: #003B4F;
+<span id="annotated-cell-7-11">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-7-12">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> is-dark <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> luma<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">170</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
@@ -580,11 +702,14 @@ background-color: null;
 font-style: inherit;">}</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// neutral default</span></span>
-<span id="cb5-7"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-13">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-8"></span>
-<span id="cb5-9"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-7-14"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="annotated-cell-7-15"></span>
+<span id="annotated-cell-7-16"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -599,12 +724,18 @@ font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"neutral"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">,</span> mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"light"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb5-10">  <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-7-17">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">let</span> <span class="va" style="color: #111111;
@@ -615,11 +746,15 @@ font-style: inherit;">=</span> get-badge-colour<span class="op" style="color: #5
 background-color: null;
 font-style: inherit;">(</span>colour<span class="op" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;">,</span> mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> mode<span class="op" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-11">  box<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-18">  box<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb5-12">    fill<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-19">    fill<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> base<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -630,7 +765,7 @@ background-color: null;
 font-style: inherit;">80%</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb5-13">    stroke<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-20">    stroke<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -645,21 +780,21 @@ background-color: null;
 font-style: inherit;">40%</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb5-14">    radius<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-21">    radius<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">4pt</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb5-15">    inset<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-22">    inset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.25em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb5-16">    text<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-23">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -674,14 +809,20 @@ background-color: null;
 font-style: inherit;">,</span> content<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-17">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-24">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-18"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-7-25"><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">}</span></span></code></pre></div></div>
+font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
-<p>Now users can specify <code>colour: "success"</code> and get a green badge.</p>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from <code>_brand.yml</code> using the Quarto Brand Lua API (see Note&nbsp;1).</span>
+</dd>
+</dl>
+<p>Now users can specify <code>colour: "success"</code> and get a green badge. The <code>mode</code> parameter selects light or dark colour palettes.</p>
 </section>
 <section id="building-the-lua-handler" class="level3" data-number="6.4">
 <h3 data-number="6.4" class="anchored" data-anchor-id="building-the-lua-handler"><span class="header-section-number">6.4</span> Building the Lua Handler</h3>
@@ -812,7 +953,7 @@ background-color: null;
 font-style: inherit;">(</span></span>
 <span id="annotated-cell-8-15">    <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'#simple-badge(colour: "%s")[%s]'</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">'#simple-badge(colour: "%s", mode: effective-brand-mode)[%s]'</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="annotated-cell-8-16">    <span class="va" style="color: #111111;
@@ -878,9 +1019,9 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 </dl>
 <p>This works for our simple use case. The Lua filter checks if a span has the <code>badge</code> class, extracts its content and attributes, and generates a Typst function call.</p>
 </section>
-<section id="the-wrapper-function-injecting-runtime-colours" class="level3" data-number="6.5">
-<h3 data-number="6.5" class="anchored" data-anchor-id="the-wrapper-function-injecting-runtime-colours"><span class="header-section-number">6.5</span> The Wrapper Function: Injecting Runtime Colours</h3>
-<p>There is one more piece to the puzzle. The Typst rendering function needs access to the document’s colour scheme, but Lua generates code at parse time before colours are resolved. The solution is a <strong>wrapper function</strong> in <code>typst-show.typ</code>.</p>
+<section id="resolving-brand-mode-at-render-time" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="resolving-brand-mode-at-render-time"><span class="header-section-number">6.5</span> Resolving Brand Mode at Render Time</h3>
+<p>There is one more piece to the puzzle. The Typst rendering function needs to know whether the document uses a light or dark colour scheme, but Lua generates code at parse time before that value is resolved. The solution is a <strong>template variable</strong> in <code>typst-show.typ</code>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -916,62 +1057,38 @@ font-style: inherit;">effective-brand-mode</span> <span class="op" style="color:
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"$if(brand-mode)$$brand-mode$$else$light$endif$"</span></span>
-<span id="annotated-cell-9-3"></span>
-<span id="annotated-cell-9-4"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Wrapper for .badge spans</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-9-5" class="code-annotation-target"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#let</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">my-badge</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span>content<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> colour<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"neutral"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span></span>
-<span id="annotated-cell-9-6">  simple-badge<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span></span>
-<span id="annotated-cell-9-7">    content<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="annotated-cell-9-8">    colour<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> colour<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="annotated-cell-9-9">  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="annotated-cell-9-10"><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+font-style: inherit;">"$if(brand-mode)$$brand-mode$$else$light$endif$"</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
 <dd>
 <span data-code-cell="annotated-cell-9" data-code-lines="2" data-code-annotation="1">Quarto template syntax (<code>$if()$</code>) resolves at render time; see <a href="https://quarto.org/docs/journals/templates.html#typst-partials">Typst partials</a>.</span>
 </dd>
-<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-9" data-code-lines="5" data-code-annotation="2">Wrapper delegates to <code>simple-badge</code>, which uses <code>get-badge-colour</code> internally for colour lookup.</span>
-</dd>
 </dl>
-<p>The Lua filter generates <code>#my-badge(colour: "success")[Completed]</code>. At render time, <code>my-badge</code> delegates to <code>simple-badge</code> which resolves the colour internally via <code>get-badge-colour</code>. For block components like panels, the wrapper pattern becomes more important as it injects the document’s colour scheme.</p>
+<p>The Lua filter generates code that references <code>effective-brand-mode</code> by name (<em>e.g.</em>, <code>#simple-badge(colour: "success", mode: effective-brand-mode)[Completed]</code>). At render time, Typst resolves the variable and <code>simple-badge</code> passes it to <code>get-badge-colour</code> to select the right colour palette.</p>
 <div class="highlight">
-<p><strong>Wrapper functions</strong> bridge the gap between parse-time code generation (Lua) and render-time colour resolution (Typst). For block components, they inject runtime context (such as the colour scheme) that Lua cannot know in advance.</p>
+<p>The Lua filter generates code that references <code>effective-brand-mode</code> <strong>by name</strong>. Typst resolves the variable at render time via Pandoc template syntax, so each badge picks the right colour palette without Lua needing to know the mode.</p>
+</div>
+<div id="nte-brand-lua" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note&nbsp;1: Quarto Brand Lua API
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Quarto also exposes a <code>quarto.brand</code> Lua module that lets filters query <code>_brand.yml</code> values directly at parse time:</p>
+<ul>
+<li><code>quarto.brand.has_mode(mode)</code>: returns <code>true</code> if the document has a brand definition for the given mode (<code>"light"</code> or <code>"dark"</code>).</li>
+<li><code>quarto.brand.get_color(mode, name)</code>: returns a brand colour by name in the output format (<em>e.g.</em>, <code>quarto.brand.get_color("light", "primary")</code>).</li>
+<li><code>quarto.brand.get_color_css(mode, name)</code>: returns the colour in CSS format.</li>
+<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options (family, size, weight, etc.) for the given element.</li>
+<li><code>quarto.brand.get_logo(mode, name)</code>: returns logo resource paths and alt text.</li>
+</ul>
+<p>This approach is useful when you need brand values <em>inside</em> the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code. In this tutorial, we pass the mode to Typst instead, keeping colour logic in a single layer.</p>
+</div>
 </div>
 </section>
 </section>
@@ -981,19 +1098,19 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 <section id="understanding-pandoc-div-elements" class="level3" data-number="7.1">
 <h3 data-number="7.1" class="anchored" data-anchor-id="understanding-pandoc-div-elements"><span class="header-section-number">7.1</span> Understanding Pandoc Div Elements</h3>
 <p>When you write a fenced div in Quarto:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1">::: {.panel style="info" title="Important Note"}</span>
-<span id="cb6-2">This panel contains **rich content** including:</span>
-<span id="cb6-3"></span>
-<span id="cb6-4"><span class="ss" style="color: #20794D;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1">::: {.panel style="info" title="Important Note"}</span>
+<span id="cb5-2">This panel contains **rich content** including:</span>
+<span id="cb5-3"></span>
+<span id="cb5-4"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">- </span>Bullet points.</span>
-<span id="cb6-5"><span class="ss" style="color: #20794D;
+<span id="cb5-5"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">- </span>_Formatted text_.</span>
-<span id="cb6-6"><span class="ss" style="color: #20794D;
+<span id="cb5-6"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">- </span>And more.</span>
-<span id="cb6-7">  :::</span></code></pre></div></div>
+<span id="cb5-7">  :::</span></code></pre></div></div>
 <p>Pandoc parses this into a Div element with:</p>
 <ul>
 <li><strong><code>div.content</code></strong>: An array of block elements (paragraphs, lists, etc.).</li>
@@ -1009,23 +1126,23 @@ font-style: inherit;">- </span>And more.</span>
 <div class="code-with-filename-file">
 <pre><strong>Conceptual pattern</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Conceptual pattern" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Conceptual pattern" style="background: #f1f3f5;"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Instead of: #panel[plain text]</span></span>
-<span id="cb7-2"><span class="co" style="color: #5E5E5E;
+<span id="cb6-2"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- We generate:</span></span>
-<span id="cb7-3"><span class="co" style="color: #5E5E5E;
+<span id="cb6-3"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- #panel(style: "info")[</span></span>
-<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+<span id="cb6-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">--   &lt;original content passes through&gt;</span></span>
-<span id="cb7-5"><span class="co" style="color: #5E5E5E;
+<span id="cb6-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- ]</span></span>
-<span id="cb7-6"></span>
-<span id="cb7-7"><span class="kw" style="color: #003B4F;
+<span id="cb6-6"></span>
+<span id="cb6-7"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">local</span> <span class="va" style="color: #111111;
@@ -1035,7 +1152,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb7-8">  <span class="va" style="color: #111111;
+<span id="cb6-8">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">pandoc</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1052,10 +1169,10 @@ background-color: null;
 font-style: inherit;">),</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Opening</span></span>
-<span id="cb7-9">  <span class="co" style="color: #5E5E5E;
+<span id="cb6-9">  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Original div.content elements go here</span></span>
-<span id="cb7-10">  <span class="va" style="color: #111111;
+<span id="cb6-10">  <span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">pandoc</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1072,7 +1189,7 @@ background-color: null;
 font-style: inherit;">)</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-- Closing</span></span>
-<span id="cb7-11"><span class="op" style="color: #5E5E5E;
+<span id="cb6-11"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span></code></pre></div></div>
 </div>
@@ -1460,18 +1577,18 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 <section id="title-extraction-a-useful-pattern" class="level3" data-number="7.4">
 <h3 data-number="7.4" class="anchored" data-anchor-id="title-extraction-a-useful-pattern"><span class="header-section-number">7.4</span> Title Extraction: A Useful Pattern</h3>
 <p>Many block components benefit from extracting the first heading as a title. Instead of requiring users to write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1">::: {.panel title="My Title"}</span>
-<span id="cb8-2">Content here.</span>
-<span id="cb8-3">:::</span></code></pre></div></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1">::: {.panel title="My Title"}</span>
+<span id="cb7-2">Content here.</span>
+<span id="cb7-3">:::</span></code></pre></div></div>
 <p>You can let them write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1">::: {.panel}</span>
-<span id="cb9-2"></span>
-<span id="cb9-3"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1">::: {.panel}</span>
+<span id="cb8-2"></span>
+<span id="cb8-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;"># My Title</span></span>
-<span id="cb9-4"></span>
-<span id="cb9-5">Content here.</span>
-<span id="cb9-6">:::</span></code></pre></div></div>
+<span id="cb8-4"></span>
+<span id="cb8-5">Content here.</span>
+<span id="cb8-6">:::</span></code></pre></div></div>
 <p>The <code>extract_first_heading_as_title</code> function handles this:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -1954,13 +2071,76 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 </dl>
 <p>The <code>breakable: false</code> default prevents panels from splitting across pages, avoiding awkward orphaned titles or content fragments.</p>
 </section>
+<section id="the-panel-wrapper-injecting-the-colour-scheme" class="level3" data-number="7.6">
+<h3 data-number="7.6" class="anchored" data-anchor-id="the-panel-wrapper-injecting-the-colour-scheme"><span class="header-section-number">7.6</span> The Panel Wrapper: Injecting the Colour Scheme</h3>
+<p>Unlike badges, where the Lua handler passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-17" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-17-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">my-panel</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>content<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> ..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-17-2">  render-panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-17-3">    content<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-17-4" class="code-annotation-target">    colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> get-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> effective-brand-mode<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-17-5" class="code-annotation-target">    ..args<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-17-6">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-17-7"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-17" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-17" data-code-lines="4" data-code-annotation="1">Injects the full colour dictionary resolved from <code>effective-brand-mode</code> at render time.</span>
+</dd>
+<dt data-target-cell="annotated-cell-17" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-17" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments (<code>title</code>, <code>style</code>, etc.) unchanged.</span>
+</dd>
+</dl>
+<p>The Lua handler generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
+<div class="highlight">
+<p>For badges, passing <code>mode</code> directly to the Typst function is sufficient. For panels, a <strong>wrapper function</strong> injects a full colour dictionary that depends on runtime context. Choose the simpler approach when it works; use a wrapper when the rendering function needs derived values the Lua filter cannot provide.</p>
+</div>
+</section>
 </section>
 <section id="conclusion" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
 <p>This tutorial introduced the dual-layer architecture for building Quarto Typst templates. You have learned how Lua filters and Typst functions work together to transform markdown elements into styled PDF components.</p>
 <p>You can download the complete code for this part of the tutorial as a zip file containing a minimal extension with badges and panels.</p>
 <div style="text-align: center;">
-<p><a href="./tutorial-part1.zip" class="btn btn-outline-light btn-" target="_blank" rel="noopener noreferrer">Part 1 (ZIP)</a></p>
+<p><a href="./tutorial-part1.zip" class="btn btn-outline-light" target="_blank" rel="noopener noreferrer">Part 1 (ZIP)</a></p>
 </div>
 <section id="key-concepts-recap" class="level3" data-number="8.1">
 <h3 data-number="8.1" class="anchored" data-anchor-id="key-concepts-recap"><span class="header-section-number">8.1</span> Key Concepts Recap</h3>
@@ -1968,7 +2148,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 <ol type="1">
 <li><strong>Lua filters</strong> intercept markdown elements and generate Typst function calls using <code>pandoc.RawBlock</code> and <code>pandoc.RawInline</code>.</li>
 <li><strong>Typst functions</strong> receive that generated code and render styled output with access to document context.</li>
-<li><strong>Wrapper functions</strong> bridge parse-time (Lua) and render-time (Typst), injecting runtime context like colour schemes.</li>
+<li><strong>Pandoc template variables</strong> (like <code>effective-brand-mode</code>) bridge parse-time (Lua) and render-time (Typst). Lua references the variable by name in the generated code; Typst resolves its value when rendering.</li>
 </ol>
 <p>For inline elements like badges, Lua extracts content and attributes, then generates a Typst function call. For block elements like panels, Lua wraps the content with opening and closing Typst code, preserving nested structure.</p>
 </section>

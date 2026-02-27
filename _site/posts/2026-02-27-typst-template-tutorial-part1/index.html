@@ -453,7 +453,7 @@ Decorative elements include floating code snippets and gradient orbs in blue and
   <li><a href="#building-the-typst-function-start-simple" id="toc-building-the-typst-function-start-simple" class="nav-link" data-scroll-target="#building-the-typst-function-start-simple"><span class="header-section-number">6.2</span> Building the Typst Function: Start Simple</a></li>
   <li><a href="#adding-colour-support" id="toc-adding-colour-support" class="nav-link" data-scroll-target="#adding-colour-support"><span class="header-section-number">6.3</span> Adding Colour Support</a></li>
   <li><a href="#building-the-lua-handler" id="toc-building-the-lua-handler" class="nav-link" data-scroll-target="#building-the-lua-handler"><span class="header-section-number">6.4</span> Building the Lua Handler</a></li>
-  <li><a href="#the-wrapper-function-injecting-runtime-colours" id="toc-the-wrapper-function-injecting-runtime-colours" class="nav-link" data-scroll-target="#the-wrapper-function-injecting-runtime-colours"><span class="header-section-number">6.5</span> The Wrapper Function: Injecting Runtime Colours</a></li>
+  <li><a href="#resolving-brand-mode-at-render-time" id="toc-resolving-brand-mode-at-render-time" class="nav-link" data-scroll-target="#resolving-brand-mode-at-render-time"><span class="header-section-number">6.5</span> Resolving Brand Mode at Render Time</a></li>
   </ul></li>
   <li><a href="#block-components-panels-wrapped-content" id="toc-block-components-panels-wrapped-content" class="nav-link" data-scroll-target="#block-components-panels-wrapped-content"><span class="header-section-number">7</span> Block Components: Panels (Wrapped Content)</a>
   <ul class="collapse">
@@ -462,6 +462,7 @@ Decorative elements include floating code snippets and gradient orbs in blue and
   <li><a href="#building-the-wrapped-content-handler" id="toc-building-the-wrapped-content-handler" class="nav-link" data-scroll-target="#building-the-wrapped-content-handler"><span class="header-section-number">7.3</span> Building the Wrapped Content Handler</a></li>
   <li><a href="#title-extraction-a-useful-pattern" id="toc-title-extraction-a-useful-pattern" class="nav-link" data-scroll-target="#title-extraction-a-useful-pattern"><span class="header-section-number">7.4</span> Title Extraction: A Useful Pattern</a></li>
   <li><a href="#the-typst-panel-function" id="toc-the-typst-panel-function" class="nav-link" data-scroll-target="#the-typst-panel-function"><span class="header-section-number">7.5</span> The Typst Panel Function</a></li>
+  <li><a href="#the-panel-wrapper-injecting-the-colour-scheme" id="toc-the-panel-wrapper-injecting-the-colour-scheme" class="nav-link" data-scroll-target="#the-panel-wrapper-injecting-the-colour-scheme"><span class="header-section-number">7.6</span> The Panel Wrapper: Injecting the Colour Scheme</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">8</span> Conclusion</a>
   <ul class="collapse">
@@ -470,7 +471,7 @@ Decorative elements include floating code snippets and gradient orbs in blue and
   <li><a href="#further-resources" id="toc-further-resources" class="nav-link" data-scroll-target="#further-resources"><span class="header-section-number">8.3</span> Further Resources</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-02-27-typst-template-tutorial-part1/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div><div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="./tutorial-part1.zip" rel="noopener noreferrer" target="_brank"><i class="bi bi-file-zip"></i>Tutorial Part 1 (zip)</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-02-27-typst-template-tutorial-part1/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div><div class="quarto-code-links"><h2>Code Links</h2><ul><li><a href="./tutorial-part1.zip" rel="noopener noreferrer" target="_blank"><i class="bi bi-file-zip"></i>Tutorial Part 1 (zip)</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -535,7 +536,7 @@ Note
 <pre class="mermaid mermaid-js" data-label="fig-bridge">flowchart LR
     A["[Completed]{.badge colour='success'}"] --&gt; B[Pandoc AST]
     B --&gt; C[Lua Filter]
-    C --&gt; D["#my-badge(colour: 'success')[Completed]"]
+    C --&gt; D["#simple-badge(colour: 'success', mode: effective-brand-mode)[Completed]"]
     D --&gt; E[Typst Function]
     E --&gt; F[Styled Badge]
 </pre>
@@ -596,7 +597,7 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <div class="code-with-filename-file">
 <pre><strong>Typst</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="Typst"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">my-badge</span><span class="op">(</span>content<span class="op">,</span> colour<span class="op">:</span> <span class="st">"neutral"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="Typst"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">simple-badge</span><span class="op">(</span>content<span class="op">,</span> colour<span class="op">:</span> <span class="st">"neutral"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  box<span class="op">(</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> luma<span class="op">(</span><span class="dv">230</span><span class="op">),</span></span>
 <span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>    radius<span class="op">:</span> <span class="fl">4pt</span><span class="op">,</span></span>
@@ -639,7 +640,8 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>├── template.typ         # Main Typst template</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>├── typst-show.typ       # Wrapper functions for components</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>├── components.typ       # Component rendering functions</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>└── filter.lua           # Lua filter for element transformation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>├── wrapper.lua          # Shared wrapper helpers loaded by filter.lua</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>└── filter.lua           # Lua filter entrypoint</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The <code>_extension.yml</code> manifest declares how these pieces fit together:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -700,26 +702,39 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <div class="code-with-filename-file">
 <pre><strong>badges.typ (v2 - with colours)</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="badges.typ (v2 - with colours)"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">get-badge-colour</span><span class="op">(</span>colour-name<span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"success"</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#009955"</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"warning"</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#cc6600"</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"danger"</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#cc0000"</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"info"</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#0066cc"</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="op">{</span> luma<span class="op">(</span><span class="dv">128</span><span class="op">)</span> <span class="op">}</span>  <span class="co">// neutral default</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">simple-badge</span><span class="op">(</span>content<span class="op">,</span> colour<span class="op">:</span> <span class="st">"neutral"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">base</span> <span class="op">=</span> get-badge-colour<span class="op">(</span>colour<span class="op">)</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  box<span class="op">(</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> base<span class="op">.</span>lighten<span class="op">(</span><span class="fl">80%</span><span class="op">),</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    stroke<span class="op">:</span> <span class="fl">0.5pt</span> <span class="op">+</span> base<span class="op">.</span>lighten<span class="op">(</span><span class="fl">40%</span><span class="op">),</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    radius<span class="op">:</span> <span class="fl">4pt</span><span class="op">,</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    inset<span class="op">:</span> <span class="fl">0.25em</span><span class="op">,</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> base<span class="op">,</span> content<span class="op">)</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-7" data-filename="badges.typ (v2 - with colours)"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-1" class="code-annotation-target"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">get-badge-colour</span><span class="op">(</span>colour-name<span class="op">,</span> mode<span class="op">:</span> <span class="st">"light"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-2"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">is-dark</span> <span class="op">=</span> mode <span class="op">==</span> <span class="st">"dark"</span></span>
+<span id="annotated-cell-7-3"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"success"</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-4"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is-dark <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#33cc88"</span><span class="op">)</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#009955"</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="annotated-cell-7-5"><a href="#annotated-cell-7-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"warning"</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-6"><a href="#annotated-cell-7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is-dark <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#ee9944"</span><span class="op">)</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#cc6600"</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="annotated-cell-7-7"><a href="#annotated-cell-7-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"danger"</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-8"><a href="#annotated-cell-7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is-dark <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#ff5555"</span><span class="op">)</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#cc0000"</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="annotated-cell-7-9"><a href="#annotated-cell-7-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> colour-name <span class="op">==</span> <span class="st">"info"</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-10"><a href="#annotated-cell-7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is-dark <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#5599ee"</span><span class="op">)</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> rgb<span class="op">(</span><span class="st">"#0066cc"</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="annotated-cell-7-11"><a href="#annotated-cell-7-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-12"><a href="#annotated-cell-7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is-dark <span class="op">{</span> luma<span class="op">(</span><span class="dv">170</span><span class="op">)</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> luma<span class="op">(</span><span class="dv">128</span><span class="op">)</span> <span class="op">}</span>  <span class="co">// neutral default</span></span>
+<span id="annotated-cell-7-13"><a href="#annotated-cell-7-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-7-14"><a href="#annotated-cell-7-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="annotated-cell-7-15"><a href="#annotated-cell-7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-7-16"><a href="#annotated-cell-7-16" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">simple-badge</span><span class="op">(</span>content<span class="op">,</span> colour<span class="op">:</span> <span class="st">"neutral"</span><span class="op">,</span> mode<span class="op">:</span> <span class="st">"light"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-17"><a href="#annotated-cell-7-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">base</span> <span class="op">=</span> get-badge-colour<span class="op">(</span>colour<span class="op">,</span> mode<span class="op">:</span> mode<span class="op">)</span></span>
+<span id="annotated-cell-7-18"><a href="#annotated-cell-7-18" aria-hidden="true" tabindex="-1"></a>  box<span class="op">(</span></span>
+<span id="annotated-cell-7-19"><a href="#annotated-cell-7-19" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> base<span class="op">.</span>lighten<span class="op">(</span><span class="fl">80%</span><span class="op">),</span></span>
+<span id="annotated-cell-7-20"><a href="#annotated-cell-7-20" aria-hidden="true" tabindex="-1"></a>    stroke<span class="op">:</span> <span class="fl">0.5pt</span> <span class="op">+</span> base<span class="op">.</span>lighten<span class="op">(</span><span class="fl">40%</span><span class="op">),</span></span>
+<span id="annotated-cell-7-21"><a href="#annotated-cell-7-21" aria-hidden="true" tabindex="-1"></a>    radius<span class="op">:</span> <span class="fl">4pt</span><span class="op">,</span></span>
+<span id="annotated-cell-7-22"><a href="#annotated-cell-7-22" aria-hidden="true" tabindex="-1"></a>    inset<span class="op">:</span> <span class="fl">0.25em</span><span class="op">,</span></span>
+<span id="annotated-cell-7-23"><a href="#annotated-cell-7-23" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> base<span class="op">,</span> content<span class="op">)</span></span>
+<span id="annotated-cell-7-24"><a href="#annotated-cell-7-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="annotated-cell-7-25"><a href="#annotated-cell-7-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Now users can specify <code>colour: "success"</code> and get a green badge.</p>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from <code>_brand.yml</code> using the Quarto Brand Lua API (see <a href="#nte-brand-lua" class="quarto-xref">Note&nbsp;1</a>).</span>
+</dd>
+</dl>
+<p>Now users can specify <code>colour: "success"</code> and get a green badge. The <code>mode</code> parameter selects light or dark colour palettes.</p>
 </section>
 <section id="building-the-lua-handler" class="level3" data-number="6.4">
 <h3 data-number="6.4" class="anchored" data-anchor-id="building-the-lua-handler"><span class="header-section-number">6.4</span> Building the Lua Handler</h3>
@@ -742,7 +757,7 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <span id="annotated-cell-8-12"><a href="#annotated-cell-8-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="annotated-cell-8-13"><a href="#annotated-cell-8-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Generate Typst function call</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-8-14" class="code-annotation-target"><a href="#annotated-cell-8-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">typst_code</span> <span class="op">=</span> <span class="fu">string.format</span><span class="op">(</span></span>
-<span id="annotated-cell-8-15"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'#simple-badge(colour: "%s")[%s]'</span><span class="op">,</span></span>
+<span id="annotated-cell-8-15"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'#simple-badge(colour: "%s", mode: effective-brand-mode)[%s]'</span><span class="op">,</span></span>
 <span id="annotated-cell-8-16"><a href="#annotated-cell-8-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">colour</span><span class="op">,</span></span>
 <span id="annotated-cell-8-17"><a href="#annotated-cell-8-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">content</span></span>
 <span id="annotated-cell-8-18"><a href="#annotated-cell-8-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
@@ -778,9 +793,9 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 </dl>
 <p>This works for our simple use case. The Lua filter checks if a span has the <code>badge</code> class, extracts its content and attributes, and generates a Typst function call.</p>
 </section>
-<section id="the-wrapper-function-injecting-runtime-colours" class="level3" data-number="6.5">
-<h3 data-number="6.5" class="anchored" data-anchor-id="the-wrapper-function-injecting-runtime-colours"><span class="header-section-number">6.5</span> The Wrapper Function: Injecting Runtime Colours</h3>
-<p>There is one more piece to the puzzle. The Typst rendering function needs access to the document’s colour scheme, but Lua generates code at parse time before colours are resolved. The solution is a <strong>wrapper function</strong> in <code>typst-show.typ</code>.</p>
+<section id="resolving-brand-mode-at-render-time" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="resolving-brand-mode-at-render-time"><span class="header-section-number">6.5</span> Resolving Brand Mode at Render Time</h3>
+<p>There is one more piece to the puzzle. The Typst rendering function needs to know whether the document uses a light or dark colour scheme, but Lua generates code at parse time before that value is resolved. The solution is a <strong>template variable</strong> in <code>typst-show.typ</code>.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -805,29 +820,38 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <pre><strong>typst-show.typ</strong></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-9" data-filename="typst-show.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define brand mode with default fallback</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-2" class="code-annotation-target"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">effective-brand-mode</span> <span class="op">=</span> <span class="st">"$if(brand-mode)$$brand-mode$$else$light$endif$"</span></span>
-<span id="annotated-cell-9-3"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Wrapper for .badge spans</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-9-5" class="code-annotation-target"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">my-badge</span><span class="op">(</span>content<span class="op">,</span> colour<span class="op">:</span> <span class="st">"neutral"</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="annotated-cell-9-6"><a href="#annotated-cell-9-6" aria-hidden="true" tabindex="-1"></a>  simple-badge<span class="op">(</span></span>
-<span id="annotated-cell-9-7"><a href="#annotated-cell-9-7" aria-hidden="true" tabindex="-1"></a>    content<span class="op">,</span></span>
-<span id="annotated-cell-9-8"><a href="#annotated-cell-9-8" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> colour<span class="op">,</span></span>
-<span id="annotated-cell-9-9"><a href="#annotated-cell-9-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
-<span id="annotated-cell-9-10"><a href="#annotated-cell-9-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-2" class="code-annotation-target"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">effective-brand-mode</span> <span class="op">=</span> <span class="st">"$if(brand-mode)$$brand-mode$$else$light$endif$"</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
 <dd>
 <span data-code-cell="annotated-cell-9" data-code-lines="2" data-code-annotation="1">Quarto template syntax (<code>$if()$</code>) resolves at render time; see <a href="https://quarto.org/docs/journals/templates.html#typst-partials">Typst partials</a>.</span>
 </dd>
-<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-9" data-code-lines="5" data-code-annotation="2">Wrapper delegates to <code>simple-badge</code>, which uses <code>get-badge-colour</code> internally for colour lookup.</span>
-</dd>
 </dl>
-<p>The Lua filter generates <code>#my-badge(colour: "success")[Completed]</code>. At render time, <code>my-badge</code> delegates to <code>simple-badge</code> which resolves the colour internally via <code>get-badge-colour</code>. For block components like panels, the wrapper pattern becomes more important as it injects the document’s colour scheme.</p>
+<p>The Lua filter generates code that references <code>effective-brand-mode</code> by name (<em>e.g.</em>, <code>#simple-badge(colour: "success", mode: effective-brand-mode)[Completed]</code>). At render time, Typst resolves the variable and <code>simple-badge</code> passes it to <code>get-badge-colour</code> to select the right colour palette.</p>
 <div class="highlight">
-<p><strong>Wrapper functions</strong> bridge the gap between parse-time code generation (Lua) and render-time colour resolution (Typst). For block components, they inject runtime context (such as the colour scheme) that Lua cannot know in advance.</p>
+<p>The Lua filter generates code that references <code>effective-brand-mode</code> <strong>by name</strong>. Typst resolves the variable at render time via Pandoc template syntax, so each badge picks the right colour palette without Lua needing to know the mode.</p>
+</div>
+<div id="nte-brand-lua" class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note&nbsp;1: Quarto Brand Lua API
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Quarto also exposes a <code>quarto.brand</code> Lua module that lets filters query <code>_brand.yml</code> values directly at parse time:</p>
+<ul>
+<li><code>quarto.brand.has_mode(mode)</code>: returns <code>true</code> if the document has a brand definition for the given mode (<code>"light"</code> or <code>"dark"</code>).</li>
+<li><code>quarto.brand.get_color(mode, name)</code>: returns a brand colour by name in the output format (<em>e.g.</em>, <code>quarto.brand.get_color("light", "primary")</code>).</li>
+<li><code>quarto.brand.get_color_css(mode, name)</code>: returns the colour in CSS format.</li>
+<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options (family, size, weight, etc.) for the given element.</li>
+<li><code>quarto.brand.get_logo(mode, name)</code>: returns logo resource paths and alt text.</li>
+</ul>
+<p>This approach is useful when you need brand values <em>inside</em> the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code. In this tutorial, we pass the mode to Typst instead, keeping colour logic in a single layer.</p>
+</div>
 </div>
 </section>
 </section>
@@ -837,13 +861,13 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <section id="understanding-pandoc-div-elements" class="level3" data-number="7.1">
 <h3 data-number="7.1" class="anchored" data-anchor-id="understanding-pandoc-div-elements"><span class="header-section-number">7.1</span> Understanding Pandoc Div Elements</h3>
 <p>When you write a fenced div in Quarto:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>::: {.panel style="info" title="Important Note"}</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>This panel contains **rich content** including:</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bullet points.</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>_Formatted text_.</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>And more.</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  :::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>::: {.panel style="info" title="Important Note"}</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>This panel contains **rich content** including:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bullet points.</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>_Formatted text_.</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>And more.</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  :::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Pandoc parses this into a Div element with:</p>
 <ul>
 <li><strong><code>div.content</code></strong>: An array of block elements (paragraphs, lists, etc.).</li>
@@ -859,17 +883,17 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <div class="code-with-filename-file">
 <pre><strong>Conceptual pattern</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Conceptual pattern"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Instead of: #panel[plain text]</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- We generate:</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- #panel(style: "info")[</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">--   &lt;original content passes through&gt;</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ]</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">result</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">pandoc</span><span class="op">.</span>RawBlock<span class="op">(</span><span class="st">'typst'</span><span class="op">,</span> <span class="st">'#my-panel(style: "info")['</span><span class="op">),</span>  <span class="co">-- Opening</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Original div.content elements go here</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">pandoc</span><span class="op">.</span>RawBlock<span class="op">(</span><span class="st">'typst'</span><span class="op">,</span> <span class="st">']'</span><span class="op">)</span>  <span class="co">-- Closing</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Conceptual pattern"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Instead of: #panel[plain text]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- We generate:</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- #panel(style: "info")[</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">--   &lt;original content passes through&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- ]</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">result</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">pandoc</span><span class="op">.</span>RawBlock<span class="op">(</span><span class="st">'typst'</span><span class="op">,</span> <span class="st">'#my-panel(style: "info")['</span><span class="op">),</span>  <span class="co">-- Opening</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Original div.content elements go here</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="va">pandoc</span><span class="op">.</span>RawBlock<span class="op">(</span><span class="st">'typst'</span><span class="op">,</span> <span class="st">']'</span><span class="op">)</span>  <span class="co">-- Closing</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This approach lets Pandoc continue processing the inner content (converting markdown to Typst), whilst our wrapper provides the styling context.</p>
 </section>
@@ -940,16 +964,16 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <section id="title-extraction-a-useful-pattern" class="level3" data-number="7.4">
 <h3 data-number="7.4" class="anchored" data-anchor-id="title-extraction-a-useful-pattern"><span class="header-section-number">7.4</span> Title Extraction: A Useful Pattern</h3>
 <p>Many block components benefit from extracting the first heading as a title. Instead of requiring users to write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>::: {.panel title="My Title"}</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Content here.</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::: {.panel title="My Title"}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Content here.</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You can let them write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>::: {.panel}</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu"># My Title</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>Content here.</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>::: {.panel}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu"># My Title</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>Content here.</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The <code>extract_first_heading_as_title</code> function handles this:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
@@ -1063,13 +1087,43 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 </dl>
 <p>The <code>breakable: false</code> default prevents panels from splitting across pages, avoiding awkward orphaned titles or content fragments.</p>
 </section>
+<section id="the-panel-wrapper-injecting-the-colour-scheme" class="level3" data-number="7.6">
+<h3 data-number="7.6" class="anchored" data-anchor-id="the-panel-wrapper-injecting-the-colour-scheme"><span class="header-section-number">7.6</span> The Panel Wrapper: Injecting the Colour Scheme</h3>
+<p>Unlike badges, where the Lua handler passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-17" data-filename="typst-show.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-17-1"><a href="#annotated-cell-17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">my-panel</span><span class="op">(</span>content<span class="op">,</span> ..args<span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-17-2"><a href="#annotated-cell-17-2" aria-hidden="true" tabindex="-1"></a>  render-panel<span class="op">(</span></span>
+<span id="annotated-cell-17-3"><a href="#annotated-cell-17-3" aria-hidden="true" tabindex="-1"></a>    content<span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-17-4" class="code-annotation-target"><a href="#annotated-cell-17-4" aria-hidden="true" tabindex="-1"></a>    colours<span class="op">:</span> get-colours<span class="op">(</span>mode<span class="op">:</span> effective-brand-mode<span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-17-5" class="code-annotation-target"><a href="#annotated-cell-17-5" aria-hidden="true" tabindex="-1"></a>    ..args<span class="op">,</span></span>
+<span id="annotated-cell-17-6"><a href="#annotated-cell-17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="annotated-cell-17-7"><a href="#annotated-cell-17-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-17" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-17" data-code-lines="4" data-code-annotation="1">Injects the full colour dictionary resolved from <code>effective-brand-mode</code> at render time.</span>
+</dd>
+<dt data-target-cell="annotated-cell-17" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-17" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments (<code>title</code>, <code>style</code>, etc.) unchanged.</span>
+</dd>
+</dl>
+<p>The Lua handler generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
+<div class="highlight">
+<p>For badges, passing <code>mode</code> directly to the Typst function is sufficient. For panels, a <strong>wrapper function</strong> injects a full colour dictionary that depends on runtime context. Choose the simpler approach when it works; use a wrapper when the rendering function needs derived values the Lua filter cannot provide.</p>
+</div>
+</section>
 </section>
 <section id="conclusion" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">8</span> Conclusion</h2>
 <p>This tutorial introduced the dual-layer architecture for building Quarto Typst templates. You have learned how Lua filters and Typst functions work together to transform markdown elements into styled PDF components.</p>
 <p>You can download the complete code for this part of the tutorial as a zip file containing a minimal extension with badges and panels.</p>
 <div style="text-align: center;">
-<p><a href="./tutorial-part1.zip" class="btn btn-outline-light btn-" target="_blank" rel="noopener noreferrer">Part 1 (ZIP)</a></p>
+<p><a href="./tutorial-part1.zip" class="btn btn-outline-light" target="_blank" rel="noopener noreferrer">Part 1 (ZIP)</a></p>
 </div>
 <section id="key-concepts-recap" class="level3" data-number="8.1">
 <h3 data-number="8.1" class="anchored" data-anchor-id="key-concepts-recap"><span class="header-section-number">8.1</span> Key Concepts Recap</h3>
@@ -1077,7 +1131,7 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <ol type="1">
 <li><strong>Lua filters</strong> intercept markdown elements and generate Typst function calls using <code>pandoc.RawBlock</code> and <code>pandoc.RawInline</code>.</li>
 <li><strong>Typst functions</strong> receive that generated code and render styled output with access to document context.</li>
-<li><strong>Wrapper functions</strong> bridge parse-time (Lua) and render-time (Typst), injecting runtime context like colour schemes.</li>
+<li><strong>Pandoc template variables</strong> (like <code>effective-brand-mode</code>) bridge parse-time (Lua) and render-time (Typst). Lua references the variable by name in the generated code; Typst resolves its value when rendering.</li>
 </ol>
 <p>For inline elements like badges, Lua extracts content and attributes, then generates a Typst function call. For block elements like panels, Lua wraps the content with opening and closing Typst code, preserving nested structure.</p>
 </section>
