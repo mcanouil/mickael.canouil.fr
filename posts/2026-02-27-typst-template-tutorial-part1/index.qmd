@@ -59,7 +59,7 @@ Copy-pasting styles between documents introduces errors.
 Updating a colour scheme across dozens of files becomes a maintenance nightmare.
 And when multiple team members contribute to documents, stylistic drift is inevitable.
 
-:::: {.highlight}
+::: {.highlight}
 
 **Reproducible branding** through code eliminates manual styling errors and ensures every document reflects your organisation's identity automatically.
 
@@ -84,7 +84,7 @@ It means creating reusable components like badges, panels, and quote cards that 
 
 In this tutorial, you will learn the architectural patterns that enable rich, interactive components whilst maintaining clean, extensible code.
 
-:::: {.callout-note}
+::: {.callout-note}
 
 This is **Part 1** of a two-part series.
 This part covers the foundational concepts; Part 2 explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.
@@ -139,7 +139,7 @@ At this stage, you can:
 
 The key Pandoc functions for this bridge are:
 
-```{.lua filename="Lua"}
+```{.lua filename="(conceptual) raw element API"}
 -- For block-level elements (divs, paragraphs)
 pandoc.RawBlock('typst', '#my-function[content]') -- <1>
 
@@ -163,7 +163,7 @@ These functions have access to:
 
 A simple Typst function might look like:
 
-```{.typst filename="Typst"}
+```{.typst filename="(conceptual) simple Typst function"}
 #let simple-badge(content, colour: "neutral") = { // <1>
   box( // <2>
     fill: luma(230), // <3>
@@ -203,7 +203,7 @@ _extensions/my-extension/
 
 The `_extension.yml` manifest declares how these pieces fit together:
 
-```{.yaml filename="_extension.yml"}
+```{.yaml filename="_extensions/my-extension/_extension.yml"}
 title: My Extension
 version: 1.0.0
 contributes:
@@ -217,7 +217,7 @@ contributes:
         - filter.lua
 ```
 
-:::: {.highlight}
+::: {.highlight}
 
 Production extensions like [quarto-mcanouil](https://github.com/mcanouil/quarto-mcanouil) use more elaborate structures with shared modules and component libraries.
 Part 2 covers those architectural patterns.
@@ -246,7 +246,7 @@ A Lua filter can inspect these properties and decide how to transform the elemen
 
 Let us begin with the simplest possible badge function in Typst:
 
-```{.typst filename="badges.typ (v1 - minimal)"}
+```{.typst filename="(conceptual) badges.typ v1"}
 #let simple-badge(content) = {
   box(
     fill: luma(230),
@@ -264,7 +264,7 @@ It works, but it lacks colour customisation and accessibility considerations.
 
 Next, let us add colour support with predefined semantic colours:
 
-```{.typst filename="badges.typ (v2 - with colours)"}
+```{.typst filename="(conceptual) badges.typ v2"}
 #let get-badge-colour(colour-name, mode: "light") = { // <1>
   let is-dark = mode == "dark"
   if colour-name == "success" {
@@ -302,7 +302,7 @@ The `mode` parameter selects light or dark colour palettes.
 With the Typst function ready, we need a Lua handler to generate calls to it.
 Here is the simplest approach:
 
-```{.lua filename="badges.lua (v1 - minimal)"}
+```{.lua filename="(conceptual) badges.lua v1"}
 function Span(span) -- <1>
   -- Only process spans with the 'badge' class
   if not span.classes:includes('badge') then -- <2>
@@ -342,7 +342,7 @@ There is one more piece to the puzzle.
 The Typst rendering function needs to know whether the document uses a light or dark colour scheme, but Lua generates code at parse time before that value is resolved.
 The solution is a **template variable** in `typst-show.typ`.
 
-:::: {.callout-tip}
+::: {.callout-tip}
 
 ## Quarto Template Syntax
 
@@ -357,7 +357,7 @@ See [Typst partials](https://quarto.org/docs/journals/templates.html#typst-parti
 
 :::
 
-```{.typst filename="typst-show.typ"}
+```{.typst filename="_extensions/my-extension/typst-show.typ"}
 // Define brand mode with default fallback
 #let effective-brand-mode = "$if(brand-mode)$$brand-mode$$else$light$endif$" // <1>
 ```
@@ -367,14 +367,14 @@ See [Typst partials](https://quarto.org/docs/journals/templates.html#typst-parti
 The Lua filter generates code that references `effective-brand-mode` by name (_e.g._, `#simple-badge(colour: "success", mode: effective-brand-mode)[Completed]`).
 At render time, Typst resolves the variable and `simple-badge` passes it to `get-badge-colour` to select the right colour palette.
 
-:::: {.highlight}
+::: {.highlight}
 
 The Lua filter generates code that references `effective-brand-mode` **by name**.
 Typst resolves the variable at render time via Pandoc template syntax, so each badge picks the right colour palette without Lua needing to know the mode.
 
 :::
 
-:::: {.callout-note #nte-brand-lua}
+::: {.callout-note #nte-brand-lua}
 
 ## Quarto Brand Lua API
 
@@ -424,7 +424,7 @@ The critical difference from spans: `div.content` is not simple text but a list 
 Unlike badges where we convert content to plain text, panels need to preserve their content structure.
 The solution is to wrap the content with opening and closing Typst code:
 
-```{.lua filename="Conceptual pattern"}
+```{.lua filename="(conceptual) wrapped content pattern"}
 -- Instead of: #panel[plain text]
 -- We generate:
 -- #panel(style: "info")[
@@ -444,7 +444,7 @@ This approach lets Pandoc continue processing the inner content (converting mark
 
 The wrapper module provides utilities for this pattern:
 
-```{.lua filename="wrapper.lua"}
+```{.lua filename="_extensions/my-extension/wrapper.lua"}
 --- Build Typst block wrappers with optional attributes
 local function build_typst_block_wrappers(config, attrs)
   local has_attributes = next(attrs) ~= nil
@@ -510,7 +510,7 @@ Content here.
 
 The `extract_first_heading_as_title` function handles this:
 
-```{.lua filename="wrapper.lua"}
+```{.lua filename="_extensions/my-extension/wrapper.lua"}
 local function extract_first_heading_as_title(el, attrs)
   if not attrs['title'] and #el.content > 0 then -- <1>
     local first_elem = el.content[1]
@@ -537,7 +537,7 @@ end
 
 On the Typst side, the panel function receives the attributes and content:
 
-```{.typst filename="panels.typ"}
+```{.typst filename="(conceptual) panels.typ excerpt"}
 #let render-panel(
   content, // <1>
   title: none,
@@ -592,7 +592,7 @@ Unlike badges, where the Lua handler passes `effective-brand-mode` directly to `
 The `render-panel` function accepts a `colours` parameter that the Lua filter cannot populate at parse time.
 A wrapper function in `typst-show.typ` bridges this gap:
 
-```{.typst filename="typst-show.typ"}
+```{.typst filename="_extensions/my-extension/typst-show.typ"}
 #let my-panel(content, ..args) = {
   render-panel(
     content,
@@ -607,7 +607,7 @@ A wrapper function in `typst-show.typ` bridges this gap:
 
 The Lua handler generates `#my-panel(style: "info")[...]`, and at render time `my-panel` resolves the colour scheme before delegating to `render-panel`.
 
-:::: {.highlight}
+::: {.highlight}
 
 For badges, passing `mode` directly to the Typst function is sufficient.
 For panels, a **wrapper function** injects a full colour dictionary that depends on runtime context.

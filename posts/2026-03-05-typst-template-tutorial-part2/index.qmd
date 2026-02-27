@@ -51,7 +51,7 @@ Here is a brief recap of the building blocks this tutorial relies on:
 
 This tutorial builds on those foundations with advanced patterns for production-quality extensions.
 
-:::: {.callout-note}
+::: {.callout-note}
 
 This is **Part 2** of a two-part series.
 If you have not read [Part 1](/posts/2026-02-27-typst-template-tutorial-part1/), start there first to understand the basic concepts of Lua filters, Typst functions, and wrapper patterns.
@@ -66,7 +66,7 @@ As you add components, the same handler structure keeps appearing.
 Part 1's panel handler called `build_wrapped_content` directly.
 With one or two components that is fine, but each new handler duplicates the same boilerplate:
 
-```{.lua filename="Without factories"}
+```{.lua filename="(conceptual) without factories"}
 local DIV_HANDLERS = {
   ['panel'] = function(div, config)
     return build_wrapped_content(div, config, true) -- <1>
@@ -85,7 +85,7 @@ A factory function captures that variation in a [closure](https://www.lua.org/pi
 
 ### The Factory Pattern
 
-```{.lua filename="wrapper.lua"}
+```{.lua filename="_extensions/my-extension/_modules/wrapper.lua"}
 local function create_wrapped_handler(extract_title) -- <1>
   return function(div, config) -- <2>
     return build_wrapped_content(div, config, extract_title)
@@ -100,7 +100,7 @@ end
 
 These factories let you declare handlers concisely:
 
-```{.lua filename="typst-markdown.lua"}
+```{.lua filename="_extensions/my-extension/typst-markdown.lua"}
 local DIV_HANDLERS = {
   ['panel'] = wrapper.create_wrapped_handler(true), -- <1>
   ['highlight'] = wrapper.create_wrapped_handler(false), -- <2>
@@ -112,7 +112,7 @@ local DIV_HANDLERS = {
 2. No title extraction.
 3. Custom handler for component-specific extraction logic.
 
-:::: {.highlight}
+::: {.highlight}
 
 **Handler factories** encapsulate common patterns.
 Use `create_wrapped_handler(true)` for components with titles and `create_wrapped_handler(false)` for content-only wrappers.
@@ -139,16 +139,16 @@ The [configuration system](https://github.com/mcanouil/quarto-mcanouil/blob/main
 
 The extension defines default mappings for all its components:
 
-```{.lua filename="config.lua"}
+```{.lua filename="_extensions/my-extension/_modules/config.lua"}
 local function get_builtin_mappings()
   return {
     div = { -- <1>
-      ['highlight'] = { wrapper = 'highlight', arguments = false }, -- <2>
-      ['panel'] = { wrapper = 'panel', arguments = true }, -- <3>
+      ['highlight'] = { wrapper = 'my-highlight', arguments = false }, -- <2>
+      ['panel'] = { wrapper = 'my-panel', arguments = true }, -- <3>
       ['quote-card'] = { wrapper = 'quote-card', arguments = true },
     },
     span = {
-      ['badge'] = { wrapper = 'badge', arguments = true }
+      ['badge'] = { wrapper = 'my-badge', arguments = true }
     }
   }
 end
@@ -167,7 +167,7 @@ Each mapping specifies:
 
 Users can extend or override mappings through document metadata:
 
-```{.yaml filename="document.qmd"}
+```{.yaml filename="(conceptual) document.qmd"}
 ---
 title: "My Document"
 extensions:
@@ -190,9 +190,9 @@ extensions:
 
 The configuration module parses user settings from metadata:
 
-```{.lua filename="config.lua"}
+```{.lua filename="_extensions/my-extension/_modules/config.lua"}
 local function load_element_mappings(meta) -- <1>
-  local user_mappings = { div = {}, span = {}, table = {}, image = {} }
+  local user_mappings = { div = {}, span = {} }
 
   local extension_config = meta.extensions and meta.extensions['typst-markdown'] -- <2>
   if not extension_config then
@@ -202,8 +202,6 @@ local function load_element_mappings(meta) -- <1>
   local element_types = { -- <3>
     { config_key = 'divs',   mappings_key = 'div' },
     { config_key = 'spans',  mappings_key = 'span' },
-    { config_key = 'tables', mappings_key = 'table' },
-    { config_key = 'images', mappings_key = 'image' }
   }
 
   for _, element_type in ipairs(element_types) do
@@ -223,14 +221,14 @@ end
 
 1. `meta` is the [document metadata](https://pandoc.org/lua-filters.html#type-meta) from YAML front matter.
 2. Short-circuit evaluation: returns nil if `meta.extensions` is nil.
-3. Data-driven approach avoids repetitive if/else blocks for each element type.
+3. Data-driven approach avoids repetitive if/else blocks for each supported element type.
 4. [`pairs()`](https://www.lua.org/manual/5.4/manual.html#pdf-pairs) iterates over all key-value pairs in the table.
 
 ### Merging Configurations
 
 User configuration overrides built-in defaults:
 
-```{.lua filename="config.lua"}
+```{.lua filename="_extensions/my-extension/_modules/config.lua"}
 local function merge_configurations(builtin, user)
   local merged = {}
 
@@ -261,7 +259,7 @@ Getting this wrong produces syntax errors or unexpected behaviour.
 
 The [`typst-utils` module](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/typst-utils.lua) provides a `typst_value` function that handles conversion:
 
-```{.lua filename="typst-utils.lua"}
+```{.lua filename="_extensions/my-extension/_modules/typst-utils.lua"}
 local function typst_value(value) -- <1>
   if value == nil then
     return 'none'
@@ -313,11 +311,11 @@ typst_value('Say "hi"') -- <7>
 
 When generating Typst function calls, attributes need proper formatting:
 
-```{.lua filename="wrapper.lua"}
+```{.lua filename="_extensions/my-extension/_modules/wrapper.lua"}
 local function build_attribute_string(attrs)
   local parts = {}
   for key, value in pairs(attrs) do -- <1>
-    local typst_key = key:gsub('%-', '-') -- <2>
+    local typst_key = key -- <2>
     local typst_val = typst_utils.typst_value(value)
     table.insert(parts, string.format('%s: %s', typst_key, typst_val))
   end
@@ -326,7 +324,7 @@ end
 ```
 
 1. Iterate over all attribute key-value pairs.
-2. Lua uses hyphens; Typst accepts them in identifiers.
+2. Keep attribute keys unchanged unless you intentionally need a naming transform.
 3. Join with comma separator for Typst function arguments.
 
 ## WCAG Compliance for Badges
@@ -336,7 +334,7 @@ The WCAG AA standard requires 4.5:1 contrast ratio for small text.
 
 ### Colour Calculation
 
-```{.typst filename="badges.typ"}
+```{.typst filename="_extensions/my-extension/components.typ (badges excerpt)"}
 /// Get badge colours with dark mode support.
 #let get-badge-colours(colour, colours) = {
   let fg-components = colours.foreground.components()
@@ -363,7 +361,7 @@ The WCAG AA standard requires 4.5:1 contrast ratio for small text.
 4. Adjust text colour to ensure 4.5:1 contrast ratio.
 5. Return a [dictionary](https://typst.app/docs/reference/foundations/dictionary/) with background, border, and text colours.
 
-:::: {.highlight}
+::: {.highlight}
 
 **WCAG AA compliance** requires 4.5:1 contrast ratio for small text (below 14pt bold or 18pt regular).
 Badge text at 0.85em typically falls into this category.
@@ -384,7 +382,7 @@ Shortcodes work well for:
 
 ### Basic Shortcode Structure
 
-```{.lua filename="my-shortcode.lua"}
+```{.lua filename="_extensions/my-extension/shortcodes.lua"}
 return {
   ['my-component'] = function(args, kwargs, meta) -- <1>
     local title = pandoc.utils.stringify(kwargs['title'] or '') -- <2>
@@ -436,7 +434,7 @@ The best way to predict the future is to invent it.
 
 ### Step 2: Create the Typst Rendering Function
 
-```{.typst filename="quote-card.typ"}
+```{.typst filename="_extensions/my-extension/components.typ (quote-card excerpt)"}
 #let QUOTE-CARD-RADIUS = 8pt
 #let QUOTE-CARD-INSET = 1.5em
 #let QUOTE-MARK-SIZE = 3em
@@ -494,7 +492,7 @@ The best way to predict the future is to invent it.
 
 ### Step 3: Create the Wrapper Function
 
-```{.typst filename="typst-show.typ"}
+```{.typst filename="_extensions/my-extension/typst-show.typ"}
 #let quote-card(content, ..args) = { // <1>
   render-quote-card(
     content,
@@ -513,9 +511,9 @@ The best way to predict the future is to invent it.
 This handler reuses the same wrapped content pattern from Part 1's panel, with one twist: instead of extracting the *first* heading as a title, it looks for a heading at the *end* of the content as an author attribution line.
 This kind of component-specific extraction logic is why some components need a custom handler rather than a factory-generated one.
 
-```{.lua filename="quote-card.lua"}
+```{.lua filename="_extensions/my-extension/_modules/quote-card.lua"}
 local wrapper = require( -- <1>
-  quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '')
+  quarto.utils.resolve_path('_modules/wrapper.lua'):gsub('%.lua$', '')
 )
 
 local function process_div(div, config)
@@ -548,7 +546,7 @@ return {
 }
 ```
 
-1. Load the shared wrapper module using Quarto's path resolution (see [Module Loading](#module-loading)).
+1. Load the shared wrapper module using Quarto's path resolution from the extension root.
 2. Convert div attributes to a Lua table for Typst parameter generation.
 3. Check the *last* element, unlike panel's first-heading extraction; this supports the `## Author Name` syntax at the end.
 4. Delegates to the shared wrapper module; the opening/closing pattern is identical to Part 1's panels.
@@ -557,7 +555,7 @@ return {
 
 Add the mapping in `config.lua`:
 
-```{.lua filename="config.lua"}
+```{.lua filename="_extensions/my-extension/_modules/config.lua"}
 ['quote-card'] = {
   wrapper = 'quote-card',
   arguments = true
@@ -566,9 +564,9 @@ Add the mapping in `config.lua`:
 
 Register the handler in `typst-markdown.lua`:
 
-```{.lua filename="typst-markdown.lua"}
-local quote_card = require(
-  quarto.utils.resolve_path('../_modules/quote-card.lua'):gsub('%.lua$', '')
+```{.lua filename="_extensions/my-extension/typst-markdown.lua"}
+local quote_card = require( -- <1>
+  quarto.utils.resolve_path('_modules/quote-card.lua'):gsub('%.lua$', '')
 )
 
 local DIV_HANDLERS = {
@@ -576,13 +574,20 @@ local DIV_HANDLERS = {
 }
 ```
 
+1. Use `_modules/...` paths because `typst-markdown.lua` is at the extension root.
+
+::: {.callout-note}
+In the downloadable assets, Quarto loads `filter.lua` as the entrypoint, and `filter.lua` delegates to `typst-markdown.lua`.
+This keeps compatibility with Quarto's filter discovery whilst preserving the tutorial's modular naming.
+:::
+
 ## Advanced Topics
 
 ### Checking Output Format
 
 Filters should only run for Typst output:
 
-```{.lua filename="typst-markdown.lua"}
+```{.lua filename="_extensions/my-extension/typst-markdown.lua"}
 function Div(div)
   if not quarto.doc.is_format('typst') then -- <1>
     return div
@@ -596,20 +601,23 @@ end
 
 Load shared modules using Quarto's path resolution:
 
-```{.lua filename="Loading modules"}
-local wrapper = require(
-  quarto.utils.resolve_path('../_modules/wrapper.lua'):gsub('%.lua$', '') -- <1>
-)
+```{.lua filename="_extensions/my-extension/typst-markdown.lua (module loading excerpt)"}
+local function require_local(path) -- <1>
+  return require(quarto.utils.resolve_path(path):gsub('%.lua$', ''))
+end
+
+local wrapper = require_local('_modules/wrapper.lua') -- <2>
 ```
 
 1. [`resolve_path`](https://quarto.org/docs/extensions/lua-api.html#quarto.utils.resolve_path) handles relative paths; `gsub` removes `.lua` extension for `require`.
+2. With a root-level `typst-markdown.lua`, module paths are `_modules/...`.
 
 ### Filter Ordering
 
 When using multiple filters, order matters.
 Declare filters in `_extension.yml`:
 
-```{.yaml filename="_extension.yml"}
+```{.yaml filename="_extensions/my-extension/_extension.yml"}
 filters:
   - typst/filters/setup.lua # <1>
   - typst/filters/transform.lua # <2>
@@ -624,7 +632,7 @@ filters:
 
 Use `quarto.log.warning()` to inspect values during development:
 
-```{.lua filename="Debugging"}
+```{.lua filename="(conceptual) debugging logs"}
 quarto.log.warning('Processing div with classes: ' .. table.concat(div.classes, ', ')) -- <1>
 quarto.log.warning('Attributes: ' .. pandoc.utils.stringify(pandoc.MetaMap(attrs))) -- <2>
 ```
@@ -658,7 +666,7 @@ You can download the complete code for this part of the tutorial as a zip file c
 
 :::
 
-:::: {.highlight}
+::: {.highlight}
 
 The separation of concerns between Lua (transformation) and Typst (rendering) enables flexibility, testability, and maintainability as your extension grows.
 
