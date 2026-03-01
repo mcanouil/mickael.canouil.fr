@@ -45,7 +45,20 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
   // highlight matches on the page
   if (query && mainEl) {
     // perform any highlighting
-    highlight(escapeRegExp(query), mainEl);
+    highlight(query, mainEl);
+
+    // Activate tabs on pageshow — after tabsets.js restores localStorage state.
+    // tabsets.js registers its pageshow handler during module execution (before
+    // DOMContentLoaded). By registering ours during DOMContentLoaded, listener
+    // ordering guarantees we run after tabsets.js — so search activation wins.
+    window.addEventListener("pageshow", function (event) {
+      if (!event.persisted) {
+        for (const mark of mainEl.querySelectorAll("mark")) {
+          openAllTabsetsContainingEl(mark);
+        }
+        requestAnimationFrame(() => scrollToFirstVisibleMatch(mainEl));
+      }
+    }, { once: true });
 
     // fix up the URL to remove the q query param
     const replacementUrl = new URL(window.location);
@@ -62,18 +75,6 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
       highlighting = false;
     }
   };
-
-  // Clear search highlighting when the user scrolls sufficiently
-  const resetFn = () => {
-    resetHighlighting("");
-    window.removeEventListener("quarto-hrChanged", resetFn);
-    window.removeEventListener("quarto-sectionChanged", resetFn);
-  };
-
-  // Register this event after the initial scrolling and settling of events
-  // on the page
-  window.addEventListener("quarto-hrChanged", resetFn);
-  window.addEventListener("quarto-sectionChanged", resetFn);
 
   // Responsively switch to overlay mode if the search is present on the navbar
   // Note that switching the sidebar to overlay mode requires more coordinate (not just
@@ -189,8 +190,8 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
                     title: isExpanded
                       ? language["search-hide-matches-text"]
                       : remainingCount === 1
-                      ? `${remainingCount} ${language["search-more-match-text"]}`
-                      : `${remainingCount} ${language["search-more-matches-text"]}`,
+                        ? `${remainingCount} ${language["search-more-match-text"]}`
+                        : `${remainingCount} ${language["search-more-matches-text"]}`,
                     type: kItemTypeMore,
                     href: kItemTypeMoreHref,
                   });
@@ -308,9 +309,8 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
               return createElement(
                 "div",
                 {
-                  class: `quarto-search-no-results${
-                    hasQuery ? "" : " no-query"
-                  }`,
+                  class: `quarto-search-no-results${hasQuery ? "" : " no-query"
+                    }`,
                 },
                 language["search-no-results-text"]
               );
@@ -356,22 +356,12 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
             },
 
             item({ item, createElement }) {
-              // process items to include text fragments as they are rendered
-              if (item.text && item.href && !item.href.includes(':~:text=')) {
-                // e.g. `item.text` for a search "def fiz": "bla bla bla<mark class='search-match'>def fiz</mark> bla bla"
-                const fullMatches = item.text.matchAll(/<mark class='search-match'>(.*?)<\/mark>/g)
-                // extract capture group with the search match
-                // result e.g. ["def fiz"]
-                const searchMatches = [...fullMatches].map(match => match[1])
-                if (searchMatches[0]) {
-                  if (item.href.includes('#')) {
-                    item.href += ':~:text=' + encodeURIComponent(searchMatches[0])
-                  } else {
-                    item.href += '#:~:text=' + encodeURIComponent(searchMatches[0])
-                  }
-                }
+              if (item.text && item.href && !item.href.includes('?q=')) {
+                const [main, hash] = item.href.split('#')
+                const hashAppend = hash ? '#' + hash : ''
+                item.href = main + '?q=' + encodeURIComponent(state.query) + hashAppend
               }
-              
+
               return renderItem(
                 item,
                 createElement,
@@ -1120,57 +1110,200 @@ function clearHighlight(searchterm, el) {
   }
 }
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+/** Get all html nodes under the given `root` that don't have children. */
+function getLeafNodes(root) {
+  let leaves = [];
+
+  function traverse(node) {
+    if (node.childNodes.length === 0) {
+      leaves.push(node);
+    } else {
+      node.childNodes.forEach(traverse);
+    }
+  }
+
+  traverse(root);
+  return leaves;
+}
+/** create and return `<mark>${txt}</mark>` */
+const markEl = txt => {
+  const el = document.createElement("mark");
+  el.appendChild(document.createTextNode(txt));
+  return el
+}
+/** get all ancestors of an element matching the given css selector */
+const matchAncestors = (el, selector) => {
+  let ancestors = [];
+  while (el) {
+    if (el.matches?.(selector)) ancestors.push(el);
+    el = el.parentNode;
+  }
+  return ancestors;
+};
+
+const isWhitespace = s => s.trim().length === 0
+// =================
+// MATCHING CODE
+// =================
+const initMatch = () => ({
+  i: 0,
+  lohisByNode: new Map()
+})
+/** 
+ * keeps track of the start (lo) and end (hi) index of the match per node (leaf)
+ * note: mutates the contents of `matchContext`
+ */
+const advanceMatch = (leaf, leafi, matchContext) => {
+  matchContext.i++
+
+  const curLoHi = matchContext.lohisByNode.get(leaf)
+
+  matchContext.lohisByNode.set(leaf, { lo: curLoHi?.lo ?? leafi, hi: leafi })
+}
+/**
+ * Finds all non-overlapping matches for a search string in the document. 
+ * The search string may be split between multiple consecutive leaf nodes.
+ * 
+ * Whitespace in the search string must be present in the document to match, but
+ * there may be addititional whitespace in the document that is ignored.
+ * 
+ * e.g. searching for `dogs rock` would match `dogs  \n <span> rock</span>`,
+ * and would contribute the match 
+ * `{ i:9, els: new Map([[textNode, {lo:0, hi:8}],[spanNode,{lo:0,hi:5}]]) }`
+ * 
+ * @returns {Map<HTMLElement,{lo:number,hi:number}>[]}
+ */
+function searchMatches(inSearch, el) {
+  // searchText has all sequences of whitespace replaced by a single space
+  const searchText = inSearch.toLowerCase().replace(/\s+/g, ' ')
+  const leafNodes = getLeafNodes(el)
+
+  /** @type {Map<HTMLElement,{lo:number,hi:number}>[]} */
+  const matches = []
+  /** @type {{i:number; els:Map<HTMLElement,{lo:number,hi:number}>}[]} */
+  let curMatchContext = initMatch()
+
+  for (const leaf of leafNodes) {
+    const leafStr = leaf.textContent.toLowerCase()
+    // for each character in this leaf's text:
+    for (let leafi = 0; leafi < leafStr.length; leafi++) {
+
+      if (isWhitespace(leafStr[leafi])) {
+        // if there is at least one whitespace in the document
+        // we advance over a search text whitespace.
+        if (isWhitespace(searchText[curMatchContext.i])) advanceMatch(leaf, leafi, curMatchContext)
+        // all sequences of whitespace are otherwise ignored.
+      } else {
+        if (searchText[curMatchContext.i] === leafStr[leafi]) {
+          advanceMatch(leaf, leafi, curMatchContext)
+        } else {
+          curMatchContext = initMatch()
+          // if current character in the document did not match at i in the search text,
+          // reset the search and see if that character matches at 0 in the search text.
+          if (searchText[curMatchContext.i] === leafStr[leafi]) advanceMatch(leaf, leafi, curMatchContext)
+        }
+      }
+
+      const isMatchComplete = curMatchContext.i === searchText.length
+      if (isMatchComplete) {
+        matches.push(curMatchContext.lohisByNode)
+        curMatchContext = initMatch()
+      }
+    }
+  }
+
+  return matches
 }
 
-// highlight matches
-function highlight(term, el) {
-  const termRegex = new RegExp(term, "ig");
-  const childNodes = el.childNodes;
+/** 
+ * e.g. `markMatches(myTextNode, [[0,5],[12,15]])` would wrap the
+ * character sequences in myTextNode from 0-5 and 12-15 in marks.
+ * Its important to mark all sequences in a text node at once
+ * because this function replaces the entire text node; so any
+ * other references to that text node will no longer be in the DOM.
+ */
+function markMatches(node, lohis) {
+  const text = node.nodeValue
 
-  // walk back to front avoid mutating elements in front of us
-  for (let i = childNodes.length - 1; i >= 0; i--) {
-    const node = childNodes[i];
+  const markFragment = document.createDocumentFragment();
 
-    if (node.nodeType === Node.TEXT_NODE) {
-      // Search text nodes for text to highlight
-      const text = node.nodeValue;
+  let prevHi = 0
+  for (const [lo, hi] of lohis) {
+    markFragment.append(
+      document.createTextNode(text.slice(prevHi, lo)),
+      markEl(text.slice(lo, hi + 1))
+    )
+    prevHi = hi + 1
+  }
+  markFragment.append(
+    document.createTextNode(text.slice(prevHi, text.length))
+  )
 
-      let startIndex = 0;
-      let matchIndex = text.search(termRegex);
-      if (matchIndex > -1) {
-        const markFragment = document.createDocumentFragment();
-        while (matchIndex > -1) {
-          const prefix = text.slice(startIndex, matchIndex);
-          markFragment.appendChild(document.createTextNode(prefix));
+  const parent = node.parentElement
+  parent?.replaceChild(markFragment, node)
+  return parent
+}
 
-          const mark = document.createElement("mark");
-          mark.appendChild(
-            document.createTextNode(
-              text.slice(matchIndex, matchIndex + term.length)
-            )
-          );
-          markFragment.appendChild(mark);
+// Activate ancestor tabs so a search match inside an inactive pane becomes visible.
+// When multiple panes in the same tabset contain matches, avoid switching away from
+// the currently active pane — the user already sees a match there.
+function openAllTabsetsContainingEl(el) {
+  for (const pane of matchAncestors(el, '.tab-pane')) {
+    const tabContent = pane.closest('.tab-content');
+    if (!tabContent) continue;
+    const activePane = tabContent.querySelector(':scope > .tab-pane.active');
+    if (activePane?.querySelector('mark')) continue;
+    const tabButton = document.querySelector(`[data-bs-target="#${pane.id}"]`);
+    if (tabButton) new bootstrap.Tab(tabButton).show();
+  }
+}
 
-          startIndex = matchIndex + term.length;
-          matchIndex = text.slice(startIndex).search(new RegExp(term, "ig"));
-          if (matchIndex > -1) {
-            matchIndex = startIndex + matchIndex;
-          }
-        }
-        if (startIndex < text.length) {
-          markFragment.appendChild(
-            document.createTextNode(text.slice(startIndex, text.length))
-          );
-        }
-
-        el.replaceChild(markFragment, node);
-      }
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      // recurse through elements
-      highlight(term, node);
+function scrollToFirstVisibleMatch(mainEl) {
+  for (const mark of mainEl.querySelectorAll("mark")) {
+    const isMarkVisible = matchAncestors(mark, '.tab-pane').every(markTabPane =>
+      markTabPane.classList.contains("active")
+    )
+    if (isMarkVisible) {
+      mark.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
     }
+  }
+}
+
+/**
+ * e.g.
+ * ```js
+ * const m = new Map()
+ *
+ * arrayMapPush(m, 'dog', 'Max')
+ * console.log(m) // Map { dog->['Max'] }
+ * 
+ * arrayMapPush(m, 'dog', 'Samba')
+ * arrayMapPush(m, 'cat', 'Scruffle')
+ * console.log(m) // Map { dog->['Max', 'Samba'], cat->['Scruffle'] }
+ * ```
+ */
+const arrayMapPush = (map, key, item) => {
+  if (!map.has(key)) map.set(key, [])
+  map.set(key, [...map.get(key), item])
+}
+
+// copy&paste any string from a quarto page and
+// this should find that string in the page and highlight it.
+// exception: text that starts outside/inside a tabset and ends
+// inside/outside that tabset. 
+function highlight(searchStr, el) {
+  const matches = searchMatches(searchStr, el);
+
+  const matchesGroupedByNode = new Map()
+  for (const match of matches) {
+    for (const [mel, { lo, hi }] of match) {
+      arrayMapPush(matchesGroupedByNode, mel, [lo, hi])
+    }
+  }
+
+  for (const [node, lohis] of matchesGroupedByNode) {
+    markMatches(node, lohis)
   }
 }
 
