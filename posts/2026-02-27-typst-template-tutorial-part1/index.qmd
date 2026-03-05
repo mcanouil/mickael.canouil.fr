@@ -121,7 +121,7 @@ In this tutorial, you will learn the architectural patterns that enable rich, in
 ::: {.callout-note}
 
 This is **Part 1** of a two-part series.
-This part covers the foundational concepts; Part 2 explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.
+This part covers the foundational concepts; [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.
 
 The examples here are generic, but the ['mcanouil' Quarto extension](https://github.com/mcanouil/quarto-mcanouil) demonstrates these patterns in a production context.
 
@@ -287,7 +287,7 @@ $body$
 ::: {.highlight}
 
 Production extensions like [quarto-mcanouil](https://github.com/mcanouil/quarto-mcanouil) use more elaborate structures with shared modules and component libraries.
-Part 2 covers those architectural patterns.
+[Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) covers those architectural patterns.
 
 :::
 
@@ -411,7 +411,7 @@ The Lua filter checks if a span has the `badge` class, extracts its content and 
 The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings.
 Typst syntax distinguishes strings (`"hello"`), numbers (`42`), and keywords (`none`, `true`); passing the wrong form produces a syntax error.
 The `wrapper.lua` module includes a minimal `typst_value` helper that handles these common cases: string pass-through for Typst keywords (`"none"`, `"true"`, `"false"`), passing Lua numbers as bare values (so `42` becomes `42` in Typst, not `"42"`), and wrapping everything else in quotes.
-Part 2 replaces this with a more robust implementation that also handles actual Lua booleans, `nil`, and Typst measurement units like `1em` or `2.5pt`.
+[Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) replaces this with a more robust implementation that also handles actual Lua booleans, `nil`, and Typst measurement units like `1em` or `2.5pt`.
 
 This handler also does not escape Typst special characters in `content`.
 Badge labels containing `[`, `]`, or `#` would produce broken Typst syntax because Typst interprets those characters as markup inside `[...]` content blocks.
@@ -691,8 +691,8 @@ On the Typst side, the panel function receives the attributes and content:
 ```
 
 1. First positional parameter receives the wrapped content from the Lua filter.
-2. Empty dictionary `(:)` as default; the parameter is declared now to keep the function signature stable, so Part 2 can add colour-aware logic without changing any call sites. The wrapper function in `typst-show.typ` injects the actual colour scheme, but this simplified Part 1 version of `get-panel-colours` ignores it.
-3. Returns a [dictionary](https://typst.app/docs/reference/foundations/dictionary/) with background, border, title, and content colours based purely on the `style` name; Part 2 upgrades this to also use the injected `colours` for theme-aware text.
+2. Empty dictionary `(:)` as default; the parameter is declared now to keep the function signature stable, so [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) can add colour-aware logic without changing any call sites. The wrapper function in `typst-show.typ` injects the actual colour scheme, but this simplified Part 1 version of `get-panel-colours` ignores it.
+3. Returns a [dictionary](https://typst.app/docs/reference/foundations/dictionary/) with background, border, title, and content colours based purely on the `style` name; [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) upgrades this to also use the injected `colours` for theme-aware text.
 4. Conditional returns `none` if title is empty; Typst's `if` is an expression.
 5. [`block`](https://typst.app/docs/reference/layout/block/) creates a block-level container with styling.
 6. `breakable: false` prevents the panel from splitting across page breaks.
@@ -780,7 +780,7 @@ end
 2. `wrapper.lua` is required at the top level; Lua caches the module, so every filter function shares the same instance.
 3. `Span` is the Pandoc filter hook; Pandoc calls it for every span in the document.
 4. `Div` is the Pandoc filter hook for block-level divs; both hooks are defined in the same file.
-5. The `config` table matches the shape used in Part 2's configuration system: `wrapper` is the Typst function name, `arguments = true` ensures the parameter list is always generated.
+5. The `config` table matches the shape used in [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/)'s configuration system: `wrapper` is the Typst function name, `arguments = true` ensures the parameter list is always generated.
 
 ::: {layout-ncol="2"}
 ```{.markdown include="assets/_example.qmd" filename="example.qmd"}
@@ -822,7 +822,7 @@ For block elements like panels, Lua wraps the content with opening and closing T
 
 ### What Comes Next
 
-Part 2 builds on these foundations with advanced patterns:
+[Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) builds on these foundations with advanced patterns:
 
 - Handler factories for reducing repetitive code.
 - Configuration systems for user-extensible mappings.
@@ -838,3 +838,4 @@ Part 2 builds on these foundations with advanced patterns:
 - [Typst Documentation](https://typst.app/docs/).
 - [`mcanouil` Extension](https://github.com/mcanouil/quarto-mcanouil).
 - [R for the Rest of Us: Typst + Quarto](https://rfortherestofus.com/2025/11/quarto-typst-pdf).
+- [Part 2: Advanced Patterns](/posts/2026-03-05-typst-template-tutorial-part2/)
