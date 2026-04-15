@@ -81,9 +81,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-24649735e795dc3a70be0dee6eaf66ae.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-726462fba7d7258a8e8d21881907e501.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-6b304afdc9dcc619919107286cd6a9a0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-726462fba7d7258a8e8d21881907e501.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7e2db4a5feb5af19f63f0e64954b587e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9da54fef802fae159881960d8fb357d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-7e2db4a5feb5af19f63f0e64954b587e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -147,18 +147,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta property="og:title" content="Branded Figures and Tables in R and Python with Quarto – Mickaël CANOUIL">
 <meta property="og:description" content="Style ggplot2, plotnine, gt, and great_tables outputs using Quarto’s brand feature by reading brand configuration from the QUARTO_EXECUTE_INFO environment variable at render time.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-04-15-quarto-brand-figures-tables/featured.gif">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-04-15-quarto-brand-figures-tables/featured.png">
 <meta property="og:site_name" content="Mickaël CANOUIL">
-<meta property="og:image:alt" content="Animated feature image cycling through six brand configurations, each showing
-branded scatter plots and tables in light and dark modes using Quarto's brand
-feature with ggplot2 and gt in R.
+<meta property="og:image:height" content="1313">
+<meta property="og:image:width" content="2500">
+<meta property="og:image:alt" content="Workflow diagram showing how Quarto's brand feature feeds code-generated
+outputs: quarto render sets QUARTO_EXECUTE_INFO, parsed by get_brand_info(),
+which feeds configure_brand_fonts(), theme_brand(), and gt_brand() to produce
+light and dark figures and tables. The Quarto logo appears in the top right.
 ">
 <meta name="twitter:title" content="Branded Figures and Tables in R and Python with Quarto – Mickaël CANOUIL">
 <meta name="twitter:description" content="Style ggplot2, plotnine, gt, and great_tables outputs using Quarto’s brand feature by reading brand configuration from the QUARTO_EXECUTE_INFO environment variable at render time.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-04-15-quarto-brand-figures-tables/featured.gif">
-<meta name="twitter:image:alt" content="Animated feature image cycling through six brand configurations, each showing
-branded scatter plots and tables in light and dark modes using Quarto's brand
-feature with ggplot2 and gt in R.
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-04-15-quarto-brand-figures-tables/featured.png">
+<meta name="twitter:image-height" content="1313">
+<meta name="twitter:image-width" content="2500">
+<meta name="twitter:image:alt" content="Workflow diagram showing how Quarto's brand feature feeds code-generated
+outputs: quarto render sets QUARTO_EXECUTE_INFO, parsed by get_brand_info(),
+which feeds configure_brand_fonts(), theme_brand(), and gt_brand() to produce
+light and dark figures and tables. The Quarto logo appears in the top right.
 ">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -448,15 +454,16 @@ feature with ggplot2 and gt in R.
   <li><a href="#the-quarto_execute_info-approach" id="toc-the-quarto_execute_info-approach" class="nav-link" data-scroll-target="#the-quarto_execute_info-approach"><span class="header-section-number">2</span> The <code>QUARTO_EXECUTE_INFO</code> Approach</a></li>
   <li><a href="#brand-data-structure" id="toc-brand-data-structure" class="nav-link" data-scroll-target="#brand-data-structure"><span class="header-section-number">3</span> Brand Data Structure</a></li>
   <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies"><span class="header-section-number">4</span> Dependencies</a></li>
-  <li><a href="#branded-figures" id="toc-branded-figures" class="nav-link" data-scroll-target="#branded-figures"><span class="header-section-number">5</span> Branded Figures</a>
+  <li><a href="#font-registration" id="toc-font-registration" class="nav-link" data-scroll-target="#font-registration"><span class="header-section-number">5</span> Font Registration</a></li>
+  <li><a href="#branded-figures" id="toc-branded-figures" class="nav-link" data-scroll-target="#branded-figures"><span class="header-section-number">6</span> Branded Figures</a>
   <ul class="collapse">
-  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage"><span class="header-section-number">5.1</span> Usage</a></li>
+  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage"><span class="header-section-number">6.1</span> Usage</a></li>
   </ul></li>
-  <li><a href="#branded-tables" id="toc-branded-tables" class="nav-link" data-scroll-target="#branded-tables"><span class="header-section-number">6</span> Branded Tables</a></li>
-  <li><a href="#font-registration" id="toc-font-registration" class="nav-link" data-scroll-target="#font-registration"><span class="header-section-number">7</span> Font Registration</a></li>
+  <li><a href="#branded-tables" id="toc-branded-tables" class="nav-link" data-scroll-target="#branded-tables"><span class="header-section-number">7</span> Branded Tables</a></li>
   <li><a href="#light-and-dark-mode" id="toc-light-and-dark-mode" class="nav-link" data-scroll-target="#light-and-dark-mode"><span class="header-section-number">8</span> Light and Dark Mode</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">9</span> Conclusion</a></li>
-  <li><a href="#further-resources" id="toc-further-resources" class="nav-link" data-scroll-target="#further-resources"><span class="header-section-number">10</span> Further Resources</a></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together"><span class="header-section-number">9</span> Putting It All Together</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">10</span> Conclusion</a></li>
+  <li><a href="#further-resources" id="toc-further-resources" class="nav-link" data-scroll-target="#further-resources"><span class="header-section-number">11</span> Further Resources</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-04-15-quarto-brand-figures-tables/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -470,9 +477,11 @@ feature with ggplot2 and gt in R.
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.gif" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Animated feature image cycling through six brand configurations, each
-showing branded scatter plots and tables in light and dark modes using
-Quarto's brand feature with ggplot2 and gt in R.
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Workflow diagram showing how Quarto's brand feature feeds code-generated
+outputs: quarto render sets QUARTO_EXECUTE_INFO, parsed by
+get_brand_info(), which feeds configure_brand_fonts(), theme_brand(),
+and gt_brand() to produce light and dark figures and tables. The Quarto
+logo appears in the top right.
 " width="600"></a></p>
 </figure>
 </div>
@@ -489,28 +498,81 @@ Quarto's brand feature with ggplot2 and gt in R.
 <p>This post was written and tested with <strong>Quarto CLI 1.9.37</strong>. Some APIs or behaviours may differ in earlier stable releases.</p>
 </div>
 </div>
+<p>Quarto’s <code>brand</code> feature is a convenient way to keep a document’s look consistent across formats: define your colours, fonts, and logos once in a <code>_brand.yml</code> file, and everything from the navbar to the code blocks picks them up automatically. Code-generated outputs, however, are a different story. A <code>ggplot2</code> scatter plot or a <code>gt</code> summary table will cheerfully ignore your brand and render with their own defaults. This post walks through one approach to close that gap: reading the resolved brand configuration at render time and applying it to every figure and table your code produces.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>TL;DR
+<span class="screen-reader-only">Tip</span>Key Principles
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Quarto’s <code>brand</code> feature themes your document automatically, but code-generated figures and tables need explicit styling. This post shows how to read brand colours, fonts, and palettes from the <code>QUARTO_EXECUTE_INFO</code> environment variable at render time, then apply them to:</p>
 <ul>
-<li><code>ggplot2</code> and <code>plotnine</code> figures via a custom <code>theme_brand()</code> function.</li>
-<li><code>gt</code> and <code>great_tables</code> tables via a custom <code>gt_brand()</code> function.</li>
+<li>Quarto sets <code>QUARTO_EXECUTE_INFO</code> for every code cell; parse it for brand colours, fonts, and palettes.</li>
+<li>Register web fonts before any plotting; graphics devices do not see brand-defined fonts by default.</li>
+<li>Wrap the styling logic in <code>theme_brand()</code> (figures) and <code>gt_brand()</code> (tables) so every output inherits brand values.</li>
+<li>Use <code>renderings: [light, dark]</code> and <code>.light-content</code>/<code>.dark-content</code> to match the reader’s selected theme automatically.</li>
+<li>The companion repository <a href="https://github.com/mcanouil/quarto-brand-renderings">mcanouil/quarto-brand-renderings</a> has production-ready implementations with full error handling.</li>
 </ul>
-<p>The companion repository <a href="https://github.com/mcanouil/quarto-brand-renderings">mcanouil/quarto-brand-renderings</a> contains six complete brand configurations with parallel R and Python implementations.</p>
 </div>
 </div>
 <section id="the-problem" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="the-problem"><span class="header-section-number">1</span> The Problem</h2>
-<p>Quarto’s <code>brand</code> feature lets you define colours, fonts, and logos in a single configuration. The document theme, navbar, sidebar, and code blocks all pick up these values automatically.</p>
-<p>Code-generated figures and tables, however, do not. A <code>ggplot2</code> scatter plot or a gt summary table will use their default styling regardless of what your brand specifies. The goal is to make every visual output match the document’s brand without hardcoding hex values or font names.</p>
+<p>The goal is to make every visual output match the document’s brand without hardcoding hex values or font names. Here is what branded outputs look like across six different brand configurations, each with light and dark variants:</p>
+<style>
+#branded-carousel .carousel-control-prev-icon,
+#branded-carousel .carousel-control-next-icon {
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6)) drop-shadow(0 0 1px rgba(0,0,0,0.8));
+}
+#branded-carousel .carousel-indicators button {
+  box-shadow: 0 0 4px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.8);
+}
+#branded-carousel {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+</style>
+<div id="branded-carousel" class="carousel slide" data-bs-ride="carousel">
+  <!-- <div class="carousel-indicators">
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Brand 1"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="1" aria-label="Brand 2"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="2" aria-label="Brand 3"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="3" aria-label="Brand 4"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="4" aria-label="Brand 5"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="5" aria-label="Brand 6"></button>
+  </div> -->
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="assets/_featured-brand-1.png" class="d-block w-100" alt="Brand 1 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-2.png" class="d-block w-100" alt="Brand 2 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-3.png" class="d-block w-100" alt="Brand 3 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-4.png" class="d-block w-100" alt="Brand 4 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-5.png" class="d-block w-100" alt="Brand 5 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-6.png" class="d-block w-100" alt="Brand 6 featured image showing light and dark mode branded figures and tables.">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#branded-carousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#branded-carousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -530,9 +592,9 @@ Quarto's brand feature with ggplot2 and gt in R.
 <p>When Quarto renders a document, it sets the <code>QUARTO_EXECUTE_INFO</code> environment variable for every code cell. This variable points to a JSON file containing document metadata, format settings, and, crucially, the resolved brand configuration.</p>
 <p>The brand data lives at <code>format.render.brand</code> in the JSON, with separate entries for each colour mode (<code>light</code>, <code>dark</code>). Reading it requires only a JSON parser.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div id="tabset-1-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-4" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a>get_brand_info <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-4-2" class="code-annotation-target"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>  jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(</span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Sys.getenv</span>(<span class="st">"QUARTO_EXECUTE_INFO"</span>, <span class="at">unset =</span> <span class="st">""</span>)</span>
@@ -587,9 +649,9 @@ Quarto's brand feature with ggplot2 and gt in R.
 <div class="callout-body-container callout-body">
 <p>During development, print the full JSON to see what is available:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div id="tabset-2-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="r"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>info <span class="ot">&lt;-</span> <span class="fu">get_brand_info</span>()</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(jsonlite<span class="sc">::</span><span class="fu">toJSON</span>(info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]], <span class="at">pretty =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -638,14 +700,52 @@ Quarto's brand feature with ggplot2 and gt in R.
 <li><code>typography.base</code> / <code>typography.headings</code>: font family names.</li>
 <li><code>typography.fonts</code>: font specifications including source (<code>bunny</code>, <code>google</code>, <code>file</code>, or <code>system</code>).</li>
 </ul>
+<p>The diagrams below summarise how each helper function fits into the rendering pipeline.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
+<div class="tab-content" data-group="language">
+<div id="tabset-3-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div id="fig-workflow-r" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-workflow-r-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="../../.quarto/typst-render/index/typst-fig-workflow-r-db8c222c1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: R workflow for branded figures and tables."><img src="../../.quarto/typst-render/index/typst-fig-workflow-r-db8c222c1.png" class="img-fluid w-75 mx-auto d-block quarto-figure quarto-figure-center figure-img"></a></p>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-workflow-r-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: R workflow for branded figures and tables.
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div id="fig-workflow-py" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-workflow-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="../../.quarto/typst-render/index/typst-fig-workflow-py-62cf0def1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;2: Python workflow for branded figures and tables."><img src="../../.quarto/typst-render/index/typst-fig-workflow-py-62cf0def1.png" class="img-fluid w-75 mx-auto d-block quarto-figure quarto-figure-center figure-img"></a></p>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-workflow-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Python workflow for branded figures and tables.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="dependencies" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="dependencies"><span class="header-section-number">4</span> Dependencies</h2>
 <p>This approach relies on a handful of packages for each language.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div id="tabset-4-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <ul>
 <li><a href="https://cran.r-project.org/package=jsonlite"><code>jsonlite</code></a>: parse the <code>QUARTO_EXECUTE_INFO</code> JSON.</li>
 <li><a href="https://ggplot2.tidyverse.org/"><code>ggplot2</code></a>: the <code>ink</code>, <code>paper</code>, <code>accent</code>, and <code>palette.*</code> theme elements used by <code>theme_brand()</code> are not yet on CRAN.</li>
@@ -654,81 +754,200 @@ Quarto's brand feature with ggplot2 and gt in R.
 <li><a href="https://systemfonts.r-lib.org/"><code>systemfonts</code></a>: font discovery, registration, and web font embedding for SVG output.</li>
 </ul>
 </div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <ul>
 <li><a href="https://plotnine.org/"><code>plotnine</code></a>: <code>ggplot2</code>-style plotting.</li>
 <li><a href="https://posit-dev.github.io/great-tables/"><code>great_tables</code></a>: table styling.</li>
 <li><a href="https://pola.rs/"><code>polars</code></a>: data manipulation.</li>
-<li><a href="https://github.com/y-sunflower/pyfonts"><code>pyfonts</code></a>: font loading from Bunny Fonts and Google Fonts, created by Joseph Barbier. The companion repository uses a development version of <code>pyfonts</code> for improved font subset selection.</li>
+<li><a href="https://github.com/y-sunflower/pyfonts"><code>pyfonts</code></a>: font loading from Bunny Fonts and Google Fonts, created by <a href="https://github.com/JosephBARBIERDARNAL">Joseph Barbier</a>. The companion repository uses a development version of <code>pyfonts</code> for improved font subset selection.</li>
 </ul>
 </div>
 </div>
 </div>
 </section>
-<section id="branded-figures" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="branded-figures"><span class="header-section-number">5</span> Branded Figures</h2>
-<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand data and builds a complete <code>ggplot2</code> or plotnine theme.</p>
+<section id="font-registration" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="font-registration"><span class="header-section-number">5</span> Font Registration</h2>
+<p>Web fonts defined in a brand configuration are not available to R or Python graphics devices by default. Before creating any plots or tables, a <code>configure_brand_fonts()</code> function registers each font so that graphics devices can find them. Call it once in a setup chunk at the top of your document.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-8" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a>theme_brand <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">base_size =</span> <span class="dv">11</span>, <span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
+<div id="tabset-5-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<p>The <code>systemfonts</code> package handles font discovery and registration.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-8" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a>configure_brand_fonts <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
 <span id="annotated-cell-8-2"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a>  info <span class="ot">&lt;-</span> <span class="fu">get_brand_info</span>()</span>
 <span id="annotated-cell-8-3"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a>  brand <span class="ot">&lt;-</span> info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]]</span>
-<span id="annotated-cell-8-4"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a>  brand_data <span class="ot">&lt;-</span> brand[[brand_mode]][[<span class="st">"data"</span>]]</span>
-<span id="annotated-cell-8-5"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a>  colors <span class="ot">&lt;-</span> brand_data[[<span class="st">"color"</span>]]</span>
-<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>  typography <span class="ot">&lt;-</span> brand_data[[<span class="st">"typography"</span>]]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-7" class="code-annotation-target"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a>  palette_values <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">unlist</span>(colors[[<span class="st">"palette"</span>]]))</span>
-<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-8-9" class="code-annotation-target"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a>  ink <span class="ot">&lt;-</span> colors[[<span class="st">"foreground"</span>]]</span>
-<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a>  paper <span class="ot">&lt;-</span> colors[[<span class="st">"background"</span>]]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-8-11" class="code-annotation-target"><a href="#annotated-cell-8-11" aria-hidden="true" tabindex="-1"></a>  accent <span class="ot">&lt;-</span> scales<span class="sc">::</span><span class="fu">col_mix</span>(ink, paper, <span class="at">amount =</span> <span class="fl">0.25</span>)</span>
-<span id="annotated-cell-8-12"><a href="#annotated-cell-8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-8-13"><a href="#annotated-cell-8-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_minimal</span>(</span>
-<span id="annotated-cell-8-14"><a href="#annotated-cell-8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">base_size =</span> base_size,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-8-15" class="code-annotation-target"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">base_family =</span> typography[[<span class="st">"base"</span>]],</span>
-<span id="annotated-cell-8-16"><a href="#annotated-cell-8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">header_family =</span> typography[[<span class="st">"headings"</span>]],</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-8-17" class="code-annotation-target"><a href="#annotated-cell-8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">ink =</span> ink,</span>
-<span id="annotated-cell-8-18"><a href="#annotated-cell-8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">paper =</span> paper,</span>
-<span id="annotated-cell-8-19"><a href="#annotated-cell-8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">accent =</span> accent</span>
-<span id="annotated-cell-8-20"><a href="#annotated-cell-8-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="annotated-cell-8-21"><a href="#annotated-cell-8-21" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
-<span id="annotated-cell-8-22"><a href="#annotated-cell-8-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(</span>
-<span id="annotated-cell-8-23"><a href="#annotated-cell-8-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">colour =</span> accent,</span>
-<span id="annotated-cell-8-24"><a href="#annotated-cell-8-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> ggplot2<span class="sc">::</span><span class="fu">rel</span>(<span class="dv">2</span>)</span>
-<span id="annotated-cell-8-25"><a href="#annotated-cell-8-25" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-8-26" class="code-annotation-target"><a href="#annotated-cell-8-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette.colour.discrete =</span> palette_values,</span>
-<span id="annotated-cell-8-27"><a href="#annotated-cell-8-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette.fill.discrete =</span> palette_values</span>
-<span id="annotated-cell-8-28"><a href="#annotated-cell-8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="annotated-cell-8-29"><a href="#annotated-cell-8-29" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-4" class="code-annotation-target"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a>  doc_dir <span class="ot">&lt;-</span> <span class="fu">dirname</span>(info[[<span class="st">"document-path"</span>]])</span>
+<span id="annotated-cell-8-5"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (mode <span class="cf">in</span> <span class="fu">intersect</span>(<span class="fu">c</span>(<span class="st">"light"</span>, <span class="st">"dark"</span>), <span class="fu">names</span>(brand))) {</span>
+<span id="annotated-cell-8-7"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a>    fonts <span class="ot">&lt;-</span> brand[[mode]][[<span class="st">"data"</span>]][[<span class="st">"typography"</span>]][[<span class="st">"fonts"</span>]]</span>
+<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (ifont <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(fonts))) {</span>
+<span id="annotated-cell-8-9"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a>      family <span class="ot">&lt;-</span> fonts[[<span class="st">"family"</span>]][[ifont]]</span>
+<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a>      source <span class="ot">&lt;-</span> fonts[[<span class="st">"source"</span>]][[ifont]]</span>
+<span id="annotated-cell-8-11"><a href="#annotated-cell-8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-12"><a href="#annotated-cell-8-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">identical</span>(source, <span class="st">"file"</span>)) {</span>
+<span id="annotated-cell-8-13"><a href="#annotated-cell-8-13" aria-hidden="true" tabindex="-1"></a>        files <span class="ot">&lt;-</span> fonts[[<span class="st">"files"</span>]][[ifont]]</span>
+<span id="annotated-cell-8-14"><a href="#annotated-cell-8-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (fp <span class="cf">in</span> <span class="fu">as.character</span>(files[[<span class="st">"path"</span>]])) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-8-15" class="code-annotation-target"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a>          resolved <span class="ot">&lt;-</span> <span class="fu">file.path</span>(doc_dir, fp)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-8-16" class="code-annotation-target"><a href="#annotated-cell-8-16" aria-hidden="true" tabindex="-1"></a>          systemfonts<span class="sc">::</span><span class="fu">register_font</span>(family, <span class="at">plain =</span> resolved)</span>
+<span id="annotated-cell-8-17"><a href="#annotated-cell-8-17" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="annotated-cell-8-18"><a href="#annotated-cell-8-18" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-8-19" class="code-annotation-target"><a href="#annotated-cell-8-19" aria-hidden="true" tabindex="-1"></a>        systemfonts<span class="sc">::</span><span class="fu">require_font</span>(family, <span class="at">repositories =</span> <span class="st">"Bunny Fonts"</span>)</span>
+<span id="annotated-cell-8-20"><a href="#annotated-cell-8-20" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="annotated-cell-8-21"><a href="#annotated-cell-8-21" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-8-22"><a href="#annotated-cell-8-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-8-23" class="code-annotation-target"><a href="#annotated-cell-8-23" aria-hidden="true" tabindex="-1"></a>  systemfonts<span class="sc">::</span><span class="fu">reset_font_cache</span>()</span>
+<span id="annotated-cell-8-24"><a href="#annotated-cell-8-24" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="7" data-code-annotation="1">Flatten the named palette into a character vector.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="4" data-code-annotation="1">Resolve the document directory from <code>QUARTO_EXECUTE_INFO</code> for relative font paths.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="9,10" data-code-annotation="2">Extract foreground (ink) and background (paper) from the brand colours.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="15" data-code-annotation="2">Build the full path to each local font file.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="11" data-code-annotation="3">Blend ink and paper to create an accent colour for titles and axes.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="16" data-code-annotation="3">Register local font files with <code>systemfonts::register_font()</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="15,16" data-code-annotation="4">Apply brand fonts to body text and headings.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="19" data-code-annotation="4">Download web fonts from Bunny Fonts (or Google Fonts) with <code>systemfonts::require_font()</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="17,18,19" data-code-annotation="5">Pass ink, paper, and accent to <code>theme_minimal()</code>.</span>
-</dd>
-<dt data-target-cell="annotated-cell-8" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="26,27" data-code-annotation="6">Set the discrete colour palette for geoms.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="23" data-code-annotation="5">Reset the font cache so newly registered fonts become available.</span>
 </dd>
 </dl>
 </div>
-<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<p>The <code>matplotlib.font_manager</code> module handles font registration, with <code>pyfonts</code> for downloading web fonts.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-9" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.font_manager <span class="im">as</span> fm</span>
+<span id="annotated-cell-9-2"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyfonts</span>
+<span id="annotated-cell-9-3"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> configure_brand_fonts() <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
+<span id="annotated-cell-9-6"><a href="#annotated-cell-9-6" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-7" class="code-annotation-target"><a href="#annotated-cell-9-7" aria-hidden="true" tabindex="-1"></a>    doc_dir <span class="op">=</span> pathlib.Path(info[<span class="st">"document-path"</span>]).parent</span>
+<span id="annotated-cell-9-8"><a href="#annotated-cell-9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-9"><a href="#annotated-cell-9-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> mode <span class="kw">in</span> [<span class="st">"light"</span>, <span class="st">"dark"</span>]:</span>
+<span id="annotated-cell-9-10"><a href="#annotated-cell-9-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> mode <span class="kw">not</span> <span class="kw">in</span> brand:</span>
+<span id="annotated-cell-9-11"><a href="#annotated-cell-9-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="annotated-cell-9-12"><a href="#annotated-cell-9-12" aria-hidden="true" tabindex="-1"></a>        fonts <span class="op">=</span> brand[mode][<span class="st">"data"</span>][<span class="st">"typography"</span>][<span class="st">"fonts"</span>]</span>
+<span id="annotated-cell-9-13"><a href="#annotated-cell-9-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> font_spec <span class="kw">in</span> fonts:</span>
+<span id="annotated-cell-9-14"><a href="#annotated-cell-9-14" aria-hidden="true" tabindex="-1"></a>            family <span class="op">=</span> font_spec[<span class="st">"family"</span>]</span>
+<span id="annotated-cell-9-15"><a href="#annotated-cell-9-15" aria-hidden="true" tabindex="-1"></a>            source <span class="op">=</span> font_spec[<span class="st">"source"</span>]</span>
+<span id="annotated-cell-9-16"><a href="#annotated-cell-9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-17"><a href="#annotated-cell-9-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> source <span class="op">==</span> <span class="st">"file"</span>:</span>
+<span id="annotated-cell-9-18"><a href="#annotated-cell-9-18" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> f <span class="kw">in</span> font_spec.get(<span class="st">"files"</span>, []):</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-9-19" class="code-annotation-target"><a href="#annotated-cell-9-19" aria-hidden="true" tabindex="-1"></a>                    resolved <span class="op">=</span> doc_dir <span class="op">/</span> f[<span class="st">"path"</span>]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-9-20" class="code-annotation-target"><a href="#annotated-cell-9-20" aria-hidden="true" tabindex="-1"></a>                    fm.fontManager.addfont(<span class="bu">str</span>(resolved))</span>
+<span id="annotated-cell-9-21"><a href="#annotated-cell-9-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> source <span class="kw">in</span> (<span class="st">"bunny"</span>, <span class="st">"google"</span>):</span>
+<span id="annotated-cell-9-22"><a href="#annotated-cell-9-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> source <span class="op">==</span> <span class="st">"bunny"</span>:</span>
+<span id="annotated-cell-9-23"><a href="#annotated-cell-9-23" aria-hidden="true" tabindex="-1"></a>                    props <span class="op">=</span> pyfonts.load_bunny_font(family)</span>
+<span id="annotated-cell-9-24"><a href="#annotated-cell-9-24" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
+<span id="annotated-cell-9-25"><a href="#annotated-cell-9-25" aria-hidden="true" tabindex="-1"></a>                    props <span class="op">=</span> pyfonts.load_google_font(family)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-9-26" class="code-annotation-target"><a href="#annotated-cell-9-26" aria-hidden="true" tabindex="-1"></a>                fm.fontManager.addfont(props.get_file())</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="7" data-code-annotation="1">Resolve the document directory for relative font paths.</span>
+</dd>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="19" data-code-annotation="2">Build the full path to each local font file.</span>
+</dd>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="20" data-code-annotation="3">Register local font files with <code>matplotlib.font_manager</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="26" data-code-annotation="4">Download web fonts using <code>pyfonts</code> and register them.</span>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>SVG Font Rendering
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser: it cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
+<p>The companion repository includes an <code>inline-svglite.lua</code> Lua filter that replaces <code>&lt;img&gt;</code> references with raw SVG content automatically. See the <a href="https://github.com/mcanouil/quarto-brand-renderings">companion repository</a> for the full implementation.</p>
+</div>
+</div>
+</section>
+<section id="branded-figures" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="branded-figures"><span class="header-section-number">6</span> Branded Figures</h2>
+<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand data and builds a complete <code>ggplot2</code> or plotnine theme. The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor. In R, the latest <code>ggplot2</code> supports <code>ink</code>, <code>paper</code>, and <code>accent</code> parameters directly in <code>theme_minimal()</code>; in Python, each theme element is styled individually.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
+<div class="tab-content" data-group="language">
+<div id="tabset-6-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-10" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-10-1"><a href="#annotated-cell-10-1" aria-hidden="true" tabindex="-1"></a>theme_brand <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">base_size =</span> <span class="dv">11</span>, <span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
+<span id="annotated-cell-10-2"><a href="#annotated-cell-10-2" aria-hidden="true" tabindex="-1"></a>  info <span class="ot">&lt;-</span> <span class="fu">get_brand_info</span>()</span>
+<span id="annotated-cell-10-3"><a href="#annotated-cell-10-3" aria-hidden="true" tabindex="-1"></a>  brand <span class="ot">&lt;-</span> info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]]</span>
+<span id="annotated-cell-10-4"><a href="#annotated-cell-10-4" aria-hidden="true" tabindex="-1"></a>  brand_data <span class="ot">&lt;-</span> brand[[brand_mode]][[<span class="st">"data"</span>]]</span>
+<span id="annotated-cell-10-5"><a href="#annotated-cell-10-5" aria-hidden="true" tabindex="-1"></a>  colors <span class="ot">&lt;-</span> brand_data[[<span class="st">"color"</span>]]</span>
+<span id="annotated-cell-10-6"><a href="#annotated-cell-10-6" aria-hidden="true" tabindex="-1"></a>  typography <span class="ot">&lt;-</span> brand_data[[<span class="st">"typography"</span>]]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-10-7" class="code-annotation-target"><a href="#annotated-cell-10-7" aria-hidden="true" tabindex="-1"></a>  palette_values <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">unlist</span>(colors[[<span class="st">"palette"</span>]]))</span>
+<span id="annotated-cell-10-8"><a href="#annotated-cell-10-8" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-10-9" class="code-annotation-target"><a href="#annotated-cell-10-9" aria-hidden="true" tabindex="-1"></a>  ink <span class="ot">&lt;-</span> colors[[<span class="st">"foreground"</span>]]</span>
+<span id="annotated-cell-10-10"><a href="#annotated-cell-10-10" aria-hidden="true" tabindex="-1"></a>  paper <span class="ot">&lt;-</span> colors[[<span class="st">"background"</span>]]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-10-11" class="code-annotation-target"><a href="#annotated-cell-10-11" aria-hidden="true" tabindex="-1"></a>  accent <span class="ot">&lt;-</span> scales<span class="sc">::</span><span class="fu">col_mix</span>(ink, paper, <span class="at">amount =</span> <span class="fl">0.25</span>)</span>
+<span id="annotated-cell-10-12"><a href="#annotated-cell-10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-13"><a href="#annotated-cell-10-13" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme_minimal</span>(</span>
+<span id="annotated-cell-10-14"><a href="#annotated-cell-10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">base_size =</span> base_size,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-10-15" class="code-annotation-target"><a href="#annotated-cell-10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">base_family =</span> typography[[<span class="st">"base"</span>]],</span>
+<span id="annotated-cell-10-16"><a href="#annotated-cell-10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">header_family =</span> typography[[<span class="st">"headings"</span>]],</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-10-17" class="code-annotation-target"><a href="#annotated-cell-10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">ink =</span> ink,</span>
+<span id="annotated-cell-10-18"><a href="#annotated-cell-10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">paper =</span> paper,</span>
+<span id="annotated-cell-10-19"><a href="#annotated-cell-10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">accent =</span> accent</span>
+<span id="annotated-cell-10-20"><a href="#annotated-cell-10-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="annotated-cell-10-21"><a href="#annotated-cell-10-21" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(</span>
+<span id="annotated-cell-10-22"><a href="#annotated-cell-10-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(</span>
+<span id="annotated-cell-10-23"><a href="#annotated-cell-10-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">colour =</span> accent,</span>
+<span id="annotated-cell-10-24"><a href="#annotated-cell-10-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> ggplot2<span class="sc">::</span><span class="fu">rel</span>(<span class="dv">2</span>)</span>
+<span id="annotated-cell-10-25"><a href="#annotated-cell-10-25" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-10-26" class="code-annotation-target"><a href="#annotated-cell-10-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette.colour.discrete =</span> palette_values,</span>
+<span id="annotated-cell-10-27"><a href="#annotated-cell-10-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">palette.fill.discrete =</span> palette_values</span>
+<span id="annotated-cell-10-28"><a href="#annotated-cell-10-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="annotated-cell-10-29"><a href="#annotated-cell-10-29" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-10" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="7" data-code-annotation="1">Flatten the named palette into a character vector.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="9,10" data-code-annotation="2">Extract foreground (ink) and background (paper) from the brand colours.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="11" data-code-annotation="3">Blend ink and paper to create an accent colour for titles and axes.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="15,16" data-code-annotation="4">Apply brand fonts to body text and headings.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="17,18,19" data-code-annotation="5">Pass ink, paper, and accent to <code>theme_minimal()</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="26,27" data-code-annotation="6">Set the discrete colour palette for geoms.</span>
+</dd>
+</dl>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
 <p>R uses <code>scales::col_mix()</code> to blend colours. Python needs a small helper since there is no equivalent in plotnine:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="python"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _col_mix(a: <span class="bu">str</span>, b: <span class="bu">str</span>, amount: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.25</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    ra, ga, ba <span class="op">=</span> <span class="bu">int</span>(a[<span class="dv">1</span>:<span class="dv">3</span>], <span class="dv">16</span>), <span class="bu">int</span>(a[<span class="dv">3</span>:<span class="dv">5</span>], <span class="dv">16</span>), <span class="bu">int</span>(a[<span class="dv">5</span>:<span class="dv">7</span>], <span class="dv">16</span>)</span>
@@ -743,60 +962,60 @@ Quarto's brand feature with ggplot2 and gt in R.
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    palette <span class="op">=</span> brand[brand_mode][<span class="st">"data"</span>][<span class="st">"color"</span>][<span class="st">"palette"</span>]</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">list</span>(palette.values())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-11" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-11-1"><a href="#annotated-cell-11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> (</span>
-<span id="annotated-cell-11-2"><a href="#annotated-cell-11-2" aria-hidden="true" tabindex="-1"></a>    element_line, element_rect, element_text, theme, theme_minimal</span>
-<span id="annotated-cell-11-3"><a href="#annotated-cell-11-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="annotated-cell-11-4"><a href="#annotated-cell-11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-11-5"><a href="#annotated-cell-11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> theme_brand(base_size: <span class="bu">int</span> <span class="op">=</span> <span class="dv">11</span>, brand_mode: <span class="bu">str</span> <span class="op">=</span> <span class="st">"light"</span>) <span class="op">-&gt;</span> theme:</span>
-<span id="annotated-cell-11-6"><a href="#annotated-cell-11-6" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
-<span id="annotated-cell-11-7"><a href="#annotated-cell-11-7" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
-<span id="annotated-cell-11-8"><a href="#annotated-cell-11-8" aria-hidden="true" tabindex="-1"></a>    brand_data <span class="op">=</span> brand[brand_mode][<span class="st">"data"</span>]</span>
-<span id="annotated-cell-11-9"><a href="#annotated-cell-11-9" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> brand_data[<span class="st">"color"</span>]</span>
-<span id="annotated-cell-11-10"><a href="#annotated-cell-11-10" aria-hidden="true" tabindex="-1"></a>    typography <span class="op">=</span> brand_data[<span class="st">"typography"</span>]</span>
-<span id="annotated-cell-11-11"><a href="#annotated-cell-11-11" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-11" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-11-12" class="code-annotation-target"><a href="#annotated-cell-11-12" aria-hidden="true" tabindex="-1"></a>    ink <span class="op">=</span> colors[<span class="st">"foreground"</span>]</span>
-<span id="annotated-cell-11-13"><a href="#annotated-cell-11-13" aria-hidden="true" tabindex="-1"></a>    paper <span class="op">=</span> colors[<span class="st">"background"</span>]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-11" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-11-14" class="code-annotation-target"><a href="#annotated-cell-11-14" aria-hidden="true" tabindex="-1"></a>    accent <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.25</span>)</span>
-<span id="annotated-cell-11-15"><a href="#annotated-cell-11-15" aria-hidden="true" tabindex="-1"></a>    base_family <span class="op">=</span> typography[<span class="st">"base"</span>]</span>
-<span id="annotated-cell-11-16"><a href="#annotated-cell-11-16" aria-hidden="true" tabindex="-1"></a>    heading_family <span class="op">=</span> typography[<span class="st">"headings"</span>]</span>
-<span id="annotated-cell-11-17"><a href="#annotated-cell-11-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-11-18"><a href="#annotated-cell-11-18" aria-hidden="true" tabindex="-1"></a>    base_line_size <span class="op">=</span> base_size <span class="op">/</span> <span class="dv">22</span></span>
-<span id="annotated-cell-11-19"><a href="#annotated-cell-11-19" aria-hidden="true" tabindex="-1"></a>    grid_major_colour <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.8</span>)</span>
-<span id="annotated-cell-11-20"><a href="#annotated-cell-11-20" aria-hidden="true" tabindex="-1"></a>    grid_minor_colour <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.9</span>)</span>
-<span id="annotated-cell-11-21"><a href="#annotated-cell-11-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-11-22"><a href="#annotated-cell-11-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> theme_minimal(</span>
-<span id="annotated-cell-11-23"><a href="#annotated-cell-11-23" aria-hidden="true" tabindex="-1"></a>        base_size<span class="op">=</span>base_size,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-11" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-11-24" class="code-annotation-target"><a href="#annotated-cell-11-24" aria-hidden="true" tabindex="-1"></a>        base_family<span class="op">=</span>base_family</span>
-<span id="annotated-cell-11-25"><a href="#annotated-cell-11-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">+</span> theme(</span>
-<span id="annotated-cell-11-26"><a href="#annotated-cell-11-26" aria-hidden="true" tabindex="-1"></a>        plot_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
-<span id="annotated-cell-11-27"><a href="#annotated-cell-11-27" aria-hidden="true" tabindex="-1"></a>        panel_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
-<span id="annotated-cell-11-28"><a href="#annotated-cell-11-28" aria-hidden="true" tabindex="-1"></a>        panel_grid_major<span class="op">=</span>element_line(colour<span class="op">=</span>grid_major_colour, size<span class="op">=</span>base_line_size),</span>
-<span id="annotated-cell-11-29"><a href="#annotated-cell-11-29" aria-hidden="true" tabindex="-1"></a>        panel_grid_minor<span class="op">=</span>element_line(colour<span class="op">=</span>grid_minor_colour, size<span class="op">=</span>base_line_size <span class="op">*</span> <span class="fl">0.5</span>),</span>
-<span id="annotated-cell-11-30"><a href="#annotated-cell-11-30" aria-hidden="true" tabindex="-1"></a>        text<span class="op">=</span>element_text(colour<span class="op">=</span>ink),</span>
-<span id="annotated-cell-11-31"><a href="#annotated-cell-11-31" aria-hidden="true" tabindex="-1"></a>        axis_title<span class="op">=</span>element_text(family<span class="op">=</span>heading_family),</span>
-<span id="annotated-cell-11-32"><a href="#annotated-cell-11-32" aria-hidden="true" tabindex="-1"></a>        axis_line_x<span class="op">=</span>element_line(colour<span class="op">=</span>accent),</span>
-<span id="annotated-cell-11-33"><a href="#annotated-cell-11-33" aria-hidden="true" tabindex="-1"></a>        axis_line_y<span class="op">=</span>element_line(colour<span class="op">=</span>accent),</span>
-<span id="annotated-cell-11-34"><a href="#annotated-cell-11-34" aria-hidden="true" tabindex="-1"></a>        plot_title<span class="op">=</span>element_text(</span>
-<span id="annotated-cell-11-35"><a href="#annotated-cell-11-35" aria-hidden="true" tabindex="-1"></a>            family<span class="op">=</span>heading_family,</span>
-<span id="annotated-cell-11-36"><a href="#annotated-cell-11-36" aria-hidden="true" tabindex="-1"></a>            colour<span class="op">=</span>accent,</span>
-<span id="annotated-cell-11-37"><a href="#annotated-cell-11-37" aria-hidden="true" tabindex="-1"></a>            size<span class="op">=</span>base_size <span class="op">*</span> <span class="dv">2</span>,</span>
-<span id="annotated-cell-11-38"><a href="#annotated-cell-11-38" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="annotated-cell-11-39"><a href="#annotated-cell-11-39" aria-hidden="true" tabindex="-1"></a>        plot_subtitle<span class="op">=</span>element_text(colour<span class="op">=</span>ink),</span>
-<span id="annotated-cell-11-40"><a href="#annotated-cell-11-40" aria-hidden="true" tabindex="-1"></a>        legend_title<span class="op">=</span>element_text(family<span class="op">=</span>heading_family, colour<span class="op">=</span>accent),</span>
-<span id="annotated-cell-11-41"><a href="#annotated-cell-11-41" aria-hidden="true" tabindex="-1"></a>        legend_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
-<span id="annotated-cell-11-42"><a href="#annotated-cell-11-42" aria-hidden="true" tabindex="-1"></a>    )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-13" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-13-1"><a href="#annotated-cell-13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> (</span>
+<span id="annotated-cell-13-2"><a href="#annotated-cell-13-2" aria-hidden="true" tabindex="-1"></a>    element_line, element_rect, element_text, theme, theme_minimal</span>
+<span id="annotated-cell-13-3"><a href="#annotated-cell-13-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="annotated-cell-13-4"><a href="#annotated-cell-13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-5"><a href="#annotated-cell-13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> theme_brand(base_size: <span class="bu">int</span> <span class="op">=</span> <span class="dv">11</span>, brand_mode: <span class="bu">str</span> <span class="op">=</span> <span class="st">"light"</span>) <span class="op">-&gt;</span> theme:</span>
+<span id="annotated-cell-13-6"><a href="#annotated-cell-13-6" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
+<span id="annotated-cell-13-7"><a href="#annotated-cell-13-7" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
+<span id="annotated-cell-13-8"><a href="#annotated-cell-13-8" aria-hidden="true" tabindex="-1"></a>    brand_data <span class="op">=</span> brand[brand_mode][<span class="st">"data"</span>]</span>
+<span id="annotated-cell-13-9"><a href="#annotated-cell-13-9" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> brand_data[<span class="st">"color"</span>]</span>
+<span id="annotated-cell-13-10"><a href="#annotated-cell-13-10" aria-hidden="true" tabindex="-1"></a>    typography <span class="op">=</span> brand_data[<span class="st">"typography"</span>]</span>
+<span id="annotated-cell-13-11"><a href="#annotated-cell-13-11" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-13-12" class="code-annotation-target"><a href="#annotated-cell-13-12" aria-hidden="true" tabindex="-1"></a>    ink <span class="op">=</span> colors[<span class="st">"foreground"</span>]</span>
+<span id="annotated-cell-13-13"><a href="#annotated-cell-13-13" aria-hidden="true" tabindex="-1"></a>    paper <span class="op">=</span> colors[<span class="st">"background"</span>]</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-13-14" class="code-annotation-target"><a href="#annotated-cell-13-14" aria-hidden="true" tabindex="-1"></a>    accent <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.25</span>)</span>
+<span id="annotated-cell-13-15"><a href="#annotated-cell-13-15" aria-hidden="true" tabindex="-1"></a>    base_family <span class="op">=</span> typography[<span class="st">"base"</span>]</span>
+<span id="annotated-cell-13-16"><a href="#annotated-cell-13-16" aria-hidden="true" tabindex="-1"></a>    heading_family <span class="op">=</span> typography[<span class="st">"headings"</span>]</span>
+<span id="annotated-cell-13-17"><a href="#annotated-cell-13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-18"><a href="#annotated-cell-13-18" aria-hidden="true" tabindex="-1"></a>    base_line_size <span class="op">=</span> base_size <span class="op">/</span> <span class="dv">22</span></span>
+<span id="annotated-cell-13-19"><a href="#annotated-cell-13-19" aria-hidden="true" tabindex="-1"></a>    grid_major_colour <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.8</span>)</span>
+<span id="annotated-cell-13-20"><a href="#annotated-cell-13-20" aria-hidden="true" tabindex="-1"></a>    grid_minor_colour <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.9</span>)</span>
+<span id="annotated-cell-13-21"><a href="#annotated-cell-13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-22"><a href="#annotated-cell-13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> theme_minimal(</span>
+<span id="annotated-cell-13-23"><a href="#annotated-cell-13-23" aria-hidden="true" tabindex="-1"></a>        base_size<span class="op">=</span>base_size,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-13-24" class="code-annotation-target"><a href="#annotated-cell-13-24" aria-hidden="true" tabindex="-1"></a>        base_family<span class="op">=</span>base_family</span>
+<span id="annotated-cell-13-25"><a href="#annotated-cell-13-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">+</span> theme(</span>
+<span id="annotated-cell-13-26"><a href="#annotated-cell-13-26" aria-hidden="true" tabindex="-1"></a>        plot_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
+<span id="annotated-cell-13-27"><a href="#annotated-cell-13-27" aria-hidden="true" tabindex="-1"></a>        panel_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
+<span id="annotated-cell-13-28"><a href="#annotated-cell-13-28" aria-hidden="true" tabindex="-1"></a>        panel_grid_major<span class="op">=</span>element_line(colour<span class="op">=</span>grid_major_colour, size<span class="op">=</span>base_line_size),</span>
+<span id="annotated-cell-13-29"><a href="#annotated-cell-13-29" aria-hidden="true" tabindex="-1"></a>        panel_grid_minor<span class="op">=</span>element_line(colour<span class="op">=</span>grid_minor_colour, size<span class="op">=</span>base_line_size <span class="op">*</span> <span class="fl">0.5</span>),</span>
+<span id="annotated-cell-13-30"><a href="#annotated-cell-13-30" aria-hidden="true" tabindex="-1"></a>        text<span class="op">=</span>element_text(colour<span class="op">=</span>ink),</span>
+<span id="annotated-cell-13-31"><a href="#annotated-cell-13-31" aria-hidden="true" tabindex="-1"></a>        axis_title<span class="op">=</span>element_text(family<span class="op">=</span>heading_family),</span>
+<span id="annotated-cell-13-32"><a href="#annotated-cell-13-32" aria-hidden="true" tabindex="-1"></a>        axis_line_x<span class="op">=</span>element_line(colour<span class="op">=</span>accent),</span>
+<span id="annotated-cell-13-33"><a href="#annotated-cell-13-33" aria-hidden="true" tabindex="-1"></a>        axis_line_y<span class="op">=</span>element_line(colour<span class="op">=</span>accent),</span>
+<span id="annotated-cell-13-34"><a href="#annotated-cell-13-34" aria-hidden="true" tabindex="-1"></a>        plot_title<span class="op">=</span>element_text(</span>
+<span id="annotated-cell-13-35"><a href="#annotated-cell-13-35" aria-hidden="true" tabindex="-1"></a>            family<span class="op">=</span>heading_family,</span>
+<span id="annotated-cell-13-36"><a href="#annotated-cell-13-36" aria-hidden="true" tabindex="-1"></a>            colour<span class="op">=</span>accent,</span>
+<span id="annotated-cell-13-37"><a href="#annotated-cell-13-37" aria-hidden="true" tabindex="-1"></a>            size<span class="op">=</span>base_size <span class="op">*</span> <span class="dv">2</span>,</span>
+<span id="annotated-cell-13-38"><a href="#annotated-cell-13-38" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="annotated-cell-13-39"><a href="#annotated-cell-13-39" aria-hidden="true" tabindex="-1"></a>        plot_subtitle<span class="op">=</span>element_text(colour<span class="op">=</span>ink),</span>
+<span id="annotated-cell-13-40"><a href="#annotated-cell-13-40" aria-hidden="true" tabindex="-1"></a>        legend_title<span class="op">=</span>element_text(family<span class="op">=</span>heading_family, colour<span class="op">=</span>accent),</span>
+<span id="annotated-cell-13-41"><a href="#annotated-cell-13-41" aria-hidden="true" tabindex="-1"></a>        legend_background<span class="op">=</span>element_rect(fill<span class="op">=</span>paper, colour<span class="op">=</span><span class="st">"none"</span>),</span>
+<span id="annotated-cell-13-42"><a href="#annotated-cell-13-42" aria-hidden="true" tabindex="-1"></a>    )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-11" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-13" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-11" data-code-lines="12,13" data-code-annotation="1">Extract foreground (ink) and background (paper) from the brand colours.</span>
+<span data-code-cell="annotated-cell-13" data-code-lines="12,13" data-code-annotation="1">Extract foreground (ink) and background (paper) from the brand colours.</span>
 </dd>
-<dt data-target-cell="annotated-cell-11" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-13" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-11" data-code-lines="14" data-code-annotation="2">Blend ink and paper to create an accent colour (custom <code>_col_mix()</code> helper).</span>
+<span data-code-cell="annotated-cell-13" data-code-lines="14" data-code-annotation="2">Blend ink and paper to create an accent colour (custom <code>_col_mix()</code> helper).</span>
 </dd>
-<dt data-target-cell="annotated-cell-11" data-target-annotation="3">3</dt>
+<dt data-target-cell="annotated-cell-13" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-11" data-code-lines="24,35" data-code-annotation="3">Apply brand fonts to body text and headings.</span>
+<span data-code-cell="annotated-cell-13" data-code-lines="24,35" data-code-annotation="3">Apply brand fonts to body text and headings.</span>
 </dd>
 </dl>
 </div>
@@ -828,13 +1047,13 @@ Note
 <p>The code samples in this post are intentionally simplified. The <a href="https://github.com/mcanouil/quarto-brand-renderings">companion repository</a> contains production-ready versions with full error handling, defensive <code>.get()</code> fallbacks, and additional styling such as continuous palette support in R.</p>
 </div>
 </div>
-<section id="usage" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="usage"><span class="header-section-number">5.1</span> Usage</h3>
+<section id="usage" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="usage"><span class="header-section-number">6.1</span> Usage</h3>
 <p>With <code>theme_brand()</code> defined, applying it to a plot is straightforward.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div id="tabset-7-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-7-1-tab">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="r"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>penguins <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"penguins.csv"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -844,7 +1063,7 @@ Note
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_brand</span>(<span class="at">brand_mode =</span> <span class="st">"light"</span>) <span class="sc">+</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Light Mode"</span>, <span class="at">subtitle =</span> <span class="st">"Using brand colours and fonts"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="python"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> aes, geom_point, ggplot, labs, scale_color_manual</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -867,240 +1086,121 @@ Note
 </div>
 </section>
 </section>
-<section id="branded-tables" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="branded-tables"><span class="header-section-number">6</span> Branded Tables</h2>
-<p>The <code>gt_brand()</code> function applies brand colours and fonts to <code>gt</code> (R) and <code>great_tables</code> (Python) tables.</p>
+<section id="branded-tables" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="branded-tables"><span class="header-section-number">7</span> Branded Tables</h2>
+<p>The <code>gt_brand()</code> function follows the same pattern: extract brand colours and fonts, then apply them to the table. Column headers get the first palette colour as a background, body borders use an accent derived from blending ink and paper, and the base and heading fonts are applied throughout.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">Python</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-8-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-2" role="tab" aria-controls="tabset-8-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
-<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-14" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-14-1"><a href="#annotated-cell-14-1" aria-hidden="true" tabindex="-1"></a>gt_brand <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
-<span id="annotated-cell-14-2"><a href="#annotated-cell-14-2" aria-hidden="true" tabindex="-1"></a>  info <span class="ot">&lt;-</span> <span class="fu">get_brand_info</span>()</span>
-<span id="annotated-cell-14-3"><a href="#annotated-cell-14-3" aria-hidden="true" tabindex="-1"></a>  brand <span class="ot">&lt;-</span> info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]]</span>
-<span id="annotated-cell-14-4"><a href="#annotated-cell-14-4" aria-hidden="true" tabindex="-1"></a>  brand_data <span class="ot">&lt;-</span> brand[[brand_mode]][[<span class="st">"data"</span>]]</span>
-<span id="annotated-cell-14-5"><a href="#annotated-cell-14-5" aria-hidden="true" tabindex="-1"></a>  colors <span class="ot">&lt;-</span> brand_data[[<span class="st">"color"</span>]]</span>
-<span id="annotated-cell-14-6"><a href="#annotated-cell-14-6" aria-hidden="true" tabindex="-1"></a>  typography <span class="ot">&lt;-</span> brand_data[[<span class="st">"typography"</span>]]</span>
-<span id="annotated-cell-14-7"><a href="#annotated-cell-14-7" aria-hidden="true" tabindex="-1"></a>  palette <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">unlist</span>(colors[[<span class="st">"palette"</span>]]))</span>
-<span id="annotated-cell-14-8"><a href="#annotated-cell-14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-14-9"><a href="#annotated-cell-14-9" aria-hidden="true" tabindex="-1"></a>  ink <span class="ot">&lt;-</span> colors[[<span class="st">"foreground"</span>]]</span>
-<span id="annotated-cell-14-10"><a href="#annotated-cell-14-10" aria-hidden="true" tabindex="-1"></a>  paper <span class="ot">&lt;-</span> colors[[<span class="st">"background"</span>]]</span>
-<span id="annotated-cell-14-11"><a href="#annotated-cell-14-11" aria-hidden="true" tabindex="-1"></a>  accent <span class="ot">&lt;-</span> scales<span class="sc">::</span><span class="fu">col_mix</span>(ink, paper, <span class="at">amount =</span> <span class="fl">0.25</span>)</span>
-<span id="annotated-cell-14-12"><a href="#annotated-cell-14-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-14-13"><a href="#annotated-cell-14-13" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>(data) <span class="sc">|&gt;</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-14-14" class="code-annotation-target"><a href="#annotated-cell-14-14" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">opt_table_font</span>(<span class="at">font =</span> typography[[<span class="st">"base"</span>]]) <span class="sc">|&gt;</span></span>
-<span id="annotated-cell-14-15"><a href="#annotated-cell-14-15" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">tab_options</span>(</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-14-16" class="code-annotation-target"><a href="#annotated-cell-14-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">table.background.color =</span> paper,</span>
-<span id="annotated-cell-14-17"><a href="#annotated-cell-14-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">table.font.color =</span> ink,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-14-18" class="code-annotation-target"><a href="#annotated-cell-14-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">column_labels.background.color =</span> palette[[<span class="dv">1</span>L]],</span>
-<span id="annotated-cell-14-19"><a href="#annotated-cell-14-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-14-20" class="code-annotation-target"><a href="#annotated-cell-14-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">table_body.border.top.color =</span> accent,</span>
-<span id="annotated-cell-14-21"><a href="#annotated-cell-14-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">table_body.border.bottom.color =</span> accent</span>
-<span id="annotated-cell-14-22"><a href="#annotated-cell-14-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="annotated-cell-14-23"><a href="#annotated-cell-14-23" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-14-24" class="code-annotation-target"><a href="#annotated-cell-14-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="at">font =</span> typography[[<span class="st">"headings"</span>]], <span class="at">color =</span> paper),</span>
-<span id="annotated-cell-14-25"><a href="#annotated-cell-14-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_column_labels</span>()</span>
-<span id="annotated-cell-14-26"><a href="#annotated-cell-14-26" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="annotated-cell-14-27"><a href="#annotated-cell-14-27" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-14" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="14" data-code-annotation="1">Set the base font for the entire table.</span>
-</dd>
-<dt data-target-cell="annotated-cell-14" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="16,17" data-code-annotation="2">Apply brand background and text colours.</span>
-</dd>
-<dt data-target-cell="annotated-cell-14" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="18" data-code-annotation="3">Use the first palette colour for column header background.</span>
-</dd>
-<dt data-target-cell="annotated-cell-14" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="20,21" data-code-annotation="4">Use the accent colour for table body borders.</span>
-</dd>
-<dt data-target-cell="annotated-cell-14" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-14" data-code-lines="24" data-code-annotation="5">Style column labels with the heading font and contrasting colour.</span>
-</dd>
-</dl>
-</div>
-<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-15" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-15-1"><a href="#annotated-cell-15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> great_tables <span class="im">import</span> GT, loc, style</span>
-<span id="annotated-cell-15-2"><a href="#annotated-cell-15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-15-3"><a href="#annotated-cell-15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gt_brand(data, brand_mode: <span class="bu">str</span> <span class="op">=</span> <span class="st">"light"</span>) <span class="op">-&gt;</span> GT:</span>
-<span id="annotated-cell-15-4"><a href="#annotated-cell-15-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
-<span id="annotated-cell-15-5"><a href="#annotated-cell-15-5" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
-<span id="annotated-cell-15-6"><a href="#annotated-cell-15-6" aria-hidden="true" tabindex="-1"></a>    brand_data <span class="op">=</span> brand[brand_mode][<span class="st">"data"</span>]</span>
-<span id="annotated-cell-15-7"><a href="#annotated-cell-15-7" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> brand_data[<span class="st">"color"</span>]</span>
-<span id="annotated-cell-15-8"><a href="#annotated-cell-15-8" aria-hidden="true" tabindex="-1"></a>    typography <span class="op">=</span> brand_data[<span class="st">"typography"</span>]</span>
-<span id="annotated-cell-15-9"><a href="#annotated-cell-15-9" aria-hidden="true" tabindex="-1"></a>    palette <span class="op">=</span> <span class="bu">list</span>(colors[<span class="st">"palette"</span>].values())</span>
-<span id="annotated-cell-15-10"><a href="#annotated-cell-15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-15-11"><a href="#annotated-cell-15-11" aria-hidden="true" tabindex="-1"></a>    ink <span class="op">=</span> colors[<span class="st">"foreground"</span>]</span>
-<span id="annotated-cell-15-12"><a href="#annotated-cell-15-12" aria-hidden="true" tabindex="-1"></a>    paper <span class="op">=</span> colors[<span class="st">"background"</span>]</span>
-<span id="annotated-cell-15-13"><a href="#annotated-cell-15-13" aria-hidden="true" tabindex="-1"></a>    accent <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.25</span>)</span>
-<span id="annotated-cell-15-14"><a href="#annotated-cell-15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-15-15"><a href="#annotated-cell-15-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (</span>
-<span id="annotated-cell-15-16"><a href="#annotated-cell-15-16" aria-hidden="true" tabindex="-1"></a>        GT(data)</span>
-<span id="annotated-cell-15-17"><a href="#annotated-cell-15-17" aria-hidden="true" tabindex="-1"></a>        .tab_options(</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-15" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-15-18" class="code-annotation-target"><a href="#annotated-cell-15-18" aria-hidden="true" tabindex="-1"></a>            table_font_names<span class="op">=</span>typography[<span class="st">"base"</span>],</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-15" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-15-19" class="code-annotation-target"><a href="#annotated-cell-15-19" aria-hidden="true" tabindex="-1"></a>            table_font_color<span class="op">=</span>ink,</span>
-<span id="annotated-cell-15-20"><a href="#annotated-cell-15-20" aria-hidden="true" tabindex="-1"></a>            table_background_color<span class="op">=</span>paper,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-15" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-15-21" class="code-annotation-target"><a href="#annotated-cell-15-21" aria-hidden="true" tabindex="-1"></a>            column_labels_background_color<span class="op">=</span>palette[<span class="dv">0</span>] <span class="cf">if</span> palette <span class="cf">else</span> accent,</span>
-<span id="annotated-cell-15-22"><a href="#annotated-cell-15-22" aria-hidden="true" tabindex="-1"></a>            column_labels_font_weight<span class="op">=</span><span class="st">"bold"</span>,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-15" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-15-23" class="code-annotation-target"><a href="#annotated-cell-15-23" aria-hidden="true" tabindex="-1"></a>            table_body_border_top_color<span class="op">=</span>accent,</span>
-<span id="annotated-cell-15-24"><a href="#annotated-cell-15-24" aria-hidden="true" tabindex="-1"></a>            table_body_border_bottom_color<span class="op">=</span>accent,</span>
-<span id="annotated-cell-15-25"><a href="#annotated-cell-15-25" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="annotated-cell-15-26"><a href="#annotated-cell-15-26" aria-hidden="true" tabindex="-1"></a>        .tab_style(</span>
-<span id="annotated-cell-15-27"><a href="#annotated-cell-15-27" aria-hidden="true" tabindex="-1"></a>            style<span class="op">=</span>style.text(</span>
-<span id="annotated-cell-15-28"><a href="#annotated-cell-15-28" aria-hidden="true" tabindex="-1"></a>                font<span class="op">=</span>typography[<span class="st">"headings"</span>],</span>
-<span id="annotated-cell-15-29"><a href="#annotated-cell-15-29" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>paper,</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-15" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-15-30" class="code-annotation-target"><a href="#annotated-cell-15-30" aria-hidden="true" tabindex="-1"></a>                weight<span class="op">=</span><span class="st">"bold"</span>,</span>
-<span id="annotated-cell-15-31"><a href="#annotated-cell-15-31" aria-hidden="true" tabindex="-1"></a>            ),</span>
-<span id="annotated-cell-15-32"><a href="#annotated-cell-15-32" aria-hidden="true" tabindex="-1"></a>            locations<span class="op">=</span>loc.column_labels(),</span>
-<span id="annotated-cell-15-33"><a href="#annotated-cell-15-33" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="annotated-cell-15-34"><a href="#annotated-cell-15-34" aria-hidden="true" tabindex="-1"></a>    )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-15" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-15" data-code-lines="18" data-code-annotation="1">Set the base font for the entire table.</span>
-</dd>
-<dt data-target-cell="annotated-cell-15" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-15" data-code-lines="19,20" data-code-annotation="2">Apply brand background and text colours.</span>
-</dd>
-<dt data-target-cell="annotated-cell-15" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-15" data-code-lines="21" data-code-annotation="3">Use the first palette colour for column header background.</span>
-</dd>
-<dt data-target-cell="annotated-cell-15" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-15" data-code-lines="23,24" data-code-annotation="4">Use the accent colour for table body borders.</span>
-</dd>
-<dt data-target-cell="annotated-cell-15" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-15" data-code-lines="30" data-code-annotation="5">Style column labels with the heading font and contrasting colour.</span>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-</section>
-<section id="font-registration" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="font-registration"><span class="header-section-number">7</span> Font Registration</h2>
-<p>Web fonts defined in a brand configuration are not available to R or Python graphics devices by default. A <code>configure_brand_fonts()</code> function, called once at setup, registers each font before any plots or tables are created.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false" href="">Python</a></li></ul>
-<div class="tab-content" data-group="language">
-<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
-<p>The <code>systemfonts</code> package handles font discovery and registration.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-16" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-16-1"><a href="#annotated-cell-16-1" aria-hidden="true" tabindex="-1"></a>configure_brand_fonts <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
+<div id="tabset-8-1" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-16" data-filename="r"><pre class="sourceCode r cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-16-1"><a href="#annotated-cell-16-1" aria-hidden="true" tabindex="-1"></a>gt_brand <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">brand_mode =</span> <span class="st">"light"</span>) {</span>
 <span id="annotated-cell-16-2"><a href="#annotated-cell-16-2" aria-hidden="true" tabindex="-1"></a>  info <span class="ot">&lt;-</span> <span class="fu">get_brand_info</span>()</span>
 <span id="annotated-cell-16-3"><a href="#annotated-cell-16-3" aria-hidden="true" tabindex="-1"></a>  brand <span class="ot">&lt;-</span> info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-16-4" class="code-annotation-target"><a href="#annotated-cell-16-4" aria-hidden="true" tabindex="-1"></a>  doc_dir <span class="ot">&lt;-</span> <span class="fu">dirname</span>(info[[<span class="st">"document-path"</span>]])</span>
-<span id="annotated-cell-16-5"><a href="#annotated-cell-16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-16-6"><a href="#annotated-cell-16-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (mode <span class="cf">in</span> <span class="fu">intersect</span>(<span class="fu">c</span>(<span class="st">"light"</span>, <span class="st">"dark"</span>), <span class="fu">names</span>(brand))) {</span>
-<span id="annotated-cell-16-7"><a href="#annotated-cell-16-7" aria-hidden="true" tabindex="-1"></a>    fonts <span class="ot">&lt;-</span> brand[[mode]][[<span class="st">"data"</span>]][[<span class="st">"typography"</span>]][[<span class="st">"fonts"</span>]]</span>
-<span id="annotated-cell-16-8"><a href="#annotated-cell-16-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (ifont <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(fonts))) {</span>
-<span id="annotated-cell-16-9"><a href="#annotated-cell-16-9" aria-hidden="true" tabindex="-1"></a>      family <span class="ot">&lt;-</span> fonts[[<span class="st">"family"</span>]][[ifont]]</span>
-<span id="annotated-cell-16-10"><a href="#annotated-cell-16-10" aria-hidden="true" tabindex="-1"></a>      source <span class="ot">&lt;-</span> fonts[[<span class="st">"source"</span>]][[ifont]]</span>
-<span id="annotated-cell-16-11"><a href="#annotated-cell-16-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-16-12"><a href="#annotated-cell-16-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">identical</span>(source, <span class="st">"file"</span>)) {</span>
-<span id="annotated-cell-16-13"><a href="#annotated-cell-16-13" aria-hidden="true" tabindex="-1"></a>        files <span class="ot">&lt;-</span> fonts[[<span class="st">"files"</span>]][[ifont]]</span>
-<span id="annotated-cell-16-14"><a href="#annotated-cell-16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (fp <span class="cf">in</span> <span class="fu">as.character</span>(files[[<span class="st">"path"</span>]])) {</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-16-15" class="code-annotation-target"><a href="#annotated-cell-16-15" aria-hidden="true" tabindex="-1"></a>          resolved <span class="ot">&lt;-</span> <span class="fu">file.path</span>(doc_dir, fp)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-16-16" class="code-annotation-target"><a href="#annotated-cell-16-16" aria-hidden="true" tabindex="-1"></a>          systemfonts<span class="sc">::</span><span class="fu">register_font</span>(family, <span class="at">plain =</span> resolved)</span>
-<span id="annotated-cell-16-17"><a href="#annotated-cell-16-17" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="annotated-cell-16-18"><a href="#annotated-cell-16-18" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-16-19" class="code-annotation-target"><a href="#annotated-cell-16-19" aria-hidden="true" tabindex="-1"></a>        systemfonts<span class="sc">::</span><span class="fu">require_font</span>(family, <span class="at">repositories =</span> <span class="st">"Bunny Fonts"</span>)</span>
-<span id="annotated-cell-16-20"><a href="#annotated-cell-16-20" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="annotated-cell-16-21"><a href="#annotated-cell-16-21" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="annotated-cell-16-22"><a href="#annotated-cell-16-22" aria-hidden="true" tabindex="-1"></a>  }</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-16-23" class="code-annotation-target"><a href="#annotated-cell-16-23" aria-hidden="true" tabindex="-1"></a>  systemfonts<span class="sc">::</span><span class="fu">reset_font_cache</span>()</span>
-<span id="annotated-cell-16-24"><a href="#annotated-cell-16-24" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="annotated-cell-16-4"><a href="#annotated-cell-16-4" aria-hidden="true" tabindex="-1"></a>  brand_data <span class="ot">&lt;-</span> brand[[brand_mode]][[<span class="st">"data"</span>]]</span>
+<span id="annotated-cell-16-5"><a href="#annotated-cell-16-5" aria-hidden="true" tabindex="-1"></a>  colors <span class="ot">&lt;-</span> brand_data[[<span class="st">"color"</span>]]</span>
+<span id="annotated-cell-16-6"><a href="#annotated-cell-16-6" aria-hidden="true" tabindex="-1"></a>  typography <span class="ot">&lt;-</span> brand_data[[<span class="st">"typography"</span>]]</span>
+<span id="annotated-cell-16-7"><a href="#annotated-cell-16-7" aria-hidden="true" tabindex="-1"></a>  palette <span class="ot">&lt;-</span> <span class="fu">unname</span>(<span class="fu">unlist</span>(colors[[<span class="st">"palette"</span>]]))</span>
+<span id="annotated-cell-16-8"><a href="#annotated-cell-16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-16-9"><a href="#annotated-cell-16-9" aria-hidden="true" tabindex="-1"></a>  ink <span class="ot">&lt;-</span> colors[[<span class="st">"foreground"</span>]]</span>
+<span id="annotated-cell-16-10"><a href="#annotated-cell-16-10" aria-hidden="true" tabindex="-1"></a>  paper <span class="ot">&lt;-</span> colors[[<span class="st">"background"</span>]]</span>
+<span id="annotated-cell-16-11"><a href="#annotated-cell-16-11" aria-hidden="true" tabindex="-1"></a>  accent <span class="ot">&lt;-</span> scales<span class="sc">::</span><span class="fu">col_mix</span>(ink, paper, <span class="at">amount =</span> <span class="fl">0.25</span>)</span>
+<span id="annotated-cell-16-12"><a href="#annotated-cell-16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-16-13"><a href="#annotated-cell-16-13" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>(data) <span class="sc">|&gt;</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-16-14" class="code-annotation-target"><a href="#annotated-cell-16-14" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">opt_table_font</span>(<span class="at">font =</span> typography[[<span class="st">"base"</span>]]) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-16-15"><a href="#annotated-cell-16-15" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">tab_options</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-16-16" class="code-annotation-target"><a href="#annotated-cell-16-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">table.background.color =</span> paper,</span>
+<span id="annotated-cell-16-17"><a href="#annotated-cell-16-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">table.font.color =</span> ink,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-16-18" class="code-annotation-target"><a href="#annotated-cell-16-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">column_labels.background.color =</span> palette[[<span class="dv">1</span>L]],</span>
+<span id="annotated-cell-16-19"><a href="#annotated-cell-16-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-16-20" class="code-annotation-target"><a href="#annotated-cell-16-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">table_body.border.top.color =</span> accent,</span>
+<span id="annotated-cell-16-21"><a href="#annotated-cell-16-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">table_body.border.bottom.color =</span> accent</span>
+<span id="annotated-cell-16-22"><a href="#annotated-cell-16-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="annotated-cell-16-23"><a href="#annotated-cell-16-23" aria-hidden="true" tabindex="-1"></a>    gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-16" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-16-24" class="code-annotation-target"><a href="#annotated-cell-16-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="at">font =</span> typography[[<span class="st">"headings"</span>]], <span class="at">color =</span> paper),</span>
+<span id="annotated-cell-16-25"><a href="#annotated-cell-16-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_column_labels</span>()</span>
+<span id="annotated-cell-16-26"><a href="#annotated-cell-16-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="annotated-cell-16-27"><a href="#annotated-cell-16-27" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-16" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-16" data-code-lines="4" data-code-annotation="1">Resolve the document directory from <code>QUARTO_EXECUTE_INFO</code> for relative font paths.</span>
+<span data-code-cell="annotated-cell-16" data-code-lines="14" data-code-annotation="1">Set the base font for the entire table.</span>
 </dd>
 <dt data-target-cell="annotated-cell-16" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-16" data-code-lines="15" data-code-annotation="2">Build the full path to each local font file.</span>
+<span data-code-cell="annotated-cell-16" data-code-lines="16,17" data-code-annotation="2">Apply brand background and text colours.</span>
 </dd>
 <dt data-target-cell="annotated-cell-16" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-16" data-code-lines="16" data-code-annotation="3">Register local font files with <code>systemfonts::register_font()</code>.</span>
+<span data-code-cell="annotated-cell-16" data-code-lines="18" data-code-annotation="3">Use the first palette colour for column header background.</span>
 </dd>
 <dt data-target-cell="annotated-cell-16" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-16" data-code-lines="19" data-code-annotation="4">Download web fonts from Bunny Fonts (or Google Fonts) with <code>systemfonts::require_font()</code>.</span>
+<span data-code-cell="annotated-cell-16" data-code-lines="20,21" data-code-annotation="4">Use the accent colour for table body borders.</span>
 </dd>
 <dt data-target-cell="annotated-cell-16" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-16" data-code-lines="23" data-code-annotation="5">Reset the font cache so newly registered fonts become available.</span>
+<span data-code-cell="annotated-cell-16" data-code-lines="24" data-code-annotation="5">Style column labels with the heading font and contrasting colour.</span>
 </dd>
 </dl>
 </div>
-<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
-<p>The <code>matplotlib.font_manager</code> module handles font registration, with <code>pyfonts</code> for downloading web fonts.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-17" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-17-1"><a href="#annotated-cell-17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.font_manager <span class="im">as</span> fm</span>
-<span id="annotated-cell-17-2"><a href="#annotated-cell-17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyfonts</span>
-<span id="annotated-cell-17-3"><a href="#annotated-cell-17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-17-4"><a href="#annotated-cell-17-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> configure_brand_fonts() <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="annotated-cell-17-5"><a href="#annotated-cell-17-5" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
-<span id="annotated-cell-17-6"><a href="#annotated-cell-17-6" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-17-7" class="code-annotation-target"><a href="#annotated-cell-17-7" aria-hidden="true" tabindex="-1"></a>    doc_dir <span class="op">=</span> pathlib.Path(info[<span class="st">"document-path"</span>]).parent</span>
-<span id="annotated-cell-17-8"><a href="#annotated-cell-17-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-17-9"><a href="#annotated-cell-17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> mode <span class="kw">in</span> [<span class="st">"light"</span>, <span class="st">"dark"</span>]:</span>
-<span id="annotated-cell-17-10"><a href="#annotated-cell-17-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> mode <span class="kw">not</span> <span class="kw">in</span> brand:</span>
-<span id="annotated-cell-17-11"><a href="#annotated-cell-17-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
-<span id="annotated-cell-17-12"><a href="#annotated-cell-17-12" aria-hidden="true" tabindex="-1"></a>        fonts <span class="op">=</span> brand[mode][<span class="st">"data"</span>][<span class="st">"typography"</span>][<span class="st">"fonts"</span>]</span>
-<span id="annotated-cell-17-13"><a href="#annotated-cell-17-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> font_spec <span class="kw">in</span> fonts:</span>
-<span id="annotated-cell-17-14"><a href="#annotated-cell-17-14" aria-hidden="true" tabindex="-1"></a>            family <span class="op">=</span> font_spec[<span class="st">"family"</span>]</span>
-<span id="annotated-cell-17-15"><a href="#annotated-cell-17-15" aria-hidden="true" tabindex="-1"></a>            source <span class="op">=</span> font_spec[<span class="st">"source"</span>]</span>
-<span id="annotated-cell-17-16"><a href="#annotated-cell-17-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-17-17"><a href="#annotated-cell-17-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> source <span class="op">==</span> <span class="st">"file"</span>:</span>
-<span id="annotated-cell-17-18"><a href="#annotated-cell-17-18" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> f <span class="kw">in</span> font_spec.get(<span class="st">"files"</span>, []):</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-17-19" class="code-annotation-target"><a href="#annotated-cell-17-19" aria-hidden="true" tabindex="-1"></a>                    resolved <span class="op">=</span> doc_dir <span class="op">/</span> f[<span class="st">"path"</span>]</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-17-20" class="code-annotation-target"><a href="#annotated-cell-17-20" aria-hidden="true" tabindex="-1"></a>                    fm.fontManager.addfont(<span class="bu">str</span>(resolved))</span>
-<span id="annotated-cell-17-21"><a href="#annotated-cell-17-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> source <span class="kw">in</span> (<span class="st">"bunny"</span>, <span class="st">"google"</span>):</span>
-<span id="annotated-cell-17-22"><a href="#annotated-cell-17-22" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> source <span class="op">==</span> <span class="st">"bunny"</span>:</span>
-<span id="annotated-cell-17-23"><a href="#annotated-cell-17-23" aria-hidden="true" tabindex="-1"></a>                    props <span class="op">=</span> pyfonts.load_bunny_font(family)</span>
-<span id="annotated-cell-17-24"><a href="#annotated-cell-17-24" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
-<span id="annotated-cell-17-25"><a href="#annotated-cell-17-25" aria-hidden="true" tabindex="-1"></a>                    props <span class="op">=</span> pyfonts.load_google_font(family)</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-17-26" class="code-annotation-target"><a href="#annotated-cell-17-26" aria-hidden="true" tabindex="-1"></a>                fm.fontManager.addfont(props.get_file())</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tabset-8-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-8-2-tab">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-17" data-filename="python"><pre class="sourceCode python cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-17-1"><a href="#annotated-cell-17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> great_tables <span class="im">import</span> GT, loc, style</span>
+<span id="annotated-cell-17-2"><a href="#annotated-cell-17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-17-3"><a href="#annotated-cell-17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gt_brand(data, brand_mode: <span class="bu">str</span> <span class="op">=</span> <span class="st">"light"</span>) <span class="op">-&gt;</span> GT:</span>
+<span id="annotated-cell-17-4"><a href="#annotated-cell-17-4" aria-hidden="true" tabindex="-1"></a>    info <span class="op">=</span> get_brand_info()</span>
+<span id="annotated-cell-17-5"><a href="#annotated-cell-17-5" aria-hidden="true" tabindex="-1"></a>    brand <span class="op">=</span> info[<span class="st">"format"</span>][<span class="st">"render"</span>][<span class="st">"brand"</span>]</span>
+<span id="annotated-cell-17-6"><a href="#annotated-cell-17-6" aria-hidden="true" tabindex="-1"></a>    brand_data <span class="op">=</span> brand[brand_mode][<span class="st">"data"</span>]</span>
+<span id="annotated-cell-17-7"><a href="#annotated-cell-17-7" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> brand_data[<span class="st">"color"</span>]</span>
+<span id="annotated-cell-17-8"><a href="#annotated-cell-17-8" aria-hidden="true" tabindex="-1"></a>    typography <span class="op">=</span> brand_data[<span class="st">"typography"</span>]</span>
+<span id="annotated-cell-17-9"><a href="#annotated-cell-17-9" aria-hidden="true" tabindex="-1"></a>    palette <span class="op">=</span> <span class="bu">list</span>(colors[<span class="st">"palette"</span>].values())</span>
+<span id="annotated-cell-17-10"><a href="#annotated-cell-17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-17-11"><a href="#annotated-cell-17-11" aria-hidden="true" tabindex="-1"></a>    ink <span class="op">=</span> colors[<span class="st">"foreground"</span>]</span>
+<span id="annotated-cell-17-12"><a href="#annotated-cell-17-12" aria-hidden="true" tabindex="-1"></a>    paper <span class="op">=</span> colors[<span class="st">"background"</span>]</span>
+<span id="annotated-cell-17-13"><a href="#annotated-cell-17-13" aria-hidden="true" tabindex="-1"></a>    accent <span class="op">=</span> _col_mix(ink, paper, <span class="fl">0.25</span>)</span>
+<span id="annotated-cell-17-14"><a href="#annotated-cell-17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-17-15"><a href="#annotated-cell-17-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (</span>
+<span id="annotated-cell-17-16"><a href="#annotated-cell-17-16" aria-hidden="true" tabindex="-1"></a>        GT(data)</span>
+<span id="annotated-cell-17-17"><a href="#annotated-cell-17-17" aria-hidden="true" tabindex="-1"></a>        .tab_options(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-17-18" class="code-annotation-target"><a href="#annotated-cell-17-18" aria-hidden="true" tabindex="-1"></a>            table_font_names<span class="op">=</span>typography[<span class="st">"base"</span>],</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-17-19" class="code-annotation-target"><a href="#annotated-cell-17-19" aria-hidden="true" tabindex="-1"></a>            table_font_color<span class="op">=</span>ink,</span>
+<span id="annotated-cell-17-20"><a href="#annotated-cell-17-20" aria-hidden="true" tabindex="-1"></a>            table_background_color<span class="op">=</span>paper,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-17-21" class="code-annotation-target"><a href="#annotated-cell-17-21" aria-hidden="true" tabindex="-1"></a>            column_labels_background_color<span class="op">=</span>palette[<span class="dv">0</span>] <span class="cf">if</span> palette <span class="cf">else</span> accent,</span>
+<span id="annotated-cell-17-22"><a href="#annotated-cell-17-22" aria-hidden="true" tabindex="-1"></a>            column_labels_font_weight<span class="op">=</span><span class="st">"bold"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-17-23" class="code-annotation-target"><a href="#annotated-cell-17-23" aria-hidden="true" tabindex="-1"></a>            table_body_border_top_color<span class="op">=</span>accent,</span>
+<span id="annotated-cell-17-24"><a href="#annotated-cell-17-24" aria-hidden="true" tabindex="-1"></a>            table_body_border_bottom_color<span class="op">=</span>accent,</span>
+<span id="annotated-cell-17-25"><a href="#annotated-cell-17-25" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="annotated-cell-17-26"><a href="#annotated-cell-17-26" aria-hidden="true" tabindex="-1"></a>        .tab_style(</span>
+<span id="annotated-cell-17-27"><a href="#annotated-cell-17-27" aria-hidden="true" tabindex="-1"></a>            style<span class="op">=</span>style.text(</span>
+<span id="annotated-cell-17-28"><a href="#annotated-cell-17-28" aria-hidden="true" tabindex="-1"></a>                font<span class="op">=</span>typography[<span class="st">"headings"</span>],</span>
+<span id="annotated-cell-17-29"><a href="#annotated-cell-17-29" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>paper,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-17" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-17-30" class="code-annotation-target"><a href="#annotated-cell-17-30" aria-hidden="true" tabindex="-1"></a>                weight<span class="op">=</span><span class="st">"bold"</span>,</span>
+<span id="annotated-cell-17-31"><a href="#annotated-cell-17-31" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="annotated-cell-17-32"><a href="#annotated-cell-17-32" aria-hidden="true" tabindex="-1"></a>            locations<span class="op">=</span>loc.column_labels(),</span>
+<span id="annotated-cell-17-33"><a href="#annotated-cell-17-33" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="annotated-cell-17-34"><a href="#annotated-cell-17-34" aria-hidden="true" tabindex="-1"></a>    )</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-17" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-17" data-code-lines="7" data-code-annotation="1">Resolve the document directory for relative font paths.</span>
+<span data-code-cell="annotated-cell-17" data-code-lines="18" data-code-annotation="1">Set the base font for the entire table.</span>
 </dd>
 <dt data-target-cell="annotated-cell-17" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-17" data-code-lines="19" data-code-annotation="2">Build the full path to each local font file.</span>
+<span data-code-cell="annotated-cell-17" data-code-lines="19,20" data-code-annotation="2">Apply brand background and text colours.</span>
 </dd>
 <dt data-target-cell="annotated-cell-17" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-17" data-code-lines="20" data-code-annotation="3">Register local font files with <code>matplotlib.font_manager</code>.</span>
+<span data-code-cell="annotated-cell-17" data-code-lines="21" data-code-annotation="3">Use the first palette colour for column header background.</span>
 </dd>
 <dt data-target-cell="annotated-cell-17" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-17" data-code-lines="26" data-code-annotation="4">Download web fonts using <code>pyfonts</code> and register them.</span>
+<span data-code-cell="annotated-cell-17" data-code-lines="23,24" data-code-annotation="4">Use the accent colour for table body borders.</span>
+</dd>
+<dt data-target-cell="annotated-cell-17" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-17" data-code-lines="30" data-code-annotation="5">Style column labels with the heading font and contrasting colour.</span>
 </dd>
 </dl>
 </div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>SVG Font Rendering
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser: it cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
-<p>The companion repository includes an <code>inline-svglite.lua</code> Lua filter that replaces <code>&lt;img&gt;</code> references with raw SVG content automatically. See the <a href="https://github.com/mcanouil/quarto-brand-renderings">companion repository</a> for the full implementation.</p>
 </div>
 </div>
 </section>
@@ -1132,67 +1232,24 @@ Note
 </div>
 </div>
 </section>
-<section id="conclusion" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">9</span> Conclusion</h2>
-<p>The <code>QUARTO_EXECUTE_INFO</code> environment variable provides language-agnostic access to Quarto’s resolved brand configuration at render time. With a small set of helper functions, you can apply consistent brand colours, fonts, and palettes to every figure and table your code produces.</p>
-<style>
-#branded-carousel .carousel-control-prev-icon,
-#branded-carousel .carousel-control-next-icon {
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6)) drop-shadow(0 0 1px rgba(0,0,0,0.8));
-}
-#branded-carousel .carousel-indicators button {
-  box-shadow: 0 0 4px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.8);
-}
-#branded-carousel {
-  max-width: 500px;
-  width: 100%;
-  margin: 0 auto;
-}
-</style>
-<div id="branded-carousel" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Brand 1"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="1" aria-label="Brand 2"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="2" aria-label="Brand 3"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="3" aria-label="Brand 4"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="4" aria-label="Brand 5"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="5" aria-label="Brand 6"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="assets/_featured-brand-1.png" class="d-block w-100" alt="Brand 1 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-2.png" class="d-block w-100" alt="Brand 2 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-3.png" class="d-block w-100" alt="Brand 3 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-4.png" class="d-block w-100" alt="Brand 4 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-5.png" class="d-block w-100" alt="Brand 5 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-6.png" class="d-block w-100" alt="Brand 6 featured image showing light and dark mode branded figures and tables.">
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#branded-carousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#branded-carousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-<div class="highlight">
-<p>The companion repository <a href="https://github.com/mcanouil/quarto-brand-renderings">mcanouil/quarto-brand-renderings</a> contains six brand configurations with full R and Python implementations for branded figures and tables. Browse the rendered examples to see how different colour palettes and typography affect the overall look and feel.</p>
-</div>
+<section id="putting-it-all-together" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="putting-it-all-together"><span class="header-section-number">9</span> Putting It All Together</h2>
+<p>The full workflow boils down to four steps:</p>
+<ol type="1">
+<li>Call <code>configure_brand_fonts()</code> once in a hidden setup chunk (<code>#| include: false</code>) to register brand fonts before any plotting.</li>
+<li>Apply <code>theme_brand(brand_mode = ...)</code> to every <code>ggplot2</code> or <code>plotnine</code> figure.</li>
+<li>Pass your data through <code>gt_brand(data, brand_mode = ...)</code> for every <code>gt</code> or <code>great_tables</code> table.</li>
+<li>Use <code>renderings: [light, dark]</code> on figure cells and <code>.light-content</code>/<code>.dark-content</code> divs on tables so the reader’s theme preference is respected automatically.</li>
+</ol>
+<p>That is the entire pattern. Every helper reads from the same <code>QUARTO_EXECUTE_INFO</code> source, so switching to a different brand configuration is just a matter of changing your <code>_brand.yml</code> file; no code changes are needed.</p>
 </section>
-<section id="further-resources" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="further-resources"><span class="header-section-number">10</span> Further Resources</h2>
+<section id="conclusion" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">10</span> Conclusion</h2>
+<p>The <code>QUARTO_EXECUTE_INFO</code> environment variable provides language-agnostic access to Quarto’s resolved brand configuration at render time. With a small set of helper functions, you can apply consistent brand colours, fonts, and palettes to every figure and table your code produces.</p>
+<p>This is one approach among several (see the note on <code>brand.yml</code> packages above), but it has the advantage of working identically in R and Python, supporting full font registration, and requiring no dependencies beyond a JSON parser and the plotting libraries you are already using. Browse the <a href="https://github.com/mcanouil/quarto-brand-renderings">companion repository</a> for six complete brand configurations with production-ready implementations, and feel free to adapt the helpers to your own projects.</p>
+</section>
+<section id="further-resources" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="further-resources"><span class="header-section-number">11</span> Further Resources</h2>
 <ul>
 <li><a href="https://quarto.org/docs/authoring/brand.html">Multiformat Branding with <code>_brand.yml</code></a>: the official Quarto documentation on the brand feature.</li>
 <li><a href="https://quarto.org/docs/advanced/quarto-execute-info.html">Execution Context Information</a>: how <code>QUARTO_EXECUTE_INFO</code> works and what data it exposes.</li>
