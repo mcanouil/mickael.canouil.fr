@@ -54,12 +54,12 @@
     draw-node((0, -1.6), "QUARTO_EXECUTE_INFO", name: "env", w: 2.2, fill: quarto-fill, stroke: quarto-stroke)
 
     // Row 2: get_brand_info()
-    draw-node((0, -3.4), "get_brand_info()", name: "get-brand", w: 1.8, h: h-pkg, fill: shared-fill, stroke: shared-stroke, pkg: parser-pkg)
+    draw-node((0, -3.4), "get_brand_info()", name: "get-brand", w: 1.8, h: if parser-pkg == none { h-small } else { h-pkg }, fill: shared-fill, stroke: shared-stroke, pkg: parser-pkg)
 
     // Row 3: three helpers
-    draw-node((-4, -5.6), "configure_brand_fonts()", name: "fonts", w: 2.2, h: h-pkg, fill: helper-fill, stroke: helper-stroke, pkg: fonts-pkg)
-    draw-node((0, -5.6), "theme_brand()", name: "theme", w: 1.6, h: h-pkg, fill: helper-fill, stroke: helper-stroke, pkg: figures-pkg)
-    draw-node((4, -5.6), "gt_brand()", name: "gt", w: 1.4, h: h-pkg, fill: helper-fill, stroke: helper-stroke, pkg: tables-pkg)
+    draw-node((-4, -5.6), "configure_brand_fonts()", name: "fonts", w: 2.2, h: if fonts-pkg == none { h-small } else { h-pkg }, fill: helper-fill, stroke: helper-stroke, pkg: fonts-pkg)
+    draw-node((0, -5.6), "theme_brand()", name: "theme", w: 1.6, h: if figures-pkg == none { h-small } else { h-pkg }, fill: helper-fill, stroke: helper-stroke, pkg: figures-pkg)
+    draw-node((4, -5.6), "gt_brand()", name: "gt", w: 1.4, h: if tables-pkg == none { h-small } else { h-pkg }, fill: helper-fill, stroke: helper-stroke, pkg: tables-pkg)
 
     // Row 4: outputs
     draw-node((0, -7.6), "Light / Dark Figures", name: "figures", w: 1.8, fill: output-fill, stroke: output-stroke)
