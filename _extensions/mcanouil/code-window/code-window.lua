@@ -799,6 +799,27 @@ local function process_typst_blocks(blocks)
         pending_annot_block_id = nil
         i = i + 1
       end
+    elseif blk.t == 'BulletList' or blk.t == 'OrderedList' then
+      for j, item in ipairs(blk.content) do
+        blk.content[j] = process_typst_blocks(pandoc.Blocks(item))
+      end
+      table.insert(new_blocks, blk)
+      pending_annot_block_id = nil
+      i = i + 1
+    elseif blk.t == 'BlockQuote' then
+      blk.content = process_typst_blocks(blk.content)
+      table.insert(new_blocks, blk)
+      pending_annot_block_id = nil
+      i = i + 1
+    elseif blk.t == 'DefinitionList' then
+      for j, def_item in ipairs(blk.content) do
+        for k, body in ipairs(def_item[2]) do
+          def_item[2][k] = process_typst_blocks(pandoc.Blocks(body))
+        end
+      end
+      table.insert(new_blocks, blk)
+      pending_annot_block_id = nil
+      i = i + 1
     else
       pending_annot_block_id = nil
       table.insert(new_blocks, blk)
