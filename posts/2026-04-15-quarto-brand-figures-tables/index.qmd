@@ -5,6 +5,7 @@ description: |
   feature by reading brand configuration from the `QUARTO_EXECUTE_INFO`
   environment variable at render time.
 date: "2026-04-15"
+date-modified: "2026-04-15"
 categories:
   - quarto
   - brand
@@ -17,6 +18,7 @@ image-alt: |
   Animated feature image cycling through six brand configurations, each showing
   branded scatter plots and tables in light and dark modes using Quarto's brand
   feature with ggplot2 and gt in R.
+engine: markdown
 ---
 
 ![](featured.gif){
@@ -36,28 +38,82 @@ Some APIs or behaviours may differ in earlier stable releases.
 
 :::
 
+Quarto's `brand` feature is a convenient way to keep a document's look consistent across formats: define your colours, fonts, and logos once in a `_brand.yml` file, and everything from the navbar to the code blocks picks them up automatically.
+Code-generated outputs, however, are a different story.
+A `ggplot2` scatter plot or a `gt` summary table will cheerfully ignore your brand and render with their own defaults.
+This post walks through one approach to close that gap: reading the resolved brand configuration at render time and applying it to every figure and table your code produces.
+
 ::: {.callout-tip}
 
-## TL;DR
+## Key Principles
 
-Quarto's `brand` feature themes your document automatically, but code-generated figures and tables need explicit styling.
-This post shows how to read brand colours, fonts, and palettes from the `QUARTO_EXECUTE_INFO` environment variable at render time, then apply them to:
-
-- `ggplot2` and `plotnine` figures via a custom `theme_brand()` function.
-- `gt` and `great_tables` tables via a custom `gt_brand()` function.
-
-The companion repository [mcanouil/quarto-brand-renderings](https://github.com/mcanouil/quarto-brand-renderings) contains six complete brand configurations with parallel R and Python implementations.
+- Quarto sets `QUARTO_EXECUTE_INFO` for every code cell; parse it for brand colours, fonts, and palettes.
+- Register web fonts before any plotting; graphics devices do not see brand-defined fonts by default.
+- Wrap the styling logic in `theme_brand()` (figures) and `gt_brand()` (tables) so every output inherits brand values.
+- Use `renderings: [light, dark]` and `.light-content`/`.dark-content` to match the reader's selected theme automatically.
+- The companion repository [mcanouil/quarto-brand-renderings](https://github.com/mcanouil/quarto-brand-renderings) has production-ready implementations with full error handling.
 
 :::
 
 ## The Problem
 
-Quarto's `brand` feature lets you define colours, fonts, and logos in a single configuration.
-The document theme, navbar, sidebar, and code blocks all pick up these values automatically.
-
-Code-generated figures and tables, however, do not.
-A `ggplot2` scatter plot or a gt summary table will use their default styling regardless of what your brand specifies.
 The goal is to make every visual output match the document's brand without hardcoding hex values or font names.
+Here is what branded outputs look like across six different brand configurations, each with light and dark variants:
+
+```{=html}
+<style>
+#branded-carousel .carousel-control-prev-icon,
+#branded-carousel .carousel-control-next-icon {
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6)) drop-shadow(0 0 1px rgba(0,0,0,0.8));
+}
+#branded-carousel .carousel-indicators button {
+  box-shadow: 0 0 4px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.8);
+}
+#branded-carousel {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+</style>
+<div id="branded-carousel" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Brand 1"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="1" aria-label="Brand 2"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="2" aria-label="Brand 3"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="3" aria-label="Brand 4"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="4" aria-label="Brand 5"></button>
+    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="5" aria-label="Brand 6"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="assets/_featured-brand-1.png" class="d-block w-100" alt="Brand 1 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-2.png" class="d-block w-100" alt="Brand 2 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-3.png" class="d-block w-100" alt="Brand 3 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-4.png" class="d-block w-100" alt="Brand 4 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-5.png" class="d-block w-100" alt="Brand 5 featured image showing light and dark mode branded figures and tables.">
+    </div>
+    <div class="carousel-item">
+      <img src="assets/_featured-brand-6.png" class="d-block w-100" alt="Brand 6 featured image showing light and dark mode branded figures and tables.">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#branded-carousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#branded-carousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+```
 
 ::: {.callout-note}
 
@@ -81,7 +137,7 @@ Reading it requires only a JSON parser.
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 ```{.r}
 get_brand_info <- function() {
@@ -94,7 +150,7 @@ get_brand_info <- function() {
 1. Read the environment variable set by Quarto.
 2. Parse the JSON string into an R list.
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 ```{.python}
 import json
@@ -124,14 +180,14 @@ During development, print the full JSON to see what is available:
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 ```{.r}
 info <- get_brand_info()
 cat(jsonlite::toJSON(info[["format"]][["render"]][["brand"]], pretty = TRUE))
 ```
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 ```{.python}
 info = get_brand_info()
@@ -183,13 +239,55 @@ The key fields are:
 - `typography.base` / `typography.headings`: font family names.
 - `typography.fonts`: font specifications including source (`bunny`, `google`, `file`, or `system`).
 
+The diagrams below summarise how each helper function fits into the rendering pipeline.
+
+::: {.panel-tabset group="language"}
+
+### {{< iconify fa7-brands:r-project >}} R {.active}
+
+```{typst}
+//| label: fig-workflow-r
+//| cap: "R workflow for branded figures and tables."
+//| alt: "Diagram showing the R workflow: quarto render sets QUARTO_EXECUTE_INFO, which is parsed by get_brand_info(). That feeds configure_brand_fonts() using systemfonts, theme_brand() using ggplot2 and scales, and gt_brand() using gt, producing light/dark figures and tables."
+//| classes: "img-fluid w-75 mx-auto d-block"
+//| fig-align: center
+//| preamble: workflow-diagram.typ
+
+#brand-workflow(
+  [jsonlite],
+  [systemfonts],
+  [ggplot2 + scales],
+  [gt],
+)
+```
+
+### {{< iconify fa7-brands:python >}} Python
+
+```{typst}
+//| label: fig-workflow-py
+//| cap: "Python workflow for branded figures and tables."
+//| alt: "Diagram showing the Python workflow: quarto render sets QUARTO_EXECUTE_INFO, which is parsed by get_brand_info(). That feeds configure_brand_fonts() using pyfonts and matplotlib, theme_brand() using plotnine, and gt_brand() using great_tables, producing light/dark figures and tables."
+//| classes: "img-fluid w-75 mx-auto d-block"
+//| fig-align: center
+//| preamble: workflow-diagram.typ
+
+#brand-workflow(
+  [json + os],
+  [pyfonts + matplotlib],
+  [plotnine],
+  [great\_tables],
+)
+```
+
+:::
+
 ## Dependencies
 
 This approach relies on a handful of packages for each language.
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 - [`jsonlite`](https://cran.r-project.org/package=jsonlite): parse the `QUARTO_EXECUTE_INFO` JSON.
 - [`ggplot2`](https://ggplot2.tidyverse.org/): the `ink`, `paper`, `accent`, and `palette.*` theme elements used by `theme_brand()` are not yet on CRAN.
@@ -197,23 +295,123 @@ This approach relies on a handful of packages for each language.
 - [`scales`](https://scales.r-lib.org/): colour blending via `col_mix()`.
 - [`systemfonts`](https://systemfonts.r-lib.org/): font discovery, registration, and web font embedding for SVG output.
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 - [`plotnine`](https://plotnine.org/): `ggplot2`-style plotting.
 - [`great_tables`](https://posit-dev.github.io/great-tables/): table styling.
 - [`polars`](https://pola.rs/): data manipulation.
-- [`pyfonts`](https://github.com/y-sunflower/pyfonts): font loading from Bunny Fonts and Google Fonts, created by Joseph Barbier.
+- [`pyfonts`](https://github.com/y-sunflower/pyfonts): font loading from Bunny Fonts and Google Fonts, created by [Joseph Barbier](https://github.com/JosephBARBIERDARNAL).
   The companion repository uses a development version of `pyfonts` for improved font subset selection.
+
+:::
+
+## Font Registration
+
+Web fonts defined in a brand configuration are not available to R or Python graphics devices by default.
+Before creating any plots or tables, a `configure_brand_fonts()` function registers each font so that graphics devices can find them.
+Call it once in a setup chunk at the top of your document.
+
+::: {.panel-tabset group="language"}
+
+### {{< iconify fa7-brands:r-project >}} R {.active}
+
+The `systemfonts` package handles font discovery and registration.
+
+```{.r}
+configure_brand_fonts <- function(brand_mode = "light") {
+  info <- get_brand_info()
+  brand <- info[["format"]][["render"]][["brand"]]
+  doc_dir <- dirname(info[["document-path"]])                                   # <1>
+
+  for (mode in intersect(c("light", "dark"), names(brand))) {
+    fonts <- brand[[mode]][["data"]][["typography"]][["fonts"]]
+    for (ifont in seq_len(nrow(fonts))) {
+      family <- fonts[["family"]][[ifont]]
+      source <- fonts[["source"]][[ifont]]
+
+      if (identical(source, "file")) {
+        files <- fonts[["files"]][[ifont]]
+        for (fp in as.character(files[["path"]])) {
+          resolved <- file.path(doc_dir, fp)                                    # <2>
+          systemfonts::register_font(family, plain = resolved)                  # <3>
+        }
+      } else {
+        systemfonts::require_font(family, repositories = "Bunny Fonts")         # <4>
+      }
+    }
+  }
+  systemfonts::reset_font_cache()                                               # <5>
+}
+```
+
+1. Resolve the document directory from `QUARTO_EXECUTE_INFO` for relative font paths.
+2. Build the full path to each local font file.
+3. Register local font files with `systemfonts::register_font()`.
+4. Download web fonts from Bunny Fonts (or Google Fonts) with `systemfonts::require_font()`.
+5. Reset the font cache so newly registered fonts become available.
+
+### {{< iconify fa7-brands:python >}} Python
+
+The `matplotlib.font_manager` module handles font registration, with `pyfonts` for downloading web fonts.
+
+```{.python}
+import matplotlib.font_manager as fm
+import pyfonts
+
+def configure_brand_fonts() -> None:
+    info = get_brand_info()
+    brand = info["format"]["render"]["brand"]
+    doc_dir = pathlib.Path(info["document-path"]).parent   # <1>
+
+    for mode in ["light", "dark"]:
+        if mode not in brand:
+            continue
+        fonts = brand[mode]["data"]["typography"]["fonts"]
+        for font_spec in fonts:
+            family = font_spec["family"]
+            source = font_spec["source"]
+
+            if source == "file":
+                for f in font_spec.get("files", []):
+                    resolved = doc_dir / f["path"]         # <2>
+                    fm.fontManager.addfont(str(resolved))  # <3>
+            elif source in ("bunny", "google"):
+                if source == "bunny":
+                    props = pyfonts.load_bunny_font(family)
+                else:
+                    props = pyfonts.load_google_font(family)
+                fm.fontManager.addfont(props.get_file())   # <4>
+```
+
+1. Resolve the document directory for relative font paths.
+2. Build the full path to each local font file.
+3. Register local font files with `matplotlib.font_manager`.
+4. Download web fonts using `pyfonts` and register them.
+
+:::
+
+::: {.callout-note}
+
+## SVG Font Rendering
+
+When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly.
+An SVG file referenced via an `<img>` tag is treated as an isolated document by the browser: it cannot access the page's stylesheets or `@import` rules, so any `@font-face` declarations inside the SVG that reference external URLs are silently ignored.
+Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.
+
+The companion repository includes an `inline-svglite.lua` Lua filter that replaces `<img>` references with raw SVG content automatically.
+See the [companion repository](https://github.com/mcanouil/quarto-brand-renderings) for the full implementation.
 
 :::
 
 ## Branded Figures
 
 The `theme_brand()` function extracts colours and fonts from the brand data and builds a complete `ggplot2` or plotnine theme.
+The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor.
+In R, the latest `ggplot2` supports `ink`, `paper`, and `accent` parameters directly in `theme_minimal()`; in Python, each theme element is styled individually.
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 ```{.r}
 theme_brand <- function(base_size = 11, brand_mode = "light") {
@@ -254,7 +452,7 @@ theme_brand <- function(base_size = 11, brand_mode = "light") {
 5. Pass ink, paper, and accent to `theme_minimal()`.
 6. Set the discrete colour palette for geoms.
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 R uses `scales::col_mix()` to blend colours.
 Python needs a small helper since there is no equivalent in plotnine:
@@ -352,7 +550,7 @@ With `theme_brand()` defined, applying it to a plot is straightforward.
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 ```{.r}
 library(ggplot2)
@@ -365,7 +563,7 @@ ggplot(penguins) +
   labs(title = "Light Mode", subtitle = "Using brand colours and fonts")
 ```
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 ```{.python}
 import polars as pl
@@ -391,11 +589,12 @@ palette = get_brand_palette("light")
 
 ## Branded Tables
 
-The `gt_brand()` function applies brand colours and fonts to `gt` (R) and `great_tables` (Python) tables.
+The `gt_brand()` function follows the same pattern: extract brand colours and fonts, then apply them to the table.
+Column headers get the first palette colour as a background, body borders use an accent derived from blending ink and paper, and the base and heading fonts are applied throughout.
 
 ::: {.panel-tabset group="language"}
 
-### R
+### {{< iconify fa7-brands:r-project >}} R {.active}
 
 ```{.r}
 gt_brand <- function(data, brand_mode = "light") {
@@ -433,7 +632,7 @@ gt_brand <- function(data, brand_mode = "light") {
 4. Use the accent colour for table body borders.
 5. Style column labels with the heading font and contrasting colour.
 
-### Python
+### {{< iconify fa7-brands:python >}} Python
 
 ```{.python}
 from great_tables import GT, loc, style
@@ -480,103 +679,6 @@ def gt_brand(data, brand_mode: str = "light") -> GT:
 
 :::
 
-## Font Registration
-
-Web fonts defined in a brand configuration are not available to R or Python graphics devices by default.
-A `configure_brand_fonts()` function, called once at setup, registers each font before any plots or tables are created.
-
-::: {.panel-tabset group="language"}
-
-### R
-
-The `systemfonts` package handles font discovery and registration.
-
-```{.r}
-configure_brand_fonts <- function(brand_mode = "light") {
-  info <- get_brand_info()
-  brand <- info[["format"]][["render"]][["brand"]]
-  doc_dir <- dirname(info[["document-path"]])                                   # <1>
-
-  for (mode in intersect(c("light", "dark"), names(brand))) {
-    fonts <- brand[[mode]][["data"]][["typography"]][["fonts"]]
-    for (ifont in seq_len(nrow(fonts))) {
-      family <- fonts[["family"]][[ifont]]
-      source <- fonts[["source"]][[ifont]]
-
-      if (identical(source, "file")) {
-        files <- fonts[["files"]][[ifont]]
-        for (fp in as.character(files[["path"]])) {
-          resolved <- file.path(doc_dir, fp)                                    # <2>
-          systemfonts::register_font(family, plain = resolved)                  # <3> 
-        }
-      } else {
-        systemfonts::require_font(family, repositories = "Bunny Fonts")         # <4> 
-      }
-    }
-  }
-  systemfonts::reset_font_cache()                                               # <5>
-}
-```
-
-1. Resolve the document directory from `QUARTO_EXECUTE_INFO` for relative font paths.
-2. Build the full path to each local font file.
-3. Register local font files with `systemfonts::register_font()`.
-4. Download web fonts from Bunny Fonts (or Google Fonts) with `systemfonts::require_font()`.
-5. Reset the font cache so newly registered fonts become available.
-
-### Python
-
-The `matplotlib.font_manager` module handles font registration, with `pyfonts` for downloading web fonts.
-
-```{.python}
-import matplotlib.font_manager as fm
-import pyfonts
-
-def configure_brand_fonts() -> None:
-    info = get_brand_info()
-    brand = info["format"]["render"]["brand"]
-    doc_dir = pathlib.Path(info["document-path"]).parent   # <1>
-
-    for mode in ["light", "dark"]:
-        if mode not in brand:
-            continue
-        fonts = brand[mode]["data"]["typography"]["fonts"]
-        for font_spec in fonts:
-            family = font_spec["family"]
-            source = font_spec["source"]
-
-            if source == "file":
-                for f in font_spec.get("files", []):
-                    resolved = doc_dir / f["path"]         # <2>
-                    fm.fontManager.addfont(str(resolved))  # <3>
-            elif source in ("bunny", "google"):
-                if source == "bunny":
-                    props = pyfonts.load_bunny_font(family)
-                else:
-                    props = pyfonts.load_google_font(family)
-                fm.fontManager.addfont(props.get_file())   # <4>
-```
-
-1. Resolve the document directory for relative font paths.
-2. Build the full path to each local font file.
-3. Register local font files with `matplotlib.font_manager`.
-4. Download web fonts using `pyfonts` and register them.
-
-:::
-
-::: {.callout-note}
-
-## SVG Font Rendering
-
-When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly.
-An SVG file referenced via an `<img>` tag is treated as an isolated document by the browser: it cannot access the page's stylesheets or `@import` rules, so any `@font-face` declarations inside the SVG that reference external URLs are silently ignored.
-Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.
-
-The companion repository includes an `inline-svglite.lua` Lua filter that replaces `<img>` references with raw SVG content automatically.
-See the [companion repository](https://github.com/mcanouil/quarto-brand-renderings) for the full implementation.
-
-:::
-
 ## Light and Dark Mode
 
 Quarto supports light and dark colour modes, and the brand data includes separate colour definitions for each.
@@ -611,72 +713,25 @@ Combining `renderings: [light, dark]` with branded themes means figures and tabl
 
 :::
 
+## Putting It All Together
+
+The full workflow boils down to four steps:
+
+1. Call `configure_brand_fonts()` once in a hidden setup chunk (`#| include: false`) to register brand fonts before any plotting.
+2. Apply `theme_brand(brand_mode = ...)` to every `ggplot2` or `plotnine` figure.
+3. Pass your data through `gt_brand(data, brand_mode = ...)` for every `gt` or `great_tables` table.
+4. Use `renderings: [light, dark]` on figure cells and `.light-content`/`.dark-content` divs on tables so the reader's theme preference is respected automatically.
+
+That is the entire pattern.
+Every helper reads from the same `QUARTO_EXECUTE_INFO` source, so switching to a different brand configuration is just a matter of changing your `_brand.yml` file; no code changes are needed.
+
 ## Conclusion
 
 The `QUARTO_EXECUTE_INFO` environment variable provides language-agnostic access to Quarto's resolved brand configuration at render time.
 With a small set of helper functions, you can apply consistent brand colours, fonts, and palettes to every figure and table your code produces.
 
-```{=html}
-<style>
-#branded-carousel .carousel-control-prev-icon,
-#branded-carousel .carousel-control-next-icon {
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6)) drop-shadow(0 0 1px rgba(0,0,0,0.8));
-}
-#branded-carousel .carousel-indicators button {
-  box-shadow: 0 0 4px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.8);
-}
-#branded-carousel {
-  max-width: 500px;
-  width: 100%;
-  margin: 0 auto;
-}
-</style>
-<div id="branded-carousel" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Brand 1"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="1" aria-label="Brand 2"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="2" aria-label="Brand 3"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="3" aria-label="Brand 4"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="4" aria-label="Brand 5"></button>
-    <button type="button" data-bs-target="#branded-carousel" data-bs-slide-to="5" aria-label="Brand 6"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="assets/_featured-brand-1.png" class="d-block w-100" alt="Brand 1 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-2.png" class="d-block w-100" alt="Brand 2 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-3.png" class="d-block w-100" alt="Brand 3 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-4.png" class="d-block w-100" alt="Brand 4 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-5.png" class="d-block w-100" alt="Brand 5 featured image showing light and dark mode branded figures and tables.">
-    </div>
-    <div class="carousel-item">
-      <img src="assets/_featured-brand-6.png" class="d-block w-100" alt="Brand 6 featured image showing light and dark mode branded figures and tables.">
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#branded-carousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#branded-carousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
-```
-
-::: {.highlight}
-
-The companion repository [mcanouil/quarto-brand-renderings](https://github.com/mcanouil/quarto-brand-renderings) contains six brand configurations with full R and Python implementations for branded figures and tables.
-Browse the rendered examples to see how different colour palettes and typography affect the overall look and feel.
-
-:::
+This is one approach among several (see the note on `brand.yml` packages above), but it has the advantage of working identically in R and Python, supporting full font registration, and requiring no dependencies beyond a JSON parser and the plotting libraries you are already using.
+Browse the [companion repository](https://github.com/mcanouil/quarto-brand-renderings) for six complete brand configurations with production-ready implementations, and feel free to adapt the helpers to your own projects.
 
 ## Further Resources
 
