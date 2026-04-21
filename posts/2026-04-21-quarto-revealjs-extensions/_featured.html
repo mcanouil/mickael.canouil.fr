@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #040810;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      position: relative;
+    }
+
+    /* Deep directional gradient */
+    .bg-grad {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 500px at 50% -10%, rgba(30, 80, 160, .28) 0%, transparent 70%),
+        radial-gradient(ellipse 600px 400px at 10% 90%, rgba(59, 191, 195, .10) 0%, transparent 60%),
+        radial-gradient(ellipse 600px 400px at 90% 90%, rgba(232, 105, 124, .10) 0%, transparent 60%);
+    }
+
+    /* Fine grid lines */
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Top rainbow accent bar */
+    .rainbow-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #58a6e8 0%, #3bbfc3 33%, #e8a03b 66%, #e8697c 100%);
+      opacity: .9;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      padding: 44px 52px 40px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Title row ── */
+    .header h1 {
+      font-size: 34px;
+      font-weight: 800;
+      color: #e6edf3;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .header h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #58a6e8, #3bbfc3 60%, #5bc8cb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ── Cards ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+      flex: 1;
+    }
+
+    /* Gradient-border wrapper */
+    .card {
+      --a: #58a6e8;
+      --ag: color-mix(in srgb, var(--a) 50%, transparent);
+      --al: color-mix(in srgb, var(--a) 12%, transparent);
+      border-radius: 16px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, var(--ag) 0%, var(--al) 55%, transparent 100%);
+      box-shadow: 0 0 32px color-mix(in srgb, var(--a) 10%, transparent);
+    }
+
+    .card-inner {
+      background: linear-gradient(145deg, #0c1420 0%, #080d15 100%);
+      border-radius: 15px;
+      height: 100%;
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top-edge glow line */
+    .card-inner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--ag) 40%, transparent 100%);
+    }
+
+    /* Large faint number watermark */
+    .card-inner::after {
+      content: attr(data-n);
+      position: absolute;
+      right: 20px;
+      bottom: -12px;
+      font-size: 120px;
+      font-weight: 900;
+      color: var(--a);
+      opacity: .045;
+      line-height: 1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-name {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--a);
+      letter-spacing: -.6px;
+      line-height: 1;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #7d8fa3;
+      line-height: 1.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .c1 {
+      --a: #58a6e8;
+    }
+
+    .c2 {
+      --a: #3bbfc3;
+    }
+
+    .c3 {
+      --a: #e8a03b;
+    }
+
+    .c4 {
+      --a: #e8697c;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-grad"></div>
+  <div class="grid-lines"></div>
+  <div class="rainbow-bar"></div>
+
+  <div class="content">
+    <div class="header">
+      <h1>Quarto <em>Reveal.js</em> Extensions</h1>
+    </div>
+
+    <div class="grid">
+
+      <div class="card c1">
+        <div class="card-inner" data-n="1">
+          <div class="card-body">
+            <div class="card-name">fragmention</div>
+            <div class="card-desc">Fine-grained fragment control: order and cross-element sync.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card c2">
+        <div class="card-inner" data-n="2">
+          <div class="card-body">
+            <div class="card-name">codefrag</div>
+            <div class="card-desc">Step through code annotations with the arrow keys.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card c3">
+        <div class="card-inner" data-n="3">
+          <div class="card-body">
+            <div class="card-name">cascade</div>
+            <div class="card-desc">Automatically cascade heading chains across slide breaks.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card c4">
+        <div class="card-inner" data-n="4">
+          <div class="card-body">
+            <div class="card-name">tabset</div>
+            <div class="card-desc">Navigate tabsets with the keyboard, export to PDF.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>
