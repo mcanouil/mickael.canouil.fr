@@ -41,6 +41,7 @@ local DEFAULTS = {
   foreground = nil,
   preamble = '',
   cache = true,
+  ['cache-refresh'] = false,
   file = nil,
   ['output-directory'] = nil,
   ['output-filename'] = nil,
@@ -133,6 +134,9 @@ local used_cache_files = {}
 
 --- Set of image format extensions produced during this render (for cleanup)
 local used_cache_formats = {}
+
+--- Cache of file contents read during this render pass (keyed by absolute path)
+local read_file_cache = {}
 
 -- ============================================================================
 -- BRAND / THEME COLOUR RESOLUTION
@@ -265,6 +269,91 @@ local function read_file(path)
   local content = f:read('*a')
   f:close()
   return content
+end
+
+--- Serialise all merged options as a sorted, deterministic string for cache hashing.
+--- Handles string, number, boolean, and nested table values.
+--- @param opts table Merged options
+--- @return string Serialised string
+local function serialise_opts(opts)
+  local function serialise_value(v)
+    local t = type(v)
+    if t == 'boolean' or t == 'number' then return tostring(v) end
+    if t == 'string' then return v end
+    if t == 'table' then
+      local keys = {}
+      for k in pairs(v) do keys[#keys + 1] = k end
+      table.sort(keys)
+      local parts = {}
+      for _, k in ipairs(keys) do
+        parts[#parts + 1] = tostring(k) .. '=' .. serialise_value(v[k])
+      end
+      return '{' .. table.concat(parts, ',') .. '}'
+    end
+    return ''
+  end
+  local keys = {}
+  for k in pairs(opts) do keys[#keys + 1] = k end
+  table.sort(keys)
+  local parts = {}
+  for _, k in ipairs(keys) do
+    -- Skip internal implementation keys (prefixed with '_'); they are not user-visible
+    -- rendering parameters and change independently (e.g. _source is a code preview,
+    -- _block_input is already captured by input_serial).
+    if opts[k] ~= nil and k:sub(1, 1) ~= '_' then
+      parts[#parts + 1] = tostring(k) .. '=' .. serialise_value(opts[k])
+    end
+  end
+  return table.concat(parts, '|')
+end
+
+--- Extract local file paths referenced by #import and #include statements.
+--- Skips package imports (paths starting with @).
+--- @param source string Typst source to scan
+--- @return table List of unique local file path strings
+local function extract_local_file_refs(source)
+  local refs, seen = {}, {}
+  local function add(path)
+    if path:sub(1, 1) ~= '@' and not seen[path] then
+      seen[path] = true
+      refs[#refs + 1] = path
+    end
+  end
+  for p in source:gmatch('#import%s*"([^"]+)"') do add(p) end
+  for p in source:gmatch("#import%s*'([^']+)'") do add(p) end
+  for p in source:gmatch('#include%s*"([^"]+)"') do add(p) end
+  for p in source:gmatch("#include%s*'([^']+)'") do add(p) end
+  return refs
+end
+
+--- Recursively collect the content of locally imported Typst files for cache hashing.
+--- All paths are resolved relative to root (matching how Typst resolves stdin imports).
+--- Missing files are silently skipped; cycles are prevented via visited table.
+--- @param source string Typst source to scan for imports
+--- @param root string Absolute Typst project root path
+--- @param visited table Set of already-visited absolute paths (prevents cycles)
+--- @return string Concatenated rel_path+content string for all reachable local imports
+local function collect_import_content(source, root, visited)
+  local parts = {}
+  for _, rel_path in ipairs(extract_local_file_refs(source)) do
+    local abs_path = pandoc.path.normalize(pandoc.path.join({ root, rel_path }))
+    if not visited[abs_path] then
+      visited[abs_path] = true
+      local content = read_file_cache[abs_path]
+      if content == nil then
+        content = read_file(abs_path)
+        read_file_cache[abs_path] = content or false
+      elseif content == false then
+        content = nil
+      end
+      if content then
+        parts[#parts + 1] = rel_path .. '\0' .. content
+        local sub = collect_import_content(content, root, visited)
+        if sub ~= '' then parts[#parts + 1] = sub end
+      end
+    end
+  end
+  return table.concat(parts, '\n')
 end
 
 --- Resolve the Typst binary path.
@@ -484,6 +573,28 @@ local function resolve_opts_colours(opts, mode)
   return resolved
 end
 
+--- Extract a raw hex value from a Typst rgb() expression, e.g. rgb("#F4EDDF") -> "#F4EDDF".
+--- Returns nil for non-hex expressions (oklch, named colours, etc.).
+--- @param typst_expr string|nil Typst colour expression
+--- @return string|nil Hex string or nil
+local function typst_colour_to_hex(typst_expr)
+  if not typst_expr then return nil end
+  return typst_expr:match('^rgb%("(#[%x]+)"%)$')
+end
+
+--- Prepend Typst let-bindings for the render background/foreground variables.
+--- These make document colours available to library code under predictable names.
+--- @param parts table String parts list to append to
+--- @param opts table Options containing background and optional foreground
+local function inject_colour_vars(parts, opts)
+  parts[#parts + 1] = '#let _typst_render_background = ' .. opts.background
+  if opts.foreground then
+    parts[#parts + 1] = '#let _typst_render_foreground = ' .. opts.foreground
+  else
+    parts[#parts + 1] = '#let _typst_render_foreground = none'
+  end
+end
+
 --- Build the `#set page(...)` directive from options (for image compilation).
 --- @param opts table Merged options
 --- @return string Typst page directive
@@ -510,6 +621,7 @@ end
 --- @return string Complete Typst source
 local function build_typst_source(code, opts)
   local parts = {}
+  inject_colour_vars(parts, opts)
   parts[#parts + 1] = build_page_directive(opts)
   if opts.foreground then
     parts[#parts + 1] = '#set text(fill: ' .. opts.foreground .. ')'
@@ -788,14 +900,24 @@ local function compile_typst(source, opts, img_format)
   end
   dpi = tostring(math.floor(dpi))
 
+  -- Resolve root early: needed for import scanning before cache key is built
+  local resolved_root = global_config.root
+      and paths.resolve_project_path(global_config.root)
+      or quarto.project.directory
+
   -- Merge global and per-block input variables
   local merged_input = merge_inputs(opts.input, opts._block_input)
   local input_serial = serialise_inputs(merged_input)
 
-  -- Include inputs in cache hash material
+  -- Build cache hash material: source + inputs + all merged options + imported file contents
   local hash_source = source
   if input_serial ~= '' then
-    hash_source = source .. '|input:' .. input_serial
+    hash_source = hash_source .. '|input:' .. input_serial
+  end
+  hash_source = hash_source .. '|opts:' .. serialise_opts(opts)
+  local import_content = collect_import_content(source, resolved_root, {})
+  if import_content ~= '' then
+    hash_source = hash_source .. '|imports:' .. import_content
   end
 
   local use_cache = opts.cache ~= false
@@ -839,14 +961,6 @@ local function compile_typst(source, opts, img_format)
     end
   end
 
-  -- Resolve --root: global config or Quarto project directory
-  local resolved_root
-  if global_config.root then
-    resolved_root = paths.resolve_project_path(global_config.root)
-  else
-    resolved_root = quarto.project.directory
-  end
-
   local args = { 'compile', '--format', img_format, '--ppi', dpi, '--root', resolved_root }
 
   -- Add --font-path flags (global-only; always a list after get_configuration)
@@ -873,6 +987,21 @@ local function compile_typst(source, opts, img_format)
   for _, k in ipairs(sorted_keys) do
     args[#args + 1] = '--input'
     args[#args + 1] = k .. '=' .. merged_input[k]
+  end
+
+  -- Expose document colours to library theme functions via sys.inputs.
+  -- Only hex colours (rgb("#RRGGBB")) can be round-tripped through a CLI flag;
+  -- other expressions (oklch, named colours) are available via the #let bindings
+  -- injected by inject_colour_vars and do not need a separate --input flag.
+  local fg_hex = typst_colour_to_hex(opts.foreground)
+  local bg_hex = typst_colour_to_hex(opts.background)
+  if fg_hex then
+    args[#args + 1] = '--input'
+    args[#args + 1] = 'typst-render-foreground=' .. fg_hex
+  end
+  if bg_hex then
+    args[#args + 1] = '--input'
+    args[#args + 1] = 'typst-render-background=' .. bg_hex
   end
 
   -- Use stdin ('-') instead of a temp file
@@ -1107,6 +1236,7 @@ end
 --- @return pandoc.Meta
 local function get_configuration(meta)
   register_custom_crossref_types(meta)
+  read_file_cache = {}
 
   -- Build per-document cache subdirectory from the input file stem
   local doc_stem = 'default'
@@ -1128,7 +1258,7 @@ local function get_configuration(meta)
     -- so we use a separate key list to ensure 'format' etc. are not missed.
     local config_keys = {
       'format', 'dpi', 'width', 'height', 'margin',
-      'cache', 'echo', 'eval', 'include', 'output', 'output-location', 'classes',
+      'cache', 'cache-refresh', 'echo', 'eval', 'include', 'output', 'output-location', 'classes',
       'root', 'package-path', 'pages', 'layout-ncol', 'align',
       'output-directory',
     }
@@ -1136,18 +1266,7 @@ local function get_configuration(meta)
       local default_val = DEFAULTS[k]
       if ext_config[k] ~= nil then
         local val = ext_config[k]
-        if k == 'cache' then
-          if type(val) == 'boolean' then
-            global_config[k] = val
-          else
-            local str = pandoc.utils.stringify(val)
-            if str == 'clean' then
-              global_config[k] = 'clean'
-            else
-              global_config[k] = str == 'true'
-            end
-          end
-        elseif k == 'echo' then
+        if k == 'echo' then
           if type(val) == 'boolean' then
             global_config[k] = val
           else
@@ -1246,20 +1365,6 @@ local function get_configuration(meta)
     end
   end
 
-  -- Clear per-document cache when caching is disabled (cache: false).
-  -- When cache is true or 'clean', existing files are preserved.
-  if global_config.cache == false then
-    local abs_cache = pandoc.path.join({ quarto.project.directory, cache_subdir })
-    local list_ok, entries = pcall(pandoc.system.list_directory, abs_cache)
-    if list_ok then
-      for _, filename in ipairs(entries) do
-        if filename:match('^typst%-') then
-          os.remove(pandoc.path.join({ abs_cache, filename }))
-        end
-      end
-    end
-  end
-
   return meta
 end
 
@@ -1272,6 +1377,14 @@ local function process_codeblock(el)
   end
 
   local block_opts, clean_code, option_lines = cell.parse_options(el.text)
+
+  if block_opts['cache-refresh'] ~= nil then
+    log.log_warning(
+      EXTENSION_NAME,
+      'Per-block "cache-refresh" is not supported; use the global option instead.'
+    )
+    block_opts['cache-refresh'] = nil
+  end
 
   -- Stash per-block input string before merge overwrites it with global table
   local block_input_str = nil
@@ -1292,18 +1405,6 @@ local function process_codeblock(el)
     elseif type(block_val) == 'string' and block_val ~= DEFAULTS[colour_key] then
       opts[colour_key] = css_colour_to_typst(block_val)
     end
-  end
-
-  -- Per-block "cache: clean" is not supported; warn and treat as true
-  if type(block_opts.cache) == 'string' and block_opts.cache:lower() == 'clean' then
-    log.log_warning(
-      EXTENSION_NAME,
-      'Per-block "cache: clean" is not supported; treating as "cache: true".'
-    )
-    opts.cache = true
-  elseif opts.cache == 'clean' then
-    -- Global 'clean' mode: normalise to true for this block's compilation
-    opts.cache = true
   end
 
   if not cell.should_include(opts) then
@@ -1349,6 +1450,7 @@ local function process_codeblock(el)
         or opts
     local preamble = resolve_preamble(typst_opts.preamble)
     local parts = {}
+    inject_colour_vars(parts, typst_opts)
     if typst_opts.foreground then
       parts[#parts + 1] = '#set text(fill: ' .. typst_opts.foreground .. ')'
     end
@@ -1651,13 +1753,13 @@ local function process_inline_code(el)
 end
 
 --- Remove stale cache files after all blocks have been processed.
---- Only runs when global `cache` is `'clean'`. Only removes files whose
+--- Only runs when `cache-refresh` is `true`. Only removes files whose
 --- extension matches a format produced during the current render, so an HTML
 --- render (producing `.svg`) will not wipe `.png` files from a previous PDF render.
 --- @param doc pandoc.Pandoc
 --- @return nil
 local function cleanup_cache(doc) -- luacheck: ignore 212
-  if global_config.cache ~= 'clean' then
+  if not global_config['cache-refresh'] or not cache_subdir then
     return nil
   end
   local abs_cache = pandoc.path.join({ quarto.project.directory, cache_subdir })
