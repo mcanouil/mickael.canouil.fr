@@ -1,174 +1,190 @@
-
-// ===========================
-// PROJECTS GRID STYLING
-// ===========================
+// =============================================================================
+// PROJECTS GRID — flat editorial cards (replaces old heavy Bootstrap chrome).
+// Two-column horizontal layout: thumbnail left, content right.
+// =============================================================================
 
 .projects {
-  flex: 0 50%;
-  background: body-mix(99%);
-  box-shadow: 0 2px 8px rgba($body-color, 0.08);
-  border: 1px solid rgba($body-color, 0.1);
-  border-radius: 8px;
-  margin: 8px;
-  padding: 10px 15px;
+  display: grid;
+  grid-template-columns: minmax(120px, 38%) 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid $mc-rule-web;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
   position: relative;
-  overflow: hidden;
-  min-height: 265px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 0;
+  transition: background-color 0.25s ease;
 
-  // Hover effects consistent with theme.scss grid items
+  &:last-child {
+    border-bottom: 1px solid $mc-rule-web;
+  }
+
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba($body-color, 0.12);
-    border-color: rgba($body-color, 0.15);
+    background-color: rgba($mc-accent, 0.04);
+    transform: none;
+    box-shadow: none;
+  }
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .card-img-top {
+    border: 1px solid $mc-rule-web;
+    aspect-ratio: 1200 / 630;
+    overflow: hidden;
+    background: rgba($mc-accent, 0.04);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
   }
 
   .card-body {
-    padding: 0 var(--bs-card-spacer-x);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0;
   }
 
   .card-text {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    gap: 0.5rem;
+  }
+
+  h5.card-title {
+    font-family: $font-family-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    margin: 0;
+    color: $body-color;
+    transition: color 0.2s ease;
+  }
+
+  &:hover h5.card-title,
+  .quarto-grid-link:hover h5.card-title {
+    color: $mc-accent;
+    text-shadow: none;
   }
 
   .listing-description {
-    flex-grow: 1;
-    color: rgba($body-color, 0.85);
+    color: rgba($body-color, 0.78);
+    font-size: 0.92rem;
+    line-height: 1.45;
   }
 
   .listing-modal {
-    margin-top: auto;
-    margin-bottom: 0.5rem;
-  }
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
 
-  .card-footer {
-    background-color: body-mix(99%);
-    border-top: 1px solid rgba($body-color, 0.1);
-  }
+    .btn {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.35em 0.75em;
+      border-radius: 4px;
+      border: 1px solid $mc-rule-web;
+      background: transparent;
+      color: $mc-accent;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
 
-  p {
-    margin: 0;
-  }
-
-  // Card title styling consistent with theme.scss
-  h5.card-title {
-    color: $body-color;
-    transition: all 0.3s ease;
-
-    &:hover {
-      color: $body-color;
-      text-shadow: 0 0 1px rgba($body-color, 0.3);
-    }
-  }
-
-  // Date styling consistent with theme.scss listing styles
-  .listing-date {
-    font-style: italic;
-    font-size: 0.9em;
-    color: rgba($body-color, 0.7);
-    font-weight: 600;
-    margin-left: auto;
-  }
-
-  // Grid link styling
-  .quarto-grid-link {
-    color: $link-color;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        $body-color 0%,
-        rgba($body-color, 0.4) 100%
-      );
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 1px;
-    }
-
-    &:hover {
-      color: $body-color;
-
-      &::after {
-        width: 100%;
+      &:hover,
+      &:focus-visible {
+        border-color: $mc-accent;
+        background-color: rgba($mc-accent, 0.08);
+        color: $mc-accent;
       }
     }
   }
 
-  // GitHub link icon hover effect
-  #github-link {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    color: rgba($body-color, 0.7);
+  .card-footer {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .listing-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+  }
+
+  .listing-category {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.18em 0.55em;
+    border-radius: 999px;
+    background-color: rgba($mc-accent, 0.08);
+    color: $mc-accent;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      transform: scale(1.25);
-      color: $body-color;
+      background-color: rgba($mc-accent, 0.18);
+    }
+  }
+
+  .listing-date {
+    font-style: italic;
+    font-size: 0.78rem;
+    color: $mc-muted;
+    font-weight: 500;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quarto-grid-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &::after,
+    &::before {
+      content: none !important;
+      display: none !important;
+    }
+  }
+
+  #github-link {
+    transition: transform 0.2s ease, color 0.2s ease;
+    color: $mc-accent;
+
+    &:hover {
+      transform: scale(1.15);
+      color: lighten($mc-accent, 10%);
     }
   }
 }
 
-// Pagination styling consistent with theme.scss
 #projects-pagination {
   padding-top: 1.5em;
 }
 
-// Fade-in animation for project items (consistent with theme.scss)
-.quarto-listing {
-  .list {
-    .projects {
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
-
-      @for $i from 1 through 20 {
-        &:nth-child(#{$i}) {
-          animation-delay: #{$i * 0.05}s;
-        }
-      }
-    }
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .projects {
-    margin: 6px;
-    padding: 8px 12px;
-    min-height: 240px;
-
-    h5.card-title {
-      font-size: 1rem;
-    }
-
-    .listing-description {
-      font-size: 0.9rem;
-    }
-
-    .listing-date {
-      font-size: 0.85em;
-    }
-  }
-}
-
-// Reduced motion support
 @media (prefers-reduced-motion: reduce) {
-  .projects {
+  .projects,
+  .projects:hover,
+  .projects #github-link {
     transition: none;
-
-    &:hover {
-      transform: none;
-    }
-  }
-
-  .quarto-listing .list .projects {
-    animation: none !important;
+    transform: none;
   }
 }

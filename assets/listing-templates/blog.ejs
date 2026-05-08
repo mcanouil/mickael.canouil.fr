@@ -1,6 +1,7 @@
 <%
 // =============================================================================
-// Blog listing — magazine rows: thumbnail left, title/lead/date/chips right.
+// Blog listing — magazine rows. Thumbnail left, content right.
+// Order: date (above title) → title → lead → categories (bottom-left).
 // =============================================================================
 %>
 
@@ -16,22 +17,20 @@
 <% } %>
     </a>
     <div class="blog-meta">
+      <time class="blog-date" datetime="<%= item.date %>"><%= item.date %></time>
       <a class="blog-title-link" href="<%- item.path %>">
         <h3 class="blog-title"><%= item.title %></h3>
       </a>
 <% if (item.description) { %>
       <p class="blog-lead"><%= item.description %></p>
 <% } %>
-      <div class="blog-footer">
-        <time class="blog-date" datetime="<%= item.date %>"><%= item.date %></time>
 <% if (item.categories && item.categories.length) { %>
-        <div class="blog-categories">
+      <div class="blog-categories">
 <% for (const category of item.categories) { %>
-          <span class="blog-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></span>
-<% } %>
-        </div>
+        <span class="blog-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></span>
 <% } %>
       </div>
+<% } %>
     </div>
   </article>
 <% } %>
