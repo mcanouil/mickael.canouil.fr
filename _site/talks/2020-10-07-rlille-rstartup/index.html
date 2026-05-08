@@ -42,14 +42,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-24649735e795dc3a70be0dee6eaf66ae.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8d55bd7508e839a4daee5f061868e5b8.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-24649735e795dc3a70be0dee6eaf66ae.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-eb3626f408cec11013137802264cf11e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4c2283852bc260e422464edd9bff7a01.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-eb3626f408cec11013137802264cf11e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-165f9075efe9580cf7b162e7c515c354.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-5a2a7f6faf40975d657bd779e85221c1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-165f9075efe9580cf7b162e7c515c354.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5891abee3fca18ec6e17a60d864ced41.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-d815b940b818c389e7c1947c8e4c5c39.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-5891abee3fca18ec6e17a60d864ced41.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -1113,6 +1113,110 @@ ul.task-list li input[type="checkbox"] {
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+  });
+</script>
+<script id="publications-bibtex-clipboard" type="text/javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    const decode = (b64) => {
+      try {
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return new TextDecoder().decode(bytes);
+      } catch {
+        return "";
+      }
+    };
+
+    document.querySelectorAll(".pub-chip[data-bibtex]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const text = decode(btn.getAttribute("data-bibtex") || "");
+        const original = btn.textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copied";
+        } catch {
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copy failed";
+        }
+        setTimeout(() => {
+          btn.classList.remove("pub-chip--copied");
+          btn.textContent = original;
+        }, 1500);
+      });
+    });
+  });
+</script>
+<script id="publications-toc" type="text/javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!document.body.classList.contains("publications-page")) return;
+
+    const headers = Array.from(document.querySelectorAll("header.pub-year[id]"));
+    if (headers.length === 0) return;
+
+    const sidebar = document.getElementById("quarto-margin-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.remove("zindex-bottom");
+
+    const tocTitle = document.createElement("h2");
+    tocTitle.id = "toc-title";
+    tocTitle.textContent = "Years";
+
+    const list = document.createElement("ul");
+
+    const links = headers.map((h) => {
+      const id = h.id;
+      const year = h.querySelector(".pub-year-num")?.textContent?.trim() || id.replace("pub-year-", "");
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.id = `toc-${id}`;
+      a.className = "nav-link";
+      a.setAttribute("data-scroll-target", `#${id}`);
+      a.textContent = year;
+      li.appendChild(a);
+      list.appendChild(li);
+      return { id, anchor: a, header: h };
+    });
+
+    const nav = document.createElement("nav");
+    nav.id = "TOC";
+    nav.setAttribute("role", "doc-toc");
+    nav.className = "toc-active";
+    nav.appendChild(tocTitle);
+    nav.appendChild(list);
+
+    const tocActions = sidebar.querySelector(".toc-actions");
+    if (tocActions) {
+      nav.appendChild(tocActions);
+    }
+    sidebar.insertBefore(nav, sidebar.firstChild);
+
+    const setActive = (targetId) => {
+      links.forEach(({ id, anchor }) => {
+        anchor.classList.toggle("active", id === targetId);
+      });
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible.length > 0) {
+            setActive(visible[0].target.id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      );
+      headers.forEach((h) => observer.observe(h));
+    }
+
+    if (links.length > 0) {
+      setActive(links[0].id);
+    }
   });
 </script>
 <script>
