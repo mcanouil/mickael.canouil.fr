@@ -1,12 +1,15 @@
 <%
 // =============================================================================
-// Talks listing — year-grouped list with action buttons + chips.
-// Items declared inline in talks.qmd; no individual talk pages.
+// Talks listing — year-grouped vertical list. Each row places the slide
+// embed next to the talk info on desktop and stacks vertically on mobile.
+// Items are declared inline in talks.qmd; no individual talk pages.
 // =============================================================================
 
 function getYear(item) {
-  const d = item.date ? new Date(item.date) : null;
-  return d && !isNaN(d) ? String(d.getFullYear()) : null;
+  // item.date arrives already formatted by Quarto's `date-format`, so parsing
+  // it as a Date returns Invalid; pull a four-digit year via regex instead.
+  const m = String(item.date || "").match(/(\d{4})/);
+  return m ? m[1] : null;
 }
 
 const grouped = {};
@@ -21,12 +24,15 @@ const years = Object.keys(grouped).sort((a, b) => {
   return b.localeCompare(a);
 });
 
-const ICON = {
-  slides:  '<iconify-icon icon="fa7-solid:person-chalkboard" aria-hidden="true"></iconify-icon>',
-  code:    '<iconify-icon icon="octicon:mark-github-16" aria-hidden="true"></iconify-icon>',
-  video:   '<iconify-icon icon="fa7-solid:circle-play" aria-hidden="true"></iconify-icon>',
-  blog:    '<iconify-icon icon="fa7-solid:newspaper" aria-hidden="true"></iconify-icon>',
-  meetup:  '<iconify-icon icon="fa7-brands:meetup" aria-hidden="true"></iconify-icon>'
+// Bootstrap-icon class for each action key. BS icons render in any HTML
+// context (unlike iconify shortcodes which are not re-processed inside
+// listing EJS output).
+const ICON_BS = {
+  slides:  "bi-easel2",
+  code:    "bi-github",
+  video:   "bi-play-circle-fill",
+  blog:    "bi-newspaper",
+  meetup:  "bi-people-fill"
 };
 
 const LABEL = {
@@ -38,11 +44,10 @@ const LABEL = {
 };
 %>
 
+```{=html}
 <% years.forEach(year => {
   const list = grouped[year];
 %>
-
-```{=html}
 <section id="talks-<%= year %>" class="talks-section">
   <h2 class="talks-year-header">
     <span class="talks-year"><%= year %></span>
@@ -51,8 +56,11 @@ const LABEL = {
   <ul class="talks-list">
 <% list.forEach(item => { %>
     <li class="talks-row" <%= metadataAttrs(item) %>>
-      <div class="talks-main">
-        <h3 class="talks-title"><%= item.title %></h3>
+      <div class="talks-info">
+        <div class="talks-info-head">
+          <h3 class="talks-title"><%= item.title %></h3>
+          <time class="talks-date" datetime="<%= item.date %>"><%= item.date %></time>
+        </div>
 <% if (item.venue) { %>
         <p class="talks-venue"><%= item.venue %></p>
 <% } %>
@@ -62,7 +70,7 @@ const LABEL = {
         <div class="talks-actions">
 <% ["slides","code","video","blog","meetup"].forEach(key => { %>
 <% if (item[key]) { %>
-          <a class="talks-button talks-button--<%= key %>" href="<%- item[key] %>" target="_blank" rel="noopener noreferrer"><%- ICON[key] %><span><%= LABEL[key] %></span></a>
+          <a class="talks-button talks-button--<%= key %>" href="<%- item[key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= ICON_BS[key] %>" aria-hidden="true"></i><span><%= LABEL[key] %></span></a>
 <% } %>
 <% }); %>
         </div>
@@ -74,11 +82,14 @@ const LABEL = {
         </div>
 <% } %>
       </div>
-      <time class="talks-date" datetime="<%= item.date %>"><%= item.date %></time>
+<% if (item.slides) { %>
+      <div class="talks-embed slide-embed slide-deck">
+        <iframe src="<%- item.slides %>" loading="lazy" title="<%= item.title %> slide deck" allowfullscreen></iframe>
+      </div>
+<% } %>
     </li>
 <% }); %>
   </ul>
 </section>
-```
-
 <% }); %>
+```

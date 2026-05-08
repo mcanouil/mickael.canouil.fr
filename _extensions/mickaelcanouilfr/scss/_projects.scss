@@ -1,22 +1,22 @@
 // =============================================================================
-// PROJECTS GRID — flat editorial cards (replaces old heavy Bootstrap chrome).
-// Two-column horizontal layout: thumbnail left, content right.
+// PROJECTS — flat editorial rows. Thumbnail left, content right.
+// No card chrome, no shadows, no rounded corners on images.
 // =============================================================================
 
-.projects {
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.project-row {
   display: grid;
-  grid-template-columns: minmax(120px, 38%) 1fr;
-  gap: 1rem;
-  padding: 1rem;
-  margin: 0;
-  border: 0;
+  grid-template-columns: minmax(140px, 28%) 1fr;
+  gap: 1.25rem;
+  padding: 1rem 0;
   border-top: 1px solid $mc-rule-web;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
-  position: relative;
-  min-height: 0;
-  transition: background-color 0.25s ease;
+  align-items: start;
+  transition: background-color 0.2s ease;
 
   &:last-child {
     border-bottom: 1px solid $mc-rule-web;
@@ -24,167 +24,129 @@
 
   &:hover {
     background-color: rgba($mc-accent, 0.04);
-    transform: none;
-    box-shadow: none;
   }
 
-  @media (max-width: 767.98px) {
+  @media (max-width: 575.98px) {
     grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-
-  .card-img-top {
-    border: 1px solid $mc-rule-web;
-    aspect-ratio: 1200 / 630;
-    overflow: hidden;
-    background: rgba($mc-accent, 0.04);
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  }
-
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0;
-  }
-
-  .card-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  h5.card-title {
-    font-family: $font-family-serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    line-height: 1.3;
-    margin: 0;
-    color: $body-color;
-    transition: color 0.2s ease;
-  }
-
-  &:hover h5.card-title,
-  .quarto-grid-link:hover h5.card-title {
-    color: $mc-accent;
-    text-shadow: none;
-  }
-
-  .listing-description {
-    color: rgba($body-color, 0.78);
-    font-size: 0.92rem;
-    line-height: 1.45;
-  }
-
-  .listing-modal {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    margin-top: 0.3rem;
-
-    .btn {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.35em 0.75em;
-      border-radius: 4px;
-      border: 1px solid $mc-rule-web;
-      background: transparent;
-      color: $mc-accent;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
-
-      &:hover,
-      &:focus-visible {
-        border-color: $mc-accent;
-        background-color: rgba($mc-accent, 0.08);
-        color: $mc-accent;
-      }
-    }
-  }
-
-  .card-footer {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    margin-top: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .listing-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin-top: 0.2rem;
-  }
-
-  .listing-category {
-    font-size: 0.62rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.18em 0.55em;
-    border-radius: 999px;
-    background-color: rgba($mc-accent, 0.08);
-    color: $mc-accent;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: rgba($mc-accent, 0.18);
-    }
-  }
-
-  .listing-date {
-    font-style: italic;
-    font-size: 0.78rem;
-    color: $mc-muted;
-    font-weight: 500;
-    margin: 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .quarto-grid-link {
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &::after,
-    &::before {
-      content: none !important;
-      display: none !important;
-    }
-  }
-
-  #github-link {
-    transition: transform 0.2s ease, color 0.2s ease;
-    color: $mc-accent;
-
-    &:hover {
-      transform: scale(1.15);
-      color: lighten($mc-accent, 10%);
-    }
+    gap: 0.75rem;
   }
 }
 
-#projects-pagination {
-  padding-top: 1.5em;
+.project-thumb {
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid $mc-rule-web;
+  background: rgba($mc-accent, 0.04);
+  border-radius: 0;
+  transition: border-color 0.2s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0 !important;
+  }
+
+  &:hover {
+    border-color: $mc-accent;
+  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .projects,
-  .projects:hover,
-  .projects #github-link {
-    transition: none;
-    transform: none;
+.project-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.project-title-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .project-title,
+  &:focus-visible .project-title {
+    color: $mc-accent;
   }
+}
+
+.project-title {
+  font-family: $font-family-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  margin: 0;
+  color: $body-color;
+  transition: color 0.2s ease;
+}
+
+.project-description {
+  font-size: 0.92rem;
+  color: rgba($body-color, 0.78);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.project-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-top: 0.25rem;
+}
+
+.project-date {
+  font-size: 0.78rem;
+  color: $mc-muted;
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+}
+
+.project-repo {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $mc-accent;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba($mc-accent, 0.5);
+  transition: border-color 0.2s ease, color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: lighten($mc-accent, 12%);
+    border-bottom-color: $mc-accent;
+  }
+}
+
+.project-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.project-category {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.18em 0.55em;
+  border-radius: 999px;
+  background-color: rgba($mc-accent, 0.08);
+  color: $mc-accent;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba($mc-accent, 0.18);
+  }
+}
+
+// Override Bootstrap card image rounding everywhere on this page.
+.featured-item .featured-thumb img,
+.project-thumb img,
+img.thumbnail-image,
+img.card-img {
+  border-radius: 0 !important;
 }

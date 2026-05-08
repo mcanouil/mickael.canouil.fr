@@ -3852,49 +3852,16 @@ a.navbar-brand {
 // LUXURY / EDITORIAL CUES (CV-derived, applied across all pages)
 // =============================================================================
 
-// 1. Warm gradient body background — restful, paper-like.
-//    Uses $body-bg as top stop so a user _brand.yml still wins.
-@keyframes mc-bg-shift {
-  0%   { background-position:   0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position:   0% 50%; }
-}
-
+// 1. Static warm/ink page background (no animation).
 body {
-  background:
-    linear-gradient(
-      135deg,
-      $body-bg 0%,
-      rgba($mc-accent, 0.07) 30%,
-      $mc-paper-warm 60%,
-      rgba($mc-ink, 0.06) 100%
-    ) fixed;
-  background-size: 300% 300%;
-  animation: mc-bg-shift 24s ease-in-out infinite;
+  background: $body-bg;
   min-height: 100vh;
   font-family: $font-family-serif;
 }
 
 [data-bs-theme="dark"] body,
 .quarto-dark body {
-  background:
-    linear-gradient(
-      135deg,
-      $mc-paper-dark 0%,
-      rgba($mc-accent, 0.10) 30%,
-      $mc-paper-warm-dark 60%,
-      rgba(#000, 0.4) 100%
-    ) fixed;
-  background-size: 300% 300%;
-  animation: mc-bg-shift 24s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body,
-  [data-bs-theme="dark"] body,
-  .quarto-dark body {
-    animation: none;
-  }
+  background: $body-bg;
 }
 
 // 2. Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
@@ -4114,21 +4081,56 @@ main a:not(.btn):not(.nav-link):not(.quarto-grid-link) {
 }
 
 // Title block — CV magazine ribbon: 3px accent rule under the page title.
-//    Skip on the publications page where the timeline starts immediately.
-body:not(.publications-page) header#title-block-header {
+// Apply on every page including publications.
+header#title-block-header {
   border-bottom: 3px solid $mc-accent;
   padding-bottom: 0.75rem;
 }
 
-// Tighten the banner-style title block; default Quarto values feel airy.
+// Title banner — ink background + white text on every page in BOTH themes.
+// Force colour explicitly so neither light- nor dark-mode body inheritance
+// repaints the title text.
 .quarto-title-block.quarto-title-banner,
-.quarto-title-banner {
+.quarto-title-banner,
+[data-bs-theme="dark"] .quarto-title-block.quarto-title-banner,
+[data-bs-theme="dark"] .quarto-title-banner,
+.quarto-dark .quarto-title-block.quarto-title-banner,
+.quarto-dark .quarto-title-banner {
+  background: $mc-ink !important;
+  background-color: $mc-ink !important;
+  color: #ffffff !important;
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0; // accent rule sits flush against the banner
+  border-bottom: 0;
+
+  .quarto-title h1.title,
+  h1.title,
+  .quarto-title-meta,
+  .quarto-title-meta-heading,
+  .quarto-title-meta-contents,
+  .quarto-categories .quarto-category,
+  .quarto-categories,
+  .quarto-title-author-name,
+  .quarto-title-author-email,
+  .quarto-title-author-orcid,
+  .description,
+  p {
+    color: #ffffff !important;
+  }
+
+  .subtitle {
+    color: rgba(#ffffff, 0.85) !important;
+  }
 
   .quarto-title h1.title {
     margin-bottom: 0.25rem;
+  }
+
+  a {
+    color: $mc-accent !important;
+    text-decoration-color: rgba($mc-accent, 0.6);
+    &:hover { color: lighten($mc-accent, 12%) !important; }
   }
 }
 
@@ -4195,19 +4197,17 @@ body:not(.publications-page) header#title-block-header {
 }
 
 // =============================================================================
-// ABOUT HERO — CV header/banner style.
-// Solana template wraps the photo + name + links in `.about-entity` with
-// children .about-image and .about-content. Repaint as a full-bleed dark ink
-// block topped by an accent rule, mirroring the Typst CV layout.
+// ABOUT HERO — original (light) treatment. The page bg shows through; gold
+// accents only on the profile photo + subtitle + social-link hover.
 // =============================================================================
 
 .about-entity {
-  background: linear-gradient(180deg, $mc-ink 0%, lighten($mc-ink, 4%) 100%);
-  color: #ffffff;
-  padding: 1.75rem 1.75rem 1.5rem;
+  background: transparent;
+  padding: 1rem 0 1.25rem;
   margin: 0 0 1.5rem;
   border-radius: 0;
-  border-bottom: 3px solid $mc-accent;
+  border-bottom: 0;
+  color: inherit;
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -4215,7 +4215,6 @@ body:not(.publications-page) header#title-block-header {
   @media (max-width: 575.98px) {
     flex-direction: column;
     text-align: center;
-    padding: 1.5rem 1rem 1.25rem;
   }
 
   .about-image,
@@ -4227,28 +4226,23 @@ body:not(.publications-page) header#title-block-header {
   > img {
     border: 2px solid $mc-accent;
     box-shadow:
-      0 0 0 6px rgba($mc-accent, 0.18),
-      0 4px 16px rgba(#000, 0.3);
+      0 0 0 6px rgba($mc-accent, 0.10),
+      0 4px 16px rgba($mc-ink, 0.12);
   }
 
   .about-contents,
   .about-content {
-    color: #ffffff;
+    color: inherit;
     flex: 1;
     min-width: 0;
   }
 
   h1, .h1 {
     font-family: $font-family-serif;
-    font-weight: 200;
-    letter-spacing: -0.5px;
-    color: #ffffff;
+    font-weight: 700;
+    color: $body-color;
     margin: 0;
-    line-height: 1.05;
-
-    strong, b {
-      font-weight: 700;
-    }
+    line-height: 1.1;
   }
 
   .subtitle,
@@ -4268,7 +4262,7 @@ body:not(.publications-page) header#title-block-header {
     gap: 0.6rem;
 
     .about-link {
-      color: rgba(#ffffff, 0.85);
+      color: $body-color;
       text-decoration: none;
       transition: color 0.2s ease, transform 0.2s ease;
 
@@ -4281,31 +4275,85 @@ body:not(.publications-page) header#title-block-header {
   }
 }
 
-// Footnotes block — match the page background instead of Bootstrap's
-// alert/aside grey tint that bleeds into the warm gradient.
+// Footnotes block — neutralise every Quarto/Bootstrap tint so the page bg
+// shows through uniformly. Single hairline rule above, no nested bands.
 section.footnotes,
+section.footnotes hr,
+section.footnotes ol,
+section.footnotes li,
+section.footnotes p,
 .footnotes,
-#footnotes {
-  background: transparent !important;
-  border-top: 1px solid $mc-rule-web;
-  margin-top: 2rem;
-  padding-top: 1rem;
-
-  ol {
-    background: transparent;
-  }
-
-  li,
-  p {
-    background: transparent;
-  }
-}
-
-// Footnote tooltip popovers (.tippy-box etc.) sometimes inherit a tinted bg
-// from Quarto/Bootstrap; force transparency where it leaks.
+.footnotes hr,
+.footnotes ol,
+.footnotes li,
+.footnotes p,
+#footnotes,
 .footnote-back,
 .footnote-ref {
   background: transparent !important;
+  background-color: transparent !important;
+}
+
+section.footnotes,
+.footnotes {
+  margin-top: 2rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+section.footnotes > hr,
+.footnotes > hr {
+  border: 0;
+  border-top: 1px solid $mc-rule-web;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+// =============================================================================
+// SIDEBAR — gold border on docked sidebar (light + dark).
+// =============================================================================
+
+aside.sidebar.sidebar-navigation,
+.sidebar.sidebar-navigation:not(.rollup) {
+  border-color: $mc-accent !important;
+  border-right: 1px solid $mc-accent;
+}
+
+// Pull the docked sidebar up to sit flush under the title banner.
+.sidebar.sidebar-navigation {
+  padding-top: 1rem;
+  margin-top: 0;
+}
+
+.quarto-title-banner + * .sidebar,
+.quarto-title-banner + .page-columns .sidebar,
+.quarto-title-block + .page-columns .sidebar {
+  margin-top: 0;
+}
+
+// Sidebar item dividers in gold tint.
+.sidebar-item-container,
+.sidebar-section a {
+  border-color: rgba($mc-accent, 0.18);
+}
+
+// Active sidebar link in gold.
+.sidebar-navigation .sidebar-link.active,
+.sidebar-navigation .sidebar-item-section .sidebar-link.active,
+.sidebar a.active {
+  color: $mc-accent !important;
+  font-weight: 700;
+}
+
+// =============================================================================
+// NAVBAR — active link keeps the hover treatment.
+// =============================================================================
+
+.navbar .nav-link.active,
+.navbar .nav-link[aria-current="page"],
+.navbar .nav-link.active:hover,
+.navbar .nav-link[aria-current="page"]:hover {
+  color: lighten($mc-accent, 12%);
 }
 
 // =============================================================================
@@ -4354,29 +4402,55 @@ section.footnotes,
   margin: 0;
 }
 
-.talks-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.slide-embed {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin: 0.75rem 0;
+  border: 1.5px solid $mc-accent;
+  background: $mc-ink;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba($mc-ink, 0.18);
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
 }
 
 .talks-row {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.5rem 1.25rem;
-  padding: 1rem 0;
+  grid-template-columns: 1fr minmax(280px, 45%);
+  gap: 1.5rem;
+  padding: 1.5rem 0;
   border-top: 1px solid $mc-rule-web;
+  align-items: start;
 
   &:last-child {
     border-bottom: 1px solid $mc-rule-web;
   }
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 }
 
-.talks-main {
+.talks-info {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   min-width: 0;
+}
+
+.talks-info-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
 }
 
 .talks-title {
@@ -4386,6 +4460,8 @@ section.footnotes,
   color: $body-color;
   margin: 0;
   line-height: 1.3;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .talks-venue {
@@ -4404,14 +4480,17 @@ section.footnotes,
 }
 
 .talks-date {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: $mc-accent;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  align-self: start;
-  margin-top: 0.2rem;
+  flex: 0 0 auto;
+}
+
+.talks-embed {
+  margin: 0;
 }
 
 .talks-actions {
