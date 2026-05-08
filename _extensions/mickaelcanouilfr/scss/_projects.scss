@@ -1,1 +1,174 @@
-// Placeholder — populated in step 2 (port SCSS layers).
+
+// ===========================
+// PROJECTS GRID STYLING
+// ===========================
+
+.projects {
+  flex: 0 50%;
+  background: body-mix(99%);
+  box-shadow: 0 2px 8px rgba($body-color, 0.08);
+  border: 1px solid rgba($body-color, 0.1);
+  border-radius: 8px;
+  margin: 8px;
+  padding: 10px 15px;
+  position: relative;
+  overflow: hidden;
+  min-height: 265px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Hover effects consistent with theme.scss grid items
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba($body-color, 0.12);
+    border-color: rgba($body-color, 0.15);
+  }
+
+  .card-body {
+    padding: 0 var(--bs-card-spacer-x);
+  }
+
+  .card-text {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .listing-description {
+    flex-grow: 1;
+    color: rgba($body-color, 0.85);
+  }
+
+  .listing-modal {
+    margin-top: auto;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-footer {
+    background-color: body-mix(99%);
+    border-top: 1px solid rgba($body-color, 0.1);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  // Card title styling consistent with theme.scss
+  h5.card-title {
+    color: $body-color;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $body-color;
+      text-shadow: 0 0 1px rgba($body-color, 0.3);
+    }
+  }
+
+  // Date styling consistent with theme.scss listing styles
+  .listing-date {
+    font-style: italic;
+    font-size: 0.9em;
+    color: rgba($body-color, 0.7);
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  // Grid link styling
+  .quarto-grid-link {
+    color: $link-color;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        $body-color 0%,
+        rgba($body-color, 0.4) 100%
+      );
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
+
+    &:hover {
+      color: $body-color;
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  // GitHub link icon hover effect
+  #github-link {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: rgba($body-color, 0.7);
+
+    &:hover {
+      transform: scale(1.25);
+      color: $body-color;
+    }
+  }
+}
+
+// Pagination styling consistent with theme.scss
+#projects-pagination {
+  padding-top: 1.5em;
+}
+
+// Fade-in animation for project items (consistent with theme.scss)
+.quarto-listing {
+  .list {
+    .projects {
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .projects {
+    margin: 6px;
+    padding: 8px 12px;
+    min-height: 240px;
+
+    h5.card-title {
+      font-size: 1rem;
+    }
+
+    .listing-description {
+      font-size: 0.9rem;
+    }
+
+    .listing-date {
+      font-size: 0.85em;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .projects {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .quarto-listing .list .projects {
+    animation: none !important;
+  }
+}
