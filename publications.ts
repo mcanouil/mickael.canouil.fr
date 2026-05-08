@@ -124,7 +124,9 @@ function splitCslEntries(pandocOut: string): string[][] {
   const startIdx = lines.findIndex((l) => l === "references:");
   const endIdx = lines.length - 1;
   if (startIdx < 0 || lines[endIdx] !== "---") {
-    throw new Error("Unexpected pandoc CSL output structure.");
+    throw new Error(
+      `Unexpected pandoc CSL output structure (got ${lines.length} lines, head: ${JSON.stringify(lines.slice(0, 3))}).`,
+    );
   }
   const body = lines.slice(startIdx + 1, endIdx);
 
@@ -186,13 +188,15 @@ function parseAuthors(lines: string[]): CslAuthor[] {
 
 function authorPosition(authors: CslAuthor[]): string {
   const total = authors.length;
-  const idx = authors.findIndex((a) => (a.family || "").includes(AUTHOR_FAMILY));
+  const idx = authors.findIndex((a) => (a.family || "").trim() === AUTHOR_FAMILY);
   return `${idx + 1}/${total}`;
 }
 
 function annoteFlag(lines: string[], keyword: string): boolean {
   const annote = findLine(lines, "annote:");
-  return !!annote && annote.includes(keyword);
+  if (!annote) return false;
+  const re = new RegExp(`\\b${keyword}\\b`);
+  return re.test(annote);
 }
 
 function extractYear(lines: string[]): string {

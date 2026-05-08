@@ -33,6 +33,13 @@ function escapeHtml(s) {
     .replace(/'/g, "&#39;");
 }
 
+function safeUrl(s) {
+  const url = String(s == null ? "" : s).trim();
+  if (!url) return "";
+  if (/^(?:https?:|mailto:|\/|#)/i.test(url)) return url;
+  return "";
+}
+
 function authorName(a) {
   const family = a.family || "";
   const particle = a["dropping-particle"] || a["non-dropping-particle"] || "";
@@ -136,12 +143,13 @@ function entryHtml(item) {
   const isFirst = String(item.first || "").includes("first");
   const isLast = String(item.last || "").includes("last");
   const titleText = titleCase(stripStars(item.title || ""));
-  const linkTarget = item.path || item.url;
+  const linkTarget = safeUrl(item.path || item.url);
   const doi = item.doi;
-  const url = item.url;
-  const pdfUrl = item["pdf-url"];
-  const codeUrl = item["code-url"];
-  const slidesUrl = item["slides-url"];
+  const doiHref = doi ? safeUrl(`https://doi.org/${doi}`) : "";
+  const url = safeUrl(item.url);
+  const pdfUrl = safeUrl(item["pdf-url"]);
+  const codeUrl = safeUrl(item["code-url"]);
+  const slidesUrl = safeUrl(item["slides-url"]);
   const bibtex = item.bibtex;
 
   const head = [
@@ -161,8 +169,8 @@ function entryHtml(item) {
     : "";
 
   const chips = [];
-  if (doi) chips.push(`<a class="pub-chip" href="https://doi.org/${escapeHtml(doi)}" rel="noopener noreferrer" target="_blank">DOI</a>`);
-  if (url && url !== `https://doi.org/${doi}`) {
+  if (doiHref) chips.push(`<a class="pub-chip" href="${escapeHtml(doiHref)}" rel="noopener noreferrer" target="_blank">DOI</a>`);
+  if (url && url !== doiHref) {
     chips.push(`<a class="pub-chip" href="${escapeHtml(url)}" rel="noopener noreferrer" target="_blank">Article</a>`);
   }
   if (pdfUrl) chips.push(`<a class="pub-chip" href="${escapeHtml(pdfUrl)}" rel="noopener noreferrer" target="_blank">PDF</a>`);
