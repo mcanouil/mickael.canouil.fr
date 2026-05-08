@@ -3847,3 +3847,222 @@ a.navbar-brand {
   height: auto;
   border-radius: 0.625rem;
 }
+
+// =============================================================================
+// LUXURY / EDITORIAL CUES (CV-derived, applied across all pages)
+// =============================================================================
+
+// 1. Warm gradient body background — restful, paper-like.
+//    Uses $body-bg as top stop so a user _brand.yml still wins.
+body {
+  background: linear-gradient(180deg, $body-bg 0%, $mc-paper-warm 100%) fixed;
+  min-height: 100vh;
+  font-family: $font-family-serif;
+}
+
+[data-bs-theme="dark"] body,
+.quarto-dark body {
+  background: linear-gradient(180deg, $mc-paper-dark 0%, $mc-paper-warm-dark 100%) fixed;
+}
+
+// 2. Drop cap — large accent first letter on lead paragraph.
+//    Stable target injected by luxury-classes.lua as `.lead-drop`.
+.lead-drop::first-letter,
+.about-body > p:first-of-type::first-letter {
+  float: left;
+  font-family: $font-family-serif;
+  font-size: 4em;
+  line-height: 0.85;
+  padding: 0.05em 0.12em 0 0;
+  color: $mc-accent;
+  font-weight: 700;
+}
+
+// 3. Tabular-nums on date-shaped elements — vertical alignment in lists.
+.listing-date,
+.pub-year,
+.pub-year-num,
+.pub-date,
+.pub-position,
+.pub-meta time,
+.pub-timeline-year,
+.pub-timeline-count,
+.education .date,
+.tabular-nums,
+time,
+.talks-year,
+.talks-row time,
+.featured-meta time {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+// 4. Italic accent credential subtitle — CV signature on the about block.
+.quarto-title .subtitle,
+.about-entity .about-subtitle,
+header#title-block-header .subtitle,
+.about-body > p.subtitle {
+  font-family: $font-family-serif;
+  font-style: italic;
+  color: $mc-accent;
+  letter-spacing: 0.5px;
+}
+
+// 5. Photo gold ring + soft glow — CV's circular accent stroke, on the web.
+.about-entity img,
+.about-image img,
+img.profile-image,
+.about-body img.profile-image {
+  border: 2px solid $mc-accent;
+  box-shadow:
+    0 0 0 6px rgba($mc-accent, 0.08),
+    0 4px 16px rgba($mc-ink, 0.12);
+  transition: box-shadow 0.4s ease;
+}
+.about-entity img:hover,
+.about-image img:hover,
+img.profile-image:hover {
+  box-shadow:
+    0 0 0 8px rgba($mc-accent, 0.14),
+    0 6px 24px rgba($mc-ink, 0.16);
+}
+
+// 6. Section heading flourish — `■` marker + tracked uppercase + accent rule.
+//    Targets in-content `<h2>`s on the about page and listing-section headings.
+.about-body > h2,
+.quarto-listing-section,
+section.level2 > h2,
+.blog-section h2,
+.cv-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: $font-family-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $mc-accent;
+  font-weight: 700;
+  font-size: 1.15rem;
+  border-bottom: 0;
+
+  &::before {
+    content: "\25A0";
+    color: $mc-accent;
+    font-size: 0.7em;
+    flex-shrink: 0;
+  }
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: $mc-rule-web;
+  }
+}
+
+// 7. `.highlight` ribbon — accent-tinted bg + left ribbon + serif italic.
+.highlight {
+  border-left: 4px solid $mc-accent;
+  background: rgba($mc-accent, 0.06);
+  padding: 0.85rem 1.1rem;
+  font-style: italic;
+  font-family: $font-family-serif;
+  margin: 1.25rem 0;
+
+  em,
+  strong {
+    color: $mc-accent;
+    font-style: normal;
+  }
+}
+
+// 8. Education list — vertical accent rail with `■` markers.
+.education {
+  list-style: none;
+  padding-left: 1rem;
+  border-left: 2px solid $mc-accent;
+  margin-top: 1rem;
+
+  > li {
+    position: relative;
+    padding: 0.25rem 0 0.6rem 1rem;
+    margin-bottom: 0.25rem;
+
+    &::before {
+      content: "\25A0";
+      color: $mc-accent;
+      position: absolute;
+      left: -0.55rem;
+      top: 0.3rem;
+      font-size: 0.6em;
+      background: $body-bg;
+      padding: 0 0.2em;
+    }
+
+    strong em {
+      color: $mc-accent;
+      font-style: normal;
+    }
+  }
+}
+
+// 9. Interests grid with `■` accent bullets.
+.interests {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem 1rem;
+  margin-top: 1rem;
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  > li::before {
+    content: "\25A0";
+    color: $mc-accent;
+    margin-right: 0.5rem;
+    font-size: 0.7em;
+    vertical-align: 0.1em;
+  }
+}
+
+// 10. Inline links — dashed gold underline, expand on hover.
+//     Scope to content links only; navbar/footer/buttons keep their own rules.
+.about-body a:not(.btn):not(.nav-link),
+.content a:not(.btn):not(.nav-link),
+main a:not(.btn):not(.nav-link):not(.quarto-grid-link) {
+  text-decoration: underline dashed rgba($mc-accent, 0.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition:
+    text-decoration-color 0.3s ease,
+    text-decoration-thickness 0.2s ease,
+    text-decoration-style 0.3s ease;
+
+  &:hover {
+    text-decoration-style: solid;
+    text-decoration-color: $mc-accent;
+    text-decoration-thickness: 2px;
+  }
+}
+
+// Title block — CV magazine ribbon: 3px accent rule under the page title.
+//    Skip on the publications page where the timeline starts immediately.
+body:not(.publications-page) header#title-block-header {
+  border-bottom: 3px solid $mc-accent;
+  padding-bottom: 0.75rem;
+}
+
+// Reduced-motion fallback for hover transitions.
+@media (prefers-reduced-motion: reduce) {
+  .about-entity img,
+  .about-image img,
+  img.profile-image,
+  .about-body a,
+  .content a,
+  main a {
+    transition: none;
+  }
+}
+
