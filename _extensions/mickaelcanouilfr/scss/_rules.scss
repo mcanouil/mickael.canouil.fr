@@ -3854,21 +3854,51 @@ a.navbar-brand {
 
 // 1. Warm gradient body background — restful, paper-like.
 //    Uses $body-bg as top stop so a user _brand.yml still wins.
+@keyframes mc-bg-shift {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
 body {
-  background: linear-gradient(180deg, $body-bg 0%, $mc-paper-warm 100%) fixed;
+  background:
+    linear-gradient(
+      135deg,
+      $body-bg 0%,
+      rgba($mc-accent, 0.07) 30%,
+      $mc-paper-warm 60%,
+      rgba($mc-ink, 0.06) 100%
+    ) fixed;
+  background-size: 300% 300%;
+  animation: mc-bg-shift 24s ease-in-out infinite;
   min-height: 100vh;
   font-family: $font-family-serif;
 }
 
 [data-bs-theme="dark"] body,
 .quarto-dark body {
-  background: linear-gradient(180deg, $mc-paper-dark 0%, $mc-paper-warm-dark 100%) fixed;
+  background:
+    linear-gradient(
+      135deg,
+      $mc-paper-dark 0%,
+      rgba($mc-accent, 0.10) 30%,
+      $mc-paper-warm-dark 60%,
+      rgba(#000, 0.4) 100%
+    ) fixed;
+  background-size: 300% 300%;
+  animation: mc-bg-shift 24s ease-in-out infinite;
 }
 
-// 2. Drop cap — large accent first letter on lead paragraph.
-//    Stable target injected by luxury-classes.lua as `.lead-drop`.
-.lead-drop::first-letter,
-.about-body > p:first-of-type::first-letter {
+@media (prefers-reduced-motion: reduce) {
+  body,
+  [data-bs-theme="dark"] body,
+  .quarto-dark body {
+    animation: none;
+  }
+}
+
+// 2. Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
+.drop-cap {
   float: left;
   font-family: $font-family-serif;
   font-size: 4em;
@@ -3959,24 +3989,34 @@ section.level2 > h2,
   }
 }
 
-// 7. `.highlight` ribbon — accent-tinted bg + left ribbon + serif italic.
+// 7. `.highlight` ribbon — accent-tinted bg + serif italic, centred horizontally.
 .highlight {
   border-left: 4px solid $mc-accent;
+  border-right: 4px solid $mc-accent;
   background: rgba($mc-accent, 0.06);
-  padding: 0.85rem 1.1rem;
+  padding: 0.85rem 1.4rem;
   font-style: italic;
   font-family: $font-family-serif;
-  margin: 1.25rem 0;
+  margin: 1.25rem auto;
+  max-width: 36rem;
+  text-align: center;
 
   em,
   strong {
     color: $mc-accent;
     font-style: normal;
   }
+
+  > p:last-child {
+    margin-bottom: 0;
+  }
 }
 
 // 8. Education list — vertical accent rail with `■` markers.
-.education {
+//    Quarto applies header attributes to both <section> and <h2>; the actual
+//    list is the <ul> inside, so target the descendant.
+section.education > ul,
+ul.education {
   list-style: none;
   padding-left: 1rem;
   border-left: 2px solid $mc-accent;
@@ -4006,7 +4046,8 @@ section.level2 > h2,
 }
 
 // 9. Interests grid with `■` accent bullets.
-.interests {
+section.interests > ul,
+ul.interests {
   list-style: none;
   padding-left: 0;
   display: grid;
@@ -4024,6 +4065,31 @@ section.level2 > h2,
     margin-right: 0.5rem;
     font-size: 0.7em;
     vertical-align: 0.1em;
+  }
+}
+
+// Same `■` rail for an explicit Skills list.
+section.skills > ul,
+ul.skills {
+  list-style: none;
+  padding-left: 1rem;
+  border-left: 2px solid $mc-accent;
+  margin-top: 1rem;
+
+  > li {
+    position: relative;
+    padding: 0.25rem 0 0.5rem 1rem;
+
+    &::before {
+      content: "\25A0";
+      color: $mc-accent;
+      position: absolute;
+      left: -0.55rem;
+      top: 0.3rem;
+      font-size: 0.6em;
+      background: $body-bg;
+      padding: 0 0.2em;
+    }
   }
 }
 
@@ -4126,6 +4192,120 @@ body:not(.publications-page) header#title-block-header {
   main a {
     transition: none;
   }
+}
+
+// =============================================================================
+// ABOUT HERO — CV header/banner style.
+// Solana template wraps the photo + name + links in `.about-entity` with
+// children .about-image and .about-content. Repaint as a full-bleed dark ink
+// block topped by an accent rule, mirroring the Typst CV layout.
+// =============================================================================
+
+.about-entity {
+  background: linear-gradient(180deg, $mc-ink 0%, lighten($mc-ink, 4%) 100%);
+  color: #ffffff;
+  padding: 1.75rem 1.75rem 1.5rem;
+  margin: 0 0 1.5rem;
+  border-radius: 0;
+  border-bottom: 3px solid $mc-accent;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+
+  @media (max-width: 575.98px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem 1.25rem;
+  }
+
+  .about-image,
+  > img {
+    flex-shrink: 0;
+  }
+
+  .about-image img,
+  > img {
+    border: 2px solid $mc-accent;
+    box-shadow:
+      0 0 0 6px rgba($mc-accent, 0.18),
+      0 4px 16px rgba(#000, 0.3);
+  }
+
+  .about-contents,
+  .about-content {
+    color: #ffffff;
+    flex: 1;
+    min-width: 0;
+  }
+
+  h1, .h1 {
+    font-family: $font-family-serif;
+    font-weight: 200;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.05;
+
+    strong, b {
+      font-weight: 700;
+    }
+  }
+
+  .subtitle,
+  p.subtitle {
+    color: $mc-accent;
+    font-style: italic;
+    font-family: $font-family-serif;
+    letter-spacing: 0.5px;
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+  }
+
+  .about-links {
+    margin-top: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    .about-link {
+      color: rgba(#ffffff, 0.85);
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+
+      &:hover,
+      &:focus-visible {
+        color: $mc-accent;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Footnotes block — match the page background instead of Bootstrap's
+// alert/aside grey tint that bleeds into the warm gradient.
+section.footnotes,
+.footnotes,
+#footnotes {
+  background: transparent !important;
+  border-top: 1px solid $mc-rule-web;
+  margin-top: 2rem;
+  padding-top: 1rem;
+
+  ol {
+    background: transparent;
+  }
+
+  li,
+  p {
+    background: transparent;
+  }
+}
+
+// Footnote tooltip popovers (.tippy-box etc.) sometimes inherit a tinted bg
+// from Quarto/Bootstrap; force transparency where it leaks.
+.footnote-back,
+.footnote-ref {
+  background: transparent !important;
 }
 
 // =============================================================================
