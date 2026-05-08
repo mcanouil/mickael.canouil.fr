@@ -230,14 +230,6 @@ function processEntry(rawCsl: string[], rawFields: RawFields): {
   const position = authorPosition(authors);
   const isFirst = annoteFlag(rawCsl, "first");
   const isLast = annoteFlag(rawCsl, "last");
-  const filler = "&emsp;&emsp;&emsp;";
-
-  const firstLine = isFirst
-    ? "  first: '*As first or co-first*'"
-    : `  first: '${filler}'`;
-  const lastLine = isLast
-    ? "  last: '*As last or co-last*'"
-    : `  last: '${filler}'`;
 
   const year = extractYear(rawCsl);
   const dateLabel = formatIssuedLabel(rawCsl);
@@ -248,8 +240,8 @@ function processEntry(rawCsl: string[], rawFields: RawFields): {
   if (dateLine) extras.push(dateLine);
   if (pathLine) extras.push(pathLine);
   extras.push(`  position: '${position}'`);
-  extras.push(firstLine);
-  extras.push(lastLine);
+  if (isFirst) extras.push("  first: '*As first or co-first*'");
+  if (isLast) extras.push("  last: '*As last or co-last*'");
   if (year) extras.push(`  year: '${year}'`);
   if (dateLabel) extras.push(`  pub-date-label: '${dateLabel}'`);
   extras.push(`  bibtype: ${bibtypeLabel}`);
@@ -277,6 +269,7 @@ function buildQmd(flagged: number, middle: number): string {
     "image: /assets/images/social-profile.png",
     "date-format: 'MMMM,<br>YYYY'",
     "body-classes: publications-page",
+    "toc: true",
     "listing:",
     "  contents:",
     "    - publications.yml",
