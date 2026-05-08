@@ -1,6 +1,79 @@
+<%
+// =============================================================================
+// Projects listing — featured carousel + sectioned card grid.
+// Sections render in a fixed order; unknown sections fall back to "Other".
+// =============================================================================
+const SECTION_ORDER = [
+  "Quarto Extensions",
+  "R Packages",
+  "Tooling & GitHub Actions",
+  "Workshops & Courses",
+  "Websites & Communities",
+  "Other"
+];
+
+const featured = items.filter(i => i.featured === true);
+
+const grouped = {};
+for (const it of items) {
+  const sec = it.section || "Other";
+  if (!grouped[sec]) grouped[sec] = [];
+  grouped[sec].push(it);
+}
+
+function slugify(s) {
+  return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+%>
+
+<% if (featured.length > 0) { %>
+```{=html}
+<section class="featured-carousel-section" aria-labelledby="featured-heading">
+  <h2 id="featured-heading" class="featured-heading">Featured</h2>
+  <div class="featured-carousel" role="region" aria-roledescription="carousel" aria-label="Featured projects" tabindex="0">
+<% featured.forEach((item, idx) => { %>
+    <a class="featured-item" href="<%- item.path %>" role="group" aria-roledescription="slide" aria-label="Slide <%= idx + 1 %> of <%= featured.length %>">
+      <div class="featured-thumb"><img src="<%= item.image %>" alt="<%= item.title %>" loading="lazy"></div>
+      <h3 class="featured-title"><%= item.title %></h3>
+      <p class="featured-description"><%= item.description %></p>
+      <div class="featured-meta">
+        <span class="featured-section"><%= item.section || "" %></span>
+        <time datetime="<%= item.date %>"><%= item.date %></time>
+      </div>
+    </a>
+<% }); %>
+  </div>
+  <div class="featured-controls" aria-label="Featured navigation">
+    <button type="button" class="featured-prev" aria-label="Previous featured project">&larr;</button>
+    <ol class="featured-dots" role="tablist" aria-label="Featured slides">
+<% featured.forEach((item, idx) => { %>
+      <li><button type="button" class="featured-dot" role="tab" aria-label="Go to slide <%= idx + 1 %>" data-slide="<%= idx %>"<%= idx === 0 ? ' aria-current="true"' : '' %>></button></li>
+<% }); %>
+    </ol>
+    <button type="button" class="featured-next" aria-label="Next featured project">&rarr;</button>
+  </div>
+</section>
+```
+<% } %>
+
+<% SECTION_ORDER.forEach(section => {
+  const list = grouped[section];
+  if (!list || list.length === 0) return;
+  const sid = "projects-" + slugify(section);
+%>
+
+```{=html}
+<section id="<%= sid %>" class="projects-section">
+  <h2 class="projects-section-header">
+    <span class="projects-section-name"><%= section %></span>
+    <span class="projects-section-count"><%= list.length %></span>
+  </h2>
+</section>
+```
+
 :::: {.grid .text-center .list}
 
-<% for (const item of items) { %>
+<% for (const item of list) { %>
 
 :::: {.g-col-12 .g-col-lg-6 .g-col-xl-4 <%= metadataAttrs(item) %>}
 
@@ -76,6 +149,8 @@ if (item.template === true) {
 
 :::
 
+<% }); %>
+
 <% for (const item of items) { %>
 <%
 const usage = item.usage;
@@ -88,3 +163,47 @@ partial("extension-use-modal.ejs.md", { id, usage });
 }
 %>
 <% } %>
+
+```{=html}
+<script id="featured-carousel-controller">
+(function () {
+  const carousel = document.querySelector(".featured-carousel");
+  if (!carousel) return;
+  const slides = Array.from(carousel.children);
+  if (slides.length === 0) return;
+  const prev = document.querySelector(".featured-prev");
+  const next = document.querySelector(".featured-next");
+  const dots = Array.from(document.querySelectorAll(".featured-dot"));
+
+  function step() {
+    return slides[0].getBoundingClientRect().width + 16;
+  }
+  function currentIndex() {
+    const left = carousel.scrollLeft;
+    const w = step();
+    return Math.max(0, Math.min(slides.length - 1, Math.round(left / w)));
+  }
+  function setCurrent(i) {
+    dots.forEach((d, idx) => d.toggleAttribute("aria-current", idx === i));
+    if (prev) prev.toggleAttribute("disabled", i === 0);
+    if (next) next.toggleAttribute("disabled", i === slides.length - 1);
+  }
+  function scrollToIndex(i) {
+    carousel.scrollTo({ left: i * step(), behavior: "smooth" });
+  }
+  prev && prev.addEventListener("click", () => scrollToIndex(Math.max(0, currentIndex() - 1)));
+  next && next.addEventListener("click", () => scrollToIndex(Math.min(slides.length - 1, currentIndex() + 1)));
+  dots.forEach((d) => d.addEventListener("click", () => scrollToIndex(parseInt(d.dataset.slide || "0", 10))));
+  carousel.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); scrollToIndex(Math.max(0, currentIndex() - 1)); }
+    if (e.key === "ArrowRight") { e.preventDefault(); scrollToIndex(Math.min(slides.length - 1, currentIndex() + 1)); }
+  });
+  let raf = null;
+  carousel.addEventListener("scroll", () => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => setCurrent(currentIndex()));
+  });
+  setCurrent(0);
+})();
+</script>
+```

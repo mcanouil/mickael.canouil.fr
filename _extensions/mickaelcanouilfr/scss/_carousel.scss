@@ -1,1 +1,250 @@
-// Placeholder — populated in step 9 (rewrite projects.ejs.md with carousel).
+// =============================================================================
+// FEATURED PROJECTS CAROUSEL
+// CSS scroll-snap row with pure-CSS slide visibility. JS only enhances dots
+// and prev/next buttons. Works without JS — slides remain accessible via the
+// native horizontal scrollbar.
+// =============================================================================
+
+.featured-carousel-section {
+  margin: 1.5rem 0 2.5rem;
+
+  .featured-heading {
+    font-family: $font-family-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $mc-accent;
+    font-size: 0.85rem;
+    margin: 0 0 0.75rem;
+  }
+}
+
+.featured-carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, calc(33.33% - 0.7rem));
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  padding-bottom: 0.5rem;
+
+  @media (max-width: 992px) {
+    grid-auto-columns: minmax(240px, calc(50% - 0.5rem));
+  }
+
+  @media (max-width: 576px) {
+    grid-auto-columns: minmax(220px, 85%);
+  }
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba($mc-accent, 0.5);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba($mc-rule-web, 0.4);
+  }
+}
+
+.featured-item {
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $mc-rule-web;
+  background: $body-bg;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    border-color: $mc-accent;
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $mc-accent;
+    outline-offset: 2px;
+  }
+
+  .featured-thumb {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    margin: -1rem -1rem 0.75rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .featured-title {
+    font-family: $font-family-serif;
+    font-weight: 700;
+    color: $mc-ink;
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+
+  &:hover .featured-title {
+    color: $mc-accent;
+  }
+
+  .featured-description {
+    font-size: 0.85rem;
+    color: rgba($mc-ink, 0.75);
+    margin: 0 0 0.6rem;
+    flex-grow: 1;
+  }
+
+  .featured-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $mc-muted;
+
+    time {
+      font-style: italic;
+    }
+  }
+}
+
+[data-bs-theme="dark"] .featured-item,
+.quarto-dark .featured-item {
+  background: rgba(#fff, 0.02);
+  .featured-title {
+    color: $mc-ink-dark;
+  }
+}
+
+.featured-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  gap: 1rem;
+
+  button {
+    background: transparent;
+    border: 1px solid $mc-rule-web;
+    color: $mc-accent;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      border-color: $mc-accent;
+      background-color: rgba($mc-accent, 0.08);
+      outline: none;
+    }
+
+    &[disabled] {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  .featured-dots {
+    display: flex;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .featured-dot {
+    background: transparent;
+    border: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background-color: $mc-rule-web;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: rgba($mc-accent, 0.6);
+    }
+
+    &[aria-current="true"] {
+      background-color: $mc-accent;
+      transform: scale(1.2);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-carousel {
+    scroll-behavior: auto;
+  }
+  .featured-item,
+  .featured-controls button,
+  .featured-dot {
+    transition: none;
+  }
+}
+
+// =============================================================================
+// PROJECT SECTION HEADING + FLAT CARD GRID (per section)
+// Overrides the heavier Bootstrap card chrome from _projects.scss.
+// =============================================================================
+
+.projects-section {
+  margin-top: 3rem;
+  scroll-margin-top: 5rem; // anchor offset for sticky navbar
+
+  .projects-section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-family: $font-family-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $mc-accent;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 0 0 1rem;
+
+    &::before {
+      content: "\25A0";
+      color: $mc-accent;
+      font-size: 0.7em;
+    }
+
+    &::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: $mc-rule-web;
+    }
+
+    .projects-section-count {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: $mc-muted;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
