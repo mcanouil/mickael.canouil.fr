@@ -81,9 +81,9 @@ if (item.template === true) {
 const usage = item.usage;
 if (usage) {
 const id = utils.b64encode(usage);
-partial("extension-install-modal.ejs", { id, usage });
+partial("extension-install-modal.ejs.md", { id, usage });
 if (item.template === true) {
-partial("extension-use-modal.ejs", { id, usage });
+partial("extension-use-modal.ejs.md", { id, usage });
 }
 }
 %>
