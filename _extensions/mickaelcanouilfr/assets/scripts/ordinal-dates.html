@@ -14,12 +14,10 @@
 
     function wrapTextNode(node) {
       const text = node.nodeValue;
-      if (!PATTERN.test(text)) return;
-      PATTERN.lastIndex = 0;
-
       const fragment = document.createDocumentFragment();
       let cursor = 0;
       let match;
+      PATTERN.lastIndex = 0;
       while ((match = PATTERN.exec(text)) !== null) {
         const [full, digits, suffix] = match;
         const start = match.index;
@@ -33,13 +31,16 @@
         fragment.appendChild(sup);
         cursor = start + full.length;
       }
+      if (cursor === 0) return;
       if (cursor < text.length) {
         fragment.appendChild(document.createTextNode(text.slice(cursor)));
       }
       node.parentNode.replaceChild(fragment, node);
     }
 
-    document.querySelectorAll(SELECTOR).forEach(function (el) {
+    const elements = document.querySelectorAll(SELECTOR);
+    if (elements.length === 0) return;
+    elements.forEach(function (el) {
       if (el.dataset.ordinalDates === "wrapped") return;
       const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
         acceptNode: function (node) {

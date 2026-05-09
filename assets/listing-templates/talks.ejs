@@ -6,11 +6,18 @@
 // what, and which materials are still available.
 // =============================================================================
 
+// item.date is already formatted by Quarto's `date-format`, so Date(...) is
+// Invalid; pull the four-digit year via regex.
 function getYear(item) {
-  // item.date arrives already formatted by Quarto's `date-format`, so parsing
-  // it as a Date returns Invalid; pull a four-digit year via regex instead.
   const m = String(item.date || "").match(/(\d{4})/);
   return m ? m[1] : null;
+}
+
+function renderCategoryChips(prefix, categories) {
+  if (!categories || !categories.length) return "";
+  return categories
+    .map((c) => `<span class="${prefix}-category" onclick="window.quartoListingCategory('${utils.b64encode(c)}'); return false;">${c}</span>`)
+    .join("");
 }
 
 const grouped = {};
@@ -100,16 +107,12 @@ const ACTIONS = [
 <% if (actions.length) { %>
       <div class="talks-actions">
 <% actions.forEach(a => { %>
-        <a class="talks-button talks-button--<%= a.key %>" href="<%- item[a.key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= a.icon %>" aria-hidden="true"></i><span><%= a.label %></span></a>
+        <a class="talks-button" href="<%- item[a.key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= a.icon %>" aria-hidden="true"></i><span><%= a.label %></span></a>
 <% }); %>
       </div>
 <% } %>
 <% if (item.categories && item.categories.length) { %>
-      <div class="talks-categories">
-<% for (const category of item.categories) { %>
-        <span class="talks-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></span>
-<% } %>
-      </div>
+      <div class="talks-categories"><%= renderCategoryChips("talks", item.categories) %></div>
 <% } %>
     </li>
 <% }); %>

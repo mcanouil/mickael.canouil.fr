@@ -20,7 +20,8 @@
 
     const list = document.createElement("ul");
 
-    const links = headers.map((h) => {
+    const anchors = new Map();
+    headers.forEach((h) => {
       const id = h.id;
       const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
       const li = document.createElement("li");
@@ -32,7 +33,7 @@
       a.textContent = year;
       li.appendChild(a);
       list.appendChild(li);
-      return { id, anchor: a, header: h };
+      anchors.set(id, a);
     });
 
     const nav = document.createElement("nav");
@@ -51,12 +52,8 @@
     let activeId = null;
     const setActive = (targetId) => {
       if (activeId === targetId) return;
-      if (activeId) {
-        const prev = links.find((l) => l.id === activeId);
-        if (prev) prev.anchor.classList.remove("active");
-      }
-      const next = links.find((l) => l.id === targetId);
-      if (next) next.anchor.classList.add("active");
+      anchors.get(activeId)?.classList.remove("active");
+      anchors.get(targetId)?.classList.add("active");
       activeId = targetId;
     };
 
@@ -75,8 +72,8 @@
       headers.forEach((h) => observer.observe(h));
     }
 
-    if (links.length > 0) {
-      setActive(links[0].id);
+    if (headers.length > 0) {
+      setActive(headers[0].id);
     }
   });
 </script>

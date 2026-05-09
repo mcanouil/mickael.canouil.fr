@@ -49,10 +49,7 @@ function authorName(a) {
 function decodeAuthors(b64) {
   if (!b64) return [];
   try {
-    const bin = atob(b64);
-    const bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    return JSON.parse(new TextDecoder().decode(bytes));
+    return JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
   } catch (e) {
     return [];
   }
@@ -161,14 +158,17 @@ function entryHtml(item) {
     ? `<p class="pub-venue"><em>${escapeHtml(venue.journal)}</em>${venue.meta ? `, <span class="pub-venue-meta">${escapeHtml(venue.meta)}</span>` : ""}</p>`
     : "";
 
-  const chips = [];
-  if (doiHref) chips.push(`<a class="pub-chip" href="${escapeHtml(doiHref)}" rel="noopener noreferrer" target="_blank">DOI</a>`);
-  if (url && url !== doiHref) {
-    chips.push(`<a class="pub-chip" href="${escapeHtml(url)}" rel="noopener noreferrer" target="_blank">Article</a>`);
-  }
-  if (pdfUrl) chips.push(`<a class="pub-chip" href="${escapeHtml(pdfUrl)}" rel="noopener noreferrer" target="_blank">PDF</a>`);
-  if (codeUrl) chips.push(`<a class="pub-chip" href="${escapeHtml(codeUrl)}" rel="noopener noreferrer" target="_blank">Code</a>`);
-  if (slidesUrl) chips.push(`<a class="pub-chip" href="${escapeHtml(slidesUrl)}" rel="noopener noreferrer" target="_blank">Slides</a>`);
+  const linkChip = (href, label) =>
+    `<a class="pub-chip" href="${escapeHtml(href)}" rel="noopener noreferrer" target="_blank">${label}</a>`;
+  const chips = [
+    [doiHref, "DOI"],
+    [url && url !== doiHref ? url : "", "Article"],
+    [pdfUrl, "PDF"],
+    [codeUrl, "Code"],
+    [slidesUrl, "Slides"],
+  ]
+    .filter(([href]) => href)
+    .map(([href, label]) => linkChip(href, label));
   if (bibtex) chips.push(`<button type="button" class="pub-chip pub-chip--bibtex" data-bibtex="${escapeHtml(bibtex)}" aria-label="Copy BibTeX entry">BibTeX</button>`);
 
   const authors = renderAuthors(decodeAuthors(item["pub-author"]));
