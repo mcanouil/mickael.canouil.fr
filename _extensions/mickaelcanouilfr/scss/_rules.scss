@@ -118,49 +118,16 @@ $_icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" wid
 // ===========================
 // CSS CUSTOM PROPERTIES
 // ===========================
-// Define theming custom properties for shared components
-// Light mode (default)
+// Theming custom properties (light + dark inherit via $body-color/$body-bg).
 body {
-  // Core colours
   --mc-fg: #{$body-color};
   --mc-bg: #{$body-bg};
   --mc-muted: #{body-mix(35%)};
-  --mc-border: #{body-mix(80%)};
-  --mc-border-strong: #{body-mix(50%)};
-  --mc-surface: #{body-mix(98%)};
-
-  // Semantic colours
-  --mc-info: #{$semantic-color-info};
-  --mc-success: #{$semantic-color-success};
-  --mc-warning: #{$semantic-color-warning};
-  --mc-danger: #{$semantic-color-danger};
-  --mc-caution: #{$callout-color-caution};
-  --mc-neutral: #{body-mix(50%)};
-}
-
-// Dark mode overrides
-[data-bs-theme="dark"],
-.quarto-dark {
-  --mc-fg: #{$body-color};
-  --mc-bg: #{$body-bg};
-  --mc-muted: #{body-mix(35%)};
-  --mc-border: #{body-mix(80%)};
-  --mc-border-strong: #{body-mix(50%)};
-  --mc-surface: #{body-mix(98%)};
-
-  // Dark mode semantic colours (WCAG compliant)
-  --mc-info: #{$semantic-color-info-dark};
-  --mc-success: #{$semantic-color-success-dark};
-  --mc-warning: #{$semantic-color-warning-dark};
-  --mc-danger: #{$semantic-color-danger-dark};
-  --mc-caution: #{$semantic-color-caution-dark};
-  --mc-neutral: #{body-mix(50%)};
 }
 
 // ===========================
 // BASE STYLES & ANIMATIONS
 // ===========================
-// Smooth scrolling for the entire page
 html {
   scroll-behavior: smooth;
 }
@@ -203,14 +170,12 @@ p:empty {
 // QUARTO UI COMPONENTS
 // ===========================
 
-// Back to top button
 #quarto-back-to-top {
   box-shadow: 0 .2rem .5rem body-mix(95%), 0 0 .05rem body-mix(95%);
   color: body-mix(5%);
   bottom: 80px;
 }
 
-// Title banner styling
 .quarto-title-banner {
   margin-bottom: 1em;
   color: $body-color;
@@ -639,12 +604,8 @@ img.about-image {
   }
 }
 
-// Footer navigation
-// Quarto's `body .nav-footer` sets border-top to #dee2e6.  Match that
-// specificity with `body` prefix.  Use $footer-fg which Quarto computes from
-// the page-footer background/foreground metadata.  When these are not set,
-// $footer-fg falls back to an auto-computed value; set explicit page-footer
-// background/foreground in _extension.yml or _quarto.yml for best results.
+// Quarto's `body .nav-footer` sets border-top to #dee2e6 — match that
+// specificity with `body` prefix.
 body .nav-footer,
 body .footer {
   border-top: 1px solid rgba($footer-fg, 0.3);
@@ -1917,7 +1878,6 @@ div.sourceCode {
   }
 }
 
-// Sidebar title text colour
 .sidebar-navigation .sidebar-title a {
   color: $sidebar-fg;
 }
@@ -2947,12 +2907,6 @@ nav#TOC {
 // SIDEBAR & BREADCRUMBS
 // ===========================
 
-// Sidebar border: override Quarto's .sidebar.sidebar-navigation:not(.rollup)
-// which uses #dee2e6.  Match full selector for equal specificity; !important to
-// override their !important.
-.sidebar.sidebar-navigation:not(.rollup) {
-  border-right: 1px solid rgba($sidebar-fg, 0.2) !important;
-}
 
 .sidebar.sidebar-navigation {
   .sidebar-item {
@@ -3108,133 +3062,45 @@ main {
     }
   }
 
-  // Different resting/hover widths and thickness per heading level
-  h2.anchored:not(:where(.quarto-listing *))::after {
-    width: 50px;
-    height: 4px;
-    border-radius: 2px;
-  }
+  // Per-level resting/hover widths, thickness, section-number prominence.
+  @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size, $num-opacity in (
+    (h2, 50px, 100px, 4px, 2px, 700, 1em, 1),
+    (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em, 1),
+    (h4, 30px, 60px, 2px, 1px, 500, 0.85em, 0.65),
+    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em, 0.6),
+  ) {
+    #{$level}.anchored:not(:where(.quarto-listing *)) {
+      &::after {
+        width: $w;
+        height: $h;
+        border-radius: $r;
+      }
 
-  h2.anchored:not(:where(.quarto-listing *)):hover::after {
-    width: 100px;
-  }
+      &:hover::after {
+        width: $w-hover;
+      }
 
-  h3.anchored:not(:where(.quarto-listing *))::after {
-    width: 40px;
-    height: 3px;
-    border-radius: 1.5px;
-  }
+      .header-section-number {
+        transition: $_link-transition;
+        opacity: 0.7;
+        margin-right: 0.5em;
+        font-weight: $num-weight;
+        font-size: $num-size;
+        @if $level == h2 { margin-right: 0.6em; }
+        @if $num-opacity != 1 { opacity: $num-opacity; }
+      }
 
-  h3.anchored:not(:where(.quarto-listing *)):hover::after {
-    width: 80px;
-  }
-
-  h4.anchored:not(:where(.quarto-listing *))::after {
-    width: 30px;
-    height: 2px;
-    border-radius: 1px;
-  }
-
-  h4.anchored:not(:where(.quarto-listing *)):hover::after {
-    width: 60px;
-  }
-
-  h5.anchored:not(:where(.quarto-listing *))::after {
-    width: 25px;
-    height: 1.5px;
-    border-radius: 1px;
-  }
-
-  h5.anchored:not(:where(.quarto-listing *)):hover::after {
-    width: 50px;
-  }
-
-  // Enhance section number styling
-  h2.anchored:not(:where(.quarto-listing *)),
-  h3.anchored:not(:where(.quarto-listing *)),
-  h4.anchored:not(:where(.quarto-listing *)),
-  h5.anchored:not(:where(.quarto-listing *)) {
-    .header-section-number {
-      transition: $_link-transition;
-      opacity: 0.7;
-      margin-right: 0.5em;
+      &:hover .header-section-number {
+        opacity: 1;
+        transform: translateX(-2px);
+      }
     }
-
-    &:hover .header-section-number {
-      opacity: 1;
-      transform: translateX(-2px);
-    }
-  }
-
-  // Per-level section number prominence
-  h2.anchored:not(:where(.quarto-listing *)) .header-section-number {
-    font-weight: 700;
-    font-size: 1em;
-    margin-right: 0.6em;
-  }
-
-  h3.anchored:not(:where(.quarto-listing *)) .header-section-number {
-    font-weight: 600;
-    font-size: 0.9em;
-  }
-
-  h4.anchored:not(:where(.quarto-listing *)) .header-section-number {
-    font-weight: 500;
-    font-size: 0.85em;
-    opacity: 0.65;
-  }
-
-  h5.anchored:not(:where(.quarto-listing *)) .header-section-number {
-    font-weight: 500;
-    font-size: 0.8em;
-    opacity: 0.6;
   }
 }
 
 // ===========================
 // KEYFRAME ANIMATIONS
 // ===========================
-
-// Shimmer animation for banner accent
-@keyframes shimmer {
-
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scaleX(1);
-  }
-
-  50% {
-    opacity: 0.5;
-    transform: scaleX(0.95);
-  }
-}
-
-// Fade in animation for separator border
-@keyframes fadeInBorder {
-  from {
-    opacity: 0;
-    transform: scaleX(0.8);
-  }
-
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-// Pulse animation for separator border
-@keyframes pulseBorder {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
-}
 
 // Gradient orbs movement
 @keyframes orbsMove {
@@ -3413,15 +3279,11 @@ body {
 .pub-year-num,
 .pub-date,
 .pub-position,
-.pub-meta time,
 .pub-timeline-year,
 .pub-timeline-count,
-.education .date,
-.tabular-nums,
 time,
 .talks-year,
-.talks-row time,
-.featured-meta time {
+.talks-row time {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
@@ -3438,9 +3300,7 @@ header#title-block-header .subtitle,
 
 // Photo gold ring + soft glow — CV's circular accent stroke, on the web.
 .about-entity img,
-.about-image img,
-img.profile-image,
-.about-body img.profile-image {
+.about-image img {
   border: 2px solid $mc-accent;
   box-shadow:
     0 0 0 6px rgba($mc-accent, 0.08),
@@ -3448,8 +3308,7 @@ img.profile-image,
   transition: box-shadow 0.4s ease;
 }
 .about-entity img:hover,
-.about-image img:hover,
-img.profile-image:hover {
+.about-image img:hover {
   box-shadow:
     0 0 0 8px rgba($mc-accent, 0.14),
     0 6px 24px rgba($mc-ink, 0.16);
@@ -3459,8 +3318,7 @@ img.profile-image:hover {
 //    Targets in-content `<h2>`s on the about page and listing-section headings.
 .about-body > h2,
 .quarto-listing-section,
-.about-body section.level2 > h2,
-.cv-divider {
+.about-body section.level2 > h2 {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -3684,7 +3542,6 @@ main a:not(.btn):not(.nav-link):not(.quarto-grid-link) {
 .quarto-listing,
 .quarto-listing > .listing,
 .featured-carousel-section,
-.talks-section:first-of-type,
 .blog-list {
   margin-top: 0.75rem;
 }
@@ -3746,7 +3603,6 @@ main,
 @media (prefers-reduced-motion: reduce) {
   .about-entity img,
   .about-image img,
-  img.profile-image,
   .about-body a,
   .content a,
   main a {
@@ -3918,13 +3774,14 @@ aside.sidebar.sidebar-navigation,
 // TALKS LISTING — year-grouped vertical list
 // =============================================================================
 
+$talks-border: rgba($body-color, 0.18);
+$talks-muted: rgba($body-color, 0.62);
+
 .talks-listing {
-  --talks-border: #{rgba($body-color, 0.18)};
-  --talks-muted: #{rgba($body-color, 0.62)};
   display: block;
 }
 
-@include year-timeline("talks", $mc-accent, "--talks-border", "--talks-muted");
+@include year-timeline("talks", $mc-accent, $talks-border, $talks-muted);
 
 .talks-section {
   margin-top: 2.5rem;

@@ -44,9 +44,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-792a28bed182d468fe12dfa764a71a65.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7c4d3baed59d0551420afe3844e2bc4b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-19dad7028e89541616a777635e5400a7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-7c4d3baed59d0551420afe3844e2bc4b.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1abb5fe1c052cc099aaa9e2006291bc6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-0d419b88ffa59af0543ad984afbdd1d9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-1abb5fe1c052cc099aaa9e2006291bc6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -514,6 +514,7 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
       categoryMap[firstLetter].push(category);
     });
 
+    const fragment = document.createDocumentFragment();
     Object.keys(categoryMap).sort().forEach(letter => {
       const groupDiv = document.createElement("div");
       groupDiv.classList.add("category-group");
@@ -530,13 +531,12 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
       collapseDiv.classList.add("collapse");
       collapseDiv.id = `collapse-category-${letter}`;
 
-      categoryMap[letter].forEach(category => {
-        collapseDiv.appendChild(category);
-      });
+      categoryMap[letter].forEach(category => collapseDiv.appendChild(category));
       groupDiv.appendChild(button);
       groupDiv.appendChild(collapseDiv);
-      container.appendChild(groupDiv);
+      fragment.appendChild(groupDiv);
     });
+    container.appendChild(fragment);
   });
 </script>
 <script id="publications-bibtex-clipboard" type="text/javascript">
@@ -590,7 +590,8 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
 
     const list = document.createElement("ul");
 
-    const links = headers.map((h) => {
+    const anchors = new Map();
+    headers.forEach((h) => {
       const id = h.id;
       const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
       const li = document.createElement("li");
@@ -602,7 +603,7 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
       a.textContent = year;
       li.appendChild(a);
       list.appendChild(li);
-      return { id, anchor: a, header: h };
+      anchors.set(id, a);
     });
 
     const nav = document.createElement("nav");
@@ -621,12 +622,8 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
     let activeId = null;
     const setActive = (targetId) => {
       if (activeId === targetId) return;
-      if (activeId) {
-        const prev = links.find((l) => l.id === activeId);
-        if (prev) prev.anchor.classList.remove("active");
-      }
-      const next = links.find((l) => l.id === targetId);
-      if (next) next.anchor.classList.add("active");
+      anchors.get(activeId)?.classList.remove("active");
+      anchors.get(targetId)?.classList.add("active");
       activeId = targetId;
     };
 
@@ -645,8 +642,8 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
       headers.forEach((h) => observer.observe(h));
     }
 
-    if (links.length > 0) {
-      setActive(links[0].id);
+    if (headers.length > 0) {
+      setActive(headers[0].id);
     }
   });
 </script>
@@ -666,12 +663,10 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
 
     function wrapTextNode(node) {
       const text = node.nodeValue;
-      if (!PATTERN.test(text)) return;
-      PATTERN.lastIndex = 0;
-
       const fragment = document.createDocumentFragment();
       let cursor = 0;
       let match;
+      PATTERN.lastIndex = 0;
       while ((match = PATTERN.exec(text)) !== null) {
         const [full, digits, suffix] = match;
         const start = match.index;
@@ -685,13 +680,16 @@ I combine expertise in genetics and multi-omics analysis with open-source develo
         fragment.appendChild(sup);
         cursor = start + full.length;
       }
+      if (cursor === 0) return;
       if (cursor < text.length) {
         fragment.appendChild(document.createTextNode(text.slice(cursor)));
       }
       node.parentNode.replaceChild(fragment, node);
     }
 
-    document.querySelectorAll(SELECTOR).forEach(function (el) {
+    const elements = document.querySelectorAll(SELECTOR);
+    if (elements.length === 0) return;
+    elements.forEach(function (el) {
       if (el.dataset.ordinalDates === "wrapped") return;
       const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
         acceptNode: function (node) {
