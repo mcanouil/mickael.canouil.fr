@@ -198,6 +198,15 @@ button:focus-visible,
   transition: outline-offset 0.2s ease;
 }
 
+// Ordinal date suffixes (st, nd, rd, th) wrapped by ordinal-dates.html.
+// Override <sup> default raise: stay on baseline, shrink, italicise.
+.ordinal-suffix {
+  font-size: 0.70em;
+  font-style: italic;
+  vertical-align: baseline;
+  line-height: inherit;
+}
+
 // Hide empty divs and paragraphs to reduce visual clutter
 div:empty:not(#code-annotation-line-highlight):not(#code-annotation-line-highlight-gutter),
 p:empty {
@@ -231,6 +240,15 @@ p:empty {
 
   .quarto-title .title {
     color: $body-color;
+  }
+
+  >div>p:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  &:has(>div>p:last-child) {
+    padding-bottom: 0 !important;
   }
 }
 
@@ -512,6 +530,19 @@ pre.code-annotation-code {
   animation: fadeIn 0.2s ease;
 }
 
+// Navbar Tippy theme: dark to match navbar in both colour modes
+.tippy-box[data-theme~="mc"] {
+  background-color: $mc-ink;
+  color: $mc-paper;
+  border: 1px solid $primary;
+  border-radius: $_radius-sm;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.15rem 0.25rem;
+  animation: fadeIn 0.15s ease;
+}
+
 // ===========================
 // ABOUT PAGE COMPONENTS
 // ===========================
@@ -650,13 +681,21 @@ hr {
   opacity: 0.25;
 }
 
-// Appendix border: override Quarto's #dee2e6 default with brand foreground
+// Appendix: override Quarto's #dee2e6 border default and pin colour to body
+// so dark mode keeps readable contrast (Quarto sets no explicit colour and
+// the inline code rule above paints a stray background on the bibtex code).
 #quarto-appendix.default {
   border-top-color: rgba($body-color, 0.15);
 
   .quarto-appendix-bibtex,
   .quarto-appendix-citeas {
     border-color: rgba($body-color, 0.15);
+    color: $body-color;
+  }
+
+  .quarto-appendix-bibtex code.sourceCode {
+    color: inherit;
+    background-color: transparent;
   }
 }
 
@@ -1090,12 +1129,10 @@ main a:not(:where(.nav-link,
   margin-right: calc(-50vw + 50%);
   margin-top: -$_space-xl;
   margin-bottom: $_space-xl;
-  background:
-    radial-gradient(ellipse at top left, rgba($body-color, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba($body-color, 0.06) 0%, transparent 50%),
-    linear-gradient(135deg, rgba($body-color, 0.02) 0%, rgba($body-color, 0.05) 100%);
+  background-color: $mc-ink;
+  color: #ffffff;
   border-radius: 0;
-  box-shadow: $_shadow-md;
+  box-shadow: 0 8px 24px rgba($mc-accent, 0.4);
   overflow: hidden;
 
   // Gradient orbs overlay
@@ -1107,11 +1144,11 @@ main a:not(:where(.nav-link,
     right: -50%;
     bottom: -50%;
     background:
-      radial-gradient(circle at 30% 40%, rgba($body-color, 0.12) 0%, transparent 30%),
-      radial-gradient(circle at 70% 60%, rgba($body-color, 0.1) 0%, transparent 30%),
-      radial-gradient(circle at 50% 20%, rgba($body-color, 0.08) 0%, transparent 20%);
+      radial-gradient(circle at 30% 40%, rgba($mc-accent, 0.06) 0%, transparent 30%),
+      radial-gradient(circle at 70% 60%, rgba($mc-accent, 0.04) 0%, transparent 30%),
+      radial-gradient(circle at 50% 20%, rgba($mc-accent, 0.05) 0%, transparent 20%);
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.5;
     animation: orbsMove 20s ease-in-out infinite alternate;
   }
 
@@ -1124,7 +1161,7 @@ main a:not(:where(.nav-link,
     padding: 0 2rem;
 
     .entity-contents {
-      .quarto-title-block {
+      #title-block-header.quarto-title-block.default {
         text-align: center;
 
         .quarto-title {
@@ -1132,10 +1169,31 @@ main a:not(:where(.nav-link,
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: $_space-sm;
-            background: linear-gradient(135deg, $body-color 0%, rgba($body-color, 0.7) 100%);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(#ffffff, 0.75) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+
+            &:hover {
+              color: #ffffff;
+              text-shadow: 0 0 10px rgba(#ffffff, 0.6);
+
+              .title-suffix {
+                text-shadow: none;
+              }
+            }
+
+            .title-suffix {
+              color: $mc-accent;
+              font-size: 0.55em;
+              font-weight: 600;
+              letter-spacing: 0.02em;
+              background: none;
+              -webkit-background-clip: initial;
+              background-clip: initial;
+              -webkit-text-fill-color: $mc-accent;
+              text-shadow: none;
+            }
 
             @media (max-width: $_breakpoint-md) {
               font-size: 2rem;
@@ -1144,7 +1202,7 @@ main a:not(:where(.nav-link,
 
           .subtitle {
             font-size: 1.2rem;
-            color: rgba($body-color, 0.8);
+            color: $mc-accent;
             font-weight: 400;
             margin-bottom: $_space-lg;
 
@@ -1167,10 +1225,10 @@ main a:not(:where(.nav-link,
           align-items: center;
           justify-content: center;
           padding: 0.6rem 1rem;
-          background-color: rgba($body-color, 0.08);
-          border: 1px solid rgba($body-color, 0.15);
+          background-color: rgba(#ffffff, 0.08);
+          border: 1px solid rgba(#ffffff, 0.3);
           border-radius: $_radius-md;
-          color: rgba($body-color, 0.85);
+          color: rgba(#ffffff, 0.85);
           text-decoration: none;
           transition: all $_anim-standard $_easing-standard;
           font-size: 1.1rem;
@@ -1183,11 +1241,11 @@ main a:not(:where(.nav-link,
           }
 
           &:hover {
-            background-color: rgba($body-color, 0.12);
-            border-color: rgba($body-color, 0.3);
+            background-color: rgba(#ffffff, 0.18);
+            border-color: rgba(#ffffff, 0.5);
             transform: translateY(-2px);
             box-shadow: $_shadow-md;
-            color: $body-color;
+            color: #ffffff;
           }
 
           &:active {
@@ -1212,14 +1270,18 @@ main a:not(:where(.nav-link,
 
     // Profile image styling (override existing)
     .about-image {
-      border: 4px solid rgba($body-color, 0.1);
-      box-shadow: $_shadow-lg;
+      border: 2px solid $mc-accent;
+      box-shadow:
+        0 0 0 6px rgba($mc-accent, 0.10),
+        0 4px 16px rgba(#000000, 0.35);
       transition: all $_anim-standard $_easing-standard;
 
       &:hover {
         transform: scale(1.05);
-        box-shadow: 0 12px 32px rgba($body-color, 0.2);
-        border-color: rgba($body-color, 0.2);
+        box-shadow:
+          0 0 0 8px rgba($mc-accent, 0.15),
+          0 12px 32px rgba(#000000, 0.45);
+        border-color: lighten($mc-accent, 10%);
       }
     }
   }
@@ -1253,7 +1315,7 @@ main a:not(:where(.nav-link,
 
 // About body styling
 .about-body {
-  margin: 2.5rem 0;
+  margin: 2.5rem 0 0;
   max-width: 800px;
 
   p {
@@ -1703,51 +1765,149 @@ body.quarto-about-solana,
     }
   }
 
-  // Education section specific styling
-  .education {
-    ul li {
-      background-color: rgba($body-color, 0.02);
-      border-left: 2px solid rgba($body-color, 0.15);
-      border-radius: 0 6px 6px 0;
-      padding: $_space-md $_space-md $_space-md $_space-xl;
+  // Education section: vertical timeline (rail + year badge per entry).
+  // Lives inside the about-solana wrapper so its specificity beats the
+  // generic `section.level2 ul li` rules above.
+  section.education > ul {
+    list-style: none;
+    padding: 0.5rem 0 0.25rem 4.5rem;
+    position: relative;
+    margin-top: 1rem;
+    border: 0;
 
-      &:hover {
-        background-color: rgba($body-color, 0.05);
-        border-left-color: rgba($body-color, 0.3);
+    &::before {
+      content: "";
+      position: absolute;
+      left: 2.5rem;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      width: 2px;
+      background: $mc-accent;
+    }
+
+    > li {
+      position: relative;
+      padding: 0.35rem 0 1.1rem 0.75rem;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+
+      &::before {
+        content: none;
       }
 
-      strong:last-of-type {
+      &:last-child {
+        padding-bottom: 0;
+      }
+
+      &:hover {
+        background: transparent;
+        padding-left: 0.75rem;
+
+        &::before {
+          content: none;
+        }
+
+        .year {
+          transform: scale(1.06);
+          box-shadow:
+            0 0 0 4px $body-bg,
+            0 0 0 6px rgba($mc-accent, 0.18);
+        }
+      }
+
+      .year {
+        position: absolute;
+        left: -3.5rem;
+        top: 0.1rem;
+        width: 3rem;
+        height: 3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: $body-bg;
+        border: 2px solid $mc-accent;
+        color: $mc-accent;
+        font-family: $font-family-serif;
+        font-weight: 700;
+        font-size: 0.78rem;
+        font-variant-numeric: tabular-nums lining-nums;
+        letter-spacing: 0.02em;
+        box-shadow: 0 0 0 4px $body-bg;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .institution {
+        display: inline-block;
+        margin-top: 0.15rem;
         color: rgba($body-color, 0.7);
         font-size: 0.95em;
+      }
+
+      strong em {
+        color: $mc-accent;
+        font-style: normal;
       }
     }
   }
 
-  // Interests section - more compact styling
-  .interests {
-    ul {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: $_space-sm;
+  // Interests section: gold-bordered pill chips (CV-style tag cloud).
+  // Lives inside the about-solana wrapper so its specificity beats the
+  // generic `section.level2 ul li` cascade above.
+  section.interests > ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0.55rem;
 
-      @media (max-width: $_breakpoint-md) {
-        grid-template-columns: 1fr;
+    > li {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.95rem;
+      margin: 0;
+      background: transparent;
+      border: 1px solid rgba($mc-accent, 0.55);
+      border-radius: 999px;
+      color: $body-color;
+      font-family: $font-family-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &::before {
+        content: "\25C6";
+        color: $mc-accent;
+        margin-right: 0.45rem;
+        font-size: 0.55em;
+        position: static;
+        left: auto;
+        top: auto;
+        transform: translateY(-1px);
+        transition: color 0.2s ease;
       }
 
-      li {
-        padding: $_space-sm $_space-md $_space-sm 1.75rem;
-        background-color: rgba($body-color, 0.04);
-        border-radius: $_radius-md;
-        font-size: 0.95rem;
+      &:hover {
+        background: $mc-accent;
+        border-color: $mc-accent;
+        color: $body-bg;
+        padding-left: 0.95rem;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($mc-accent, 0.25);
 
         &::before {
-          left: $_space-sm;
-          font-size: 0.85rem;
-        }
-
-        &:hover {
-          background-color: rgba($body-color, 0.08);
-          padding-left: $_space-xl;
+          color: $body-bg;
         }
       }
     }
@@ -3574,10 +3734,15 @@ h2,
 // Animated underlines for section headings in main content
 main {
 
-  h2.anchored,
-  h3.anchored,
-  h4.anchored,
-  h5.anchored {
+  // Top-level headings keep gold accent colour
+  h2.anchored:not(:where(.quarto-listing *)) {
+    color: $mc-accent;
+  }
+
+  h2.anchored:not(:where(.quarto-listing *)),
+  h3.anchored:not(:where(.quarto-listing *)),
+  h4.anchored:not(:where(.quarto-listing *)),
+  h5.anchored:not(:where(.quarto-listing *)) {
     position: relative;
     transition: all $_anim-standard $_easing-standard;
     cursor: default;
@@ -3606,44 +3771,52 @@ main {
     }
   }
 
-  // Different resting/hover widths per heading level
-  h2.anchored::after {
+  // Different resting/hover widths and thickness per heading level
+  h2.anchored:not(:where(.quarto-listing *))::after {
     width: 50px;
+    height: 4px;
+    border-radius: 2px;
   }
 
-  h2.anchored:hover::after {
+  h2.anchored:not(:where(.quarto-listing *)):hover::after {
     width: 100px;
   }
 
-  h3.anchored::after {
+  h3.anchored:not(:where(.quarto-listing *))::after {
     width: 40px;
+    height: 3px;
+    border-radius: 1.5px;
   }
 
-  h3.anchored:hover::after {
+  h3.anchored:not(:where(.quarto-listing *)):hover::after {
     width: 80px;
   }
 
-  h4.anchored::after {
+  h4.anchored:not(:where(.quarto-listing *))::after {
     width: 30px;
+    height: 2px;
+    border-radius: 1px;
   }
 
-  h4.anchored:hover::after {
+  h4.anchored:not(:where(.quarto-listing *)):hover::after {
     width: 60px;
   }
 
-  h5.anchored::after {
+  h5.anchored:not(:where(.quarto-listing *))::after {
     width: 25px;
+    height: 1.5px;
+    border-radius: 1px;
   }
 
-  h5.anchored:hover::after {
+  h5.anchored:not(:where(.quarto-listing *)):hover::after {
     width: 50px;
   }
 
   // Enhance section number styling
-  h2.anchored,
-  h3.anchored,
-  h4.anchored,
-  h5.anchored {
+  h2.anchored:not(:where(.quarto-listing *)),
+  h3.anchored:not(:where(.quarto-listing *)),
+  h4.anchored:not(:where(.quarto-listing *)),
+  h5.anchored:not(:where(.quarto-listing *)) {
     .header-section-number {
       transition: $_link-transition;
       opacity: 0.7;
@@ -3654,6 +3827,30 @@ main {
       opacity: 1;
       transform: translateX(-2px);
     }
+  }
+
+  // Per-level section number prominence
+  h2.anchored:not(:where(.quarto-listing *)) .header-section-number {
+    font-weight: 700;
+    font-size: 1em;
+    margin-right: 0.6em;
+  }
+
+  h3.anchored:not(:where(.quarto-listing *)) .header-section-number {
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+
+  h4.anchored:not(:where(.quarto-listing *)) .header-section-number {
+    font-weight: 500;
+    font-size: 0.85em;
+    opacity: 0.65;
+  }
+
+  h5.anchored:not(:where(.quarto-listing *)) .header-section-number {
+    font-weight: 500;
+    font-size: 0.8em;
+    opacity: 0.6;
   }
 }
 
@@ -3865,14 +4062,19 @@ body {
 }
 
 // 2. Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
+// Sized to span exactly two `.about-body p` lines.
 .drop-cap {
   float: left;
   font-family: $font-family-serif;
-  font-size: 4em;
-  line-height: 0.85;
+  font-size: 3.5rem;
+  line-height: 1;
   padding: 0.05em 0.12em 0 0;
   color: $mc-accent;
   font-weight: 700;
+
+  @media (max-width: $_breakpoint-md) {
+    font-size: 3.25rem;
+  }
 }
 
 // 3. Tabular-nums on date-shaped elements — vertical alignment in lists.
@@ -3927,8 +4129,7 @@ img.profile-image:hover {
 //    Targets in-content `<h2>`s on the about page and listing-section headings.
 .about-body > h2,
 .quarto-listing-section,
-section.level2 > h2,
-.blog-section h2,
+.about-body section.level2 > h2,
 .cv-divider {
   display: flex;
   align-items: center;
@@ -3956,6 +4157,84 @@ section.level2 > h2,
   }
 }
 
+// 6b. Editorial alternating bands on the home page.
+//     Each `<section class="level2">` inside `.about-body` becomes a full-bleed
+//     band; odd-indexed sections take the warm paper tint to break the vertical
+//     monotony of the long stacked column. A small gold rhombus ornament closes
+//     each section except the last. Selector is wrapper-scoped so it beats the
+//     `body.quarto-about-solana section.level2 { padding-top: 0 }` override
+//     declared earlier in this file.
+body.quarto-about-solana .about-body > section.level2,
+#quarto-content:has(.quarto-about-solana) .about-body > section.level2 {
+  position: relative;
+  padding: 1.25rem 0 2rem;
+  margin: 0;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    z-index: -1;
+  }
+
+  &:nth-of-type(odd)::before {
+    background: $mc-paper-warm;
+  }
+
+  &::after {
+    content: "\25C6\00A0\00A0\25C6\00A0\00A0\25C6";
+    display: block;
+    text-align: center;
+    color: rgba($mc-accent, 0.55);
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    margin-top: 1.75rem;
+  }
+
+  &:last-of-type::after {
+    content: none;
+  }
+}
+
+// Quarto's `.page-rows-contents` grid reserves a `minmax(60px, max-content)`
+// row below the content, leaving a paper-coloured gap between the last band
+// and the footer. Collapse that row on the home page so the bands meet the
+// footer flush.
+body.quarto-about-solana #quarto-content.page-rows-contents,
+#quarto-content.page-rows-contents:has(.quarto-about-solana) {
+  grid-template-rows: [content-top] minmax(max-content, 1fr) [content-bottom] 0 [page-bottom];
+}
+
+// Larger octicon section anchor; suppress the generic ■ marker when the H2
+// already carries an iconify-icon (avoids two stacked decorations).
+.about-body h2 > iconify-icon,
+.about-body section.level2 > h2 > iconify-icon {
+  font-size: 1.55em;
+  vertical-align: -0.25em;
+  margin-right: 0.15em;
+  flex-shrink: 0;
+}
+
+.about-body h2:has(> iconify-icon)::before,
+.about-body section.level2 > h2:has(> iconify-icon)::before {
+  content: none;
+}
+
+// Thin gold rule below the streak block so the first band entry feels
+// intentional. Hidden theme-content blocks collapse with display:none, so the
+// rule only renders on the visible one.
+.about-body > .light-content,
+.about-body > .dark-content {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba($mc-accent, 0.25);
+}
+
 // 7. `.highlight` ribbon — accent-tinted bg + serif italic, centred horizontally.
 .highlight {
   border-left: 4px solid $mc-accent;
@@ -3979,61 +4258,11 @@ section.level2 > h2,
   }
 }
 
-// 8. Education list — vertical accent rail with `■` markers.
-//    Quarto applies header attributes to both <section> and <h2>; the actual
-//    list is the <ul> inside, so target the descendant.
-section.education > ul,
-ul.education {
-  list-style: none;
-  padding-left: 1rem;
-  border-left: 2px solid $mc-accent;
-  margin-top: 1rem;
+// 8. Education timeline lives in `_rules.scss` under the about-solana wrapper
+//    so its specificity beats the generic `section.level2 ul li` cascade.
 
-  > li {
-    position: relative;
-    padding: 0.25rem 0 0.6rem 1rem;
-    margin-bottom: 0.25rem;
-
-    &::before {
-      content: "\25A0";
-      color: $mc-accent;
-      position: absolute;
-      left: -0.55rem;
-      top: 0.3rem;
-      font-size: 0.6em;
-      background: $body-bg;
-      padding: 0 0.2em;
-    }
-
-    strong em {
-      color: $mc-accent;
-      font-style: normal;
-    }
-  }
-}
-
-// 9. Interests grid with `■` accent bullets.
-section.interests > ul,
-ul.interests {
-  list-style: none;
-  padding-left: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.4rem 1rem;
-  margin-top: 1rem;
-
-  @media (min-width: 992px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  > li::before {
-    content: "\25A0";
-    color: $mc-accent;
-    margin-right: 0.5rem;
-    font-size: 0.7em;
-    vertical-align: 0.1em;
-  }
-}
+// 9. Interests pill chips live in `_rules.scss` under the about-solana wrapper
+//    so their specificity beats the generic `section.level2 ul li` cascade.
 
 // Same `■` rail for an explicit Skills list.
 section.skills > ul,
@@ -4372,6 +4601,127 @@ aside.sidebar.sidebar-navigation,
 // TALKS LISTING — year-grouped vertical list
 // =============================================================================
 
+.talks-listing {
+  --talks-border: #{rgba($body-color, 0.18)};
+  --talks-muted: #{rgba($body-color, 0.62)};
+  display: block;
+}
+
+$talks-timeline-arrow: 12px;
+$talks-timeline-tick: 10px;
+
+.talks-timeline {
+  margin: 1rem 0 2.5rem;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.talks-timeline-list {
+  display: flex;
+  align-items: stretch;
+  list-style: none;
+  padding: 0 #{$talks-timeline-arrow + 4px} 0 0;
+  margin: 0;
+  position: relative;
+  min-width: max-content;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: #{$talks-timeline-arrow};
+    height: 2px;
+    background-color: var(--talks-border);
+    transform: translateY(-50%);
+    z-index: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-left: #{$talks-timeline-arrow} solid var(--talks-border);
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+}
+
+.talks-timeline-item {
+  flex: 1 0 auto;
+  position: relative;
+}
+
+.talks-timeline-link {
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 1rem;
+  text-decoration: none !important;
+  color: var(--talks-muted);
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease;
+
+  &::after,
+  &::before {
+    content: none !important;
+    background: none !important;
+  }
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-1px);
+
+    .talks-timeline-year {
+      color: $mc-accent;
+    }
+
+    .talks-timeline-tick {
+      background-color: $mc-accent;
+      border-color: $mc-accent;
+    }
+  }
+}
+
+.talks-timeline-year {
+  grid-row: 1;
+  align-self: end;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: $body-color;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease;
+}
+
+.talks-timeline-tick {
+  grid-row: 2;
+  width: $talks-timeline-tick;
+  height: $talks-timeline-tick;
+  border-radius: 50%;
+  background-color: $body-bg;
+  border: 2px solid var(--talks-border);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.talks-timeline-count {
+  grid-row: 3;
+  align-self: start;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--talks-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .talks-section {
   margin-top: 2.5rem;
   scroll-margin-top: 5rem;
@@ -4414,102 +4764,95 @@ aside.sidebar.sidebar-navigation,
   margin: 0;
 }
 
-.slide-embed {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  margin: 0.75rem 0;
-  border: 1.5px solid $mc-accent;
-  background: $mc-ink;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba($mc-ink, 0.18);
-
-  iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
-  }
-}
-
 .talks-row {
-  display: grid;
-  grid-template-columns: 1fr minmax(280px, 45%);
-  gap: 1.5rem;
-  padding: 1.5rem 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.5rem 0 1.5rem 1.25rem;
   border-top: 1px solid $mc-rule-web;
-  align-items: start;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    width: 2px;
+    background: $mc-rule-web;
+    transition: background-color 0.2s ease;
+  }
+
+  &:hover::before {
+    background: $mc-accent;
+  }
 
   &:last-child {
     border-bottom: 1px solid $mc-rule-web;
   }
-
-  @media (max-width: 767.98px) {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
 }
 
-.talks-info {
+.talks-meta {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  min-width: 0;
-}
-
-.talks-info-head {
-  display: flex;
-  align-items: baseline;
   flex-wrap: wrap;
-  gap: 0.6rem 1rem;
+  align-items: baseline;
+  gap: 0.4rem 0.75rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.talks-date {
+  color: $mc-accent;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.talks-venue-sep {
+  color: $mc-rule-web;
+  font-weight: 600;
+}
+
+.talks-venue {
+  color: $mc-muted;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
 }
 
 .talks-title {
   font-family: $font-family-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   color: $body-color;
   margin: 0;
   line-height: 1.3;
-  flex: 1 1 auto;
-  min-width: 0;
-}
 
-.talks-venue {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: $mc-muted;
-  margin: 0;
+  > p {
+    margin: 0;
+    display: inline;
+  }
 }
 
 .talks-description {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: rgba($body-color, 0.78);
-  font-style: italic;
-  margin: 0.2rem 0 0;
-}
-
-.talks-date {
-  font-size: 0.72rem;
-  color: $mc-accent;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
-
-.talks-embed {
+  line-height: 1.5;
   margin: 0;
+
+  > p {
+    margin: 0;
+  }
 }
 
 .talks-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.45rem;
+  margin-top: 0.2rem;
 }
 
 .talks-button {
@@ -4566,7 +4909,7 @@ aside.sidebar.sidebar-navigation,
 }
 
 // =============================================================================
-// BLOG LISTING — magazine rows
+// BLOG LISTING — hero (latest) + magazine rows
 // =============================================================================
 
 .blog-list {
@@ -4574,6 +4917,119 @@ aside.sidebar.sidebar-navigation,
   flex-direction: column;
   gap: 0;
   margin: 1.5rem 0;
+}
+
+.blog-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 2rem 0 2.5rem;
+  border-bottom: 2px solid $mc-rule-web;
+  margin-bottom: 0.5rem;
+  align-items: center;
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0 2rem;
+  }
+}
+
+.blog-hero-thumb {
+  display: block;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border: 1px solid $mc-rule-web;
+  background: rgba($mc-accent, 0.04);
+  transition: border-color 0.3s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .blog-thumb-fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-family-serif;
+    font-size: 5rem;
+    font-weight: 700;
+    color: $mc-accent;
+  }
+
+  &:hover {
+    border-color: $mc-accent;
+  }
+}
+
+.blog-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.blog-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.blog-hero-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.25em 0.7em;
+  border-radius: 4px;
+  background-color: $mc-accent;
+  color: #fff;
+}
+
+.blog-hero-title {
+  font-family: $font-family-serif;
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0;
+  color: $mc-ink;
+  transition: color 0.2s ease;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
+}
+
+[data-bs-theme="dark"] .blog-hero-title,
+.quarto-dark .blog-hero-title {
+  color: $mc-ink-dark;
+}
+
+.blog-title-link:hover .blog-hero-title,
+.blog-title-link:focus-visible .blog-hero-title {
+  color: $mc-accent;
+}
+
+.blog-hero-lead {
+  font-size: 1.05rem;
+  color: rgba($mc-ink, 0.8);
+  line-height: 1.55;
+  margin: 0;
+
+  > p {
+    margin: 0;
+  }
+}
+
+[data-bs-theme="dark"] .blog-hero-lead,
+.quarto-dark .blog-hero-lead {
+  color: rgba($mc-ink-dark, 0.8);
 }
 
 .blog-row {
@@ -4591,6 +5047,32 @@ aside.sidebar.sidebar-navigation,
   @media (max-width: 767.98px) {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+}
+
+.blog-row--compact {
+  grid-template-columns: minmax(100px, 0.7fr) 2fr;
+  gap: 1rem;
+  padding: 0.9rem 0;
+
+  .blog-title {
+    font-size: 1.15rem;
+  }
+
+  .blog-lead {
+    font-size: 0.88rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-thumb-fallback {
+    font-size: 2.25rem;
+  }
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -4667,6 +5149,11 @@ aside.sidebar.sidebar-navigation,
   color: $mc-ink;
   line-height: 1.25;
   transition: color 0.2s ease;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
 }
 
 [data-bs-theme="dark"] .blog-title,
@@ -4679,6 +5166,15 @@ aside.sidebar.sidebar-navigation,
   color: rgba($mc-ink, 0.75);
   margin: 0;
   line-height: 1.5;
+
+  > p {
+    margin: 0;
+  }
+}
+
+[data-bs-theme="dark"] .blog-lead,
+.quarto-dark .blog-lead {
+  color: rgba($mc-ink-dark, 0.75);
 }
 
 // .blog-footer removed — date is now above the title, categories sit at the bottom.
@@ -4688,8 +5184,8 @@ aside.sidebar.sidebar-navigation,
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  padding: 0.2em 0.6em;
-  border-radius: 4px;
+  padding: 0.18em 0.55em;
+  border-radius: 999px;
   background-color: rgba($mc-accent, 0.08);
   color: $mc-accent;
   cursor: pointer;

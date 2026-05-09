@@ -1,57 +1,84 @@
 // =============================================================================
-// FEATURED PROJECTS CAROUSEL
-// CSS scroll-snap row with pure-CSS slide visibility. JS only enhances dots
-// and prev/next buttons. Works without JS — slides remain accessible via the
-// native horizontal scrollbar.
+// FEATURED CAROUSEL — pure CSS auto-loop.
+// Track + clone-first-slide trick. Animation duration scales with --count.
+// Pause on hover/focus-within. Reduced-motion disables animation.
+// Per-count keyframes generated below for supported counts (2-10).
 // =============================================================================
+
+#listing-projects {
+  display: flex;
+  flex-direction: column;
+
+  > .featured-carousel-section { order: 0; }
+  > .quarto-listing-category { order: 1; }
+  > .listing-actions-group { order: 2; }
+  > .list { order: 3; }
+  > .listing-no-matching { order: 4; }
+  > .listing-pagination { order: 5; }
+}
 
 .featured-carousel-section {
   margin: 1.5rem 0 2.5rem;
-
-  .featured-heading {
-    font-family: $font-family-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: $mc-accent;
-    font-size: 0.85rem;
-    margin: 0 0 0.75rem;
-  }
 }
 
 .featured-carousel {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(260px, calc(33.33% - 0.7rem));
-  gap: 1rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  padding-bottom: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
 
-  @media (max-width: 992px) {
-    grid-auto-columns: minmax(240px, calc(50% - 0.5rem));
-  }
-
-  @media (max-width: 576px) {
-    grid-auto-columns: minmax(220px, 85%);
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: calc(100% / 3);
+    pointer-events: none;
+    z-index: 2;
   }
 
-  &::-webkit-scrollbar {
-    height: 6px;
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, $body-bg, rgba($body-bg, 0));
   }
-  &::-webkit-scrollbar-thumb {
-    background: rgba($mc-accent, 0.5);
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-track {
-    background: rgba($mc-rule-web, 0.4);
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, $body-bg, rgba($body-bg, 0));
   }
 }
 
+.featured-track {
+  display: flex;
+  align-items: stretch;
+  width: calc(var(--total, 1) * 100% / 3);
+  animation-timing-function: ease;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.featured-track > .featured-item,
+.featured-track > img {
+  flex: 0 0 calc(100% / var(--total, 1));
+  min-width: 0;
+}
+
+.featured-track > .featured-item {
+  overflow: hidden;
+}
+
+.featured-carousel-section:hover .featured-track,
+.featured-carousel-section:hover .featured-track > .featured-item,
+.featured-carousel-section:hover .featured-track > img,
+.featured-carousel-section:focus-within .featured-track,
+.featured-carousel-section:focus-within .featured-track > .featured-item,
+.featured-carousel-section:focus-within .featured-track > img {
+  animation-play-state: paused;
+}
+
 .featured-item {
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   border: 1px solid $mc-rule-web;
@@ -92,6 +119,11 @@
     margin: 0 0 0.4rem;
     font-size: 1.05rem;
     line-height: 1.3;
+
+    > p {
+      margin: 0;
+      display: inline;
+    }
   }
 
   &:hover .featured-title {
@@ -100,9 +132,12 @@
 
   .featured-description {
     font-size: 0.85rem;
-    color: rgba($mc-ink, 0.75);
+    color: rgba($body-color, 0.75);
     margin: 0 0 0.6rem;
-    flex-grow: 1;
+
+    > p {
+      margin: 0;
+    }
   }
 
   .featured-meta {
@@ -128,123 +163,218 @@
   }
 }
 
-.featured-controls {
+// Media variant: 1-up sliding (one image per viewport).
+// Slot = full carousel width. Track width = total × 100%. Disables side
+// dimming (gradient overlays) and per-item depth animation.
+.featured-carousel--media::before,
+.featured-carousel--media::after {
+  display: none;
+}
+
+.featured-carousel--media .featured-track {
+  width: calc(var(--total, 1) * 100%);
+}
+
+.featured-carousel--media .featured-track > img,
+.featured-carousel--media .featured-track > a {
+  flex: 0 0 calc(100% / var(--total, 1));
+  height: 100%;
+  display: block;
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.featured-carousel--media .featured-track > img {
+  object-fit: contain;
+}
+
+.featured-carousel--media .featured-track > a img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+// Generate per-count keyframes and animation hooks.
+// 3-up sliding window: track has N+3 items (originals + 3 clones at end).
+// Animation cycles through N+1 hold positions over N transitions.
+// Slot-time = 100/(N+1) %. Slot-pos = 100/(N+3) % of track width = 1 card.
+// Hold = 90% of slot-time, slide-in = 10% of slot-time.
+//
+// Parallax: each item gets its own depth keyframe synced to the track.
+// At each segment k of the cycle, the item occupies viewport slot j - k.
+// Centre slot = scale 1, full opacity. Side slots = scaled down, dimmed,
+// pulled inward via translateX for a coverflow depth illusion.
+@for $n from 2 through 10 {
+  $total: $n + 3;
+  $slot-time: percentage(1 / $n);
+  $slot-pos: percentage(1 / $total);
+
+  // 3-up: N transitions evenly over 100% of duration. Final 100% lands on
+  // the clone-of-first-3 position which is visually identical to start.
+  @keyframes featured-carousel-loop-#{$n} {
+    @for $k from 0 through ($n - 1) {
+      $start: $k * $slot-time;
+      $end: $start + $slot-time * 0.9;
+      $pos: $k * $slot-pos;
+      #{$start}, #{$end} {
+        transform: translateX(-#{$pos});
+      }
+    }
+    100% {
+      transform: translateX(-#{$n * $slot-pos});
+    }
+  }
+
+  .featured-carousel--n#{$n} .featured-track {
+    animation-name: featured-carousel-loop-#{$n};
+    animation-duration: #{$n * 5}s;
+  }
+
+  // 1-up media variant: track must have N+1 items (N originals + 1 clone of
+  // item 0). --total must equal N+1. Slot-time = 100/N evenly distributes
+  // transitions; slot-pos = 100/(N+1) places clone at cycle end.
+  $media-slot-pos: percentage(1 / ($n + 1));
+
+  @keyframes featured-carousel-loop-media-#{$n} {
+    @for $k from 0 through ($n - 1) {
+      $start: $k * $slot-time;
+      $end: $start + $slot-time * 0.9;
+      $pos: $k * $media-slot-pos;
+      #{$start}, #{$end} {
+        transform: translateX(-#{$pos});
+      }
+    }
+    100% {
+      transform: translateX(-#{$n * $media-slot-pos});
+    }
+  }
+
+  .featured-carousel--media.featured-carousel--n#{$n} .featured-track {
+    animation-name: featured-carousel-loop-media-#{$n};
+    animation-duration: #{$n * 5}s;
+  }
+
+  @for $j from 0 through ($total - 1) {
+    @keyframes featured-item-depth-#{$n}-#{$j} {
+      @for $k from 0 through ($n - 1) {
+        $slot: $j - $k;
+        $start: $k * $slot-time;
+        $end: $start + $slot-time * 0.9;
+        @if $slot == 1 {
+          #{$start}, #{$end} {
+            transform: scale(1) translateX(0);
+            opacity: 1;
+            filter: none;
+          }
+        } @else if $slot == 0 {
+          #{$start}, #{$end} {
+            transform: scale(0.85) translateX(8%);
+            opacity: 0.6;
+            filter: blur(0.5px);
+          }
+        } @else if $slot == 2 {
+          #{$start}, #{$end} {
+            transform: scale(0.85) translateX(-8%);
+            opacity: 0.6;
+            filter: blur(0.5px);
+          }
+        } @else {
+          #{$start}, #{$end} {
+            transform: scale(0.85) translateX(0);
+            opacity: 0.6;
+            filter: blur(0.5px);
+          }
+        }
+      }
+      $final-slot: $j - $n;
+      @if $final-slot == 1 {
+        100% { transform: scale(1) translateX(0); opacity: 1; filter: none; }
+      } @else if $final-slot == 0 {
+        100% { transform: scale(0.85) translateX(8%); opacity: 0.6; filter: blur(0.5px); }
+      } @else if $final-slot == 2 {
+        100% { transform: scale(0.85) translateX(-8%); opacity: 0.6; filter: blur(0.5px); }
+      } @else {
+        100% { transform: scale(0.85) translateX(0); opacity: 0.6; filter: blur(0.5px); }
+      }
+    }
+
+    .featured-carousel--n#{$n} .featured-track > :nth-child(#{$j + 1}) {
+      animation: featured-item-depth-#{$n}-#{$j} #{$n * 5}s ease infinite;
+    }
+  }
+}
+
+// Marker: N-dot indicator below carousel. Each dot pulses in sync with the
+// frame currently centred. Dot order must match centre-rotation order.
+.featured-marker {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.75rem;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.75rem auto 0;
+  list-style: none;
+  padding: 0;
 
-  button {
-    background: transparent;
-    border: 1px solid $mc-rule-web;
-    color: $mc-accent;
-    width: 2rem;
-    height: 2rem;
+  > li {
+    width: 0.55rem;
+    height: 0.55rem;
     border-radius: 50%;
-    cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    background: $mc-rule-web;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease;
+  }
+}
 
-    &:hover,
-    &:focus-visible {
-      border-color: $mc-accent;
-      background-color: rgba($mc-accent, 0.08);
-      outline: none;
+.featured-carousel-section:hover .featured-marker > li,
+.featured-carousel-section:focus-within .featured-marker > li {
+  animation-play-state: paused;
+}
+
+@for $n from 2 through 10 {
+  $duration: $n * 5;
+  $active-end: percentage(1 / $n) * 0.9;
+  $inactive-start: percentage(1 / $n);
+
+  @keyframes featured-marker-pulse-#{$n} {
+    0%, #{$active-end} {
+      background: $mc-accent;
+      transform: scale(1.4);
     }
-
-    &[disabled] {
-      opacity: 0.35;
-      cursor: not-allowed;
+    #{$inactive-start}, 100% {
+      background: $mc-rule-web;
+      transform: scale(1);
     }
   }
 
-  .featured-dots {
-    display: flex;
-    gap: 0.4rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .featured-marker--n#{$n} > li {
+    animation-name: featured-marker-pulse-#{$n};
+    animation-duration: #{$duration}s;
   }
 
-  .featured-dot {
-    background: transparent;
-    border: 0;
-    width: 0.6rem;
-    height: 0.6rem;
-    border-radius: 50%;
-    background-color: $mc-rule-web;
-    padding: 0;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-      background-color: rgba($mc-accent, 0.6);
-    }
-
-    &[aria-current="true"] {
-      background-color: $mc-accent;
-      transform: scale(1.2);
+  @for $k from 0 through ($n - 1) {
+    .featured-marker--n#{$n} > li:nth-child(#{$k + 1}) {
+      animation-delay: #{$k * 5}s;
     }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .featured-carousel {
-    scroll-behavior: auto;
+  .featured-track,
+  .featured-track > .featured-item,
+  .featured-track > img {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
   }
-  .featured-item,
-  .featured-controls button,
-  .featured-dot {
+  .featured-marker > li {
+    animation: none !important;
+    transform: none !important;
+  }
+  .featured-item {
     transition: none;
   }
 }
 
-// =============================================================================
-// PROJECT SECTION HEADING + FLAT CARD GRID (per section)
-// Overrides the heavier Bootstrap card chrome from _projects.scss.
-// =============================================================================
-
-.projects-section {
-  margin-top: 3rem;
-  scroll-margin-top: 5rem; // anchor offset for sticky navbar
-
-  .projects-section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    font-family: $font-family-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: $mc-accent;
-    font-weight: 700;
-    font-size: 1.15rem;
-    margin: 0 0 1rem;
-
-    &::before {
-      content: "\25A0";
-      color: $mc-accent;
-      font-size: 0.7em;
-    }
-
-    &::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: $mc-rule-web;
-    }
-
-    .projects-section-count {
-      flex-shrink: 0;
-      font-size: 0.7rem;
-      color: $mc-muted;
-      letter-spacing: 0.1em;
-      font-weight: 500;
-      font-variant-numeric: tabular-nums;
-    }
-  }
-}

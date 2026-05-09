@@ -1,8 +1,9 @@
 <%
 // =============================================================================
-// Talks listing — year-grouped vertical list. Each row places the slide
-// embed next to the talk info on desktop and stacks vertically on mobile.
-// Items are declared inline in talks.qmd; no individual talk pages.
+// Talks listing — year-grouped speaking history. Items declared inline in
+// talks.qmd; no individual talk pages. Each row surfaces the metadata a
+// visitor actually wants when scanning a speaker's record: when, where,
+// what, and which materials are still available.
 // =============================================================================
 
 function getYear(item) {
@@ -42,9 +43,29 @@ const LABEL = {
   blog:   "Blog",
   meetup: "Meetup"
 };
+
+const ACTION_KEYS = ["slides", "code", "video", "blog", "meetup"];
 %>
 
 ```{=html}
+<section class="talks-listing">
+<nav class="talks-timeline" aria-label="Talks timeline">
+  <ol class="talks-timeline-list">
+<% const timelineOrder = [...years].reverse(); %>
+<% for (const year of timelineOrder) {
+  const yEntries = grouped[year];
+  const yTotal = yEntries.length;
+%>
+    <li class="talks-timeline-item">
+      <a class="talks-timeline-link" href="#talks-<%- year %>">
+        <span class="talks-timeline-year"><%- year %></span>
+        <span class="talks-timeline-tick" aria-hidden="true"></span>
+        <span class="talks-timeline-count"><%- yTotal %></span>
+      </a>
+    </li>
+<% } %>
+  </ol>
+</nav>
 <% years.forEach(year => {
   const list = grouped[year];
 %>
@@ -54,37 +75,51 @@ const LABEL = {
     <span class="talks-year-count"><%= list.length %> talk<%= list.length === 1 ? "" : "s" %></span>
   </h2>
   <ul class="talks-list">
-<% list.forEach(item => { %>
+<% list.forEach(item => {
+  const actions = ACTION_KEYS.filter(k => item[k]);
+%>
     <li class="talks-row" <%= metadataAttrs(item) %>>
-      <div class="talks-info">
-        <div class="talks-info-head">
-          <h3 class="talks-title"><%= item.title %></h3>
-          <time class="talks-date" datetime="<%= item.date %>"><%= item.date %></time>
-        </div>
+      <div class="talks-meta">
+        <time class="talks-date" datetime="<%= item.date %>"><%= item.date %></time>
 <% if (item.venue) { %>
-        <p class="talks-venue"><%= item.venue %></p>
-<% } %>
-<% if (item.description) { %>
-        <p class="talks-description"><%= item.description %></p>
-<% } %>
-        <div class="talks-actions">
-<% ["slides","code","video","blog","meetup"].forEach(key => { %>
-<% if (item[key]) { %>
-          <a class="talks-button talks-button--<%= key %>" href="<%- item[key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= ICON_BS[key] %>" aria-hidden="true"></i><span><%= LABEL[key] %></span></a>
-<% } %>
-<% }); %>
-        </div>
-<% if (item.categories && item.categories.length) { %>
-        <div class="talks-categories">
-<% for (const category of item.categories) { %>
-          <span class="talks-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></span>
-<% } %>
-        </div>
+        <span class="talks-venue-sep" aria-hidden="true">·</span>
+        <span class="talks-venue">
+```
+
+<%= item.venue %>
+
+```{=html}
+        </span>
 <% } %>
       </div>
-<% if (item.slides) { %>
-      <div class="talks-embed slide-embed slide-deck">
-        <iframe src="<%- item.slides %>" loading="lazy" title="<%= item.title %> slide deck" allowfullscreen></iframe>
+      <h3 class="talks-title no-anchor">
+```
+
+<%= item.title %>
+
+```{=html}
+      </h3>
+<% if (item.description) { %>
+      <div class="talks-description">
+```
+
+<%= item.description %>
+
+```{=html}
+      </div>
+<% } %>
+<% if (actions.length) { %>
+      <div class="talks-actions">
+<% actions.forEach(key => { %>
+        <a class="talks-button talks-button--<%= key %>" href="<%- item[key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= ICON_BS[key] %>" aria-hidden="true"></i><span><%= LABEL[key] %></span></a>
+<% }); %>
+      </div>
+<% } %>
+<% if (item.categories && item.categories.length) { %>
+      <div class="talks-categories">
+<% for (const category of item.categories) { %>
+        <span class="talks-category" onclick="window.quartoListingCategory('<%= utils.b64encode(category) %>'); return false;"><%= category %></span>
+<% } %>
       </div>
 <% } %>
     </li>
@@ -92,4 +127,5 @@ const LABEL = {
   </ul>
 </section>
 <% }); %>
+</section>
 ```

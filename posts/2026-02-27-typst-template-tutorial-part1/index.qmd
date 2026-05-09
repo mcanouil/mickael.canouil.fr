@@ -5,6 +5,7 @@ description: |
   This tutorial introduces the dual-layer architecture for building Quarto Typst templates.
   You will learn how Lua filters and Typst functions work together to transform markdown elements into styled PDF components.
 date: "2026-02-27"
+engine: markdown
 categories:
   - quarto
   - extensions
@@ -139,16 +140,15 @@ The solution requires two layers working in concert:
 
 The transformation looks like this:
 
-```{mermaid}
-%%| label: fig-bridge
-%%| fig-cap: "The bridge between markdown and Typst."
-%%| fig-alt: "Diagram showing the transformation of markdown syntax `[Completed]{.badge colour='success'}` through Pandoc AST processing by Lua filter into Typst code `#simple-badge(colour: 'success', mode: effective-brand-mode)[Completed]` which is then rendered by Typst function into a styled badge component."
-flowchart LR
-    A["[Completed]{.badge colour='success'}"] --> B[Pandoc AST]
-    B --> C[Lua Filter]
-    C --> D["#simple-badge(colour: 'success', mode: effective-brand-mode)[Completed]"]
-    D --> E[Typst Function]
-    E --> F[Styled Badge]
+```{typst}
+//| label: fig-bridge
+//| cap: "The bridge between markdown and Typst."
+//| alt: "Two-band cetz diagram. Top band labelled 'Lua layer (Pandoc + filter)' shows four boxes left to right: the markdown source `[Completed]{.badge colour=\"success\"}`, then 'Pandoc AST', then 'Lua filter', then the generated Typst code `#simple-badge(colour: \"success\", mode: effective-brand-mode)[Completed]`. An arrow drops from that last box down into a second band labelled 'Typst layer (renderer)', which contains a 'Typst function' box and a rendered green pill badge reading 'Completed' with a tick."
+//| classes: "img-fluid w-75 mx-auto d-block"
+//| fig-align: center
+//| preamble: bridge-diagram.typ
+
+#bridge-diagram()
 ```
 
 ## The Dual-Layer Architecture

@@ -1,13 +1,14 @@
 // @ts-nocheck
-// Pre-render: convert publications.bib to a CSL YAML feed (publications.yml)
-// and a Quarto listing page (publications.qmd) wired to assets/listing-templates/publications.ejs.
-// Replaces publications.r. Executed by Quarto's bundled Deno runtime.
+// Pre-render: convert publications/publications.bib to a CSL YAML feed
+// (publications/publications.yml) and a Quarto listing page
+// (publications/index.qmd) wired to assets/listing-templates/publications.ejs.
+// Executed by Quarto's bundled Deno runtime; paths are relative to project root.
 export {};
 
 const AUTHOR_FAMILY = "Canouil";
-const BIB_FILE = "publications.bib";
-const YML_FILE = "publications.yml";
-const QMD_FILE = "publications.qmd";
+const BIB_FILE = "publications/publications.bib";
+const YML_FILE = "publications/publications.yml";
+const QMD_FILE = "publications/index.qmd";
 
 const BIB_TYPE_MAP: Record<string, string> = {
   article: "article",
@@ -67,7 +68,7 @@ function utf8Base64(s: string): string {
 function shouldSkip(): boolean {
   const renderAll = Deno.env.get("QUARTO_PROJECT_RENDER_ALL") ?? "";
   const inputFiles = Deno.env.get("QUARTO_PROJECT_INPUT_FILES") ?? "";
-  return renderAll === "" && inputFiles.includes("publications.qmd");
+  return renderAll === "" && inputFiles.includes("publications/index.qmd");
 }
 
 function splitRawEntries(bib: string): string[] {
@@ -278,7 +279,7 @@ function buildQmd(flagged: number, middle: number): string {
     "  - id: publications",
     "    contents:",
     "      - publications.yml",
-    "    template: assets/listing-templates/publications.ejs",
+    "    template: ../assets/listing-templates/publications.ejs",
     "    page-size: 1000",
     "    sort: 'issued desc'",
     "    categories: false",
