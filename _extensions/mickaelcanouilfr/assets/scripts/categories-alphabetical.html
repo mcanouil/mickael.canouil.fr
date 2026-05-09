@@ -1,13 +1,14 @@
 <script id="quarto-categories-alphabetical" type="text/javascript">
   document.addEventListener("DOMContentLoaded", function () {
     const categories = document.querySelectorAll(".quarto-listing-category .category");
+    if (categories.length === 0) return;
     const container = document.querySelector(".quarto-listing-category");
 
     const categoryMap = {};
 
     categories.forEach(category => {
       const dataCategory = category.getAttribute("data-category");
-      const decodedCategory = atob(dataCategory);
+      const decodedCategory = window.mcDecodeB64(dataCategory);
       const firstLetter = decodedCategory.charAt(0).toUpperCase();
       if (!categoryMap[firstLetter]) {
         categoryMap[firstLetter] = [];
@@ -31,18 +32,12 @@
       collapseDiv.classList.add("collapse");
       collapseDiv.id = `collapse-category-${letter}`;
 
-      if (letter.length === 0) {
-        categoryMap[letter].forEach(category => {
-          container.appendChild(category);
-        });
-      } else {
-        categoryMap[letter].forEach(category => {
-          collapseDiv.appendChild(category);
-        });
-        groupDiv.appendChild(button);
-        groupDiv.appendChild(collapseDiv);
-        container.appendChild(groupDiv);
-      }
+      categoryMap[letter].forEach(category => {
+        collapseDiv.appendChild(category);
+      });
+      groupDiv.appendChild(button);
+      groupDiv.appendChild(collapseDiv);
+      container.appendChild(groupDiv);
     });
   });
 </script>

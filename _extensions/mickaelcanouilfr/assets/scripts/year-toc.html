@@ -1,8 +1,13 @@
-<script id="talks-toc" type="text/javascript">
+<script id="year-toc" type="text/javascript">
   document.addEventListener("DOMContentLoaded", () => {
-    if (!document.body.classList.contains("talks-page")) return;
+    const configs = [
+      { bodyClass: "publications-page", headerSelector: "header.pub-year[id]", yearSelector: ".pub-year-num", idPrefix: "pub-year-" },
+      { bodyClass: "talks-page", headerSelector: "section.talks-section[id]", yearSelector: ".talks-year", idPrefix: "talks-" },
+    ];
+    const config = configs.find((c) => document.body.classList.contains(c.bodyClass));
+    if (!config) return;
 
-    const headers = Array.from(document.querySelectorAll("section.talks-section[id]"));
+    const headers = Array.from(document.querySelectorAll(config.headerSelector));
     if (headers.length === 0) return;
 
     const sidebar = document.getElementById("quarto-margin-sidebar");
@@ -17,7 +22,7 @@
 
     const links = headers.map((h) => {
       const id = h.id;
-      const year = h.querySelector(".talks-year")?.textContent?.trim() || id.replace("talks-", "");
+      const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
       const li = document.createElement("li");
       const a = document.createElement("a");
       a.href = `#${id}`;
@@ -43,10 +48,16 @@
     }
     sidebar.insertBefore(nav, sidebar.firstChild);
 
+    let activeId = null;
     const setActive = (targetId) => {
-      links.forEach(({ id, anchor }) => {
-        anchor.classList.toggle("active", id === targetId);
-      });
+      if (activeId === targetId) return;
+      if (activeId) {
+        const prev = links.find((l) => l.id === activeId);
+        if (prev) prev.anchor.classList.remove("active");
+      }
+      const next = links.find((l) => l.id === targetId);
+      if (next) next.anchor.classList.add("active");
+      activeId = targetId;
     };
 
     if ("IntersectionObserver" in window) {

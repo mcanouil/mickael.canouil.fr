@@ -116,12 +116,6 @@ $_icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" wid
 }
 
 // ===========================
-// SHARED COMPONENTS IMPORT
-// ===========================
-// Import shared component styles (mixin-based)
-@import 'components';
-
-// ===========================
 // CSS CUSTOM PROPERTIES
 // ===========================
 // Define theming custom properties for shared components
@@ -163,20 +157,12 @@ body {
   --mc-neutral: #{body-mix(50%)};
 }
 
-// Include all shared component styles at root level
-@include all;
-
 // ===========================
 // BASE STYLES & ANIMATIONS
 // ===========================
 // Smooth scrolling for the entire page
 html {
   scroll-behavior: smooth;
-}
-
-// Page fade-in animation on load
-body {
-  animation: fadeIn 0.6s ease-in;
 }
 
 @keyframes fadeIn {
@@ -893,11 +879,11 @@ hr {
 // Top-right toggle (body area, uses dimmed foreground colour)
 .top-right.quarto-color-scheme-toggle {
   &:not(.alternate) .bi::before {
-    @include toggle-icon($_icon-sun, theme-dim($body-color, 35%));
+    @include toggle-icon($_icon-sun, body-mix(35%));
   }
 
   &.alternate .bi::before {
-    @include toggle-icon($_icon-moon, theme-dim($body-color, 20%));
+    @include toggle-icon($_icon-moon, body-mix(20%));
   }
 }
 
@@ -1422,251 +1408,6 @@ figure:has(img.img-styled) {
 
     figcaption {
       font-size: 0.75em;
-    }
-  }
-}
-
-// Highlight callout box - minimal dotted border style
-.highlight {
-  position: relative;
-  margin: $_space-xl auto;
-  padding: $_space-lg $_space-xl;
-  width: 65%;
-  background: transparent;
-  border: 2px dashed rgba($body-color, 0.25);
-  border-radius: $_radius-md;
-  transition: all $_anim-standard $_easing-standard;
-
-  // Corner accents
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 2px solid $body-color;
-    transition: $_link-transition;
-  }
-
-  // Top-left corner
-  &::before {
-    top: -2px;
-    left: -2px;
-    border-right: none;
-    border-bottom: none;
-    border-radius: 8px 0 0 0;
-  }
-
-  // Bottom-right corner
-  &::after {
-    bottom: -2px;
-    right: -2px;
-    border-left: none;
-    border-top: none;
-    border-radius: 0 0 8px 0;
-  }
-
-  &:hover {
-    border-color: rgba($body-color, 0.4);
-    background: rgba($body-color, 0.02);
-
-    &::before,
-    &::after {
-      width: 20px;
-      height: 20px;
-    }
-  }
-
-  p {
-    margin: 0;
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: $body-color;
-
-    @media (max-width: $_breakpoint-md) {
-      font-size: 1rem;
-    }
-
-    strong {
-      color: $body-color;
-      position: relative;
-      padding: 0 0.2em;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0.1em;
-        left: 0;
-        right: 0;
-        height: 0.35em;
-        background: rgba($body-color, 0.12);
-        z-index: -1;
-        transition: background 0.3s ease;
-      }
-    }
-
-    em {
-      font-style: italic;
-      color: $body-color;
-    }
-  }
-
-  &:hover p strong::after {
-    background: rgba($body-color, 0.2);
-  }
-
-  // Multiple paragraphs in highlight
-  p+p {
-    margin-top: $_space-md;
-  }
-
-  @media (max-width: $_breakpoint-md) {
-    padding: 1.25rem 1.5rem;
-  }
-
-  // Reduced motion support
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-
-    &::before,
-    &::after {
-      transition: none;
-    }
-  }
-}
-
-// Thanks callout box - solid border with subtle background
-.thanks {
-  position: relative;
-  margin: $_space-xl auto;
-  padding: $_space-lg $_space-xl;
-  width: 90%;
-  background: linear-gradient(135deg,
-      rgba($body-color, 0.03) 0%,
-      rgba($body-color, 0.05) 100%);
-  border: 2px solid rgba($body-color, 0.2);
-  border-radius: $_radius-md;
-  transition: all $_anim-standard $_easing-standard;
-  box-shadow: $_shadow-sm;
-
-  // Corner accents - filled style
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: $body-color;
-    transition: $_link-transition;
-    opacity: 0.3;
-  }
-
-  // Top-left corner
-  &::before {
-    top: -1px;
-    left: -1px;
-    border-radius: 8px 0 0 0;
-  }
-
-  // Bottom-right corner
-  &::after {
-    bottom: -1px;
-    right: -1px;
-    border-radius: 0 0 8px 0;
-  }
-
-  &:hover {
-    border-color: rgba($body-color, 0.35);
-    background: linear-gradient(135deg,
-        rgba($body-color, 0.05) 0%,
-        rgba($body-color, 0.08) 100%);
-    box-shadow: $_shadow-md;
-
-    &::before,
-    &::after {
-      width: 16px;
-      height: 16px;
-      opacity: 0.5;
-    }
-  }
-
-  p {
-    margin: 0;
-    font-size: 1.08rem;
-    line-height: 1.8;
-    color: $body-color;
-    font-weight: 500;
-    font-style: italic;
-    letter-spacing: 0.01em;
-
-    @media (max-width: $_breakpoint-md) {
-      font-size: 1.02rem;
-    }
-
-    strong {
-      color: $body-color;
-      font-weight: 700;
-      font-style: normal;
-      position: relative;
-      padding: 0 0.15em;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0.05em;
-        left: 0;
-        right: 0;
-        height: 0.4em;
-        background: rgba($body-color, 0.15);
-        z-index: -1;
-        border-radius: 2px;
-        transition: $_link-transition;
-      }
-    }
-
-    em {
-      font-style: italic;
-      color: rgba($body-color, 0.85);
-      font-weight: 600;
-    }
-
-    // Links inside thanks box
-    a {
-      color: $body-color;
-      font-weight: 600;
-      text-decoration-thickness: $_link-underline-thickness;
-      text-decoration-color: $_link-underline-color;
-      transition: $_link-transition;
-
-      &:hover {
-        text-decoration-color: $_link-underline-color-hover;
-        text-decoration-thickness: $_link-underline-thickness-hover;
-      }
-    }
-  }
-
-  &:hover p strong::after {
-    background: rgba($body-color, 0.25);
-    height: 0.45em;
-  }
-
-  // Multiple paragraphs in thanks
-  p+p {
-    margin-top: $_space-md;
-  }
-
-  @media (max-width: $_breakpoint-md) {
-    padding: 1.25rem 1.5rem;
-    width: 80%;
-  }
-
-  // Reduced motion support
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-
-    &::before,
-    &::after {
-      transition: none;
     }
   }
 }
@@ -3241,10 +2982,12 @@ nav#TOC {
 // ===========================
 // Supports two styles via title-block-style: academic (default) or magazine
 
-// Base title block container
+// Base title block container — CV magazine ribbon: 3px accent rule under page title.
 header#title-block-header {
   position: relative;
   margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid $mc-accent;
 
   // Title section - shared styles
   .quarto-title {
@@ -3291,412 +3034,6 @@ header#title-block-header {
   }
 }
 
-// ===========================
-// ACADEMIC / JOURNAL STYLE
-// ===========================
-.mc-style-academic {
-  text-align: center;
-  padding: $_space-lg 0;
-
-  // Authors inline with superscript affiliations
-  .mc-academic-authors {
-    margin-bottom: $_space-md;
-    font-size: 1rem;
-    line-height: 1.8;
-
-    .mc-academic-author {
-      .author {
-        a {
-          color: $body-color;
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-
-      sup {
-        font-size: 0.7em;
-        color: $body-color;
-        margin-left: 0.1em;
-
-        a {
-          color: inherit;
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-
-        &.mc-academic-corresponding {
-          margin-left: 0;
-        }
-      }
-    }
-  }
-
-  // Affiliations list at bottom
-  .mc-academic-affiliations {
-    font-size: 0.85rem;
-    color: var(--mc-muted);
-    margin-bottom: $_space-md;
-
-    .mc-academic-affiliation {
-      margin-bottom: $_space-xs;
-      scroll-margin-top: $_space-md;
-
-      sup {
-        font-size: 0.85em;
-        color: $body-color;
-        margin-right: 0.25em;
-      }
-    }
-  }
-
-  // Corresponding author note
-  .mc-academic-corresponding-note {
-    font-size: 0.85rem;
-    color: var(--mc-muted);
-    margin-bottom: $_space-md;
-    scroll-margin-top: $_space-md;
-
-    sup {
-      color: $body-color;
-      margin-right: 0.25em;
-    }
-
-    a {
-      color: $body-color;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  // Meta line
-  .mc-academic-meta-line {
-    font-size: 0.85rem;
-    color: var(--mc-muted);
-    margin-bottom: $_space-lg;
-
-    span {
-      &::after {
-        content: ' | ';
-        color: var(--mc-border);
-      }
-
-      &:last-child::after {
-        content: '';
-      }
-    }
-
-    a {
-      color: $body-color;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  // Abstract
-  .mc-academic-abstract {
-    text-align: left;
-    background: var(--mc-surface);
-    padding: 1.25rem;
-    margin: $_space-lg 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
-
-    .mc-academic-abstract-label {
-      display: block;
-      margin-bottom: $_space-sm;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
-      color: var(--mc-muted);
-    }
-
-    .mc-academic-abstract-content {
-      color: rgba($body-color, 0.9);
-
-      p:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  // Keywords
-  .mc-academic-keywords {
-    text-align: left;
-    font-size: 0.85rem;
-    padding: 0 1.25rem;
-
-    .mc-academic-keywords-label {
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
-      color: var(--mc-muted);
-      margin-right: $_space-sm;
-    }
-
-    .mc-academic-keywords-list {
-      color: $body-color;
-    }
-  }
-}
-
-// ===========================
-// PROFESSIONAL / EDITORIAL STYLE
-// ===========================
-.mc-style-professional {
-  padding: $_space-xl 0 $_space-lg;
-  border-bottom: 4px solid $body-color;
-
-  // Top meta: category and date
-  .mc-professional-meta-top {
-    display: flex;
-    gap: $_space-lg;
-    margin-bottom: $_space-lg;
-    align-items: center;
-
-    .mc-professional-category {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: $body-color;
-      font-weight: 600;
-    }
-
-    .mc-professional-date {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--mc-muted);
-    }
-  }
-
-  // Byline with avatars
-  .mc-professional-byline {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $_space-lg;
-    padding-top: $_space-lg;
-    border-top: 1px solid var(--mc-border);
-    margin-bottom: $_space-lg;
-  }
-
-  .mc-professional-author {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .mc-professional-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: $body-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    // User icon via SVG (uses background colour for icon fill)
-    &::before {
-      content: '';
-      width: 20px;
-      height: 20px;
-      background-color: $body-bg;
-      mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/></svg>');
-      mask-size: contain;
-      mask-repeat: no-repeat;
-      -webkit-mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/></svg>');
-      -webkit-mask-size: contain;
-      -webkit-mask-repeat: no-repeat;
-    }
-  }
-
-  .mc-professional-author-info {
-    .mc-professional-author-name {
-      font-weight: 600;
-      color: $body-color;
-
-      a {
-        color: inherit;
-        font-weight: 600;
-        text-decoration: none;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-
-    .mc-professional-author-affiliation {
-      font-size: 0.85rem;
-      color: var(--mc-muted);
-    }
-  }
-
-  // Abstract
-  .mc-professional-abstract {
-    margin: 1.5rem 0;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, var(--mc-surface) 0%, transparent 100%);
-    border-left: 3px solid $body-color;
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: $body-color;
-
-    p {
-      margin: 0;
-    }
-  }
-
-  // Keywords as dark tags
-  .mc-professional-keywords {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $_space-sm;
-    margin-top: $_space-lg;
-  }
-
-  .mc-professional-keyword {
-    font-size: 0.75rem;
-    padding: 0.35em 0.75em;
-    background: $body-color;
-    color: $body-bg;
-    border-radius: 2px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-  }
-
-  // Meta footer
-  .mc-professional-meta-footer {
-    margin-top: $_space-lg;
-    padding-top: $_space-md;
-    border-top: 1px solid var(--mc-border);
-    font-size: 0.8rem;
-    color: var(--mc-muted);
-    display: flex;
-    gap: $_space-lg;
-
-    a {
-      color: $body-color;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-// Professional style: enhance title in header
-header#title-block-header:has(.mc-style-professional) {
-  padding-bottom: 0;
-
-  .quarto-title {
-    background: linear-gradient(135deg, $body-bg 0%, darken($body-bg, 8%) 100%);
-    color: $body-color;
-    padding: 3rem 2rem 2.5rem;
-    margin: 0 -1rem 0;
-    position: relative;
-    overflow: hidden;
-
-    // Corner bracket decorations (matching Reveal.js style)
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-color: $body-color;
-      border-style: solid;
-      pointer-events: none;
-    }
-
-    // Top-left corner bracket
-    &::before {
-      top: $_space-md;
-      left: $_space-md;
-      border-width: 3px 0 0 3px;
-    }
-
-    // Bottom-right corner bracket
-    &::after {
-      bottom: $_space-md;
-      right: $_space-md;
-      border-width: 0 3px 3px 0;
-    }
-
-    .title {
-      font-size: 3rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: $_space-md;
-      color: $body-color;
-      position: relative;
-
-      @media (max-width: $_breakpoint-sm) {
-        font-size: 2rem;
-      }
-    }
-
-    .subtitle {
-      font-size: 1.1rem;
-      font-weight: 400;
-      color: rgba($body-color, 0.7);
-      margin-bottom: 0;
-      max-width: 600px;
-      position: relative;
-
-      @media (max-width: $_breakpoint-sm) {
-        font-size: 1rem;
-      }
-    }
-  }
-
-  // Metadata section below title
-  .mc-style-professional {
-    padding-top: $_space-lg;
-  }
-}
-
-// Academic style: centred title in header
-header#title-block-header:has(.mc-style-academic) {
-  .quarto-title {
-    text-align: center;
-    padding-bottom: $_space-lg;
-    margin-bottom: 0;
-
-    .title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-bottom: $_space-sm;
-    }
-
-    .subtitle {
-      font-size: 1.1rem;
-      font-style: italic;
-      color: var(--mc-muted);
-      margin-bottom: 0;
-    }
-  }
-
-  // Connect to metadata section
-  .mc-style-academic {
-    padding-top: 0;
-  }
-}
 
 // ===========================
 // SECTION HEADINGS (H2-H6)
@@ -3969,7 +3306,7 @@ blockquote {
   padding: 1.5em 2em 1.5em 3em;
   background-color: body-mix(98%);
   border-left: 4px solid body-mix(70%);
-  border-radius: $mc-radius-sm;
+  border-radius: $_radius-sm;
   font-style: italic;
 
   // Opening curly quote (top-left)
@@ -4006,8 +3343,6 @@ blockquote {
     margin-bottom: 0;
   }
 }
-
-// ===== folded from theme.scss =====
 
 a.navbar-brand {
   display: none;
@@ -4049,19 +3384,14 @@ a.navbar-brand {
 // LUXURY / EDITORIAL CUES (CV-derived, applied across all pages)
 // =============================================================================
 
-// 1. Static warm/ink page background (no animation).
 body {
   background: $body-bg;
   min-height: 100vh;
   font-family: $font-family-serif;
+  animation: fadeIn 0.6s ease-in;
 }
 
-[data-bs-theme="dark"] body,
-.quarto-dark body {
-  background: $body-bg;
-}
-
-// 2. Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
+// Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
 // Sized to span exactly two `.about-body p` lines.
 .drop-cap {
   float: left;
@@ -4077,7 +3407,7 @@ body {
   }
 }
 
-// 3. Tabular-nums on date-shaped elements — vertical alignment in lists.
+// Tabular-nums on date-shaped elements — vertical alignment in lists.
 .listing-date,
 .pub-year,
 .pub-year-num,
@@ -4095,7 +3425,7 @@ time,
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-// 4. Italic accent credential subtitle — CV signature on the about block.
+// Italic accent credential subtitle — CV signature on the about block.
 .quarto-title .subtitle,
 .about-entity .about-subtitle,
 header#title-block-header .subtitle,
@@ -4106,7 +3436,7 @@ header#title-block-header .subtitle,
   letter-spacing: 0.5px;
 }
 
-// 5. Photo gold ring + soft glow — CV's circular accent stroke, on the web.
+// Photo gold ring + soft glow — CV's circular accent stroke, on the web.
 .about-entity img,
 .about-image img,
 img.profile-image,
@@ -4125,7 +3455,7 @@ img.profile-image:hover {
     0 6px 24px rgba($mc-ink, 0.16);
 }
 
-// 6. Section heading flourish — `■` marker + tracked uppercase + accent rule.
+// Section heading flourish — `■` marker + tracked uppercase + accent rule.
 //    Targets in-content `<h2>`s on the about page and listing-section headings.
 .about-body > h2,
 .quarto-listing-section,
@@ -4235,7 +3565,7 @@ body.quarto-about-solana #quarto-content.page-rows-contents,
   border-bottom: 1px solid rgba($mc-accent, 0.25);
 }
 
-// 7. `.highlight` ribbon — accent-tinted bg + serif italic, centred horizontally.
+// `.highlight` ribbon — accent-tinted bg + serif italic, centred horizontally.
 .highlight {
   border-left: 4px solid $mc-accent;
   border-right: 4px solid $mc-accent;
@@ -4257,12 +3587,6 @@ body.quarto-about-solana #quarto-content.page-rows-contents,
     margin-bottom: 0;
   }
 }
-
-// 8. Education timeline lives in `_rules.scss` under the about-solana wrapper
-//    so its specificity beats the generic `section.level2 ul li` cascade.
-
-// 9. Interests pill chips live in `_rules.scss` under the about-solana wrapper
-//    so their specificity beats the generic `section.level2 ul li` cascade.
 
 // Same `■` rail for an explicit Skills list.
 section.skills > ul,
@@ -4289,7 +3613,7 @@ ul.skills {
   }
 }
 
-// 10. Inline links — dashed gold underline, expand on hover.
+// Inline links — dashed gold underline, expand on hover.
 //     Scope to content links only; navbar/footer/buttons keep their own rules.
 .about-body a:not(.btn):not(.nav-link),
 .content a:not(.btn):not(.nav-link),
@@ -4307,13 +3631,6 @@ main a:not(.btn):not(.nav-link):not(.quarto-grid-link) {
     text-decoration-color: $mc-accent;
     text-decoration-thickness: 2px;
   }
-}
-
-// Title block — CV magazine ribbon: 3px accent rule under the page title.
-// Apply on every page including publications.
-header#title-block-header {
-  border-bottom: 3px solid $mc-accent;
-  padding-bottom: 0.75rem;
 }
 
 // Title banner — ink background + white text on every page in BOTH themes.
@@ -4607,120 +3924,7 @@ aside.sidebar.sidebar-navigation,
   display: block;
 }
 
-$talks-timeline-arrow: 12px;
-$talks-timeline-tick: 10px;
-
-.talks-timeline {
-  margin: 1rem 0 2.5rem;
-  padding: 0;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.talks-timeline-list {
-  display: flex;
-  align-items: stretch;
-  list-style: none;
-  padding: 0 #{$talks-timeline-arrow + 4px} 0 0;
-  margin: 0;
-  position: relative;
-  min-width: max-content;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: #{$talks-timeline-arrow};
-    height: 2px;
-    background-color: var(--talks-border);
-    transform: translateY(-50%);
-    z-index: 0;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-left: #{$talks-timeline-arrow} solid var(--talks-border);
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    transform: translateY(-50%);
-    z-index: 1;
-  }
-}
-
-.talks-timeline-item {
-  flex: 1 0 auto;
-  position: relative;
-}
-
-.talks-timeline-link {
-  display: grid;
-  grid-template-rows: 1fr auto 1fr;
-  justify-items: center;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.4rem 1rem;
-  text-decoration: none !important;
-  color: var(--talks-muted);
-  position: relative;
-  z-index: 1;
-  transition: transform 0.2s ease;
-
-  &::after,
-  &::before {
-    content: none !important;
-    background: none !important;
-  }
-
-  &:hover,
-  &:focus-visible {
-    transform: translateY(-1px);
-
-    .talks-timeline-year {
-      color: $mc-accent;
-    }
-
-    .talks-timeline-tick {
-      background-color: $mc-accent;
-      border-color: $mc-accent;
-    }
-  }
-}
-
-.talks-timeline-year {
-  grid-row: 1;
-  align-self: end;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: $body-color;
-  font-variant-numeric: tabular-nums;
-  transition: color 0.2s ease;
-}
-
-.talks-timeline-tick {
-  grid-row: 2;
-  width: $talks-timeline-tick;
-  height: $talks-timeline-tick;
-  border-radius: 50%;
-  background-color: $body-bg;
-  border: 2px solid var(--talks-border);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.talks-timeline-count {
-  grid-row: 3;
-  align-self: start;
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  color: var(--talks-muted);
-  font-variant-numeric: tabular-nums;
-}
+@include year-timeline("talks", $mc-accent, "--talks-border", "--talks-muted");
 
 .talks-section {
   margin-top: 2.5rem;
@@ -4892,20 +4096,7 @@ $talks-timeline-tick: 10px;
 }
 
 .talks-category {
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.2em 0.55em;
-  border-radius: 999px;
-  background-color: rgba($mc-accent, 0.08);
-  color: $mc-accent;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba($mc-accent, 0.18);
-  }
+  @include pill-chip;
 }
 
 // =============================================================================
@@ -5177,21 +4368,6 @@ $talks-timeline-tick: 10px;
   color: rgba($mc-ink-dark, 0.75);
 }
 
-// .blog-footer removed — date is now above the title, categories sit at the bottom.
-
 .blog-category {
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.18em 0.55em;
-  border-radius: 999px;
-  background-color: rgba($mc-accent, 0.08);
-  color: $mc-accent;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba($mc-accent, 0.18);
-  }
+  @include pill-chip;
 }

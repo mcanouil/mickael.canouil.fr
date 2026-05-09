@@ -38,10 +38,13 @@
       bind(logo, "Home");
     });
 
-    document.querySelectorAll("img.about-image").forEach(function (img) {
+    const aboutImages = document.querySelectorAll("img.about-image");
+    if (aboutImages.length > 0) {
       const titleEl = document.querySelector("header#title-block-header h1.title, h1.title");
-      const label = (titleEl && titleEl.textContent.trim()) || img.getAttribute("alt") || "Profile picture";
-      bind(img, label);
-    });
+      const titleText = (titleEl && titleEl.textContent.trim()) || "";
+      aboutImages.forEach(function (img) {
+        bind(img, titleText || img.getAttribute("alt") || "Profile picture");
+      });
+    }
   });
 </script>

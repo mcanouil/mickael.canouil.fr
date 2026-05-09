@@ -2,32 +2,25 @@
 
 set -euo pipefail
 
-Rscript -e "renv::activate(profile = '2020-05-06-ggpacman')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = '2020-05-06-ggpacman'); renv::restore()"
 quarto render posts/2020-05-06-ggpacman
 
-Rscript -e "renv::activate(profile = '2021-05-06-floating-toc-in-blogdown')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = '2021-05-06-floating-toc-in-blogdown'); renv::restore()"
 quarto render posts/2021-05-06-floating-toc-in-blogdown
 
-Rscript -e "renv::activate(profile = '2023-03-05-quarto-auto-table-crossref')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = '2023-03-05-quarto-auto-table-crossref'); renv::restore()"
 quarto render posts/2023-03-05-quarto-auto-table-crossref
 
-Rscript -e "renv::activate(profile = '2023-03-12-quarto-mathjax-packages')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = '2023-03-12-quarto-mathjax-packages'); renv::restore()"
 quarto render posts/2023-03-12-quarto-mathjax-packages
 
-Rscript -e "renv::activate(profile = 'default')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = 'default'); renv::restore()"
 quarto render posts/2023-05-07-quarto-docker
 
-Rscript -e "renv::activate(profile = '2023-05-30-quarto-light-dark')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = '2023-05-30-quarto-light-dark'); renv::restore()"
 quarto render posts/2023-05-30-quarto-light-dark
 
-Rscript -e "renv::activate(profile = 'default')"
-Rscript -e "renv::restore()"
+Rscript -e "renv::activate(profile = 'default'); renv::restore()"
 quarto render posts/2024-12-30-quarto-github-pages
 quarto render posts/2025-04-21-quarto-revealjs-tabset-pdf
 bash posts/2025-04-21-quarto-revealjs-tabset-pdf/assets/featured.sh

@@ -2,18 +2,11 @@
 const SELF_FAMILY = "Canouil";
 const SELF_GIVEN = "Mickaël";
 
-const TYPE_LABELS = {
-  article: "Article",
-  preprint: "Preprint",
-  chapter: "Chapter",
-  conf: "Conf.",
-};
-
-const TYPE_PLURAL = {
-  article: ["article", "articles"],
-  preprint: ["preprint", "preprints"],
-  chapter: ["chapter", "chapters"],
-  conf: ["conference paper", "conference papers"],
+const TYPES = {
+  article: { label: "Article", singular: "article", plural: "articles" },
+  preprint: { label: "Preprint", singular: "preprint", plural: "preprints" },
+  chapter: { label: "Chapter", singular: "chapter", plural: "chapters" },
+  conf: { label: "Conf.", singular: "conference paper", plural: "conference papers" },
 };
 
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
@@ -137,7 +130,7 @@ function formatDate(item) {
 
 function entryHtml(item) {
   const bibtype = item.bibtype || "article";
-  const typeLabel = TYPE_LABELS[bibtype] || "Article";
+  const typeLabel = (TYPES[bibtype] && TYPES[bibtype].label) || "Article";
   const venue = venueText(item);
   const dateLabel = formatDate(item);
   const isFirst = String(item.first || "").includes("first");
@@ -230,8 +223,8 @@ const yearOrder = [...groups.keys()].sort((a, b) => b.localeCompare(a));
   const breakdown = Object.entries(typeCounts)
     .sort((a, b) => b[1] - a[1])
     .map(([t, n]) => {
-      const [s, p] = TYPE_PLURAL[t] || [t, t + "s"];
-      return `${n} ${n === 1 ? s : p}`;
+      const meta = TYPES[t] || { singular: t, plural: t + "s" };
+      return `${n} ${n === 1 ? meta.singular : meta.plural}`;
     })
     .join(" · ");
   const countLabel = `${spellCount(total)} ${total === 1 ? "publication" : "publications"}`;

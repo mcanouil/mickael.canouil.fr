@@ -46,19 +46,20 @@ _extensions/mickaelcanouilfr/
 ├── scss/
 │   ├── mickaelcanouilfr.scss     entry, composes layers + partials
 │   ├── _defaults.scss            scss:defaults — palette, fonts, tokens
-│   ├── _theme.scss               scss:theme — semantic mappings
+│   ├── _dark.scss                dark-mode defaults overrides
 │   ├── _rules.scss               scss:rules — selectors
-│   ├── _components.scss          shared component mixins
 │   ├── _projects.scss            projects listing
 │   ├── _publications.scss        publications listing
 │   └── _carousel.scss            featured carousel
 ├── filters/
-│   ├── external-links.lua
-│   ├── ordinal-dates.lua
-│   ├── categories-alphabetical.lua
-│   ├── current-year.lua
-│   └── luxury-classes.lua
+│   └── current-year.lua          [current-year] span replacement
 └── assets/
     ├── images/                   logo variants (light, dark, gold, ink)
     └── scripts/                  client-side JS hooks
+        ├── categories-alphabetical.html
+        ├── navbar-tooltips.html
+        ├── ordinal-dates.html
+        ├── publications-clipboard.html
+        ├── title-block-header.html
+        └── year-toc.html
 ```

@@ -25,26 +25,15 @@ const years = Object.keys(grouped).sort((a, b) => {
   return b.localeCompare(a);
 });
 
-// Bootstrap-icon class for each action key. BS icons render in any HTML
-// context (unlike iconify shortcodes which are not re-processed inside
-// listing EJS output).
-const ICON_BS = {
-  slides:  "bi-easel2",
-  code:    "bi-github",
-  video:   "bi-play-circle-fill",
-  blog:    "bi-newspaper",
-  meetup:  "bi-people-fill"
-};
-
-const LABEL = {
-  slides: "Slides",
-  code:   "Code",
-  video:  "Video",
-  blog:   "Blog",
-  meetup: "Meetup"
-};
-
-const ACTION_KEYS = ["slides", "code", "video", "blog", "meetup"];
+// Bootstrap icons render in any HTML context (unlike iconify shortcodes which
+// are not re-processed inside listing EJS output).
+const ACTIONS = [
+  { key: "slides", icon: "bi-easel2", label: "Slides" },
+  { key: "code", icon: "bi-github", label: "Code" },
+  { key: "video", icon: "bi-play-circle-fill", label: "Video" },
+  { key: "blog", icon: "bi-newspaper", label: "Blog" },
+  { key: "meetup", icon: "bi-people-fill", label: "Meetup" },
+];
 %>
 
 ```{=html}
@@ -76,7 +65,7 @@ const ACTION_KEYS = ["slides", "code", "video", "blog", "meetup"];
   </h2>
   <ul class="talks-list">
 <% list.forEach(item => {
-  const actions = ACTION_KEYS.filter(k => item[k]);
+  const actions = ACTIONS.filter(a => item[a.key]);
 %>
     <li class="talks-row" <%= metadataAttrs(item) %>>
       <div class="talks-meta">
@@ -110,8 +99,8 @@ const ACTION_KEYS = ["slides", "code", "video", "blog", "meetup"];
 <% } %>
 <% if (actions.length) { %>
       <div class="talks-actions">
-<% actions.forEach(key => { %>
-        <a class="talks-button talks-button--<%= key %>" href="<%- item[key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= ICON_BS[key] %>" aria-hidden="true"></i><span><%= LABEL[key] %></span></a>
+<% actions.forEach(a => { %>
+        <a class="talks-button talks-button--<%= a.key %>" href="<%- item[a.key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= a.icon %>" aria-hidden="true"></i><span><%= a.label %></span></a>
 <% }); %>
       </div>
 <% } %>
