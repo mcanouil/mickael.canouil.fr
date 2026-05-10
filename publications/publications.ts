@@ -272,6 +272,7 @@ function buildQmd(flagged: number, middle: number): string {
     `title: 'Publications (${flagged} + ${middle})'`,
     "title-block-banner: true",
     "image: /assets/images/social-profile.png",
+    "image-alt: Mickaël CANOUIL",
     "date-format: 'MMMM,<br>YYYY'",
     "body-classes: publications-page",
     "toc: true",
