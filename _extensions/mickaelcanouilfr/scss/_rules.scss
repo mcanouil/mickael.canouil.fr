@@ -929,7 +929,10 @@ hr {
 // LINK ANIMATIONS & EFFECTS
 // ===========================
 
-// Main content links with subtle underline animation
+// Main content links with subtle underline animation.
+//   Title-block author links (`.quarto-title-meta-contents`) get the same
+//   treatment so the author URL matches body link styling; icon-only sibling
+//   links (email, ORCID) keep their bare-icon look via the :not() filter.
 main a:not(:where(.nav-link,
     .btn,
     .about-link,
@@ -939,7 +942,9 @@ main a:not(:where(.nav-link,
     .anchor-section,
     .anchorjs-link,
     .toc-action,
-    #quarto-back-to-top)):not(:has(img)) {
+    #quarto-back-to-top)):not(:has(img)),
+.quarto-title-meta-contents a:not(:where(.quarto-title-author-email,
+    .quarto-title-author-orcid)):not(:has(img)) {
   position: relative;
   text-decoration: underline;
   text-decoration-color: $_link-underline-color;
@@ -2968,11 +2973,13 @@ header#title-block-header {
   }
 }
 
-// Shared author styling
+// Shared author styling — degrees rendered as a smaller gold suffix,
+//   matching the about-page `.title-suffix` treatment (see lines 1139–1149).
 .quarto-title-author-degree {
-  font-style: italic;
-  font-weight: normal;
-  color: var(--mc-muted);
+  font-size: 0.65em;
+  font-weight: 600;
+  color: $mc-accent;
+  letter-spacing: 0.02em;
 }
 
 .quarto-title-author-orcid,
