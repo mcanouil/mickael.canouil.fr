@@ -70,10 +70,14 @@
     };
 
     // Group the listing categories title and list as one complementary landmark.
+    // Use <div role="complementary"> instead of <aside>: Quarto's quarto.js treats
+    // any <aside> as a margin-column conflict element and collapses the entire
+    // margin-sidebar into a navbar toggle when it intersects.
     document.querySelectorAll(".quarto-listing-category-title").forEach((title) => {
       const next = title.nextElementSibling;
       if (next && next.classList.contains("quarto-listing-category") && !insideLandmark(title.parentElement)) {
-        const wrap = document.createElement("aside");
+        const wrap = document.createElement("div");
+        wrap.setAttribute("role", "complementary");
         wrap.setAttribute("aria-label", "Listing filters");
         title.parentNode.insertBefore(wrap, title);
         wrap.appendChild(title);
