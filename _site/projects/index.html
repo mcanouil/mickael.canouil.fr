@@ -47,9 +47,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-837b6d801ec9adf9b0fefb83cee427ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-dcc527b69b26a7630196292dad37a277.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-647023df476147c992e933c819ffa3e8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-dcc527b69b26a7630196292dad37a277.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4b6478815da4e1f0e5e27e6a87841fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-0e6c4b81a824a68ce774e9363c111e45.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-4b6478815da4e1f0e5e27e6a87841fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -2139,10 +2139,14 @@ window.Quarto = {
     };
 
     // Group the listing categories title and list as one complementary landmark.
+    // Use <div role="complementary"> instead of <aside>: Quarto's quarto.js treats
+    // any <aside> as a margin-column conflict element and collapses the entire
+    // margin-sidebar into a navbar toggle when it intersects.
     document.querySelectorAll(".quarto-listing-category-title").forEach((title) => {
       const next = title.nextElementSibling;
       if (next && next.classList.contains("quarto-listing-category") && !insideLandmark(title.parentElement)) {
-        const wrap = document.createElement("aside");
+        const wrap = document.createElement("div");
+        wrap.setAttribute("role", "complementary");
         wrap.setAttribute("aria-label", "Listing filters");
         title.parentNode.insertBefore(wrap, title);
         wrap.appendChild(title);
