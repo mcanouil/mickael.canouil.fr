@@ -686,7 +686,6 @@ hr {
 
   .nav-link {
     color: inherit;
-    opacity: 0.65;
   }
 
   a.nav-link,
@@ -865,6 +864,12 @@ hr {
 .quarto-listing-category .category:hover,
 .quarto-title .quarto-categories .quarto-category a:hover {
   color: $body-color;
+}
+
+// Quarto applies opacity: 0.6 to .quarto-title .quarto-category which drops
+// link contrast on the dark title banner below WCAG AA. Restore full opacity.
+.quarto-title .quarto-categories .quarto-category {
+  opacity: 1;
 }
 
 .quarto-listing-category .category {
@@ -2969,11 +2974,16 @@ header#title-block-header {
   color: var(--mc-muted);
 }
 
-.quarto-title-author-orcid {
+.quarto-title-author-orcid,
+.quarto-title-author-email {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   vertical-align: middle;
   margin-left: 0.35em;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 4px;
   opacity: 0.8;
   transition: opacity $_link-transition-duration $_link-transition-timing;
 
@@ -3022,12 +3032,51 @@ h2,
   }
 }
 
+// Skip-to-content link. Visually hidden until focused; lands on Quarto's
+// <main id="quarto-document-content">.
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  background-color: $body-bg;
+  color: $body-color;
+  border: 2px solid $body-color;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid $body-color;
+    outline-offset: 2px;
+  }
+}
+
+// Quarto applies opacity: 0.9 to h3-h6 (and to appendix headings) which drops
+// link contrast below WCAG AA. Restore full opacity; visual hierarchy is
+// carried by font-size and weight.
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  opacity: 1;
+}
+
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section [role="doc-endnotes"],
+#quarto-appendix.default section > :not(a) {
+  opacity: 1;
+}
+
 // Animated underlines for section headings in main content
 main {
 
-  // Top-level headings keep gold accent colour
+  // Top-level headings keep gold accent colour. Use $mc-accent-link so light
+  // mode passes WCAG AA on the paper background; dark mode keeps brand gold.
   h2.anchored:not(:where(.quarto-listing *)) {
-    color: $mc-accent;
+    color: $mc-accent-link;
   }
 
   h2.anchored:not(:where(.quarto-listing *)),
@@ -3865,7 +3914,7 @@ $talks-muted: rgba($body-color, 0.62);
 }
 
 .talks-date {
-  color: $mc-accent;
+  color: $mc-accent-link;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -4035,7 +4084,9 @@ $talks-muted: rgba($body-color, 0.62);
   letter-spacing: 0.12em;
   padding: 0.25em 0.7em;
   border-radius: 4px;
-  background-color: $mc-accent;
+  // Use $mc-accent-link so #fff text passes WCAG AA on the badge background
+  // (5.32:1 in light, 5.36:1 in dark — both above 4.5:1).
+  background-color: $mc-accent-link;
   color: #fff;
 }
 
