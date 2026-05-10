@@ -1,0 +1,50 @@
+<script id="navbar-tooltips" type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window.tippy !== "function") return;
+
+    const config = {
+      theme: "mc",
+      placement: "bottom",
+      arrow: false,
+      delay: [100, 0],
+      offset: [0, 6],
+      allowHTML: false,
+      appendTo: function () { return document.body; },
+    };
+
+    function bind(el, content) {
+      if (!el || !content || el.dataset.tippyBound === "1") return;
+      el.removeAttribute("title");
+      window.tippy(el, Object.assign({ content: content }, config));
+      el.dataset.tippyBound = "1";
+    }
+
+    document.querySelectorAll(".navbar a.nav-link, a.about-link").forEach(function (link) {
+      const icon = link.querySelector("iconify-icon[aria-label], iconify-icon[title]");
+      if (!icon) return;
+      const titleFirst = link.classList.contains("about-link");
+      const label = titleFirst
+        ? (icon.getAttribute("title") || icon.getAttribute("aria-label"))
+        : (icon.getAttribute("aria-label") || icon.getAttribute("title"));
+      icon.removeAttribute("title");
+      bind(link, label);
+    });
+
+    document.querySelectorAll("a.quarto-color-scheme-toggle").forEach(function (toggle) {
+      bind(toggle, toggle.getAttribute("title") || toggle.getAttribute("aria-label"));
+    });
+
+    document.querySelectorAll("a.navbar-brand-logo").forEach(function (logo) {
+      bind(logo, "Home");
+    });
+
+    const aboutImages = document.querySelectorAll("img.about-image");
+    if (aboutImages.length > 0) {
+      const titleEl = document.querySelector("header#title-block-header h1.title, h1.title");
+      const titleText = (titleEl && titleEl.textContent.trim()) || "";
+      aboutImages.forEach(function (img) {
+        bind(img, titleText || img.getAttribute("alt") || "Profile picture");
+      });
+    }
+  });
+</script>

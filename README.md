@@ -1,4 +1,4 @@
-# mickael.canouil.fr <picture align="right"><source srcset="assets/images/logo-light-path.svg" media="(prefers-color-scheme: dark)"><source srcset="assets/images/logo-dark-path.svg" media="(prefers-color-scheme: light)"><img src="assets/images/logo-dark-path.svg" alt="Mickaël Canouil" width="120" style="vertical-align: middle;"></picture>
+# mickael.canouil.fr <picture align="right"><source srcset="_extensions/mickaelcanouilfr/assets/images/logo-light-path.svg" media="(prefers-color-scheme: dark)"><source srcset="_extensions/mickaelcanouilfr/assets/images/logo-dark-path.svg" media="(prefers-color-scheme: light)"><img src="_extensions/mickaelcanouilfr/assets/images/logo-dark-path.svg" alt="Mickaël Canouil" width="120" style="vertical-align: middle;"></picture>
 
 <!-- badges: start -->
 

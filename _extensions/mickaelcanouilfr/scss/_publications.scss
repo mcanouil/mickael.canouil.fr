@@ -1,0 +1,203 @@
+
+$pub-border: rgba($body-color, 0.18);
+$pub-rule: rgba($body-color, 0.12);
+$pub-muted: rgba($body-color, 0.78);
+$pub-chip-bg: rgba($body-color, 0.06);
+$pub-chip-bg-hover: rgba($link-color, 0.12);
+
+.publications-list {
+  display: block;
+}
+
+@include year-timeline("pub", $link-color, $pub-border, $pub-muted);
+
+.pub-year {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 1rem 0 0.5rem;
+  margin-top: 2.5rem;
+  border-bottom: 2px solid $pub-border;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.pub-year-num {
+  font-size: clamp(3rem, 7vw, 4.5rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: $mc-accent-link;
+  font-variant-numeric: tabular-nums;
+}
+
+.pub-year-count {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $pub-muted;
+}
+
+.pub-year-types {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: $pub-muted;
+  text-align: right;
+}
+
+.pub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 32px;
+  margin-top: 1.5rem;
+}
+
+.pub-entry {
+  border-top: 1px solid $pub-rule;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pub-entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.1rem;
+}
+
+.pub-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  line-height: 1.4;
+
+  @each $variant, $color, $text, $alpha in (
+    (article, $semantic-color-info, $semantic-text-info, 0.08),
+    (preprint, $semantic-color-warning, $semantic-text-warning, 0.08),
+    (chapter, $semantic-color-success, $semantic-text-success, 0.08),
+    (conf, $callout-color-caution, $semantic-text-caution, 0.1),
+  ) {
+    &--#{$variant} {
+      color: $text;
+      background-color: rgba($color, $alpha);
+      border-color: $color;
+    }
+  }
+}
+
+.pub-mark {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: $pub-muted;
+  padding: 0.15em 0.5em;
+  border-radius: 999px;
+  background-color: $pub-chip-bg;
+}
+
+.pub-position {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: $pub-muted;
+  letter-spacing: 0.04em;
+}
+
+.pub-date {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $pub-muted;
+  margin-left: auto;
+}
+
+.pub-authors {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: $pub-muted;
+  margin: 0;
+}
+
+.pub-author--self {
+  color: $body-color;
+  font-weight: 700;
+}
+
+.pub-title {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+
+  a {
+    &::after,
+    &::before {
+      content: none !important;
+      display: none !important;
+      background: none !important;
+    }
+  }
+}
+
+.pub-venue {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+
+  em {
+    font-style: italic;
+  }
+}
+
+.pub-venue-meta {
+  font-style: normal;
+  color: $pub-muted;
+}
+
+.pub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.pub-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.35em 0.7em;
+  border-radius: 4px;
+  border: 0;
+  background-color: $pub-chip-bg;
+  color: $pub-muted;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: inherit;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $pub-chip-bg-hover;
+    color: $link-color;
+    outline: none;
+  }
+
+  &--copied {
+    background-color: rgba($semantic-color-success, 0.18);
+    color: $semantic-text-success;
+  }
+}

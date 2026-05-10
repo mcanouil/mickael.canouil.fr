@@ -1,0 +1,123 @@
+<%
+// =============================================================================
+// Talks listing — year-grouped speaking history. Items declared inline in
+// talks.qmd; no individual talk pages. Each row surfaces the metadata a
+// visitor actually wants when scanning a speaker's record: when, where,
+// what, and which materials are still available.
+// =============================================================================
+
+// item.date is already formatted by Quarto's `date-format`, so Date(...) is
+// Invalid; pull the four-digit year via regex.
+function getYear(item) {
+  const m = String(item.date || "").match(/(\d{4})/);
+  return m ? m[1] : null;
+}
+
+function renderCategoryChips(prefix, categories) {
+  if (!categories || !categories.length) return "";
+  return categories
+    .map((c) => `<span class="${prefix}-category" onclick="window.quartoListingCategory('${utils.b64encode(c)}'); return false;">${c}</span>`)
+    .join("");
+}
+
+const grouped = {};
+for (const it of items) {
+  const y = getYear(it) || "Undated";
+  if (!grouped[y]) grouped[y] = [];
+  grouped[y].push(it);
+}
+const years = Object.keys(grouped).sort((a, b) => {
+  if (a === "Undated") return 1;
+  if (b === "Undated") return -1;
+  return b.localeCompare(a);
+});
+
+// Bootstrap icons render in any HTML context (unlike iconify shortcodes which
+// are not re-processed inside listing EJS output).
+const ACTIONS = [
+  { key: "slides", icon: "bi-easel2", label: "Slides" },
+  { key: "code", icon: "bi-github", label: "Code" },
+  { key: "video", icon: "bi-play-circle-fill", label: "Video" },
+  { key: "blog", icon: "bi-newspaper", label: "Blog" },
+  { key: "meetup", icon: "bi-people-fill", label: "Meetup" },
+];
+%>
+
+```{=html}
+<section class="talks-listing">
+<nav class="talks-timeline" aria-label="Talks timeline">
+  <ol class="talks-timeline-list">
+<% const timelineOrder = [...years].reverse(); %>
+<% for (const year of timelineOrder) {
+  const yEntries = grouped[year];
+  const yTotal = yEntries.length;
+%>
+    <li class="talks-timeline-item">
+      <a class="talks-timeline-link" href="#talks-<%- year %>">
+        <span class="talks-timeline-year"><%- year %></span>
+        <span class="talks-timeline-tick" aria-hidden="true"></span>
+        <span class="talks-timeline-count"><%- yTotal %></span>
+      </a>
+    </li>
+<% } %>
+  </ol>
+</nav>
+<% years.forEach(year => {
+  const list = grouped[year];
+%>
+<section id="talks-<%= year %>" class="talks-section">
+  <h2 class="talks-year-header">
+    <span class="talks-year"><%= year %></span>
+    <span class="talks-year-count"><%= list.length %> talk<%= list.length === 1 ? "" : "s" %></span>
+  </h2>
+  <ul class="talks-list">
+<% list.forEach(item => {
+  const actions = ACTIONS.filter(a => item[a.key]);
+%>
+    <li class="talks-row" <%= metadataAttrs(item) %>>
+      <div class="talks-meta">
+        <time class="talks-date" datetime="<%= item.date %>"><%= item.date %></time>
+<% if (item.venue) { %>
+        <span class="talks-venue-sep" aria-hidden="true">·</span>
+        <span class="talks-venue">
+```
+
+<%= item.venue %>
+
+```{=html}
+        </span>
+<% } %>
+      </div>
+      <h3 class="talks-title no-anchor">
+```
+
+<%= item.title %>
+
+```{=html}
+      </h3>
+<% if (item.description) { %>
+      <div class="talks-description">
+```
+
+<%= item.description %>
+
+```{=html}
+      </div>
+<% } %>
+<% if (actions.length) { %>
+      <div class="talks-actions">
+<% actions.forEach(a => { %>
+        <a class="talks-button" href="<%- item[a.key] %>" target="_blank" rel="noopener noreferrer"><i class="bi <%= a.icon %>" aria-hidden="true"></i><span><%= a.label %></span></a>
+<% }); %>
+      </div>
+<% } %>
+<% if (item.categories && item.categories.length) { %>
+      <div class="talks-categories"><%= renderCategoryChips("talks", item.categories) %></div>
+<% } %>
+    </li>
+<% }); %>
+  </ul>
+</section>
+<% }); %>
+</section>
+```

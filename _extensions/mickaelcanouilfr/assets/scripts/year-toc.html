@@ -1,0 +1,79 @@
+<script id="year-toc" type="text/javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    const configs = [
+      { bodyClass: "publications-page", headerSelector: "h2.pub-year[id]", yearSelector: ".pub-year-num", idPrefix: "pub-year-" },
+      { bodyClass: "talks-page", headerSelector: "section.talks-section[id]", yearSelector: ".talks-year", idPrefix: "talks-" },
+    ];
+    const config = configs.find((c) => document.body.classList.contains(c.bodyClass));
+    if (!config) return;
+
+    const headers = Array.from(document.querySelectorAll(config.headerSelector));
+    if (headers.length === 0) return;
+
+    const sidebar = document.getElementById("quarto-margin-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.remove("zindex-bottom");
+
+    const tocTitle = document.createElement("h2");
+    tocTitle.id = "toc-title";
+    tocTitle.textContent = "Years";
+
+    const list = document.createElement("ul");
+
+    const anchors = new Map();
+    headers.forEach((h) => {
+      const id = h.id;
+      const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.id = `toc-${id}`;
+      a.className = "nav-link";
+      a.setAttribute("data-scroll-target", `#${id}`);
+      a.textContent = year;
+      li.appendChild(a);
+      list.appendChild(li);
+      anchors.set(id, a);
+    });
+
+    const nav = document.createElement("nav");
+    nav.id = "TOC";
+    nav.setAttribute("role", "doc-toc");
+    nav.className = "toc-active";
+    nav.appendChild(tocTitle);
+    nav.appendChild(list);
+
+    const tocActions = sidebar.querySelector(".toc-actions");
+    if (tocActions) {
+      nav.appendChild(tocActions);
+    }
+    sidebar.insertBefore(nav, sidebar.firstChild);
+
+    let activeId = null;
+    const setActive = (targetId) => {
+      if (activeId === targetId) return;
+      anchors.get(activeId)?.classList.remove("active");
+      anchors.get(targetId)?.classList.add("active");
+      activeId = targetId;
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible.length > 0) {
+            setActive(visible[0].target.id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      );
+      headers.forEach((h) => observer.observe(h));
+    }
+
+    if (headers.length > 0) {
+      setActive(headers[0].id);
+    }
+  });
+</script>

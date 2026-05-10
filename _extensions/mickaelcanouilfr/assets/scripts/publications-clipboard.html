@@ -1,0 +1,30 @@
+<script id="publications-bibtex-clipboard" type="text/javascript">
+  document.addEventListener("DOMContentLoaded", () => {
+    const chips = document.querySelectorAll(".pub-chip[data-bibtex]");
+    if (chips.length === 0) return;
+
+    chips.forEach((btn) => {
+      btn.setAttribute("aria-live", "polite");
+      const original = btn.textContent;
+      let pending = false;
+      btn.addEventListener("click", async () => {
+        if (pending) return;
+        pending = true;
+        const text = window.mcDecodeB64(btn.getAttribute("data-bibtex") || "");
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copied";
+        } catch {
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copy failed";
+        }
+        setTimeout(() => {
+          btn.classList.remove("pub-chip--copied");
+          btn.textContent = original;
+          pending = false;
+        }, 1500);
+      });
+    });
+  });
+</script>

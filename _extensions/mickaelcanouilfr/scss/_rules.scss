@@ -1,0 +1,4299 @@
+
+// ===========================
+// QUARTO / BOOTSTRAP VARIABLE NOTES
+// ===========================
+// This theme uses Quarto-provided SASS variables directly:
+//   $body-color   - page text colour (from brand foreground)
+//   $body-bg      - page background colour (from brand background)
+//   $link-color   - link colour (from brand typography.link.color)
+//   $sidebar-fg   - sidebar foreground (auto-contrasted by Quarto)
+//   $navbar-fg    - navbar foreground (auto-contrasted by Quarto)
+//   $footer-fg    - footer foreground (auto-contrasted by Quarto)
+
+// ===========================
+// LINK STYLE TOKENS
+// ===========================
+// Centralised variables for consistent link styling across the theme
+$_link-transition-duration: 0.3s;
+$_link-transition-timing: ease;
+$_link-transition: all $_link-transition-duration $_link-transition-timing;
+$_link-underline-color: rgba($body-color, 0.3);
+$_link-underline-color-hover: $link-color;
+$_link-underline-thickness: 1px;
+$_link-underline-thickness-hover: 2px;
+
+// ===========================
+// LINK STYLING PATTERNS
+// ===========================
+// Pattern A (Content Links): Underline with animated thickness/colour
+//   - Use for inline text links in main content, thanks box, etc.
+//   - Variables: $_link-underline-*, $_link-transition
+//
+// Pattern B (Metadata Links): Toggle text-decoration on hover
+//   - Use for author names, dates, meta info in academic/magazine styles
+//   - Keeps UI clean, underline appears only on hover
+//
+// Pattern C (Navigation): Animated pseudo-element underline
+//   - Use for navbar, footer navigation
+//   - ::after element expands from centre or left
+//
+// Pattern D (Interactive UI): Transform effects
+//   - Use for social links, breadcrumbs where motion adds value
+//   - scale() for emphasis, translateX/Y for directional cues
+
+// ===========================
+// BREAKPOINT VARIABLES
+// ===========================
+// Convention: This file uses desktop-first (max-width) media queries throughout.
+// All responsive styles should follow this pattern for consistency.
+$_breakpoint-sm: 576px;
+$_breakpoint-md: 768px;
+$_breakpoint-lg: 992px;
+$_breakpoint-xl: 1200px;
+
+// ===========================
+// SPACING SCALE
+// ===========================
+$_space-xs: 0.25rem;
+$_space-sm: 0.5rem;
+$_space-md: 1rem;
+$_space-lg: 1.5rem;
+$_space-xl: 2rem;
+
+// ===========================
+// BORDER RADIUS
+// ===========================
+$_radius-sm: 4px;
+$_radius-md: 8px;
+$_radius-lg: 12px;
+$_radius-full: 50%;
+
+// ===========================
+// ANIMATION TIMING
+// ===========================
+$_anim-fast: 0.2s;
+$_anim-standard: 0.3s;
+$_anim-slow: 0.6s;
+$_easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ===========================
+// BOX SHADOW SCALE
+// ===========================
+$_shadow-sm: 0 2px 4px rgba($body-color, 0.08);
+$_shadow-md: 0 4px 12px rgba($body-color, 0.1);
+$_shadow-lg: 0 8px 24px rgba($body-color, 0.15);
+
+// ===========================
+// SPECIAL COLOURS
+// ===========================
+$_color-sponsor: rgb(255, 105, 180);
+
+// ===========================
+// UTILITY FUNCTIONS
+// ===========================
+// Helper function to mix background and foreground colors
+@function body-mix($weight) {
+  @return mix($body-bg, $body-color, $weight);
+}
+
+// ===========================
+// THEME TOGGLE ICON TOKENS
+// ===========================
+// SVG data URLs for sun/moon icons (defined once, reused across toggle blocks)
+$_icon-sun: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-sun-fill" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>');
+$_icon-moon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-moon-stars-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>');
+
+// Mixin for mask-image toggle icons (shape from SVG, colour from background-color)
+@mixin toggle-icon($icon, $color) {
+  background-image: none;
+  background-color: $color;
+  -webkit-mask-image: $icon;
+  mask-image: $icon;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+// ===========================
+// CSS CUSTOM PROPERTIES
+// ===========================
+// Theming custom properties (light + dark inherit via $body-color/$body-bg).
+body {
+  --mc-fg: #{$body-color};
+  --mc-bg: #{$body-bg};
+  --mc-muted: #{body-mix(35%)};
+}
+
+// ===========================
+// BASE STYLES & ANIMATIONS
+// ===========================
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// Enhanced focus states for accessibility
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid $body-color;
+  outline-offset: 2px;
+  transition: outline-offset 0.2s ease;
+}
+
+// Ordinal date suffixes (st, nd, rd, th) wrapped by ordinal-dates.html.
+// Override <sup> default raise: stay on baseline, shrink, italicise.
+.ordinal-suffix {
+  font-size: 0.70em;
+  font-style: italic;
+  vertical-align: baseline;
+  line-height: inherit;
+}
+
+// Hide empty divs and paragraphs to reduce visual clutter
+div:empty:not(#code-annotation-line-highlight):not(#code-annotation-line-highlight-gutter),
+p:empty {
+  display: none;
+}
+
+// ===========================
+// QUARTO UI COMPONENTS
+// ===========================
+
+#quarto-back-to-top {
+  box-shadow: 0 .2rem .5rem body-mix(95%), 0 0 .05rem body-mix(95%);
+  color: body-mix(5%);
+  bottom: 80px;
+}
+
+.quarto-title-banner {
+  margin-bottom: 1em;
+  color: $body-color;
+  background-color: body-mix(99%);
+
+  a {
+    color: body-mix(50%);
+
+    &:hover {
+      color: $body-color;
+    }
+  }
+
+  .quarto-title .title {
+    color: $body-color;
+  }
+
+  >div>p:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  &:has(>div>p:last-child) {
+    padding-bottom: 0 !important;
+  }
+}
+
+// Breadcrumb last item styling
+.quarto-title-breadcrumbs .breadcrumb li:last-of-type a,
+.quarto-secondary-nav nav.quarto-page-breadcrumbs .breadcrumb li:last-of-type a {
+  color: body-mix(50%);
+  font-weight: 600;
+}
+
+// Secondary navigation text and border
+// The secondary nav sits below the navbar but follows the *sidebar* colour
+// scheme, not the navbar one.  Use $sidebar-fg (auto-contrasted against
+// $sidebar-bg) so the search icon, toggle, and breadcrumbs remain visible
+// regardless of whether the sidebar is light or dark.
+nav.quarto-secondary-nav {
+  border-bottom: 1px solid rgba($sidebar-fg, 0.3);
+  color: $sidebar-fg;
+
+  // .btn explicitly sets color via --bs-btn-color, overriding inheritance.
+  .quarto-search-button {
+    color: $sidebar-fg;
+  }
+}
+
+// ===========================
+// FORMS & PAGINATION
+// ===========================
+.page-item {
+
+  &.active .page-link,
+  .page-link:hover {
+    color: $body-bg;
+    background-color: $body-color;
+    border-color: $body-bg;
+  }
+
+  &.disabled .page-link {
+    color: $body-color;
+    background-color: $body-bg;
+  }
+}
+
+.input-group-text {
+  color: $body-bg;
+  background-color: $body-color;
+}
+
+// ===========================
+// CODE STYLING
+// ===========================
+// Inline code styling matching Typst: subtle background, foreground text
+// Uses body-mix(90%) for background (90% background, 10% foreground)
+code,
+a>code {
+  color: $body-color;
+  background-color: body-mix(90%);
+}
+
+a>code {
+  text-decoration: underline;
+}
+
+div.sourceCode {
+  background-color: body-mix(95%);
+  border: 1px solid body-mix(50%);
+}
+
+p code.sourceCode,
+li code.sourceCode,
+td code.sourceCode {
+  background-color: inherit;
+}
+
+.code-annotation-gutter {
+  background-color: body-mix(95%);
+}
+
+// Restore consistent vertical padding for code blocks with annotations
+// Quarto removes padding on .code-annotation-code, causing visual inconsistency
+pre.code-annotation-code {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+// Style code annotation markers as interactive buttons
+.code-annotation-anchor {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+// Prevent copy button overlap with code annotation gutter
+.code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
+  right: 1.5em;
+  margin-right: 0;
+}
+
+// Code annotation workaround
+// Workaround: Quarto PR #13429 (still open as of 2026-01)
+// Remove this block once the PR is merged
+#code-annotation-line-highlight {
+  margin-left: unset;
+  width: 100%;
+  // Offset highlight to account for restored vertical padding
+  margin-top: 0.4rem;
+}
+
+#code-annotation-line-highlight-gutter,
+.code-annotation-gutter-bg,
+.code-annotation-gutter {
+  all: unset;
+}
+
+// ===========================
+// PRINT PAGINATION STYLES
+// ===========================
+// Ensure proper pagination for print and PDF output
+@media print {
+
+  // Keep code windows together when possible
+  .code-with-filename {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .code-with-filename-file {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+
+  // Keep callouts together
+  .callout {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  // Keep panels together
+  .mc-panel {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-panel__header {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+
+  // Keep cards together
+  .mc-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-card__header {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+
+  // Keep executive summaries together
+  .mc-executive-summary {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    .mc-executive-summary__title {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+  }
+}
+
+// ===========================
+// CALLOUT STYLING
+// ===========================
+// Callout styling matching Typst: left border in callout colour, subtle background
+// Border colour matches the callout type for visual consistency
+
+.callout {
+  // Override Quarto defaults (!important required to override inline styles)
+  border: none !important;
+  border-left: 4px solid !important;
+  border-radius: 4px !important;
+
+  // Pagination control for print/PDF output
+  page-break-inside: avoid;
+  break-inside: avoid;
+
+  // Subtle background using SCSS mix (computed at build time for browser compatibility)
+  &.callout-note {
+    background-color: mix($callout-color-note, $body-bg, 15%) !important;
+    border-left-color: $callout-color-note !important;
+  }
+
+  &.callout-tip {
+    background-color: mix($callout-color-tip, $body-bg, 15%) !important;
+    border-left-color: $callout-color-tip !important;
+  }
+
+  &.callout-warning {
+    background-color: mix($callout-color-warning, $body-bg, 15%) !important;
+    border-left-color: $callout-color-warning !important;
+  }
+
+  &.callout-important {
+    background-color: mix($callout-color-important, $body-bg, 15%) !important;
+    border-left-color: $callout-color-important !important;
+  }
+
+  &.callout-caution {
+    background-color: mix($callout-color-caution, $body-bg, 15%) !important;
+    border-left-color: $callout-color-caution !important;
+  }
+
+  // Title styling
+  .callout-title-container {
+    font-weight: 600;
+  }
+
+  // Remove edge spacing from first/last elements in callout body (except raw code blocks)
+  &.callout-titled .callout-body> :first-child:not(.sourceCode),
+  &.callout-titled .callout-body>div> :first-child:not(.sourceCode) {
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  &.callout-titled .callout-body> :last-child:not(.sourceCode),
+  &.callout-titled .callout-body>div> :last-child:not(.sourceCode) {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  &.callout-style-default .callout-body {
+    padding: .5em;
+  }
+}
+
+// ===========================
+// BOOTSTRAP COMPONENTS
+// ===========================
+
+// List Groups
+.list-group-item-action {
+
+  &:hover,
+  &:focus {
+    color: unset;
+    background-color: unset;
+  }
+}
+
+// Navigation Tabs
+.nav-tabs {
+  border-bottom: 1px solid $body-color;
+
+  .nav-link.active,
+  .nav-item.show .nav-link {
+    color: $body-color;
+    background-color: $body-bg;
+    border-color: $body-color;
+  }
+
+  .nav-link,
+  .nav-pills .nav-link {
+    color: $body-color;
+  }
+}
+
+// Tab content borders (Quarto/Bootstrap default is #dee2e6)
+.tab-content {
+  border-color: rgba($body-color, 0.15);
+  background-color: $body-bg;
+}
+
+// Tooltips
+.tooltip {
+  animation: fadeIn 0.2s ease;
+  font-family: $font-family-system-sans;
+}
+
+// Navbar Tippy theme: dark to match navbar in both colour modes
+.tippy-box[data-theme~="mc"] {
+  background-color: $mc-ink;
+  color: $mc-paper;
+  border: 1px solid $primary;
+  border-radius: $_radius-sm;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.15rem 0.25rem;
+  animation: fadeIn 0.15s ease;
+}
+
+// ===========================
+// ABOUT PAGE COMPONENTS
+// ===========================
+
+// Profile image with glow effect
+img.about-image {
+  border-radius: $_radius-full;
+  border-style: solid;
+  border-width: 3px;
+  border-color: $body-color;
+  padding: 6px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: $body-color;
+    transition: .5s;
+    transform: scale(.9);
+    z-index: -1;
+  }
+
+  &:hover {
+    color: $body-color;
+    box-shadow: 0 0 10px $body-color;
+    text-shadow: 0 0 10px $body-color;
+
+    &::before {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px $body-color;
+    }
+  }
+}
+
+// About entity title hover effect
+.about-entity {
+  #title-block-header.quarto-title-block.default .quarto-title .title:hover {
+    color: $body-color;
+    text-shadow: 0 0 10px $body-color;
+  }
+}
+
+// Solana template about links
+.quarto-about-solana .about-entity {
+  .about-links {
+    column-gap: 0;
+
+    .about-link {
+      font-size: 1.5em;
+      border-style: none;
+      transition: $_link-transition;
+
+      &:hover {
+        transform: scale(1.25);
+      }
+    }
+
+    // Override Quarto's column layout on smaller screens (!important for Bootstrap override)
+    @media(max-width: $_breakpoint-lg) {
+      flex-direction: row !important;
+      justify-content: center !important;
+      flex-wrap: wrap !important;
+    }
+  }
+}
+
+// Trestles template about links
+.quarto-about-trestles .about-entity {
+  .about-link {
+    // Mix link colour with background for muted appearance (different from body-mix)
+    color: mix($link-color, $body-bg, 50%);
+    border: solid 1px $body-color;
+
+    &:hover {
+      color: $link-color;
+      font-weight: bold;
+    }
+  }
+}
+
+// ===========================
+// NAVIGATION & HEADER
+// ===========================
+
+// Main navbar styling
+// Background colour is controlled by $navbar-bg (set via brand.yml + metadata).
+// Only custom border and layout overrides remain here.
+.navbar {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba($navbar-fg, 0.2);
+
+  &.bg-primary,
+  &.bg-dark {
+    border: 1px solid rgba($navbar-fg, 0.2);
+  }
+
+  &.fixed-top {
+    border-width: 0 0 1px;
+  }
+
+  &.fixed-bottom {
+    border-width: 1px 0 0;
+  }
+}
+
+// Quarto's `body .nav-footer` sets border-top to #dee2e6 — match that
+// specificity with `body` prefix.
+body .nav-footer,
+body .footer {
+  border-top: 1px solid rgba($footer-fg, 0.3);
+  color: $footer-fg;
+
+  a {
+    color: $footer-fg;
+
+    &:hover {
+      color: $footer-fg;
+      opacity: 0.8;
+    }
+  }
+}
+
+// Horizontal rule: use body foreground for brand-awareness
+hr {
+  color: $body-color;
+  border-top-color: $body-color;
+  opacity: 0.25;
+}
+
+// Appendix: override Quarto's #dee2e6 border default and pin colour to body
+// so dark mode keeps readable contrast (Quarto sets no explicit colour and
+// the inline code rule above paints a stray background on the bibtex code).
+#quarto-appendix.default {
+  border-top-color: rgba($body-color, 0.15);
+
+  .quarto-appendix-bibtex,
+  .quarto-appendix-citeas {
+    border-color: rgba($body-color, 0.15);
+    color: $body-color;
+  }
+
+  .quarto-appendix-bibtex code.sourceCode {
+    color: inherit;
+    background-color: transparent;
+  }
+}
+
+.nav-footer-center {
+  min-height: unset;
+
+  p,
+  ol,
+  ul,
+  dl {
+    margin-bottom: 0;
+  }
+
+  .toc-actions {
+
+    ol,
+    ul {
+      padding-left: 0;
+    }
+  }
+}
+
+.navbar-logo {
+  max-height: 2em;
+}
+
+// Navbar navigation items with animated underlines
+// Uses inherit/currentColor so colours follow $navbar-fg set by brand/metadata.
+.navbar-nav {
+
+  .show>.nav-link,
+  .active>.nav-link,
+  .nav-link.active {
+    color: inherit;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus {
+    color: inherit;
+  }
+
+  .nav-link {
+    color: inherit;
+  }
+
+  a.nav-link,
+  a.nav-link:after,
+  a.nav-link:before {
+    transition: $_link-transition;
+  }
+
+  a.nav-link {
+    position: relative;
+  }
+
+  a.nav-link:hover:after {
+    width: 80%;
+  }
+
+  a.nav-link.active:after,
+  a.nav-link.active:hover:after {
+    border-top: .2em solid currentColor;
+  }
+
+  a.nav-link:hover:after,
+  a.nav-link:after {
+    border-top: .1em solid currentColor;
+  }
+
+  a.nav-link:after {
+    position: absolute;
+    border-top: .1em solid transparent;
+    content: "";
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 0%;
+  }
+
+  .show>.nav-link,
+  .active>.nav-link,
+  .nav-link.active {
+    font-weight: bolder;
+  }
+}
+
+// Responsive navbar adjustments
+@media (max-width: $_breakpoint-lg) {
+  .navbar-expand-lg {
+
+    a.nav-link.active:after,
+    a.nav-link.active:hover:after,
+    a.nav-link:hover:after,
+    a.nav-link:after {
+      border-top: 0 solid currentColor;
+    }
+  }
+}
+
+.navbar-brand {
+  color: inherit;
+}
+
+// Navbar title with corner brackets animation
+.navbar-title,
+.navbar-brand-logo {
+  transition: $_link-transition;
+  display: inline-block;
+  padding: .25em .4em;
+  position: relative;
+  font-weight: bolder;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 14px;
+    width: 14px;
+    position: absolute;
+    transition: $_link-transition;
+    opacity: 0;
+  }
+
+  &::before {
+    content: '';
+    right: 0;
+    top: 0;
+    border-top: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+    transform: translate(-100%, 50%);
+  }
+
+  &:after {
+    content: '';
+    left: 0;
+    bottom: 0;
+    border-bottom: 3px solid currentColor;
+    border-left: 3px solid currentColor;
+    transform: translate(100%, -50%);
+  }
+
+  &:hover {
+    color: inherit;
+    opacity: 0.8;
+
+    &:before,
+    &:after {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: $_breakpoint-md) {
+    display: none;
+  }
+}
+
+// ===========================
+// THEME TOGGLE ICONS
+// ===========================
+
+// Navbar toggle (inherits navbar text colour via currentColor)
+.navbar .quarto-color-scheme-toggle {
+  &:not(.alternate) .bi::before {
+    @include toggle-icon($_icon-sun, currentColor);
+  }
+
+  &.alternate .bi::before {
+    @include toggle-icon($_icon-moon, currentColor);
+  }
+}
+
+// Sidebar toggle: inherit size and colour from sidebar tools.
+// Other tools (.quarto-navigation-tool) use font-size: .875rem + opacity: .7.
+// The toggle already has .quarto-navigation-tool so it gets those, but the
+// ::before pseudo-element is hardcoded at 1rem.  Override to match.
+.sidebar-navigation .quarto-color-scheme-toggle {
+  .bi::before {
+    height: 0.875rem;
+    width: 0.875rem;
+    background-size: 0.875rem 0.875rem;
+    vertical-align: middle;
+  }
+
+  &:not(.alternate) .bi::before {
+    @include toggle-icon($_icon-sun, $sidebar-fg);
+  }
+
+  &.alternate .bi::before {
+    @include toggle-icon($_icon-moon, $sidebar-fg);
+  }
+}
+
+// Top-right toggle (body area, uses dimmed foreground colour)
+.top-right.quarto-color-scheme-toggle {
+  &:not(.alternate) .bi::before {
+    @include toggle-icon($_icon-sun, body-mix(35%));
+  }
+
+  &.alternate .bi::before {
+    @include toggle-icon($_icon-moon, body-mix(20%));
+  }
+}
+
+// ===========================
+// LISTING & BLOG COMPONENTS
+// ===========================
+
+// Listing category tags
+.quarto-post .listing-categories .listing-category {
+  border: solid 1px $body-color;
+
+  &:hover {
+    color: $body-color;
+  }
+}
+
+.quarto-grid-item .listing-categories .listing-category:hover,
+.quarto-listing-category .category:hover,
+.quarto-title .quarto-categories .quarto-category a:hover {
+  color: $body-color;
+}
+
+// Quarto applies opacity: 0.6 to .quarto-title .quarto-category which drops
+// link contrast on the dark title banner below WCAG AA. Restore full opacity.
+.quarto-title .quarto-categories .quarto-category {
+  opacity: 1;
+}
+
+.quarto-listing-category .category {
+  text-transform: uppercase;
+}
+
+.listing-description {
+  color: $body-color;
+}
+
+// ===========================
+// CUSTOM UTILITY STYLES
+// ===========================
+
+// Rounded picture style
+.picture {
+  border-style: solid;
+  border-width: $_radius-sm;
+  border-color: $body-color;
+  border-radius: $_radius-full;
+  padding: 6px;
+  height: 50%;
+  width: auto;
+  max-width: 200px !important;
+  min-width: 100px;
+}
+
+@media (max-width: $_breakpoint-md) {
+  .quarto-layout-row {
+    flex-direction: column;
+  }
+
+  .quarto-layout-cell {
+    flex-basis: 100% !important;
+    margin-bottom: $_space-md;
+  }
+
+  .quarto-figure-spacer {
+    display: none;
+  }
+}
+
+.quarto-alternate-formats,
+.quarto-code-links,
+.quarto-other-links {
+  h2 {
+    display: none;
+  }
+
+  ul {
+    margin-bottom: 0;
+  }
+}
+
+// ===========================
+// LINK ANIMATIONS & EFFECTS
+// ===========================
+
+// Main content links with subtle underline animation.
+//   Title-block author links (`.quarto-title-meta-contents`) get the same
+//   treatment so the author URL matches body link styling; icon-only sibling
+//   links (email, ORCID) keep their bare-icon look via the :not() filter.
+main a:not(:where(.nav-link,
+    .btn,
+    .about-link,
+    .listing-category,
+    .quarto-grid-link,
+    .code-annotation-anchor,
+    .anchor-section,
+    .anchorjs-link,
+    .toc-action,
+    #quarto-back-to-top)):not(:has(img)),
+.quarto-title-meta-contents a:not(:where(.quarto-title-author-email,
+    .quarto-title-author-orcid)):not(:has(img)) {
+  position: relative;
+  text-decoration: underline;
+  text-decoration-color: $_link-underline-color;
+  text-decoration-thickness: $_link-underline-thickness;
+  text-underline-offset: 2px;
+  transition: $_link-transition;
+
+  &:hover {
+    text-decoration-color: $_link-underline-color-hover;
+    text-decoration-thickness: $_link-underline-thickness-hover;
+  }
+}
+
+// ===========================
+// CARD & GRID ENHANCEMENTS
+// ===========================
+
+// Blog listing cards with hover effects
+.quarto-post {
+  transition: all $_anim-standard $_easing-standard;
+  border-radius: $_radius-md;
+  overflow: hidden;
+  padding: $_space-md;
+
+  &:hover {
+    will-change: transform;
+    transform: translateY(-4px);
+    box-shadow: $_shadow-lg;
+  }
+
+  .listing-title {
+    transition: color 0.3s ease;
+    margin-bottom: $_space-sm !important;
+  }
+
+  .listing-image {
+    transition: transform 0.4s ease;
+    overflow: hidden;
+
+    img {
+      transition: transform 0.4s ease;
+    }
+  }
+
+  &:hover .listing-image img {
+    transform: scale(1.05);
+  }
+}
+
+// Thumbnail images in listings - match featured image styling
+.quarto-listing .thumbnail-image {
+  border-radius: 1.5rem;
+  box-shadow: $_shadow-lg;
+}
+
+// Featured images
+.img-featured {
+  border-radius: 1.5rem;
+  box-shadow: $_shadow-lg;
+  margin-bottom: $_space-xl;
+}
+
+// Grid items
+.quarto-grid-item {
+  transition: all $_anim-standard $_easing-standard;
+
+  &:hover {
+    will-change: transform;
+    transform: translateY(-4px);
+    box-shadow: $_shadow-lg;
+  }
+
+  .card-img-top {
+    transition: transform 0.4s ease;
+  }
+
+  .card-title {
+    font-weight: 700;
+  }
+
+  &:hover .card-img-top {
+    transform: scale(1.05);
+  }
+}
+
+.card {
+  border-color: $body-color !important;
+}
+
+// ===========================
+// BUTTON & FORM CONTROLS
+// ===========================
+
+// Buttons and pagination links
+.btn,
+.page-link {
+  transition: all $_anim-fast $_easing-standard;
+  text-decoration: none;
+  position: relative;
+
+  // Remove any inherited underline animations from main links
+  &::after {
+    display: none !important;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $_shadow-md;
+    text-decoration: none;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ===========================
+// Category Tags
+// ===========================
+
+.listing-category,
+.quarto-category {
+  transition: all 0.25s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: $_shadow-sm;
+  }
+}
+
+// ===========================
+// ABOUT PAGE - HERO BANNER
+// ===========================
+
+// Hero banner styling for Solana about template with gradient orbs
+.quarto-about-solana {
+  position: relative;
+  padding: 3rem 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-top: -$_space-xl;
+  margin-bottom: $_space-xl;
+  background-color: $mc-ink;
+  color: #ffffff;
+  border-radius: 0;
+  box-shadow: 0 8px 24px rgba($mc-accent, 0.4);
+  overflow: hidden;
+
+  // Gradient orbs overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background:
+      radial-gradient(circle at 30% 40%, rgba($mc-accent, 0.06) 0%, transparent 30%),
+      radial-gradient(circle at 70% 60%, rgba($mc-accent, 0.04) 0%, transparent 30%),
+      radial-gradient(circle at 50% 20%, rgba($mc-accent, 0.05) 0%, transparent 20%);
+    pointer-events: none;
+    opacity: 0.5;
+    animation: orbsMove 20s ease-in-out infinite alternate;
+  }
+
+  .about-entity {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 2rem;
+
+    .entity-contents {
+      #title-block-header.quarto-title-block.default {
+        text-align: center;
+
+        .quarto-title {
+          .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: $_space-sm;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(#ffffff, 0.75) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+
+            &:hover {
+              color: #ffffff;
+              text-shadow: 0 0 10px rgba(#ffffff, 0.6);
+
+              .title-suffix {
+                text-shadow: none;
+              }
+            }
+
+            .title-suffix {
+              color: $mc-accent;
+              font-size: 0.55em;
+              font-weight: 600;
+              letter-spacing: 0.02em;
+              background: none;
+              -webkit-background-clip: initial;
+              background-clip: initial;
+              -webkit-text-fill-color: $mc-accent;
+              text-shadow: none;
+            }
+
+            @media (max-width: $_breakpoint-md) {
+              font-size: 2rem;
+            }
+          }
+
+          .subtitle {
+            font-size: 1.2rem;
+            color: $mc-accent;
+            font-weight: 400;
+            margin-bottom: $_space-lg;
+
+            @media (max-width: $_breakpoint-md) {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+
+      .about-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: $_space-lg;
+
+        .about-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.6rem 1rem;
+          background-color: rgba(#ffffff, 0.08);
+          border: 1px solid rgba(#ffffff, 0.3);
+          border-radius: $_radius-md;
+          color: rgba(#ffffff, 0.85);
+          text-decoration: none;
+          transition: all $_anim-standard $_easing-standard;
+          font-size: 1.1rem;
+          min-width: 2.5rem;
+
+          .about-link-text {
+            display: flex;
+            align-items: center;
+            gap: $_space-sm;
+          }
+
+          &:hover {
+            background-color: rgba(#ffffff, 0.18);
+            border-color: rgba(#ffffff, 0.5);
+            transform: translateY(-2px);
+            box-shadow: $_shadow-md;
+            color: #ffffff;
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+
+          // Special styling for sponsor link
+          &:has(iconify-icon[icon*="heart"]) {
+            background-color: rgba($_color-sponsor, 0.1);
+            border-color: rgba($_color-sponsor, 0.3);
+            color: $_color-sponsor;
+
+            &:hover {
+              background-color: rgba($_color-sponsor, 0.2);
+              border-color: rgba($_color-sponsor, 0.5);
+              color: darken($_color-sponsor, 10%);
+            }
+          }
+        }
+      }
+    }
+
+    // Profile image styling (override existing)
+    .about-image {
+      border: 2px solid $mc-accent;
+      box-shadow:
+        0 0 0 6px rgba($mc-accent, 0.10),
+        0 4px 16px rgba(#000000, 0.35);
+      transition: all $_anim-standard $_easing-standard;
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow:
+          0 0 0 8px rgba($mc-accent, 0.15),
+          0 12px 32px rgba(#000000, 0.45);
+        border-color: lighten($mc-accent, 10%);
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: $_breakpoint-md) {
+    padding: $_space-xl 0;
+    margin-top: -$_space-md;
+    margin-bottom: $_space-lg;
+
+    .about-entity {
+      padding: 0 $_space-lg;
+    }
+  }
+}
+
+// ===========================
+// ABOUT PAGE - CONTENT SECTIONS
+// ===========================
+
+// About entity links (outside hero section)
+.about-entity {
+  .about-link {
+    transition: all $_anim-standard $_easing-standard;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+}
+
+// About body styling
+.about-body {
+  margin: 2.5rem 0 0;
+  max-width: 800px;
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    margin-bottom: $_space-lg;
+    color: rgba($body-color, 0.85);
+
+    @media (max-width: $_breakpoint-md) {
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    strong {
+      color: $body-color;
+      font-weight: 600;
+    }
+
+    em {
+      color: rgba($body-color, 0.75);
+    }
+  }
+}
+
+// Subtle image styling class
+// Targets figures containing img.img-styled
+figure:has(img.img-styled) {
+  display: block;
+  margin: $_space-xl auto;
+  padding: $_space-md;
+  background: linear-gradient(135deg,
+      rgba($body-color, 0.02) 0%,
+      rgba($body-color, 0.04) 100%);
+  border: 1px solid rgba($body-color, 0.08);
+  border-radius: $_radius-lg;
+  box-shadow: $_shadow-sm;
+  transition: all $_anim-standard $_easing-standard;
+  overflow: visible;
+  position: relative;
+
+  // Remove default paragraph margin around image
+  p {
+    margin: 0;
+  }
+
+  // Round the image corners
+  img.img-styled {
+    border-radius: $_radius-md;
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  // Figcaption styling - hidden by default, expands on hover
+  figcaption {
+    display: block;
+    max-height: 0;
+    margin-top: 0;
+    padding-right: 0;
+    font-size: 0.8em;
+    color: rgba($body-color, 0.6);
+    text-align: right;
+    opacity: 0;
+    overflow: hidden;
+    transition: all $_anim-standard $_easing-standard;
+    line-height: 1.4;
+    font-style: italic;
+
+    a {
+      color: rgba($body-color, 0.7);
+      text-decoration: underline;
+
+      &:hover {
+        color: $body-color;
+      }
+    }
+  }
+
+  &:hover {
+    background: linear-gradient(135deg,
+        rgba($body-color, 0.04) 0%,
+        rgba($body-color, 0.06) 100%);
+    border-color: rgba($body-color, 0.12);
+    box-shadow: $_shadow-md;
+
+    // Show and expand figcaption on hover
+    figcaption {
+      max-height: 100px;
+      margin-top: 0.75rem;
+      opacity: 1;
+    }
+  }
+
+  // Responsive
+  @media (max-width: $_breakpoint-md) {
+    padding: 0.75rem;
+    margin: $_space-lg auto;
+    border-radius: 10px;
+
+    img.img-styled {
+      border-radius: 5px;
+    }
+
+    figcaption {
+      font-size: 0.75em;
+    }
+  }
+}
+
+// Index page content styling
+body.quarto-about-solana,
+#quarto-content:has(.quarto-about-solana) {
+  overflow-x: hidden;
+
+  // Introduction paragraphs after hero
+  >div:not(.quarto-about-solana) {
+    p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      color: rgba($body-color, 0.85);
+
+      strong {
+        color: $body-color;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Education and Interests sections
+  section.level2 {
+    padding-top: 0;
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: $_space-lg;
+      color: $body-color;
+      position: relative;
+      padding-bottom: 0.75rem;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, $body-color 0%, rgba($body-color, 0.3) 100%);
+        transition: width $_anim-standard $_easing-standard;
+      }
+
+      &:hover::after {
+        width: 100px;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+
+      li {
+        position: relative;
+        padding: 0.75rem 0 0.75rem 2rem;
+        margin-bottom: 0.75rem;
+        transition: $_link-transition;
+
+        &::before {
+          content: '▸';
+          position: absolute;
+          left: 0.5rem;
+          color: rgba($body-color, 0.5);
+          font-size: 1rem;
+          transition: $_link-transition;
+        }
+
+        &:hover {
+          padding-left: 2.25rem;
+          color: $body-color;
+
+          &::before {
+            color: $body-color;
+            left: 0.25rem;
+          }
+        }
+
+        p {
+          margin: 0;
+
+          strong {
+            color: $body-color;
+            font-weight: 600;
+          }
+
+          em {
+            color: rgba($body-color, 0.7);
+          }
+        }
+      }
+    }
+  }
+
+  // Education section: vertical timeline (rail + year badge per entry).
+  // Lives inside the about-solana wrapper so its specificity beats the
+  // generic `section.level2 ul li` rules above.
+  section.education > ul {
+    list-style: none;
+    padding: 0.5rem 0 0.25rem 4.5rem;
+    position: relative;
+    margin-top: 1rem;
+    border: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 2.5rem;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      width: 2px;
+      background: $mc-accent;
+    }
+
+    > li {
+      position: relative;
+      padding: 0.35rem 0 1.1rem 0.75rem;
+      margin: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+
+      &::before {
+        content: none;
+      }
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+
+      &:hover {
+        background: transparent;
+        padding-left: 0.75rem;
+
+        &::before {
+          content: none;
+        }
+
+        .year {
+          transform: scale(1.06);
+          box-shadow:
+            0 0 0 4px $body-bg,
+            0 0 0 6px rgba($mc-accent, 0.18);
+        }
+      }
+
+      .year {
+        position: absolute;
+        left: -3.5rem;
+        top: 0.1rem;
+        width: 3rem;
+        height: 3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: $body-bg;
+        border: 2px solid $mc-accent;
+        color: $mc-accent;
+        font-family: $font-family-serif;
+        font-weight: 700;
+        font-size: 0.78rem;
+        font-variant-numeric: tabular-nums lining-nums;
+        letter-spacing: 0.02em;
+        box-shadow: 0 0 0 4px $body-bg;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .institution {
+        display: inline-block;
+        margin-top: 0.15rem;
+        color: rgba($body-color, 0.7);
+        font-size: 0.95em;
+      }
+
+      strong em {
+        color: $mc-accent;
+        font-style: normal;
+      }
+    }
+  }
+
+  // Interests section: gold-bordered pill chips (CV-style tag cloud).
+  // Lives inside the about-solana wrapper so its specificity beats the
+  // generic `section.level2 ul li` cascade above.
+  section.interests > ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0.55rem;
+
+    > li {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.95rem;
+      margin: 0;
+      background: transparent;
+      border: 1px solid rgba($mc-accent, 0.55);
+      border-radius: 999px;
+      color: $body-color;
+      font-family: $font-family-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &::before {
+        content: "\25C6";
+        color: $mc-accent;
+        margin-right: 0.45rem;
+        font-size: 0.55em;
+        position: static;
+        left: auto;
+        top: auto;
+        transform: translateY(-1px);
+        transition: color 0.2s ease;
+      }
+
+      &:hover {
+        background: $mc-accent;
+        border-color: $mc-accent;
+        color: $body-bg;
+        padding-left: 0.95rem;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba($mc-accent, 0.25);
+
+        &::before {
+          color: $body-bg;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments for index page
+@media (max-width: $_breakpoint-md) {
+
+  body.quarto-about-solana,
+  #quarto-content:has(.quarto-about-solana) {
+    >div:not(.quarto-about-solana) p {
+      font-size: 1rem;
+    }
+
+    section.level2 {
+      margin-top: 0;
+      padding-top: 0;
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+// ===========================
+// CODE ENHANCEMENTS
+// ===========================
+
+// Override Quarto/Bootstrap code styling (!important required for specificity)
+code:not(.sourceCode) {
+  color: $body-color !important;
+  background-color: body-mix(90%) !important;
+}
+
+// Inline code styling with hover effects
+p code:not(.sourceCode),
+li code:not(.sourceCode),
+td code:not(.sourceCode),
+span code:not(.sourceCode),
+div code:not(.sourceCode),
+h1 code:not(.sourceCode),
+h2 code:not(.sourceCode),
+h3 code:not(.sourceCode),
+h4 code:not(.sourceCode),
+h5 code:not(.sourceCode),
+h6 code:not(.sourceCode) {
+  // Improved padding and spacing
+  padding: 0.15em 0.4em;
+  margin: 0 0.1em;
+
+  // Rounded corners for modern look
+  border-radius: $_radius-sm;
+
+  // Smooth transitions
+  transition: all $_anim-fast $_easing-standard;
+
+  // Subtle border for definition
+  border: 1px solid rgba($body-color, 0.12);
+
+  // Font styling
+  font-size: 0.9em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+
+  // Subtle shadow for depth
+  box-shadow: 0 1px 2px rgba($body-color, 0.05);
+
+  // Hover effect
+  &:hover {
+    border-color: rgba($body-color, 0.25);
+    box-shadow: $_shadow-sm;
+    transform: translateY(-1px);
+  }
+}
+
+// Code within links
+a>code:not(.sourceCode) {
+  // Maintain underline from brand.yml
+  // Add hover effect
+  transition: $_link-transition;
+
+  &:hover {
+    box-shadow: $_shadow-sm;
+  }
+}
+
+// Code within headings - slightly larger
+h1 code:not(.sourceCode),
+h2 code:not(.sourceCode),
+h3 code:not(.sourceCode) {
+  font-size: 0.85em;
+  padding: 0.2em 0.5em;
+  font-weight: 600;
+}
+
+// Code within smaller headings
+h4 code:not(.sourceCode),
+h5 code:not(.sourceCode),
+h6 code:not(.sourceCode) {
+  font-size: 0.88em;
+  padding: 0.18em 0.45em;
+  font-weight: 600;
+}
+
+// Code in navigation (from brand.yml) - ensure consistency
+nav p code:not(.sourceCode),
+nav li code:not(.sourceCode),
+nav td code:not(.sourceCode),
+nav div code:not(.sourceCode),
+nav span code:not(.sourceCode) {
+  padding: 0.15em 0.4em;
+  border-radius: $_radius-sm;
+  border: 1px solid rgba($body-color, 0.12);
+}
+
+div.sourceCode {
+  border-radius: $_radius-md;
+}
+
+// Code with filename wrapper (multi-style code window)
+.code-with-filename {
+  margin: 1em 0;
+  border: 1px solid rgba($body-color, 0.5);
+  border-radius: $_radius-md;
+  overflow: hidden;
+
+  // Filename header (title bar)
+  .code-with-filename-file {
+    background-color: body-mix(92%);
+
+    .quarto-dark & {
+      background-color: body-mix(92%);
+    }
+
+    border-bottom: 1px solid rgba($body-color, 0.5);
+    padding: 0.2em 1em;
+    line-height: 1.2;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    transition: $_link-transition;
+
+    pre {
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      font-size: 0.85em;
+      font-weight: 500;
+      color: rgba($body-color, 0.6);
+      font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+      flex-grow: 1;
+
+      strong {
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Code block immediately after filename
+  .code-copy-outer-scaffold,
+  div.sourceCode {
+    margin-top: 0;
+    border-radius: 0;
+    border: none;
+  }
+
+  // Remove top border from nested code block
+  div.sourceCode {
+    border-top: none;
+  }
+
+  // Auto-generated filenames display in simulated small caps (uppercase, smaller)
+  &.code-window-auto {
+    .code-with-filename-file pre strong {
+      text-transform: uppercase;
+      font-size: 0.8em;
+    }
+  }
+}
+
+// Style: default (plain filename, no decorations)
+.code-with-filename.code-window-default .code-with-filename-file pre {
+  text-align: left;
+}
+
+// Style: macOS (traffic lights left, filename right)
+.code-with-filename.code-window-macos .code-with-filename-file {
+  &::before {
+    content: "";
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 52px;
+    height: 12px;
+    margin-right: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12'%3E%3Ccircle cx='6' cy='6' r='5' fill='%23ff5f56'/%3E%3Ccircle cx='24' cy='6' r='5' fill='%23ffbd2e'/%3E%3Ccircle cx='42' cy='6' r='5' fill='%2327c93f'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  pre {
+    text-align: right;
+  }
+}
+
+// Style: Windows (filename left, window buttons right)
+.code-with-filename.code-window-windows .code-with-filename-file {
+  pre {
+    text-align: left;
+  }
+
+  &::after {
+    content: '';
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 3.6em;
+    height: 0.85em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' fill='none'%3E%3Cline x1='3' y1='5' x2='11' y2='5' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3Crect x='17' y='1' width='8' height='8' rx='1' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3Cline x1='31' y1='1' x2='39' y2='9' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='39' y1='1' x2='31' y2='9' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+}
+
+.code-copy-button {
+  transition: all $_anim-fast ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// ===========================
+// SEARCH & INTERACTION
+// ===========================
+
+// Navbar navigation items
+.navbar-nav .nav-item {
+  .nav-link {
+    &::after {
+      transition: all $_anim-standard $_easing-standard;
+    }
+  }
+}
+
+// Search form focus effect
+#quarto-search {
+  .aa-Form {
+    transition: $_link-transition;
+
+    &:focus-within {
+      box-shadow: $_shadow-md;
+    }
+  }
+}
+
+// Search icon colour in navbar (inherits from $navbar-fg)
+.navbar #quarto-search.type-overlay .aa-Autocomplete {
+
+  .aa-Form .aa-Label svg,
+  .aa-Form .aa-LoadingIndicator svg,
+  svg.aa-SubmitIcon {
+    color: inherit;
+  }
+}
+
+.sidebar-navigation .sidebar-title a {
+  color: $sidebar-fg;
+}
+
+// Sidebar search theming: use $sidebar-fg explicitly because Quarto does not
+// set a `color` on .sidebar-navigation, so `inherit` falls through to body.
+// The .aa-Input override is needed because Quarto's base rule
+// (.aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input) has higher
+// specificity (4 classes) and sets color to $body-color, which can match the
+// sidebar background in dark mode, making the cursor and text invisible.
+.sidebar-search .aa-Form {
+  background-color: transparent;
+  border-color: $sidebar-fg;
+  color: $sidebar-fg;
+
+  .aa-InputWrapper .aa-Input {
+    color: $sidebar-fg;
+    caret-color: $sidebar-fg;
+
+    &::placeholder {
+      color: $sidebar-fg;
+      opacity: 0.5;
+    }
+  }
+
+  .aa-InputWrapperPrefix .aa-Label svg,
+  .aa-InputWrapperPrefix .aa-LoadingIndicator svg {
+    color: $sidebar-fg;
+    opacity: 0.8;
+  }
+}
+
+.sidebar-tools-collapse,
+.sidebar-tools-main {
+
+  #quarto-search .aa-DetachedSearchButton .aa-DetachedSearchButtonIcon {
+    color: $sidebar-fg;
+  }
+}
+
+// ===========================
+// LISTING PAGE ANIMATIONS
+// ===========================
+
+// Staggered fade-in for listing items
+.quarto-listing {
+  .list {
+
+    .quarto-grid-item,
+    .quarto-post {
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
+    }
+  }
+}
+
+// ===========================
+// LISTING TABLES
+// ===========================
+
+// Modern table styling with rounded corners and shadows
+.quarto-listing-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 1.5em 0;
+  border-radius: $_radius-md;
+  overflow: hidden;
+  box-shadow: $_shadow-sm;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: $_shadow-md;
+  }
+
+  // Table header
+  thead {
+    background: linear-gradient(180deg,
+        rgba($body-color, 0.08) 0%,
+        rgba($body-color, 0.05) 100%);
+    border-bottom: 2px solid rgba($body-color, 0.15);
+
+    tr {
+      transition: background-color 0.3s ease;
+    }
+
+    th {
+      padding: $_space-md 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: rgba($body-color, 0.85);
+      text-align: left;
+      border-bottom: 2px solid rgba($body-color, 0.15);
+      position: relative;
+      transition: $_link-transition;
+
+      // First column
+      &:first-child {
+        padding-left: $_space-lg;
+        border-top-left-radius: 8px;
+      }
+
+      // Last column
+      &:last-child {
+        padding-right: $_space-lg;
+        border-top-right-radius: 8px;
+      }
+
+      // Sort links
+      a.sort {
+        color: rgba($body-color, 0.85);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: $_space-sm;
+        transition: color 0.3s ease;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+
+        // Remove any inherited underline animations
+        &::before {
+          display: none;
+        }
+
+        // Sort indicator
+        &::after {
+          content: '⇅';
+          font-size: 0.9em;
+          opacity: 0.5;
+          transition: $_link-transition;
+          flex-shrink: 0;
+        }
+
+        &:hover {
+          color: $body-color;
+
+          &::after {
+            opacity: 1;
+            transform: scale(1.2);
+          }
+        }
+
+        // Active sort states
+        &.sort-asc::after {
+          content: '↑';
+          opacity: 1;
+          color: $body-color;
+        }
+
+        &.sort-desc::after {
+          content: '↓';
+          opacity: 1;
+          color: $body-color;
+        }
+      }
+
+      &:hover {
+        background-color: rgba($body-color, 0.06);
+      }
+    }
+  }
+
+  // Table body
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba($body-color, 0.08);
+      transition: all $_anim-standard $_easing-standard;
+      background-color: transparent;
+
+      &:hover {
+        background-color: rgba($body-color, 0.04);
+        transform: scale(1.005);
+        box-shadow: $_shadow-sm;
+        position: relative;
+        z-index: 1;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      // Fade in animation for rows
+      animation: fadeInUp 0.5s ease-out;
+      animation-fill-mode: both;
+
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.03}s;
+        }
+      }
+    }
+
+    td {
+      padding: $_space-md 1.25rem;
+      vertical-align: middle;
+      transition: $_link-transition;
+
+      // First column
+      &:first-child {
+        padding-left: $_space-lg;
+        font-weight: 600;
+      }
+
+      // Last column
+      &:last-child {
+        padding-right: $_space-lg;
+      }
+    }
+  }
+
+  // Listing-specific elements
+  .listing-date {
+    font-size: 0.9em;
+    color: rgba($body-color, 0.75);
+    font-weight: 600;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .listing-title {
+    color: $body-color;
+    text-decoration: none;
+    font-weight: 600;
+    transition: $_link-transition;
+    display: inline-block;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg,
+          $body-color 0%,
+          rgba($body-color, 0.4) 100%);
+      transition: width $_anim-standard $_easing-standard;
+      border-radius: 1px;
+    }
+
+    &:hover {
+      color: $body-color;
+      transform: translateX(2px);
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  .listing-journal-title {
+    color: rgba($body-color, 0.8);
+    font-size: 0.95em;
+    font-style: italic;
+
+    em {
+      font-style: italic;
+    }
+  }
+
+  .listing-first,
+  .listing-last {
+    font-size: 0.9em;
+    color: rgba($body-color, 0.7);
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    transition: all $_anim-fast ease;
+
+    &:not(:empty) {
+      padding: 0.25em 0.75em;
+      background-color: rgba($body-color, 0.05);
+      border-radius: $_radius-sm;
+      border: 1px solid rgba($body-color, 0.12);
+
+      &:hover {
+        background-color: rgba($body-color, 0.08);
+        border-color: rgba($body-color, 0.2);
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// Listing actions group (filter and sort controls)
+.listing-actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $_space-md;
+  margin-bottom: $_space-lg;
+
+  @media (max-width: $_breakpoint-md) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  // Input groups (both sort and filter)
+  .input-group {
+    flex: 1;
+    min-width: 200px;
+
+    @media (max-width: $_breakpoint-md) {
+      min-width: 100%;
+    }
+  }
+
+  .input-group-text {
+    background-color: rgba($body-color, 0.08);
+    border: 1px solid rgba($body-color, 0.15);
+    border-right: none;
+    color: rgba($body-color, 0.7);
+    border-radius: 6px 0 0 6px;
+    padding: $_space-sm 0.75rem;
+    transition: $_link-transition;
+
+    i {
+      font-size: 1em;
+    }
+  }
+
+  // Sort dropdown
+  .quarto-listing-sort {
+    .form-select {
+      border: 1px solid rgba($body-color, 0.15);
+      border-left: none;
+      border-radius: 0 6px 6px 0;
+      padding: $_space-sm 2.5rem $_space-sm $_space-md;
+      background-color: $body-bg;
+      color: rgba($body-color, 0.85);
+      font-size: 0.95em;
+      transition: $_link-transition;
+      cursor: pointer;
+
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+
+      &:hover {
+        border-color: rgba($body-color, 0.3);
+        background-color: rgba($body-color, 0.02);
+        box-shadow: $_shadow-sm;
+      }
+
+      &:focus {
+        border-color: rgba($body-color, 0.4);
+        box-shadow: 0 0 0 3px rgba($body-color, 0.08);
+        outline: none;
+      }
+
+      option {
+        padding: $_space-sm;
+        background-color: $body-bg;
+        color: $body-color;
+
+        &:hover {
+          background-color: rgba($body-color, 0.08);
+        }
+      }
+    }
+  }
+}
+
+// Listing filter input
+.quarto-listing-filter {
+  .form-control {
+    border: 1px solid rgba($body-color, 0.15);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    padding: $_space-sm $_space-md;
+    background-color: $body-bg;
+    color: rgba($body-color, 0.85);
+    transition: $_link-transition;
+
+    &::placeholder {
+      color: rgba($body-color, 0.4);
+      font-style: italic;
+    }
+
+    &:hover {
+      border-color: rgba($body-color, 0.3);
+      background-color: rgba($body-color, 0.02);
+      box-shadow: $_shadow-sm;
+    }
+
+    &:focus {
+      border-color: rgba($body-color, 0.4);
+      box-shadow: 0 0 0 3px rgba($body-color, 0.08);
+      outline: none;
+      background-color: $body-bg;
+    }
+  }
+}
+
+// Pagination styling
+.listing-pagination,
+.pagination {
+  margin-top: $_space-xl;
+  display: flex;
+  justify-content: center;
+  gap: $_space-sm;
+
+  .page-link {
+    border: 1px solid rgba($body-color, 0.15);
+    border-radius: $_radius-md;
+    padding: $_space-sm $_space-md;
+    color: rgba($body-color, 0.85);
+    background-color: $body-bg;
+    transition: all $_anim-fast $_easing-standard;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+
+    // Ensure no underline animations
+    &::after,
+    &::before {
+      display: none !important;
+    }
+
+    &:hover {
+      background-color: rgba($body-color, 0.08);
+      border-color: rgba($body-color, 0.25);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: $body-color;
+    }
+
+    &:focus {
+      outline: 2px solid $body-color;
+      outline-offset: 2px;
+      text-decoration: none;
+    }
+
+    &.active {
+      background-color: $body-color;
+      color: $body-bg;
+      border-color: $body-color;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        color: $body-bg;
+        background-color: rgba($body-color, 0.9);
+      }
+    }
+
+    &:disabled,
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+
+      &:hover {
+        transform: none;
+        background-color: $body-bg;
+        border-color: rgba($body-color, 0.15);
+      }
+    }
+  }
+
+  // Page item wrapper
+  .page-item {
+    &.active .page-link {
+      background-color: $body-color;
+      color: $body-bg;
+      border-color: $body-color;
+    }
+
+    &.disabled .page-link {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Listing category section
+.quarto-listing-category-title {
+  position: relative;
+  transition: all $_anim-standard $_easing-standard;
+  cursor: default;
+  margin-bottom: $_space-md;
+  padding-bottom: $_space-sm;
+
+  // Remove default border for animated version
+  border-bottom: none !important;
+
+  // Animated underline effect on hover
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, $body-color 0%, rgba($body-color, 0.4) 100%);
+    transition: width $_anim-standard $_easing-standard;
+  }
+
+  &:hover::after {
+    width: 50px;
+  }
+
+  // Enhanced section number styling if present
+  .header-section-number {
+    transition: $_link-transition;
+    opacity: 0.7;
+    margin-right: 0.5em;
+  }
+
+  &:hover .header-section-number {
+    opacity: 1;
+    transform: translateX(-2px);
+  }
+}
+
+.quarto-listing-category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: $_space-md;
+  max-height: none;
+  overflow: visible;
+
+  .category {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25em 0.25em;
+    background-color: transparent;
+    border: none;
+    border-radius: $_radius-sm;
+    font-size: 0.85em;
+    color: rgba($body-color, 0.75);
+    cursor: pointer;
+    transition: all $_anim-fast ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    gap: 0.5em;
+
+    &:hover {
+      background-color: rgba($body-color, 0.05);
+      color: rgba($body-color, 0.9);
+
+      .quarto-category-count {
+        background-color: rgba($body-color, 0.1);
+        color: rgba($body-color, 0.8);
+      }
+    }
+
+    &:active {
+      background-color: rgba($body-color, 0.08);
+    }
+
+    // Active/selected state
+    &.active,
+    &[aria-current="true"] {
+      background-color: rgba($body-color, 0.1);
+      color: $body-color;
+      font-weight: 600;
+
+      .quarto-category-count {
+        background-color: rgba($body-color, 0.15);
+        color: $body-color;
+      }
+
+      &:hover {
+        background-color: rgba($body-color, 0.12);
+      }
+    }
+
+    // Focus state for accessibility
+    &:focus {
+      outline: 2px solid rgba($body-color, 0.3);
+      outline-offset: 2px;
+    }
+
+    .quarto-category-count {
+      padding: 0.1em 0.4em;
+      background-color: rgba($body-color, 0.08);
+      border-radius: $_radius-md;
+      font-size: 0.8em;
+      font-weight: 500;
+      color: rgba($body-color, 0.6);
+      transition: all $_anim-fast ease;
+      min-width: 1.8em;
+      text-align: center;
+    }
+  }
+
+  // Special styling for "All" category
+  .category[data-category=""] {
+    font-weight: 600;
+    color: rgba($body-color, 0.8);
+  }
+
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    .category {
+      transition: none;
+    }
+  }
+}
+
+// Responsive adjustments for categories
+@media (max-width: $_breakpoint-md) {
+  .quarto-listing-category {
+    gap: 0.2rem;
+
+    .category {
+      font-size: 0.8em;
+      padding: 0.2em 0.4em;
+
+      .quarto-category-count {
+        font-size: 0.75em;
+        padding: 0.08em 0.35em;
+      }
+    }
+  }
+
+  .quarto-listing-category-title {
+    font-size: 0.85rem;
+  }
+}
+
+// Responsive table adjustments
+@media (max-width: $_breakpoint-lg) {
+  .quarto-listing-table {
+    font-size: 0.9em;
+
+    thead th,
+    tbody td {
+      padding: 0.75rem $_space-md;
+
+      &:first-child {
+        padding-left: $_space-md;
+      }
+
+      &:last-child {
+        padding-right: $_space-md;
+      }
+    }
+  }
+}
+
+@media (max-width: $_breakpoint-md) {
+  .quarto-listing-table {
+    font-size: 0.85em;
+    border-radius: $_radius-md;
+
+    thead th,
+    tbody td {
+      padding: 0.6rem 0.75rem;
+
+      &:first-child {
+        padding-left: 0.75rem;
+      }
+
+      &:last-child {
+        padding-right: 0.75rem;
+      }
+    }
+
+    thead th {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===========================
+// MEDIA & IMAGES
+// ===========================
+
+// Footer link animations
+.nav-footer {
+  a {
+    transition: $_link-transition;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 1px;
+      background: currentColor;
+      transition: $_link-transition;
+      transform: translateX(-50%);
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+}
+
+// Figure images with hover zoom
+figure {
+  img {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: $_shadow-lg;
+    }
+  }
+}
+
+// ===========================
+// TABLE OF CONTENTS (TOC)
+// ===========================
+
+// TOC link border-left: override Quarto's #e9ecef with brand colour
+.sidebar nav[role="doc-toc"]>ul a {
+  border-left-color: rgba($body-color, 0.1);
+}
+
+// TOC navigation with animated indicators
+nav#TOC {
+  position: relative;
+  transition: $_link-transition;
+
+  // TOC Title styling
+  #toc-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: $_space-md;
+    padding-bottom: $_space-sm;
+    position: relative;
+    color: rgba($body-color, 0.85);
+
+    // Animated underline
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          $body-color 0%,
+          rgba($body-color, 0.3) 100%);
+      transition: width $_anim-standard $_easing-standard;
+      border-radius: 2px;
+    }
+
+    &:hover::after {
+      width: 80px;
+    }
+  }
+
+  // TOC list styling
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: $_space-sm;
+
+    // Nested lists
+    ul {
+      padding-left: $_space-md;
+      margin-top: $_space-xs;
+      margin-bottom: $_space-xs;
+      position: relative;
+
+      // Vertical line for nested items
+      &::before {
+        content: '';
+        position: absolute;
+        left: $_space-sm;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(180deg,
+            rgba($body-color, 0.15) 0%,
+            rgba($body-color, 0.05) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      &:hover::before {
+        opacity: 1;
+      }
+    }
+
+    li {
+      margin-bottom: $_space-xs;
+      position: relative;
+    }
+  }
+
+  // TOC link styling
+  .nav-link {
+    padding: 0.15rem 0.75rem;
+    border-radius: $_radius-md;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: rgba($body-color, 0.75);
+    transition: all $_anim-fast $_easing-standard;
+    display: block;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+
+    // Section numbers
+    .header-section-number {
+      font-weight: 600;
+      margin-right: $_space-sm;
+      opacity: 0.6;
+      transition: opacity 0.25s ease;
+      font-size: 0.8em;
+    }
+
+    // Hover effect background
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: $body-color;
+      transform: scaleY(0);
+      transition: transform $_anim-fast $_easing-standard;
+      border-radius: 0 2px 2px 0;
+    }
+
+    // Hover state
+    &:hover {
+      color: rgba($body-color, 0.95);
+      background-color: rgba($body-color, 0.04);
+      transform: translateX(2px);
+      padding-left: 0.85rem;
+
+      .header-section-number {
+        opacity: 1;
+      }
+
+      &::before {
+        transform: scaleY(1);
+      }
+    }
+
+    // Active state
+    &.active {
+      color: $body-color;
+      background-color: rgba($body-color, 0.08);
+      font-weight: 600;
+      padding-left: 0.85rem;
+
+      .header-section-number {
+        opacity: 1;
+        font-weight: 700;
+      }
+
+      &::before {
+        transform: scaleY(1);
+        width: 4px;
+      }
+
+      // Subtle pulse animation for active item
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 4px;
+        height: 4px;
+        background: $body-color;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        animation: tocPulse 2s ease-in-out infinite;
+      }
+    }
+
+    // Focus state for accessibility
+    &:focus-visible {
+      outline: 2px solid $body-color;
+      outline-offset: 2px;
+      background-color: rgba($body-color, 0.06);
+    }
+  }
+
+  // Collapsed nested items
+  ul.collapse {
+    .nav-link {
+      font-size: 0.8125rem;
+      padding: 0.3rem 0.75rem;
+      color: rgba($body-color, 0.65);
+
+      &:hover {
+        color: rgba($body-color, 0.9);
+      }
+    }
+  }
+
+  // TOC actions (Edit/Report buttons)
+  .toc-actions {
+    margin-top: $_space-lg;
+    padding-top: $_space-md;
+    border-top: 1px solid rgba($body-color, 0.1);
+
+    ul {
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    li {
+      margin-bottom: $_space-sm;
+    }
+
+    .toc-action {
+      display: flex;
+      align-items: center;
+      padding: $_space-sm 0.75rem;
+      border-radius: $_radius-md;
+      font-size: 0.875rem;
+      color: rgba($body-color, 0.7);
+      text-decoration: none;
+      transition: all $_anim-fast $_easing-standard;
+      background-color: rgba($body-color, 0.02);
+      border: 1px solid rgba($body-color, 0.08);
+
+      i,
+      .bi {
+        margin-right: $_space-sm;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        color: $body-color;
+        background-color: rgba($body-color, 0.06);
+        border-color: rgba($body-color, 0.15);
+        transform: translateY(-1px);
+        box-shadow: $_shadow-sm;
+
+        i,
+        .bi {
+          transform: scale(1.1);
+        }
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Sticky behavior enhancement
+  &.toc-active {
+
+    // Add subtle shadow when scrolling
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: linear-gradient(180deg,
+          rgba($body-color, 0.03) 0%,
+          transparent 100%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+  }
+}
+
+// Animation for active item pulse
+@keyframes tocPulse {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: translateY(-50%) scale(1.5);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: $_breakpoint-lg) {
+  nav#TOC {
+    #toc-title {
+      font-size: 0.8125rem;
+    }
+
+    .nav-link {
+      font-size: 0.8125rem;
+      padding: 0.15rem 0.5rem;
+    }
+  }
+}
+
+// ===========================
+// SIDEBAR & BREADCRUMBS
+// ===========================
+
+
+.sidebar.sidebar-navigation {
+  .sidebar-item {
+    transition: all $_anim-fast ease;
+
+    &:hover {
+      padding-left: 0.2rem;
+    }
+  }
+}
+
+// Breadcrumb link animations
+.breadcrumb {
+  .breadcrumb-item {
+    a {
+      transition: $_link-transition;
+
+      &:hover {
+        transform: translateX(2px);
+      }
+    }
+  }
+}
+
+// ===========================
+// TITLE BLOCK & HEADERS
+// ===========================
+// Supports two styles via title-block-style: academic (default) or magazine
+
+// Base title block container — CV magazine ribbon: 3px accent rule under page title.
+header#title-block-header {
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid $mc-accent;
+
+  // Title section - shared styles
+  .quarto-title {
+    .title {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: $_space-sm;
+      color: $body-color;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--mc-muted);
+      font-weight: 400;
+      margin-bottom: $_space-lg;
+    }
+  }
+}
+
+// Shared author styling — degrees rendered as a smaller gold suffix,
+//   matching the about-page `.title-suffix` treatment (see lines 1139–1149).
+.quarto-title-author-degree {
+  font-size: 0.65em;
+  font-weight: 600;
+  color: $mc-accent;
+  letter-spacing: 0.02em;
+}
+
+.quarto-title-author-orcid,
+.quarto-title-author-email {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  margin-left: 0.35em;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 4px;
+  opacity: 0.8;
+  transition: opacity $_link-transition-duration $_link-transition-timing;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+  }
+}
+
+
+// ===========================
+// SECTION HEADINGS (H2-H6)
+// ===========================
+
+// Override default heading borders with theme variables
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+h5,
+.h5,
+h6,
+.h6 {
+
+  // Override any default border colors with theme variables
+  &[style*="border-bottom"],
+  &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *)) {
+    border-bottom-color: rgba($body-color, 0.15) !important;
+  }
+}
+
+// Default h2 border override (Quarto adds border-bottom to h2 by default)
+h2,
+.h2 {
+  &:not(:where(.nav-footer *, .navbar *, .sidebar *, nav#TOC *, .card-title)) {
+    border-bottom-color: rgba($body-color, 0.15);
+  }
+}
+
+// Skip-to-content link. Visually hidden until focused; lands on Quarto's
+// <main id="quarto-document-content">.
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  padding: 0.5rem 1rem;
+  background-color: $body-bg;
+  color: $body-color;
+  border: 2px solid $body-color;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:focus,
+  &:focus-visible {
+    outline: 2px solid $body-color;
+    outline-offset: 2px;
+  }
+}
+
+// Quarto applies opacity: 0.9 to h3-h6 (and to appendix headings) which drops
+// link contrast below WCAG AA. Restore full opacity; visual hierarchy is
+// carried by font-size and weight.
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  opacity: 1;
+}
+
+#quarto-appendix.default .quarto-appendix-heading,
+#quarto-appendix.default section [role="doc-endnotes"],
+#quarto-appendix.default section > :not(a) {
+  opacity: 1;
+}
+
+// Animated underlines for section headings in main content
+main {
+
+  // Top-level headings keep gold accent colour. Use $mc-accent-link so light
+  // mode passes WCAG AA on the paper background; dark mode keeps brand gold.
+  h2.anchored:not(:where(.quarto-listing *)) {
+    color: $mc-accent-link;
+  }
+
+  h2.anchored:not(:where(.quarto-listing *)),
+  h3.anchored:not(:where(.quarto-listing *)),
+  h4.anchored:not(:where(.quarto-listing *)),
+  h5.anchored:not(:where(.quarto-listing *)) {
+    position: relative;
+    transition: all $_anim-standard $_easing-standard;
+    cursor: default;
+    padding-bottom: 4px;
+
+    // Remove default border for animated version
+    border-bottom: none !important;
+
+    // Gradient underline: always visible, extends on hover
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg,
+          $body-color 0%,
+          rgba($body-color, 0.4) 100%);
+      transition: width $_anim-slow $_easing-standard;
+      border-radius: 1px;
+    }
+
+    &:hover::after {
+      width: 80px;
+    }
+  }
+
+  // Per-level resting/hover widths, thickness, section-number prominence.
+  @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size, $num-opacity in (
+    (h2, 50px, 100px, 4px, 2px, 700, 1em, 1),
+    (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em, 1),
+    (h4, 30px, 60px, 2px, 1px, 500, 0.85em, 0.65),
+    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em, 0.6),
+  ) {
+    #{$level}.anchored:not(:where(.quarto-listing *)) {
+      &::after {
+        width: $w;
+        height: $h;
+        border-radius: $r;
+      }
+
+      &:hover::after {
+        width: $w-hover;
+      }
+
+      .header-section-number {
+        transition: $_link-transition;
+        opacity: 0.7;
+        margin-right: 0.5em;
+        font-weight: $num-weight;
+        font-size: $num-size;
+        @if $level == h2 { margin-right: 0.6em; }
+        @if $num-opacity != 1 { opacity: $num-opacity; }
+      }
+
+      &:hover .header-section-number {
+        opacity: 1;
+        transform: translateX(-2px);
+      }
+    }
+  }
+}
+
+// ===========================
+// KEYFRAME ANIMATIONS
+// ===========================
+
+// Gradient orbs movement
+@keyframes orbsMove {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  33% {
+    transform: translate(8%, 5%) rotate(120deg) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-5%, 8%) rotate(240deg) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(1);
+  }
+}
+
+// ===========================
+// ACCESSIBILITY & REDUCED MOTION
+// ===========================
+
+// Disable all animations for users who prefer reduced motion
+// Note: !important is intentional here to ensure accessibility overrides all other styles
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // Disable title-block animations for reduced motion
+  header#title-block-header {
+    &::after {
+      animation: none !important;
+    }
+
+    .quarto-title .title::after {
+      transition: none !important;
+    }
+
+    .quarto-title-meta::before {
+      animation: none !important;
+      opacity: 1 !important;
+    }
+  }
+
+  // Disable TOC animations for reduced motion
+  nav#TOC {
+    .nav-link.active::after {
+      animation: none !important;
+      opacity: 0 !important;
+    }
+  }
+}
+
+// ---------------------------
+// BLOCKQUOTE WITH CURLY QUOTES
+// ---------------------------
+blockquote {
+  position: relative;
+  margin: 1.5em 0;
+  padding: 1.5em 2em 1.5em 3em;
+  background-color: body-mix(98%);
+  border-left: 4px solid body-mix(70%);
+  border-radius: $_radius-sm;
+  font-style: italic;
+
+  // Opening curly quote (top-left)
+  &::before {
+    content: '\201C';
+    position: absolute;
+    top: 0.1em;
+    left: 0.3em;
+    font-size: 3em;
+    line-height: 1;
+    color: body-mix(70%);
+    font-family: Georgia, serif;
+    font-style: normal;
+  }
+
+  // Closing curly quote (bottom-right)
+  &::after {
+    content: '\201D';
+    position: absolute;
+    bottom: -0.3em;
+    right: 0.3em;
+    font-size: 3em;
+    line-height: 1;
+    color: body-mix(70%);
+    font-family: Georgia, serif;
+    font-style: normal;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+a.navbar-brand {
+  display: none;
+}
+
+.code-with-filename:not(.code-window-windows) .code-with-filename-file::after {
+  width: 0px !important;
+}
+
+.slide-deck {
+  max-width: 100%;
+  aspect-ratio: 1.5;
+  width: 560px;
+  height: auto;
+}
+
+.hero-art {
+  border: 1.5px solid var(--mc-fg);
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 0 var(--mc-fg);
+  padding: 0.75rem;
+  background: var(--mc-bg);
+  transform: rotate(-1.25deg);
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hero-art:hover {
+  transform: rotate(-0.4deg);
+}
+
+.hero-art embed {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.625rem;
+}
+
+// =============================================================================
+// LUXURY / EDITORIAL CUES (CV-derived, applied across all pages)
+// =============================================================================
+
+body {
+  background: $body-bg;
+  min-height: 100vh;
+  font-family: $font-family-serif;
+  animation: fadeIn 0.6s ease-in;
+}
+
+// Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
+// Sized to span exactly two `.about-body p` lines.
+.drop-cap {
+  float: left;
+  font-family: $font-family-serif;
+  font-size: 3.5rem;
+  line-height: 1;
+  padding: 0.05em 0.12em 0 0;
+  color: $mc-accent;
+  font-weight: 700;
+
+  @media (max-width: $_breakpoint-md) {
+    font-size: 3.25rem;
+  }
+}
+
+// Tabular-nums on date-shaped elements — vertical alignment in lists.
+.listing-date,
+.pub-year,
+.pub-year-num,
+.pub-date,
+.pub-position,
+.pub-timeline-year,
+.pub-timeline-count,
+time,
+.talks-year,
+.talks-row time {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+// Italic accent credential subtitle — CV signature on the about block.
+.quarto-title .subtitle,
+.about-entity .about-subtitle,
+header#title-block-header .subtitle,
+.about-body > p.subtitle {
+  font-family: $font-family-serif;
+  font-style: italic;
+  color: $mc-accent;
+  letter-spacing: 0.5px;
+}
+
+// Photo gold ring + soft glow — CV's circular accent stroke, on the web.
+.about-entity img,
+.about-image img {
+  border: 2px solid $mc-accent;
+  box-shadow:
+    0 0 0 6px rgba($mc-accent, 0.08),
+    0 4px 16px rgba($mc-ink, 0.12);
+  transition: box-shadow 0.4s ease;
+}
+.about-entity img:hover,
+.about-image img:hover {
+  box-shadow:
+    0 0 0 8px rgba($mc-accent, 0.14),
+    0 6px 24px rgba($mc-ink, 0.16);
+}
+
+// Section heading flourish — `■` marker + tracked uppercase + accent rule.
+//    Targets in-content `<h2>`s on the about page and listing-section headings.
+.about-body > h2,
+.quarto-listing-section,
+.about-body section.level2 > h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: $font-family-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $mc-accent;
+  font-weight: 700;
+  font-size: 1.15rem;
+  border-bottom: 0;
+
+  &::before {
+    content: "\25A0";
+    color: $mc-accent;
+    font-size: 0.7em;
+    flex-shrink: 0;
+  }
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: $mc-rule-web;
+  }
+}
+
+// 6b. Editorial alternating bands on the home page.
+//     Each `<section class="level2">` inside `.about-body` becomes a full-bleed
+//     band; odd-indexed sections take the warm paper tint to break the vertical
+//     monotony of the long stacked column. A small gold rhombus ornament closes
+//     each section except the last. Selector is wrapper-scoped so it beats the
+//     `body.quarto-about-solana section.level2 { padding-top: 0 }` override
+//     declared earlier in this file.
+body.quarto-about-solana .about-body > section.level2,
+#quarto-content:has(.quarto-about-solana) .about-body > section.level2 {
+  position: relative;
+  padding: 1.25rem 0 2rem;
+  margin: 0;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    z-index: -1;
+  }
+
+  &:nth-of-type(odd)::before {
+    background: $mc-paper-warm;
+  }
+
+  &::after {
+    content: "\25C6\00A0\00A0\25C6\00A0\00A0\25C6";
+    display: block;
+    text-align: center;
+    color: rgba($mc-accent, 0.55);
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    margin-top: 1.75rem;
+  }
+
+  &:last-of-type::after {
+    content: none;
+  }
+}
+
+// Quarto's `.page-rows-contents` grid reserves a `minmax(60px, max-content)`
+// row below the content, leaving a paper-coloured gap between the last band
+// and the footer. Collapse that row on the home page so the bands meet the
+// footer flush.
+body.quarto-about-solana #quarto-content.page-rows-contents,
+#quarto-content.page-rows-contents:has(.quarto-about-solana) {
+  grid-template-rows: [content-top] minmax(max-content, 1fr) [content-bottom] 0 [page-bottom];
+}
+
+// Larger octicon section anchor; suppress the generic ■ marker when the H2
+// already carries an iconify-icon (avoids two stacked decorations).
+.about-body h2 > iconify-icon,
+.about-body section.level2 > h2 > iconify-icon {
+  font-size: 1.55em;
+  vertical-align: -0.25em;
+  margin-right: 0.15em;
+  flex-shrink: 0;
+}
+
+.about-body h2:has(> iconify-icon)::before,
+.about-body section.level2 > h2:has(> iconify-icon)::before {
+  content: none;
+}
+
+// Thin gold rule below the streak block so the first band entry feels
+// intentional. Hidden theme-content blocks collapse with display:none, so the
+// rule only renders on the visible one.
+.about-body > .light-content,
+.about-body > .dark-content {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba($mc-accent, 0.25);
+}
+
+// `.highlight` ribbon — accent-tinted bg + serif italic, centred horizontally.
+.highlight {
+  border-left: 4px solid $mc-accent;
+  border-right: 4px solid $mc-accent;
+  background: rgba($mc-accent, 0.06);
+  padding: 0.85rem 1.4rem;
+  font-style: italic;
+  font-family: $font-family-serif;
+  margin: 1.25rem auto;
+  max-width: 36rem;
+  text-align: center;
+
+  em,
+  strong {
+    color: $mc-accent;
+    font-style: normal;
+  }
+
+  > p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Same `■` rail for an explicit Skills list.
+section.skills > ul,
+ul.skills {
+  list-style: none;
+  padding-left: 1rem;
+  border-left: 2px solid $mc-accent;
+  margin-top: 1rem;
+
+  > li {
+    position: relative;
+    padding: 0.25rem 0 0.5rem 1rem;
+
+    &::before {
+      content: "\25A0";
+      color: $mc-accent;
+      position: absolute;
+      left: -0.55rem;
+      top: 0.3rem;
+      font-size: 0.6em;
+      background: $body-bg;
+      padding: 0 0.2em;
+    }
+  }
+}
+
+// Inline links — dashed gold underline, expand on hover.
+//     Scope to content links only; navbar/footer/buttons keep their own rules.
+.about-body a:not(.btn):not(.nav-link),
+.content a:not(.btn):not(.nav-link),
+main a:not(.btn):not(.nav-link):not(.quarto-grid-link) {
+  text-decoration: underline dashed rgba($mc-accent, 0.55);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition:
+    text-decoration-color 0.3s ease,
+    text-decoration-thickness 0.2s ease,
+    text-decoration-style 0.3s ease;
+
+  &:hover {
+    text-decoration-style: solid;
+    text-decoration-color: $mc-accent;
+    text-decoration-thickness: 2px;
+  }
+}
+
+// Title banner — ink background + white text on every page in BOTH themes.
+// Force colour explicitly so neither light- nor dark-mode body inheritance
+// repaints the title text.
+.quarto-title-block.quarto-title-banner,
+.quarto-title-banner,
+[data-bs-theme="dark"] .quarto-title-block.quarto-title-banner,
+[data-bs-theme="dark"] .quarto-title-banner,
+.quarto-dark .quarto-title-block.quarto-title-banner,
+.quarto-dark .quarto-title-banner {
+  background: $mc-ink !important;
+  background-color: $mc-ink !important;
+  color: #ffffff !important;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 0; // accent rule sits flush against the banner
+  border-bottom: 0;
+
+  .quarto-title h1.title,
+  h1.title,
+  .quarto-title-meta,
+  .quarto-title-meta-heading,
+  .quarto-title-meta-contents,
+  .quarto-categories .quarto-category,
+  .quarto-categories,
+  .quarto-title-author-name,
+  .quarto-title-author-email,
+  .quarto-title-author-orcid,
+  .description,
+  p {
+    color: #ffffff !important;
+  }
+
+  .subtitle {
+    color: rgba(#ffffff, 0.85) !important;
+  }
+
+  .quarto-title h1.title {
+    margin-bottom: 0.25rem;
+  }
+
+  a {
+    color: $mc-accent !important;
+    text-decoration-color: rgba($mc-accent, 0.6);
+    &:hover { color: lighten($mc-accent, 12%) !important; }
+  }
+}
+
+// Reduce default top spacing under the banner before listings start.
+.quarto-listing,
+.quarto-listing > .listing,
+.featured-carousel-section,
+.blog-list {
+  margin-top: 0.75rem;
+}
+
+// Quarto adds a top margin on <main> and a top padding on every direct child
+// of #quarto-content; they push content away from the banner. Drop both so
+// the title banner sits flush against the next content block.
+main,
+.page-columns main {
+  margin-top: 0 !important;
+}
+
+#quarto-content > * {
+  padding-top: 0 !important;
+}
+
+// Navbar/footer foreground — gold accent text for editorial feel.
+.navbar.bg-dark,
+.navbar-dark,
+.navbar {
+  .navbar-title,
+  .nav-link,
+  .navbar-brand,
+  .quarto-navbar-tools .quarto-navigation-tool {
+    color: $mc-accent;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: lighten($mc-accent, 12%);
+  }
+
+  iconify-icon {
+    color: $mc-accent;
+  }
+}
+
+.nav-footer,
+.page-footer {
+  color: $mc-accent;
+
+  a {
+    color: $mc-accent;
+    text-decoration-color: rgba($mc-accent, 0.5);
+
+    &:hover,
+    &:focus-visible {
+      color: lighten($mc-accent, 12%);
+      text-decoration-color: $mc-accent;
+    }
+  }
+
+  iconify-icon {
+    color: $mc-accent;
+  }
+}
+
+// Reduced-motion fallback for hover transitions.
+@media (prefers-reduced-motion: reduce) {
+  .about-entity img,
+  .about-image img,
+  .about-body a,
+  .content a,
+  main a {
+    transition: none;
+  }
+}
+
+// =============================================================================
+// ABOUT HERO — original (light) treatment. The page bg shows through; gold
+// accents only on the profile photo + subtitle + social-link hover.
+// =============================================================================
+
+.about-entity {
+  background: transparent;
+  padding: 1rem 0 1.25rem;
+  margin: 0 0 1.5rem;
+  border-radius: 0;
+  border-bottom: 0;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+
+  @media (max-width: 575.98px) {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-image,
+  > img {
+    flex-shrink: 0;
+  }
+
+  .about-image img,
+  > img {
+    border: 2px solid $mc-accent;
+    box-shadow:
+      0 0 0 6px rgba($mc-accent, 0.10),
+      0 4px 16px rgba($mc-ink, 0.12);
+  }
+
+  .about-contents,
+  .about-content {
+    color: inherit;
+    flex: 1;
+    min-width: 0;
+  }
+
+  h1, .h1 {
+    font-family: $font-family-serif;
+    font-weight: 700;
+    color: $body-color;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .subtitle,
+  p.subtitle {
+    color: $mc-accent;
+    font-style: italic;
+    font-family: $font-family-serif;
+    letter-spacing: 0.5px;
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+  }
+
+  .about-links {
+    margin-top: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    .about-link {
+      color: $body-color;
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+
+      &:hover,
+      &:focus-visible {
+        color: $mc-accent;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Footnotes block — neutralise every Quarto/Bootstrap tint so the page bg
+// shows through uniformly. Single hairline rule above, no nested bands.
+section.footnotes,
+section.footnotes hr,
+section.footnotes ol,
+section.footnotes li,
+section.footnotes p,
+.footnotes,
+.footnotes hr,
+.footnotes ol,
+.footnotes li,
+.footnotes p,
+#footnotes,
+.footnote-back,
+.footnote-ref {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+section.footnotes,
+.footnotes {
+  margin-top: 2rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+section.footnotes > hr,
+.footnotes > hr {
+  border: 0;
+  border-top: 1px solid $mc-rule-web;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+// =============================================================================
+// SIDEBAR — gold border on docked sidebar (light + dark).
+// =============================================================================
+
+aside.sidebar.sidebar-navigation,
+.sidebar.sidebar-navigation:not(.rollup) {
+  border-color: $mc-accent !important;
+  border-right: 1px solid $mc-accent;
+}
+
+// Pull the docked sidebar up to sit flush under the title banner.
+.sidebar.sidebar-navigation {
+  padding-top: 1rem;
+  margin-top: 0;
+}
+
+.quarto-title-banner + * .sidebar,
+.quarto-title-banner + .page-columns .sidebar,
+.quarto-title-block + .page-columns .sidebar {
+  margin-top: 0;
+}
+
+// Sidebar item dividers in gold tint.
+.sidebar-item-container,
+.sidebar-section a {
+  border-color: rgba($mc-accent, 0.18);
+}
+
+// Active sidebar link in gold.
+.sidebar-navigation .sidebar-link.active,
+.sidebar-navigation .sidebar-item-section .sidebar-link.active,
+.sidebar a.active {
+  color: $mc-accent !important;
+  font-weight: 700;
+}
+
+// =============================================================================
+// NAVBAR — active link keeps the hover treatment.
+// =============================================================================
+
+.navbar .nav-link.active,
+.navbar .nav-link[aria-current="page"],
+.navbar .nav-link.active:hover,
+.navbar .nav-link[aria-current="page"]:hover {
+  color: lighten($mc-accent, 12%);
+}
+
+// =============================================================================
+// TALKS LISTING — year-grouped vertical list
+// =============================================================================
+
+$talks-border: rgba($body-color, 0.18);
+$talks-muted: rgba($body-color, 0.62);
+
+.talks-listing {
+  display: block;
+}
+
+@include year-timeline("talks", $mc-accent, $talks-border, $talks-muted);
+
+.talks-section {
+  margin-top: 2.5rem;
+  scroll-margin-top: 5rem;
+
+  &:first-of-type {
+    margin-top: 1rem;
+  }
+}
+
+.talks-year-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid $mc-rule-web;
+
+  .talks-year {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 200;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: $mc-accent;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .talks-year-count {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: $mc-muted;
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.talks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.talks-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.5rem 0 1.5rem 1.25rem;
+  border-top: 1px solid $mc-rule-web;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    width: 2px;
+    background: $mc-rule-web;
+    transition: background-color 0.2s ease;
+  }
+
+  &:hover::before {
+    background: $mc-accent;
+  }
+
+  &:last-child {
+    border-bottom: 1px solid $mc-rule-web;
+  }
+}
+
+.talks-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.75rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.talks-date {
+  color: $mc-accent-link;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.talks-venue-sep {
+  color: $mc-rule-web;
+  font-weight: 600;
+}
+
+.talks-venue {
+  color: $mc-muted;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
+}
+
+.talks-title {
+  font-family: $font-family-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: $body-color;
+  margin: 0;
+  line-height: 1.3;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
+}
+
+.talks-description {
+  font-size: 0.95rem;
+  color: rgba($body-color, 0.78);
+  line-height: 1.5;
+  margin: 0;
+
+  > p {
+    margin: 0;
+  }
+}
+
+.talks-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.talks-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35em 0.75em;
+  border-radius: 4px;
+  border: 1px solid $mc-rule-web;
+  background: transparent;
+  color: $mc-accent;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $mc-accent;
+    background-color: rgba($mc-accent, 0.08);
+    text-decoration: none;
+  }
+
+  iconify-icon {
+    font-size: 0.95em;
+    color: inherit;
+  }
+}
+
+.talks-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.talks-category {
+  @include pill-chip;
+}
+
+// =============================================================================
+// BLOG LISTING — hero (latest) + magazine rows
+// =============================================================================
+
+.blog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 1.5rem 0;
+}
+
+.blog-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1.5rem 0 2rem;
+  border-bottom: 2px solid $mc-rule-web;
+  margin-bottom: 0.5rem;
+  align-items: center;
+
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 2rem 0 2.5rem;
+
+    .blog-hero-thumb {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .blog-hero-meta {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+}
+
+.blog-hero-thumb {
+  display: block;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border: 1px solid $mc-rule-web;
+  background: rgba($mc-accent, 0.04);
+  transition: border-color 0.3s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .blog-thumb-fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-family-serif;
+    font-size: 5rem;
+    font-weight: 700;
+    color: $mc-accent;
+  }
+
+  &:hover {
+    border-color: $mc-accent;
+  }
+}
+
+.blog-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.blog-hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.blog-hero-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 0.25em 0.7em;
+  border-radius: 4px;
+  // Use $mc-accent-link so #fff text passes WCAG AA on the badge background
+  // (5.32:1 in light, 5.36:1 in dark — both above 4.5:1).
+  background-color: $mc-accent-link;
+  color: #fff;
+}
+
+.blog-hero-title {
+  font-family: $font-family-serif;
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0;
+  color: $mc-ink;
+  transition: color 0.2s ease;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
+}
+
+[data-bs-theme="dark"] .blog-hero-title,
+.quarto-dark .blog-hero-title {
+  color: $mc-ink-dark;
+}
+
+.blog-title-link:hover .blog-hero-title,
+.blog-title-link:focus-visible .blog-hero-title {
+  color: $mc-accent;
+}
+
+.blog-hero-lead {
+  font-size: 1.05rem;
+  color: rgba($mc-ink, 0.8);
+  line-height: 1.55;
+  margin: 0;
+
+  > p {
+    margin: 0;
+  }
+}
+
+[data-bs-theme="dark"] .blog-hero-lead,
+.quarto-dark .blog-hero-lead {
+  color: rgba($mc-ink-dark, 0.8);
+}
+
+.blog-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) 2fr;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid $mc-rule-web;
+  align-items: start;
+
+  &:last-child {
+    border-bottom: 1px solid $mc-rule-web;
+  }
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.blog-row--compact {
+  grid-template-columns: minmax(100px, 0.7fr) 2fr;
+  gap: 1rem;
+  padding: 0.9rem 0;
+
+  .blog-title {
+    font-size: 1.15rem;
+  }
+
+  .blog-lead {
+    font-size: 0.88rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-thumb-fallback {
+    font-size: 2.25rem;
+  }
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blog-thumb {
+  display: block;
+  aspect-ratio: 1200 / 630;
+  overflow: hidden;
+  border: 1px solid $mc-rule-web;
+  background: rgba($mc-accent, 0.04);
+  transition: border-color 0.3s ease;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .blog-thumb-fallback {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-family-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: $mc-accent;
+  }
+
+  &:hover {
+    border-color: $mc-accent;
+  }
+}
+
+.blog-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.blog-meta .blog-date {
+  font-size: 0.72rem;
+  color: $mc-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.blog-meta .blog-categories {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.blog-title-link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .blog-title,
+  &:focus-visible .blog-title {
+    color: $mc-accent;
+  }
+}
+
+.blog-title {
+  font-family: $font-family-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0;
+  color: $mc-ink;
+  line-height: 1.25;
+  transition: color 0.2s ease;
+
+  > p {
+    margin: 0;
+    display: inline;
+  }
+}
+
+[data-bs-theme="dark"] .blog-title,
+.quarto-dark .blog-title {
+  color: $mc-ink-dark;
+}
+
+.blog-lead {
+  font-size: 0.95rem;
+  color: rgba($mc-ink, 0.75);
+  margin: 0;
+  line-height: 1.5;
+
+  > p {
+    margin: 0;
+  }
+}
+
+[data-bs-theme="dark"] .blog-lead,
+.quarto-dark .blog-lead {
+  color: rgba($mc-ink-dark, 0.75);
+}
+
+.blog-category {
+  @include pill-chip;
+}

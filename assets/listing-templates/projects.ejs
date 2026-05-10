@@ -1,0 +1,111 @@
+<%
+const featured = items.filter(i => i.featured === true);
+
+function renderCategoryChips(item) {
+  if (!item.categories) return "";
+  return item.categories
+    .map((c) => `<span class="project-category" onclick="window.quartoListingCategory('${utils.b64encode(c)}'); return false;">${c}</span>`)
+    .join("");
+}
+%>
+
+<% if (featured.length > 0) {
+  const N = featured.length;
+  const looped = N >= 3;
+  const TOTAL = looped ? N + 3 : N;
+  const slides = looped ? featured.concat([featured[0], featured[1], featured[2]]) : featured;
+%>
+```{=html}
+<section class="featured-carousel-section" aria-label="Featured projects section">
+  <h2 id="featured-heading" class="visually-hidden">Featured projects</h2>
+  <div class="featured-carousel<%= looped ? ' featured-carousel--n' + N : '' %>" role="region" aria-roledescription="carousel" aria-labelledby="featured-heading">
+    <div class="featured-track" style="--total: <%= TOTAL %>;">
+```
+
+<% slides.forEach((item, idx) => {
+  const isClone = looped && idx >= N;
+%>
+
+```{=html}
+      <a class="featured-item" href="<%- item.path %>" target="_blank" rel="noopener noreferrer"<%= isClone ? ' aria-hidden="true" tabindex="-1"' : ' aria-roledescription="slide" aria-label="Slide ' + (idx + 1) + ' of ' + N + '"' %>>
+        <div class="featured-thumb"><% if (item.image) { %><img src="<%= item.image %>" alt="<%= isClone ? '' : item.title %>" loading="lazy"><% } %></div>
+        <h3 class="featured-title no-anchor">
+```
+
+<%= item.title %>
+
+```{=html}
+        </h3>
+        <div class="featured-description">
+```
+
+<%= item.description %>
+
+```{=html}
+        </div>
+      </a>
+```
+
+<% }); %>
+
+```{=html}
+    </div>
+  </div>
+<% if (looped) { %>
+  <ol class="featured-marker featured-marker--n<%= N %>" aria-hidden="true">
+<% for (let i = 0; i < N; i++) { %>
+    <li></li>
+<% } %>
+  </ol>
+<% } %>
+</section>
+```
+<% } %>
+
+```{=html}
+<ul class="list project-list">
+```
+<% items.forEach(item => { %>
+```{=html}
+    <li class="project-row" <%= metadataAttrs(item) %>>
+      <a class="project-thumb" href="<%- item.path %>" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1">
+<% if (item.image) { %>        <img src="<%= item.image %>" alt="" loading="lazy">
+<% } %>      </a>
+      <div class="project-meta">
+        <div class="project-date-line">
+          <span class="project-date-label">Created</span>
+          <time class="project-date listing-date" datetime="<%= item.date %>"><%= item.date %></time>
+        </div>
+        <a class="project-title-link" href="<%- item.path %>" target="_blank" rel="noopener noreferrer">
+          <h3 class="project-title listing-title no-anchor">
+```
+
+<%= item.title %>
+
+```{=html}
+          </h3>
+        </a>
+        <div class="project-description listing-description">
+```
+
+<%= item.description %>
+
+```{=html}
+        </div>
+        <div class="project-footer">
+          <a class="project-repo" href="<%- item.path %>" target="_blank" rel="noopener noreferrer">Open repository &rarr;</a>
+        </div>
+        <div class="project-categories listing-categories"><%= renderCategoryChips(item) %></div>
+<% if (item.template) { %>
+        <span class="listing-template visually-hidden">template</span>
+<% } %>
+<% if (item.featured) { %>
+        <span class="listing-featured visually-hidden">featured</span>
+<% } %>
+      </div>
+    </li>
+```
+<% }); %>
+```{=html}
+</ul>
+```
