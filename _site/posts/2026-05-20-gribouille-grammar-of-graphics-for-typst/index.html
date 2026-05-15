@@ -760,7 +760,7 @@ Tip
 </section>
 <section id="polish" class="level3" data-number="4.6">
 <h3 data-number="4.6" class="anchored" data-anchor-id="polish"><span class="header-section-number">4.6</span> 6. Polish</h3>
-<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the subtitle: the <code>typst({...})</code> constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> covers the simpler case where the subtitle is a plain string carrying Typst markup like <code>$hat(y) = beta_0 + beta_1 dot.c x$</code>.</p>
+<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> wires the subtitle to render as Typst markup, so the linear-fit formula <code>$hat(y) = beta_0 + beta_1 dot.c x$</code> and the per-species names appear with maths and inline colour without leaving the string. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the second subtitle line: the entries are mapped to coloured <code>#text(...)</code> snippets, joined into one Typst-markup string. Legend placement is controlled with <a href="https://m.canouil.dev/gribouille/reference/guides/guides.html"><code>guides()</code></a> bound to <a href="https://m.canouil.dev/gribouille/reference/guides/guide-legend.html"><code>guide-legend(position: ...)</code></a>; <code>position:</code> accepts the side strings <code>"top"</code>, <code>"right"</code>, <code>"bottom"</code>, <code>"left"</code>, a Typst alignment like <code>bottom + right</code> for an inside-panel corner, or a <code>(dx:, dy:)</code> offset for arbitrary placement.</p>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row quarto-layout-valign-center">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -795,27 +795,32 @@ Tip
 <span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    scale-y-continuous<span class="op">(</span>labels<span class="op">:</span> format-comma<span class="op">()),</span></span>
 <span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
 <span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  facet<span class="op">:</span> facet-wrap<span class="op">(</span><span class="st">"island"</span><span class="op">),</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  labs<span class="op">:</span> labs<span class="op">(</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Penguin Body Mass Scales with Flipper Length"</span><span class="op">,</span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    subtitle<span class="op">:</span> typst<span class="op">({</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>      <span class="op">[</span>Linear fit <span class="ss">$hat(y) = beta_0 + beta_1 dot.c x$</span> on every island <span class="sc">\ </span><span class="op">]</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>      species-colours</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        .pairs<span class="op">()</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        .map<span class="op">(</span>p <span class="op">=&gt;</span> text<span class="op">(</span>fill<span class="op">:</span> p<span class="op">.</span>at<span class="op">(</span><span class="dv">1</span><span class="op">),</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">)[</span><span class="kw">#</span>p<span class="op">.</span>at<span class="op">(</span><span class="dv">0</span><span class="op">)])</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        .join<span class="op">(</span><span class="st">", "</span><span class="op">)</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="op">}),</span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    shape<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    plot-title<span class="op">:</span> element-text<span class="op">(</span>size<span class="op">:</span> <span class="fl">12pt</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">),</span></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">9cm</span><span class="op">,</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> guide-legend<span class="op">(</span>position<span class="op">:</span> bottom <span class="op">+</span> right<span class="op">),</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> guide-legend<span class="op">(</span>position<span class="op">:</span> bottom <span class="op">+</span> right<span class="op">),</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    shape<span class="op">:</span> guide-legend<span class="op">(</span>position<span class="op">:</span> bottom <span class="op">+</span> right<span class="op">),</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  labs<span class="op">:</span> labs<span class="op">(</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Penguin Body Mass Scales with Flipper Length"</span><span class="op">,</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    subtitle<span class="op">:</span> <span class="op">{</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>      <span class="op">[</span>Linear fit <span class="ss">$hat(y) = beta_0 + beta_1 dot.c x$</span> on every island for three species: <span class="op">]</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>      species-colours<span class="op">.</span>pairs<span class="op">()</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        .map<span class="op">(</span>p <span class="op">=&gt;</span> text<span class="op">(</span>fill<span class="op">:</span> p<span class="op">.</span>at<span class="op">(</span><span class="dv">1</span><span class="op">),</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> p<span class="op">.</span>at<span class="op">(</span><span class="dv">0</span><span class="op">)))</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>        .join<span class="op">(</span><span class="st">", "</span><span class="op">)</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    shape<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    plot-title<span class="op">:</span> element-text<span class="op">(</span>size<span class="op">:</span> <span class="fl">12pt</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">),</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    plot-subtitle<span class="op">:</span> element-typst<span class="op">(</span>size<span class="op">:</span> <span class="fl">9pt</span><span class="op">),</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">9cm</span><span class="op">,</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="typst-render-error quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <p><strong>[typst-render] Compilation failed for this block.</strong><br>
@@ -854,7 +859,7 @@ Tip
 <p>The code cell below inlines the same bootstrap with <code>#| echo: true</code> so you can read it in context.</p>
 </div>
 </div>
-<div id="347261f0" class="cell" data-execution_count="1">
+<div id="9960c6cf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" data-filename="python"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>

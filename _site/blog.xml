@@ -877,7 +877,7 @@ Tip
 </section>
 <section id="polish" class="level3" data-number="4.6">
 <h3 data-number="4.6" class="anchored" data-anchor-id="polish"><span class="header-section-number">4.6</span> 6. Polish</h3>
-<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the subtitle: the <code>typst({...})</code> constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> covers the simpler case where the subtitle is a plain string carrying Typst markup like <code>$hat(y) = beta_0 + beta_1 dot.c x$</code>.</p>
+<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> wires the subtitle to render as Typst markup, so the linear-fit formula <code>$hat(y) = beta_0 + beta_1 dot.c x$</code> and the per-species names appear with maths and inline colour without leaving the string. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the second subtitle line: the entries are mapped to coloured <code>#text(...)</code> snippets, joined into one Typst-markup string. Legend placement is controlled with <a href="https://m.canouil.dev/gribouille/reference/guides/guides.html"><code>guides()</code></a> bound to <a href="https://m.canouil.dev/gribouille/reference/guides/guide-legend.html"><code>guide-legend(position: ...)</code></a>; <code>position:</code> accepts the side strings <code>"top"</code>, <code>"right"</code>, <code>"bottom"</code>, <code>"left"</code>, a Typst alignment like <code>bottom + right</code> for an inside-panel corner, or a <code>(dx:, dy:)</code> offset for arbitrary placement.</p>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row quarto-layout-valign-center">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -1072,37 +1072,77 @@ background-color: null;
 font-style: inherit;">"island"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb9-32">  labs<span class="op" style="color: #5E5E5E;
+<span id="cb9-32">  guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-33">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-34">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-35">    shape<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-36">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-37">  labs<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> labs<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb9-33">    title<span class="op" style="color: #5E5E5E;
+<span id="cb9-38">    title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Penguin Body Mass Scales with Flipper Length"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-34">    subtitle<span class="op" style="color: #5E5E5E;
+<span id="cb9-39">    subtitle<span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">:</span> typst<span class="op" style="color: #5E5E5E;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">({</span></span>
-<span id="cb9-35">      <span class="op" style="color: #5E5E5E;
+font-style: inherit;">{</span></span>
+<span id="cb9-40">      <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">[</span>Linear fit <span class="ss" style="color: #20794D;
 background-color: null;
-font-style: inherit;">$hat(y) = beta_0 + beta_1 dot.c x$</span> on every island <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">\ </span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">$hat(y) = beta_0 + beta_1 dot.c x$</span> on every island for three species: <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">]</span></span>
-<span id="cb9-36">      species-colours</span>
-<span id="cb9-37">        .pairs<span class="op" style="color: #5E5E5E;
+<span id="cb9-41">      species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>pairs<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">()</span></span>
-<span id="cb9-38">        .map<span class="op" style="color: #5E5E5E;
+<span id="cb9-42">        .map<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>p <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1124,10 +1164,7 @@ font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">)[</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#</span>p<span class="op" style="color: #5E5E5E;
+font-style: inherit;">,</span> p<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1135,61 +1172,61 @@ font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">)])</span></span>
-<span id="cb9-39">        .join<span class="op" style="color: #5E5E5E;
+font-style: inherit;">)))</span></span>
+<span id="cb9-43">        .join<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">", "</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb9-40">    <span class="op" style="color: #5E5E5E;
+<span id="cb9-44">    <span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">}),</span></span>
-<span id="cb9-41">    x<span class="op" style="color: #5E5E5E;
+font-style: inherit;">},</span></span>
+<span id="cb9-45">    x<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Flipper Length (mm)"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-42">    y<span class="op" style="color: #5E5E5E;
+<span id="cb9-46">    y<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-43">    colour<span class="op" style="color: #5E5E5E;
+<span id="cb9-47">    colour<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-44">    fill<span class="op" style="color: #5E5E5E;
+<span id="cb9-48">    fill<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-45">    shape<span class="op" style="color: #5E5E5E;
+<span id="cb9-49">    shape<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-46">  <span class="op" style="color: #5E5E5E;
+<span id="cb9-50">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb9-47">  theme<span class="op" style="color: #5E5E5E;
+<span id="cb9-51">  theme<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb9-48">    plot-title<span class="op" style="color: #5E5E5E;
+<span id="cb9-52">    plot-title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> element-text<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1206,24 +1243,35 @@ background-color: null;
 font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb9-49">  <span class="op" style="color: #5E5E5E;
+<span id="cb9-53">    plot-subtitle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-typst<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9pt</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb9-50">  width<span class="op" style="color: #5E5E5E;
+<span id="cb9-54">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-55">  width<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-51">  height<span class="op" style="color: #5E5E5E;
+<span id="cb9-56">  height<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb9-52"><span class="op" style="color: #5E5E5E;
+<span id="cb9-57"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
@@ -1286,7 +1334,7 @@ font-style: inherit;">import</span> typst_define</span></code></pre></div></div>
 <p>The code cell below inlines the same bootstrap with <code>#| echo: true</code> so you can read it in context.</p>
 </div>
 </div>
-<div id="347261f0" class="cell" data-execution_count="1">
+<div id="9960c6cf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" data-filename="python" style="background: #f1f3f5;"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> os</span>
@@ -21958,7 +22006,7 @@ font-style: inherit;">"Penguin Species"</span></span>
 background-color: null;
 font-style: inherit;">```</span></span></code></pre></div></div>
 </details>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
