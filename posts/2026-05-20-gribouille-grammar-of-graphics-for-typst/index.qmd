@@ -84,6 +84,12 @@ That works, but it splits the toolchain in two: one font system on the page, ano
 `cetz` already gives Typst a robust low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing.
 That is exactly the gap Gribouille fills.
 
+::: {.highlight}
+
+**One toolchain.** Same fonts, same palette, same render pass, from data to PDF.
+
+:::
+
 The pay-off is a single toolchain.
 A Gribouille figure is a Typst `figure` element with `kind: "gribouille-plot"`, so you can attach show rules, captions, or cross-references to every plot in one place, and it shares the document's fonts, palette, and geometry.
 The YAML front-matter of this very post wires its `background:` and `foreground:` to the site's light and dark colours, and every figure below reacts automatically when you toggle the theme.
@@ -496,6 +502,12 @@ Sometimes a story needs more than one panel.
 [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) takes several deferred plots, lays them out on a grid or stack, and hoists their shared legend into a single guide block at the edge of the figure.
 The deferred plots are produced by passing `defer: true` to [`plot()`](https://m.canouil.dev/gribouille/reference/core/plot.html), which returns a spec dictionary instead of rendering immediately.
 
+::: {.highlight}
+
+**Many plots, one legend.** `compose()` hoists the shared aesthetics for you.
+
+:::
+
 ::: {layout-ncol="2" layout-valign="center"}
 
 ```{typst}
@@ -537,6 +549,12 @@ The hoisting is configurable.
 `Typst Render` 0.13.1 adds a small but powerful helper called `typst_define()`, available from both R and Python.
 It lets a code cell hand any value to every `{typst}` block in the document under a single Typst dictionary named `typst_define`.
 A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.
+
+::: {.highlight}
+
+**Compute anywhere, render in Typst.** `typst_define()` is the bridge.
+
+:::
 
 The mechanism is deliberately plain.
 The helper serialises the values you give it to JSON, hex-encodes them, and emits a tiny Pandoc metadata block of the form `---\ntypst-define: <hex>\n---\n`.
@@ -680,16 +698,25 @@ Some `ggplot2`/`plotnine` features are out of scope by design; others are pendin
 - `geom-smooth()` and [`stat-smooth()`](https://m.canouil.dev/gribouille/reference/stats/stat-smooth.html) support `method: "lm"` only.
   LOESS is deferred for the same reason.
 - [`geom-dotplot()`](https://m.canouil.dev/gribouille/reference/geoms/geom-dotplot.html) is `method: "histodot"` only; dynamic dot density is deferred.
-- Maps and spatial geometries (ggplot2's `sf` integration) are currently out of scope.
+- Maps and spatial geometries (`ggplot2`'s `sf` integration) are currently out of scope.
 
 ## Wrap-up
 
-Gribouille is small, focused, and modelled on the library that has shaped a generation of data visualisation.
+::: {.highlight}
 
-- Repository: <https://github.com/mcanouil/gribouille>.
-- Documentation: <https://m.canouil.dev/gribouille>.
+**Small, focused, and modelled on the library that has shaped a generation of data visualisation.**
+
+:::
 
 Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day.
+
+- Gribouille
+  - Repository: <https://github.com/mcanouil/gribouille>.
+  - Documentation: <https://m.canouil.dev/gribouille>.
+  - Typst Universe: <https://typst.app/universe/package/gribouille>.
+- Typst Render
+  - Repository: <https:// github.com/mcanouil/quarto-typst-render>.
+  - Documentation: <https://m.canouil.dev/quarto-typst-render>.
 
 ::: {.callout-tip}
 
