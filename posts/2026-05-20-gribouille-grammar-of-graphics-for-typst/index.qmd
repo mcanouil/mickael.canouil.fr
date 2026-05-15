@@ -1,0 +1,548 @@
+---
+title: "Gribouille: a Grammar of Graphics for Typst"
+description: |
+  Gribouille is a new Typst package that brings Wilkinson's grammar of
+  graphics natively into Typst, in the spirit of `ggplot2` and `plotnine`.
+  Version 0.1.0 ships alongside an updated `Typst Render` Quarto extension
+  whose new `typst_define()` helper streams arbitrary Python and R values,
+  from a scalar to a Polars DataFrame, straight into Typst code blocks.
+date: "2026-05-20"
+categories:
+  - typst
+  - quarto
+  - computation
+  - grammar-of-graphics
+image: featured.png
+image-alt: |
+  Featured card for the Gribouille release on a cream paper background.
+  On the left, the Gribouille wordmark sits above the tagline "Create
+  elegant graphics with the Grammar of Graphics for Typst.", a small
+  orange "v0.1.0 release" pill, and the URL m.canouil.dev/gribouille.
+  On the right, a slightly rotated bordered card frames a scatter plot
+  of Palmer Penguin body mass against flipper length, with three
+  coloured point clouds for the species and per-species summary labels.
+engine: jupyter
+jupyter: gribouille-post
+extensions:
+  typst-render:
+    output-directory: ./assets/typst-render
+    format: svg
+    preamble: _preamble.typ
+    classes: hero-art
+    background:
+      light: "#fafafa"
+      dark: "#161616"
+    foreground:
+      light: "#111827"
+      dark: "#f5f5f4"
+comments:
+  giscus:
+    mapping: title
+    theme:
+      dark: dark_dimmed
+      light: light
+    repo: mcanouil/gribouille
+    repo-id: R_kgDOSGUuww
+    category: Announcements
+    category-id: DIC_kwDOSGUuw84C7KIV
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+## Introduction
+
+Typst has grown from a curious newcomer to a credible alternative for scientific writing, reports, and slide decks.
+What it still lacked, until today, was a real grammar of graphics: a way to declare a figure with the same vocabulary you would reach for in [`ggplot2`](https://ggplot2.tidyverse.org), then have it draw, lay out, and align with the rest of the document.
+
+[Gribouille](https://github.com/mcanouil/gribouille) (French for *scribble*) is the first cut of that library.
+Version 0.1.0 is released on [Typst Universe](https://typst.app/universe/package/gribouille) today, modelled closely on `ggplot2`, drawing on top of [`cetz`](https://cetz-package.github.io/), and shipped with a documentation site that is itself a Quarto project rendered by the [`quarto-typst-render`](https://github.com/mcanouil/quarto-typst-render) extension.
+Every figure in this post is a real, freshly compiled plot.
+
+::: {.callout-note}
+
+## At a glance
+
+- [Gribouille](https://github.com/mcanouil/gribouille) v0.1.0 on Typst Universe: `#import "@preview/gribouille:0.1.0": *`.
+- 45 geoms, 18 stats, 65+ scales, multiple themes, full facet support.
+- [`quarto-typst-render`](https://github.com/mcanouil/quarto-typst-render) v0.13.1 ships `typst_define()`, the Python and R helper that streams arbitrary values, scalars, lists, dictionaries, and full data frames alike, straight into Typst code blocks.
+
+:::
+
+## Why a grammar of graphics for Typst
+
+Until now, producing a figure inside a Typst document meant taking a detour through another language.
+You would leave Typst to call out to `ggplot2`, [`matplotlib`](https://matplotlib.org), or [`plotnine`](https://plotnine.org), save a PNG or SVG, and import it back.
+That works, but it splits the toolchain in two: one font system on the page, another inside the figure; one colour palette in the report, another in the chart; one render pass that knows about the layout, another that does not.
+
+`cetz` already gives Typst a robust low-level drawing API.
+What was missing was the layer in between: a declarative grammar that turns a dataset, a mapping, and a few layers into a publication-quality figure without you having to handle ticks, breaks, legends, or coordinate transforms by hand.
+That is exactly the gap Gribouille fills.
+
+The pay-off is a single toolchain.
+A Gribouille figure (`kind: "gribouille-plot"`) shares the document's fonts, the document's colours, and the document's geometry.
+Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.
+
+## A respectful nod to ggplot2
+
+A short personal aside.
+I have been using `ggplot2` since almost its first release, and a large part of how I think about data visualisation comes from that work.
+This release would not exist without Hadley Wickham's original vision, nor without the people carrying it forward today, in particular Thomas Lin Pedersen and Teun van den Brand, and the wider community of contributors who keep shaping the package to the recent v4 release.
+
+Gribouille is, in many ways, a port of `ggplot2`'s vocabulary into Typst.
+The names line up: [`plot()`](https://m.canouil.dev/gribouille/reference/core/plot.html) instead of `ggplot()`, `geom-point()` for `geom_point()`, `facet-wrap()`, `scale-colour-*()`, [`theme-minimal()`](https://m.canouil.dev/gribouille/reference/themes/theme-minimal.html), and so on.
+Where the two part ways, it is because Typst is a different language, with no lazy evaluation, no plot object you can mutate after the fact, no `ggsave()` output pipeline, and no `vars()` quoting.
+Column names are plain strings.
+Per-aesthetic type coercion is done inline with [`as-factor()`](https://m.canouil.dev/gribouille/reference/helpers/as-factor.html) and [`as-numeric()`](https://m.canouil.dev/gribouille/reference/helpers/as-numeric.html).
+These are opinionated departures, but the mental model is the same one you already have.
+
+## Build a penguins plot, one layer at a time
+
+The library ships the [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) dataset under the [`penguins`](https://m.canouil.dev/gribouille/reference/datasets/penguins.html) symbol.
+The walk-through below builds a single figure end to end, one grammar concept at a time, with brief notes on alternatives at each step.
+It is a tighter version of the [Get Started](https://m.canouil.dev/gribouille/get-started/) page on the documentation site.
+
+The post's YAML points the `typst-render` extension at a one-line preamble file so every `{typst}` block has the library in scope:
+
+```yaml
+extensions:
+  typst-render:
+    preamble: _preamble.typ
+```
+
+And `_preamble.typ` contains:
+
+```typst
+#import "@preview/gribouille:0.1.0": *
+```
+
+You would write the same `#import` once at the top of your own Typst document.
+
+### 1. Data and aesthetics
+
+Every plot starts with a dataset and an [`aes()`](https://m.canouil.dev/gribouille/reference/core/aes.html) mapping that binds column names to visual channels.
+At a minimum, [`geom-point()`](https://m.canouil.dev/gribouille/reference/geoms/geom-point.html) needs `x` and `y`.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-1.svg"
+//| alt: "Scatter of penguin body mass against flipper length, all points the same colour."
+#plot(
+  data: penguins,
+  mapping: aes(x: "flipper-len", y: "body-mass"),
+  layers: (geom-point(size: 2pt),),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+The plot-level `mapping` is inherited by every layer.
+If only one layer needs a given mapping, you can also pass it inside that layer's `mapping:` argument and keep the plot-level mapping minimal.
+
+### 2. Encode a third variable with colour
+
+Add `colour: "species"` and the points split visually by group.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-2a.svg"
+//| alt: "Scatter of body mass against flipper length, points coloured by species."
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    colour: "species",
+  ),
+  layers: (geom-point(size: 2pt, alpha: 0.85),),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+If your figure must remain legible in greyscale, swap `colour: "species"` for `shape: "species"` and the same grouping rides the point shape instead.
+Both aesthetics can be combined when accessibility matters.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-2b.svg"
+//| alt: "Scatter of body mass against flipper length, points shaped by species."
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    shape: "species",
+  ),
+  layers: (geom-point(size: 2pt, alpha: 0.85),),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+### 3. Stack a second layer
+
+Layers stack in the order you list them.
+Adding [`geom-smooth()`](https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html) draws one fitted line per colour group, because the `colour` aesthetic is inherited from the plot-level mapping.
+
+::: {.callout-note}
+Only `method: "lm"` is supported in this release; LOESS is deferred for the reason listed in the [limitations section](#sec-limitations).
+:::
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-3.svg"
+//| alt: "Per-species scatter with linear fits and 95% confidence ribbons."
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    colour: "species",
+    fill: "species",
+  ),
+  layers: (
+    geom-point(size: 2pt, alpha: 0.6),
+    geom-smooth(method: "lm", alpha: 0.2),
+  ),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+### 4. Pick a palette
+
+[`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) replaces the default palette.
+A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-fill-discrete.html) keeps the confidence ribbons in step with the points.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-4.svg"
+//| alt: "Same scatter as step 3 with a colour-blind-friendly palette."
+#let cb = (
+  rgb("#0072B2"),
+  rgb("#D55E00"),
+  rgb("#009E73"),
+)
+
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    colour: "species",
+    fill: "species",
+  ),
+  layers: (
+    geom-point(size: 2pt, alpha: 0.6),
+    geom-smooth(method: "lm", alpha: 0.2),
+  ),
+  scales: (
+    scale-colour-discrete(palette: cb),
+    scale-fill-discrete(palette: cb),
+  ),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+::: {.callout-tip}
+[`scale-colour-okabe-ito()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-okabe-ito.html) exposes the same Okabe-Ito palette used in the example but as a one-liner if you do not want to spell out the colour codes.
+:::
+
+### 5. Split into small multiples
+
+[`facet-wrap()`](https://m.canouil.dev/gribouille/reference/facets/facet-wrap.html) lays out one panel per level of a discrete column, sharing scales across panels.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-5.svg"
+//| alt: "Three side-by-side panels, one per island, sharing colour and axis scales."
+#let cb = (
+  rgb("#0072B2"),
+  rgb("#D55E00"),
+  rgb("#009E73"),
+)
+
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    colour: "species",
+    fill: "species",
+  ),
+  layers: (
+    geom-point(size: 2pt, alpha: 0.6),
+    geom-smooth(method: "lm", alpha: 0.2),
+  ),
+  scales: (
+    scale-colour-discrete(palette: cb),
+    scale-fill-discrete(palette: cb),
+  ),
+  facet: facet-wrap("island"),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+::: {.callout-tip}
+For two crossed factors, [`facet-grid()`](https://m.canouil.dev/gribouille/reference/facets/facet-grid.html) produces a matrix of panels instead.
+:::
+
+### 6. Polish
+
+A theme, axis labels, and the figure is ready for the page.
+[`format-comma()`](https://m.canouil.dev/gribouille/reference/helpers/format-comma.html), passed to `scale-y-continuous(labels: ...)`, turns `5000` into `5,000` on the y-axis; sibling helpers cover percent, currency, and scientific notation.
+A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` + `palette:`) and the subtitle: the `typst({...})` constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula.
+[`element-typst()`](https://m.canouil.dev/gribouille/reference/themes/element-typst.html) covers the simpler case where the subtitle is a plain string carrying Typst markup like `$hat(y) = beta_0 + beta_1 dot.c x$`.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "step-6.svg"
+//| alt: "Polished version of the faceted scatter with title block, axis labels, formatted ticks, a minimal theme, and a subtitle whose second line lists the species names in their own colours."
+#let species-colours = (
+  Adelie:    rgb("#0072B2"),
+  Chinstrap: rgb("#D55E00"),
+  Gentoo:    rgb("#009E73"),
+)
+
+#plot(
+  data: penguins,
+  mapping: aes(
+    x: "flipper-len",
+    y: "body-mass",
+    colour: "species",
+    fill: "species",
+    shape: "species",
+  ),
+  layers: (
+    geom-point(size: 2pt, alpha: 0.6),
+    geom-smooth(method: "lm", alpha: 0.2),
+  ),
+  scales: (
+    scale-colour-discrete(
+      limits: species-colours.keys(),
+      palette: species-colours.values(),
+    ),
+    scale-fill-discrete(
+      limits: species-colours.keys(),
+      palette: species-colours.values(),
+    ),
+    scale-y-continuous(labels: format-comma()),
+  ),
+  facet: facet-wrap("island"),
+  labs: labs(
+    title: "Penguin body mass scales with flipper length",
+    subtitle: typst({
+      [Linear fit $hat(y) = beta_0 + beta_1 dot.c x$ on every island \ ]
+      species-colours
+        .pairs()
+        .map(p => text(fill: p.at(1), weight: "bold")[#p.at(0)])
+        .join(", ")
+    }),
+    x: "Flipper length (mm)",
+    y: "Body mass (g)",
+    colour: "Species",
+    fill: "Species",
+    shape: "Species",
+  ),
+  theme: theme-minimal(
+    plot-title: element-text(size: 12pt, weight: "bold"),
+  ),
+  width: 12cm,
+  height: 9cm,
+)
+```
+
+:::
+
+## Drive Gribouille from any computation
+
+`Typst Render` 0.13.1 adds a small but powerful helper called `typst_define()`, available from both R and Python.
+It lets a code cell hand any value to every `{typst}` block in the document under a single Typst dictionary named `typst_define`.
+A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.
+
+The mechanism is deliberately plain.
+The helper serialises the values you give it to JSON, hex-encodes them, and emits a tiny Pandoc metadata block of the form `---\ntypst-define: <hex>\n---\n`.
+The extension's Lua filter, which runs at the `pre-quarto` stage, decodes that block and injects a `#let typst_define = (...)` preamble in front of every Typst compilation.
+You compute on one side, read `typst_define.something` on the other, and the two stay in step regardless of which language did the work.
+
+That bridge is what makes the rest of this section possible.
+The example below uses Python with [`polars`](https://pola.rs), but the same approach works with R (`typst_define()` ships in both languages), with plain Python collections, with database queries, with REST calls, or with anything else that can produce a value.
+Python and Polars are one concrete illustration, not a requirement.
+
+### A Python example
+
+The Python helper has explicit converters for `polars.DataFrame` and `numpy.ndarray`, which is what keeps the example short.
+
+::: {.callout-important}
+
+## Source the helper yourself
+
+`typst_define()` is not auto-injected.
+Quarto runs the computational engine *before* any filter or shortcode, so the extension cannot stage the helper into the kernel for you.
+You must source it explicitly, typically inside a setup code cell marked `#| include: false`, by extending `sys.path` (Python) or `source()`-ing the file (R) from `_extensions/mcanouil/typst-render/_resources/`:
+
+```{.python}
+#| include: false
+import os, sys
+sys.path.insert(0, os.path.join(
+  os.environ.get("QUARTO_PROJECT_DIR", "."),
+  "_extensions", "mcanouil", "typst-render", "_resources",
+))
+from typst_define import typst_define
+```
+
+The code cell below inlines the same bootstrap with `#| echo: true` so you can read it in context.
+
+:::
+
+```{python}
+#| echo: true
+
+import os
+import sys
+
+import polars as pl
+
+project_dir = os.environ.get("QUARTO_PROJECT_DIR", "../..")
+sys.pycache_prefix = os.path.join(project_dir, ".cache", "pycache")
+extension_resources = os.path.join(
+  project_dir,
+  "_extensions",
+  "mcanouil",
+  "typst-render",
+  "_resources",
+)
+sys.path.insert(0, extension_resources)
+from typst_define import typst_define
+
+penguins = pl.read_csv(
+  "https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv",
+  null_values="NA",
+).with_columns(
+  pl.col("flipper_length_mm").cast(pl.Float64),
+  pl.col("body_mass_g").cast(pl.Float64),
+)
+
+summary = (
+  penguins
+  .drop_nulls(["flipper_length_mm", "body_mass_g"])
+  .group_by("species")
+  .agg(
+    pl.col("flipper_length_mm").mean().round(1).alias("flipper_mean"),
+    pl.col("body_mass_g").mean().round(0).cast(pl.Int64).alias("body_mass_mean"),
+    pl.len().alias("n"),
+  )
+  .sort("species")
+)
+
+typst_define(summary=summary)
+summary
+```
+
+The same `plot()` call you wrote in the previous section now reads its data from `typst_define.summary` instead of the bundled `penguins` symbol.
+Nothing else changes; the data has simply crossed a language boundary.
+
+```{typst}
+//| echo: true
+//| output-filename: "polars-summary.svg"
+//| alt: "Bar chart of mean body mass per species, computed in Polars and rendered with Gribouille."
+#let cb = (
+  rgb("#0072B2"),
+  rgb("#D55E00"),
+  rgb("#009E73"),
+)
+
+#plot(
+  data: typst_define.summary,
+  mapping: aes(
+    x: "species",
+    y: "body_mass_mean",
+    fill: "species",
+  ),
+  layers: (geom-col(width: 0.6),),
+  scales: (scale-fill-discrete(palette: cb),),
+  labs: labs(
+    title: "Mean body mass per species",
+    subtitle: "Polars on the inside, Gribouille on the outside",
+    x: "Species",
+    y: "Body mass (g)",
+    fill: "Species",
+  ),
+  theme: theme-minimal(),
+  width: 12cm,
+  height: 7cm,
+)
+```
+
+::: {.callout-tip}
+
+## Rendering notes
+
+- Set `engine: jupyter` explicitly in the post YAML so the Python code cells run via Jupyter.
+- The Python environment needs `polars` and [`IPython`](https://ipython.org) available.
+- The Lua filter runs at the `pre-quarto` stage, which means `typst_define` is in scope for every `{typst}` block from that point in the document onward.
+
+:::
+
+## Current limitations {#sec-limitations}
+
+This first release is deliberately focused.
+A handful of `ggplot2`/`plotnine` features are deferred or left out by design.
+
+- No `geom-violin()`, `geom-density()`, or `geom-density-2d()`.
+  Kernel density estimation needs numerical machinery that pure Typst cannot run efficiently, and the realistic escape hatch is a WebAssembly helper.
+  That route is on hold for now because I do not yet have enough hands-on WASM experience to build and ship one with confidence, and the help I have had from LLMs has not closed that gap to a level I am comfortable releasing.
+- `geom-smooth()` and [`stat-smooth()`](https://m.canouil.dev/gribouille/reference/stats/stat-smooth.html) support `method: "lm"` only.
+  LOESS is deferred for the same reason.
+- [`geom-dotplot()`](https://m.canouil.dev/gribouille/reference/geoms/geom-dotplot.html) is `method: "histodot"` only; dynamic dot density is deferred.
+- Maps and `sf` geometries are currently out of scope.
+
+## Wrap-up
+
+Gribouille is small, focused, and modelled on the library that has shaped a generation of data visualisation.
+
+- Repository: <https://github.com/mcanouil/gribouille>.
+- Documentation: <https://m.canouil.dev/gribouille>.
+
+Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day.
+
+A note on contributions.
+Gribouille is an unfunded spare-time project, and the API is still settling.
+Bug reports and ideas are very welcome on the issue tracker.
+Pull requests are not being accepted for now: the internals shift between releases, every review costs time I have to take from the work that moves the library forward, and I am being especially careful in the current climate of unreviewed LLM-authored patches.
+Once the surface is stable I will revisit and open the door.
+Thanks in advance for your patience.
