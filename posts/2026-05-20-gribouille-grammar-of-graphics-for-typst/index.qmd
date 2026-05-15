@@ -133,7 +133,7 @@ At a minimum, [`geom-point()`](https://m.canouil.dev/gribouille/reference/geoms/
 ```{typst}
 //| echo: true
 //| output-filename: "step-1.svg"
-//| alt: "Scatter of penguin body mass against flipper length, all points the same colour."
+//| alt: "Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."
 #plot(
   data: penguins,
   mapping: aes(x: "flipper-len", y: "body-mass"),
@@ -157,7 +157,7 @@ Add `colour: "species"` and the points split visually by group.
 ```{typst}
 //| echo: true
 //| output-filename: "step-2a.svg"
-//| alt: "Scatter of body mass against flipper length, points coloured by species."
+//| alt: "Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."
 #plot(
   data: penguins,
   mapping: aes(
@@ -181,7 +181,7 @@ Both aesthetics can be combined when accessibility matters.
 ```{typst}
 //| echo: true
 //| output-filename: "step-2b.svg"
-//| alt: "Scatter of body mass against flipper length, points shaped by species."
+//| alt: "Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."
 #plot(
   data: penguins,
   mapping: aes(
@@ -211,7 +211,7 @@ Only `method: "lm"` is supported in this release; LOESS is deferred for the reas
 ```{typst}
 //| echo: true
 //| output-filename: "step-3.svg"
-//| alt: "Per-species scatter with linear fits and 95% confidence ribbons."
+//| alt: "Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."
 #plot(
   data: penguins,
   mapping: aes(
@@ -241,7 +241,7 @@ A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/
 ```{typst}
 //| echo: true
 //| output-filename: "step-4.svg"
-//| alt: "Same scatter as step 3 with a colour-blind-friendly palette."
+//| alt: "Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."
 #let cb = (
   rgb("#0072B2"),
   rgb("#D55E00"),
@@ -284,7 +284,7 @@ A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/
 ```{typst}
 //| echo: true
 //| output-filename: "step-5.svg"
-//| alt: "Three side-by-side panels, one per island, sharing colour and axis scales."
+//| alt: "Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."
 #let cb = (
   rgb("#0072B2"),
   rgb("#D55E00"),
@@ -323,15 +323,16 @@ For two crossed factors, [`facet-grid()`](https://m.canouil.dev/gribouille/refer
 
 A theme, axis labels, and the figure is ready for the page.
 [`format-comma()`](https://m.canouil.dev/gribouille/reference/helpers/format-comma.html), passed to `scale-y-continuous(labels: ...)`, turns `5000` into `5,000` on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting.
-A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` + `palette:`) and the subtitle: the `typst({...})` constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula.
-[`element-typst()`](https://m.canouil.dev/gribouille/reference/themes/element-typst.html) covers the simpler case where the subtitle is a plain string carrying Typst markup like `$hat(y) = beta_0 + beta_1 dot.c x$`.
+[`element-typst()`](https://m.canouil.dev/gribouille/reference/themes/element-typst.html) wires the subtitle to render as Typst markup, so the linear-fit formula `$hat(y) = beta_0 + beta_1 dot.c x$` and the per-species names appear with maths and inline colour without leaving the string.
+A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` + `palette:`) and the second subtitle line: the entries are mapped to coloured `#text(...)` snippets, joined into one Typst-markup string.
+Legend placement is controlled with [`guides()`](https://m.canouil.dev/gribouille/reference/guides/guides.html) bound to [`guide-legend(position: ...)`](https://m.canouil.dev/gribouille/reference/guides/guide-legend.html); `position:` accepts the side strings `"top"`, `"right"`, `"bottom"`, `"left"`, a Typst alignment like `bottom + right` for an inside-panel corner, or a `(dx:, dy:)` offset for arbitrary placement.
 
 ::: {layout-ncol="2" layout-valign="center"}
 
 ```{typst}
 //| echo: true
 //| output-filename: "step-6.svg"
-//| alt: "Polished version of the faceted scatter with title block, axis labels, formatted ticks, a minimal theme, and a subtitle whose second line lists the species names in their own colours."
+//| alt: "Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."
 #let species-colours = (
   Adelie:    rgb("#0072B2"),
   Chinstrap: rgb("#D55E00"),
@@ -363,15 +364,19 @@ A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](htt
     scale-y-continuous(labels: format-comma()),
   ),
   facet: facet-wrap("island"),
+  guides: guides(
+    colour: guide-legend(position: bottom + right),
+    fill: guide-legend(position: bottom + right),
+    shape: guide-legend(position: bottom + right),
+  ),
   labs: labs(
     title: "Penguin Body Mass Scales with Flipper Length",
-    subtitle: typst({
-      [Linear fit $hat(y) = beta_0 + beta_1 dot.c x$ on every island \ ]
-      species-colours
-        .pairs()
-        .map(p => text(fill: p.at(1), weight: "bold")[#p.at(0)])
+    subtitle: {
+      [Linear fit $hat(y) = beta_0 + beta_1 dot.c x$ on every island for three species: ]
+      species-colours.pairs()
+        .map(p => text(fill: p.at(1), weight: "bold", p.at(0)))
         .join(", ")
-    }),
+    },
     x: "Flipper Length (mm)",
     y: "Body Mass (g)",
     colour: "Species",
@@ -380,6 +385,7 @@ A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](htt
   ),
   theme: theme-minimal(
     plot-title: element-text(size: 12pt, weight: "bold"),
+    plot-subtitle: element-typst(size: 9pt),
   ),
   width: 12cm,
   height: 9cm,
@@ -481,7 +487,7 @@ The same `plot()` call you wrote in the previous section now reads its data from
 ```{typst}
 //| echo: true
 //| output-filename: "polars-summary.svg"
-//| alt: "Bar chart of mean body mass per species, computed in Polars and rendered with Gribouille."
+//| alt: "Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."
 #let cb = (
   rgb("#0072B2"),
   rgb("#D55E00"),
