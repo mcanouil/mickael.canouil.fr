@@ -43,7 +43,7 @@ clouds for the species and per-species summary labels.
 <section id="introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
 <p>Typst has grown from a curious newcomer to a credible alternative for scientific writing, reports, and slide decks. What it still lacked, until today, was a real grammar of graphics: a way to declare a figure with the same vocabulary you would reach for in <a href="https://ggplot2.tidyverse.org"><code>ggplot2</code></a>, then have it draw, lay out, and align with the rest of the document.</p>
-<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> (French for <em>scribble</em>) is the first cut of that library. Version 0.1.0 is released on <a href="https://typst.app/universe/package/gribouille">Typst Universe</a> today, modelled closely on <code>ggplot2</code>, drawing on top of <a href="https://cetz-package.github.io/"><code>cetz</code></a>, and shipped with a documentation site that is itself a Quarto project rendered by the <a href="https://github.com/mcanouil/quarto-typst-render"><code>quarto-typst-render</code></a> extension. Every figure in this post is a real, freshly compiled plot.</p>
+<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> (French for <em>scribble</em>) is the first cut of that library. Version 0.1.0 lands on <a href="https://typst.app/universe/package/gribouille">Typst Universe</a> with this announcement, modelled closely on <code>ggplot2</code>, drawing on top of <a href="https://cetz-package.github.io/"><code>cetz</code></a>, and shipped with a documentation site that is itself a Quarto project rendered by the <a href="https://github.com/mcanouil/quarto-typst-render"><code>quarto-typst-render</code></a> extension. Every figure in this post is a real, freshly compiled plot.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -56,7 +56,7 @@ clouds for the species and per-species summary labels.
 <div class="callout-body-container callout-body">
 <ul>
 <li><a href="https://github.com/mcanouil/gribouille">Gribouille</a> v0.1.0 on Typst Universe: <code>#import "@preview/gribouille:0.1.0": *</code>.</li>
-<li>45 geoms, 18 stats, 65+ scales, multiple themes, full facet support.</li>
+<li>Dozens of layer constructors and stats, scores of scales, multiple themes, and full facet support.</li>
 <li><a href="https://github.com/mcanouil/quarto-typst-render"><code>quarto-typst-render</code></a> v0.13.1 ships <code>typst_define()</code>, the Python and R helper that streams arbitrary values, scalars, lists, dictionaries, and full data frames alike, straight into Typst code blocks.</li>
 </ul>
 </div>
@@ -65,13 +65,13 @@ clouds for the species and per-species summary labels.
 <section id="why-a-grammar-of-graphics-for-typst" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="why-a-grammar-of-graphics-for-typst"><span class="header-section-number">2</span> Why a grammar of graphics for Typst</h2>
 <p>Until now, producing a figure inside a Typst document meant taking a detour through another language. You would leave Typst to call out to <code>ggplot2</code>, <a href="https://matplotlib.org"><code>matplotlib</code></a>, or <a href="https://plotnine.org"><code>plotnine</code></a>, save a PNG or SVG, and import it back. That works, but it splits the toolchain in two: one font system on the page, another inside the figure; one colour palette in the report, another in the chart; one render pass that knows about the layout, another that does not.</p>
-<p><code>cetz</code> already gives Typst a robust low-level drawing API. What was missing was the layer in between: a declarative grammar that turns a dataset, a mapping, and a few layers into a publication-quality figure without you having to handle ticks, breaks, legends, or coordinate transforms by hand. That is exactly the gap Gribouille fills.</p>
-<p>The pay-off is a single toolchain. A Gribouille figure (<code>kind: "gribouille-plot"</code>) shares the document’s fonts, the document’s colours, and the document’s geometry. Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.</p>
+<p><code>cetz</code> already gives Typst a robust low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing. That is exactly the gap Gribouille fills.</p>
+<p>The pay-off is a single toolchain. A Gribouille figure is a Typst <code>figure</code> element with <code>kind: "gribouille-plot"</code>, so you can attach show rules, captions, or cross-references to every plot in one place, and it shares the document’s fonts, palette, and geometry. The YAML front-matter of this very post wires its <code>background:</code> and <code>foreground:</code> to the site’s light and dark colours, and every figure below reacts automatically when you toggle the theme. Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.</p>
 </section>
 <section id="a-respectful-nod-to-ggplot2" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="a-respectful-nod-to-ggplot2"><span class="header-section-number">3</span> A respectful nod to ggplot2</h2>
-<p>A short personal aside. I have been using <code>ggplot2</code> since almost its first release, and a large part of how I think about data visualisation comes from that work. This release would not exist without Hadley Wickham’s original vision, nor without the people carrying it forward today, in particular Thomas Lin Pedersen and Teun van den Brand, and the wider community of contributors who keep shaping the package to the recent v4 release.</p>
-<p>Gribouille is, in many ways, a port of <code>ggplot2</code>’s vocabulary into Typst. The names line up: <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a> instead of <code>ggplot()</code>, <code>geom-point()</code> for <code>geom_point()</code>, <code>facet-wrap()</code>, <code>scale-colour-*()</code>, <a href="https://m.canouil.dev/gribouille/reference/themes/theme-minimal.html"><code>theme-minimal()</code></a>, and so on. Where the two part ways, it is because Typst is a different language, with no lazy evaluation, no plot object you can mutate after the fact, no <code>ggsave()</code> output pipeline, and no <code>vars()</code> quoting. Column names are plain strings. Per-aesthetic type coercion is done inline with <a href="https://m.canouil.dev/gribouille/reference/helpers/as-factor.html"><code>as-factor()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/as-numeric.html"><code>as-numeric()</code></a>. These are opinionated departures, but the mental model is the same one you already have.</p>
+<p>A short personal aside. I have been using <code>ggplot2</code> since almost its first release, and a large part of how I think about data visualisation comes from that work. This release would not exist without Hadley Wickham’s original vision, nor without the people carrying it forward today, in particular Thomas Lin Pedersen and Teun van den Brand, and the wider community of contributors who keep shaping the package through to the recent v4 release.</p>
+<p>Gribouille is, in many ways, a port of <code>ggplot2</code>’s vocabulary into Typst. The names line up: <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a> instead of <code>ggplot()</code>, <code>geom-point()</code> for <code>geom_point()</code>, <code>facet-wrap()</code>, <code>scale-colour-*()</code>, <a href="https://m.canouil.dev/gribouille/reference/themes/theme-minimal.html"><code>theme-minimal()</code></a>, and so on. Where the two part ways, it is because Typst is a different language, with no lazy evaluation, no plot object you can mutate after the fact, and no <code>ggsave()</code> output pipeline. Column names are plain strings. Per-aesthetic type coercion is done inline with <a href="https://m.canouil.dev/gribouille/reference/helpers/as-factor.html"><code>as-factor()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/as-numeric.html"><code>as-numeric()</code></a>. These are opinionated departures, but the mental model is the same one you already have.</p>
 </section>
 <section id="build-a-penguins-plot-one-layer-at-a-time" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="build-a-penguins-plot-one-layer-at-a-time"><span class="header-section-number">4</span> Build a penguins plot, one layer at a time</h2>
@@ -877,7 +877,7 @@ Tip
 </section>
 <section id="polish" class="level3" data-number="4.6">
 <h3 data-number="4.6" class="anchored" data-anchor-id="polish"><span class="header-section-number">4.6</span> 6. Polish</h3>
-<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover percent, currency, and scientific notation. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the subtitle: the <code>typst({...})</code> constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> covers the simpler case where the subtitle is a plain string carrying Typst markup like <code>$hat(y) = beta_0 + beta_1 dot.c x$</code>.</p>
+<p>A theme, axis labels, and the figure is ready for the page. <a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting. A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> + <code>palette:</code>) and the subtitle: the <code>typst({...})</code> constructor iterates its pairs to print each species name in its own colour, on a second line below the linear-fit formula. <a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> covers the simpler case where the subtitle is a plain string carrying Typst markup like <code>$hat(y) = beta_0 + beta_1 dot.c x$</code>.</p>
 <div class="quarto-layout-panel" data-layout-ncol="2">
 <div class="quarto-layout-row quarto-layout-valign-center">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
@@ -1081,7 +1081,7 @@ font-style: inherit;">(</span></span>
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Penguin body mass scales with flipper length"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Penguin Body Mass Scales with Flipper Length"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb9-34">    subtitle<span class="op" style="color: #5E5E5E;
@@ -1150,14 +1150,14 @@ font-style: inherit;">}),</span></span>
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Flipper length (mm)"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Flipper Length (mm)"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb9-42">    y<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Body mass (g)"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb9-43">    colour<span class="op" style="color: #5E5E5E;
@@ -1286,7 +1286,7 @@ font-style: inherit;">import</span> typst_define</span></code></pre></div></div>
 <p>The code cell below inlines the same bootstrap with <code>#| echo: true</code> so you can read it in context.</p>
 </div>
 </div>
-<div id="8823ed56" class="cell" data-execution_count="1">
+<div id="347261f0" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" data-filename="python" style="background: #f1f3f5;"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> os</span>
@@ -1340,40 +1340,46 @@ font-style: inherit;">from</span> typst_define <span class="im" style="color: #0
 background-color: null;
 font-style: inherit;">import</span> typst_define</span>
 <span id="cb11-17"></span>
-<span id="cb11-18">penguins <span class="op" style="color: #5E5E5E;
+<span id="cb11-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Network read at render time; swap for a local CSV or the `palmerpenguins`</span></span>
+<span id="cb11-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Python package when working offline.</span></span>
+<span id="cb11-20">penguins <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pl.read_csv(</span>
-<span id="cb11-19">  <span class="st" style="color: #20794D;
+<span id="cb11-21">  <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv"</span>,</span>
-<span id="cb11-20">  null_values<span class="op" style="color: #5E5E5E;
+<span id="cb11-22">  null_values<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"NA"</span>,</span>
-<span id="cb11-21">).with_columns(</span>
-<span id="cb11-22">  pl.col(<span class="st" style="color: #20794D;
+<span id="cb11-23">).with_columns(</span>
+<span id="cb11-24">  pl.col(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"flipper_length_mm"</span>).cast(pl.Float64),</span>
-<span id="cb11-23">  pl.col(<span class="st" style="color: #20794D;
+<span id="cb11-25">  pl.col(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"body_mass_g"</span>).cast(pl.Float64),</span>
-<span id="cb11-24">)</span>
-<span id="cb11-25"></span>
-<span id="cb11-26">summary <span class="op" style="color: #5E5E5E;
+<span id="cb11-26">)</span>
+<span id="cb11-27"></span>
+<span id="cb11-28">summary <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> (</span>
-<span id="cb11-27">  penguins</span>
-<span id="cb11-28">  .drop_nulls([<span class="st" style="color: #20794D;
+<span id="cb11-29">  penguins</span>
+<span id="cb11-30">  .drop_nulls([<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"flipper_length_mm"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"body_mass_g"</span>])</span>
-<span id="cb11-29">  .group_by(<span class="st" style="color: #20794D;
+<span id="cb11-31">  .group_by(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"species"</span>)</span>
-<span id="cb11-30">  .agg(</span>
-<span id="cb11-31">    pl.col(<span class="st" style="color: #20794D;
+<span id="cb11-32">  .agg(</span>
+<span id="cb11-33">    pl.col(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"flipper_length_mm"</span>).mean().<span class="bu" style="color: null;
 background-color: null;
@@ -1382,7 +1388,7 @@ background-color: null;
 font-style: inherit;">1</span>).alias(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"flipper_mean"</span>),</span>
-<span id="cb11-32">    pl.col(<span class="st" style="color: #20794D;
+<span id="cb11-34">    pl.col(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"body_mass_g"</span>).mean().<span class="bu" style="color: null;
 background-color: null;
@@ -1391,21 +1397,21 @@ background-color: null;
 font-style: inherit;">0</span>).cast(pl.Int64).alias(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"body_mass_mean"</span>),</span>
-<span id="cb11-33">    pl.<span class="bu" style="color: null;
+<span id="cb11-35">    pl.<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">len</span>().alias(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"n"</span>),</span>
-<span id="cb11-34">  )</span>
-<span id="cb11-35">  .sort(<span class="st" style="color: #20794D;
+<span id="cb11-36">  )</span>
+<span id="cb11-37">  .sort(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"species"</span>)</span>
-<span id="cb11-36">)</span>
-<span id="cb11-37"></span>
-<span id="cb11-38">typst_define(summary<span class="op" style="color: #5E5E5E;
+<span id="cb11-38">)</span>
+<span id="cb11-39"></span>
+<span id="cb11-40">typst_define(summary<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>summary)</span>
-<span id="cb11-39">summary</span></code></pre></div></div>
+<span id="cb11-41">summary</span></code></pre></div></div>
 <div class="cell-output cell-output-display cell-output-markdown">
 
 </div>
@@ -1457,7 +1463,7 @@ font-style: inherit;">=</span>summary)</span>
 </div>
 </div>
 </div>
-<p>The same <code>plot()</code> call you wrote in the previous section now reads its data from <code>typst_define.summary</code> instead of the bundled <code>penguins</code> symbol. Nothing else changes; the data has simply crossed a language boundary.</p>
+<p>The trailing <code>summary</code> is there on purpose, so Jupyter prints the DataFrame in the rendered output and the reader can see exactly what crossed the language boundary. The same <code>plot()</code> call you wrote in the previous section now reads its data from <code>typst_define.summary</code> instead of the bundled <code>penguins</code> symbol.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -1568,14 +1574,14 @@ font-style: inherit;">(</span></span>
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Mean body mass per species"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Mean Body Mass per Species"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb12-18">    subtitle<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Polars on the inside, Gribouille on the outside"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Computed in Polars, drawn in Gribouille"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb12-19">    x<span class="op" style="color: #5E5E5E;
@@ -1589,7 +1595,7 @@ font-style: inherit;">,</span></span>
 background-color: null;
 font-style: inherit;">:</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Body mass (g)"</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
 <span id="cb12-21">    fill<span class="op" style="color: #5E5E5E;
@@ -1640,8 +1646,9 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="callout-body-container callout-body">
 <ul>
 <li>Set <code>engine: jupyter</code> explicitly in the post YAML so the Python code cells run via Jupyter.</li>
+<li>Pin the kernel with <code>jupyter: &lt;name&gt;</code> (this post uses <code>python3</code>, but a dedicated kernel such as <code>gribouille-post</code> makes the env reproducible).</li>
 <li>The Python environment needs <code>polars</code> and <a href="https://ipython.org"><code>IPython</code></a> available.</li>
-<li>The Lua filter runs at the <code>pre-quarto</code> stage, which means <code>typst_define</code> is in scope for every <code>{typst}</code> block from that point in the document onward.</li>
+<li>The Lua filter runs before any Quarto rendering, so <code>typst_define</code> is in scope for every <code>{typst}</code> block from that point in the document onward.</li>
 </ul>
 </div>
 </div>
@@ -1649,15 +1656,13 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="sec-limitations" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="sec-limitations"><span class="header-section-number">6</span> Current limitations</h2>
-<p>This first release is deliberately focused. A handful of <code>ggplot2</code> features are deferred or left out by design.</p>
+<p>This first release is deliberately focused. Some <code>ggplot2</code>/<code>plotnine</code> features are out of scope by design; others are pending while the project matures.</p>
 <ul>
-<li>No <code>geom-violin()</code>, <code>geom-density()</code>, or <code>geom-density-2d()</code>. Kernel density estimation needs numerical machinery that pure Typst cannot run efficiently, and Gribouille treats WebAssembly helpers as a last resort.</li>
+<li>No <code>geom-violin()</code>, <code>geom-density()</code>, or <code>geom-density-2d()</code>. Kernel density estimation needs numerical machinery that pure Typst cannot run efficiently, and the realistic escape hatch is a WebAssembly helper. That route is on hold for now because I do not yet have enough hands-on WASM experience to build and ship one with confidence, and the help I have had from LLMs has not closed that gap to a level I am comfortable releasing.</li>
 <li><code>geom-smooth()</code> and <a href="https://m.canouil.dev/gribouille/reference/stats/stat-smooth.html"><code>stat-smooth()</code></a> support <code>method: "lm"</code> only. LOESS is deferred for the same reason.</li>
 <li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-dotplot.html"><code>geom-dotplot()</code></a> is <code>method: "histodot"</code> only; dynamic dot density is deferred.</li>
-<li>Maps and <code>sf</code> geometries are out of scope.</li>
-<li>Lazy plot composition (<code>%+%</code>), <code>ggsave()</code>, and <code>vars()</code> quoting are out of scope by design.</li>
+<li>Maps and spatial geometries (ggplot2’s <code>sf</code> integration) are currently out of scope.</li>
 </ul>
-<p>The full coverage table lives at <a href="https://m.canouil.dev/gribouille/feature-matrix.html" class="uri">https://m.canouil.dev/gribouille/feature-matrix.html</a>.</p>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">7</span> Wrap-up</h2>
@@ -1666,7 +1671,8 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <li>Repository: <a href="https://github.com/mcanouil/gribouille" class="uri">https://github.com/mcanouil/gribouille</a>.</li>
 <li>Documentation: <a href="https://m.canouil.dev/gribouille" class="uri">https://m.canouil.dev/gribouille</a>.</li>
 </ul>
-<p>Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day. Issues, ideas, and pull requests are welcome on the repository.</p>
+<p>Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day.</p>
+<p>A note on contributions. Gribouille is an unfunded spare-time project, and the API is still settling. Bug reports and ideas are very welcome on the issue tracker. Pull requests are not being accepted for now: the internals shift between releases, every review costs time I have to take from the work that moves the library forward, and I am being especially careful in the current climate of unreviewed LLM-authored patches. Once the surface is stable I will revisit and open the door. Thanks in advance for your patience.</p>
 
 
 </section>
@@ -1797,7 +1803,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -1900,7 +1906,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -1985,7 +1991,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -2091,7 +2097,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -2143,7 +2149,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
@@ -17879,7 +17885,7 @@ font-style: inherit;">![An image]({{&lt; placeholder 900 300&gt;}})</span></span
 background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-default.qmd</span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/_demo-default.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-1"><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.html" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title=""><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="enhanced-tabset-navigation" class="level2" data-number="5">
@@ -18983,7 +18989,7 @@ background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-tabset.qmd</span></code></pre></div></div>
 <p>Now, simply use the left and right arrow keys to seamlessly transition between tabs—it’s like your presentation has its own rhythm!</p>
 <div style="text-align: center;">
-<p><a href="assets/_demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="exporting-to-pdf" class="level2" data-number="6">
@@ -19045,11 +19051,11 @@ font-style: inherit;">"my-slides.pdf"</span></span></code></pre></div></div>
 <div class="quarto-layout-row">
 <section id="default-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="default-quarto-reveal.js">Default Quarto Reveal.js</h4>
-<p><a href="assets/_demo-default.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 <section id="tabset-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="tabset-quarto-reveal.js">Tabset Quarto Reveal.js</h4>
-<p><a href="assets/_demo-tabset.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 </div>
 </div>
@@ -21952,7 +21958,7 @@ font-style: inherit;">"Penguin Species"</span></span>
 background-color: null;
 font-style: inherit;">```</span></span></code></pre></div></div>
 </details>
-<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
+<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
