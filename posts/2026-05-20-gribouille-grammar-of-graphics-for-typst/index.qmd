@@ -69,7 +69,8 @@ Every figure in this post is a real, freshly compiled plot.
 ## At a glance
 
 - [Gribouille](https://github.com/mcanouil/gribouille) v0.1.0 on Typst Universe: `#import "@preview/gribouille:0.1.0": *`.
-- Dozens of layer constructors and stats, scores of scales, multiple themes, and full facet support.
+- Forty-four geoms and twenty-seven stats, scores of scales across twelve aesthetics, eight built-in themes, and full facet support.
+- [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) orchestrates several plots into a single figure with a shared, hoisted legend, fed by a new `defer: true` flag on [`plot()`](https://m.canouil.dev/gribouille/reference/core/plot.html).
 - [`quarto-typst-render`](https://github.com/mcanouil/quarto-typst-render) v0.13.1 ships `typst_define()`, the Python and R helper that streams arbitrary values, scalars, lists, dictionaries, and full data frames alike, straight into Typst code blocks.
 
 :::
@@ -326,6 +327,8 @@ A theme, axis labels, and the figure is ready for the page.
 [`element-typst()`](https://m.canouil.dev/gribouille/reference/themes/element-typst.html) wires the subtitle to render as Typst markup, so the linear-fit formula `$hat(y) = beta_0 + beta_1 dot.c x$` and the per-species names appear with maths and inline colour without leaving the string.
 A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` + `palette:`) and the second subtitle line: the entries are mapped to coloured `#text(...)` snippets, joined into one Typst-markup string.
 Legend placement is controlled with [`guides()`](https://m.canouil.dev/gribouille/reference/guides/guides.html) bound to [`guide-legend(position: ...)`](https://m.canouil.dev/gribouille/reference/guides/guide-legend.html); `position:` accepts the side strings `"top"`, `"right"`, `"bottom"`, `"left"`, a Typst alignment like `bottom + right` for an inside-panel corner, or a `(dx:, dy:)` offset for arbitrary placement.
+The same constructor exposes `direction`, `byrow`, `nrow`, and `ncolumn` for swatch layout, and a `"top"` or `"bottom"` placement automatically lays a colourbar or size ladder out horizontally.
+The `ncol` argument was renamed to `ncolumn` in the run-up to this release, so older snippets need updating before they compile.
 
 ::: {layout-ncol="2" layout-valign="center"}
 
@@ -391,6 +394,48 @@ Legend placement is controlled with [`guides()`](https://m.canouil.dev/gribouill
   height: 9cm,
 )
 ```
+
+:::
+
+## Compose multiple plots
+
+Sometimes a story needs more than one panel.
+[`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) takes several deferred plots, lays them out on a grid or stack, and hoists their shared legend into a single guide block at the edge of the figure.
+The deferred plots are produced by passing `defer: true` to [`plot()`](https://m.canouil.dev/gribouille/reference/core/plot.html), which returns a spec dictionary instead of rendering immediately.
+
+::: {layout-ncol="2" layout-valign="center"}
+
+```{typst}
+//| echo: true
+//| output-filename: "compose.svg"
+//| alt: "Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."
+#let panel(mapping) = plot(
+  data: penguins,
+  mapping: mapping,
+  layers: (geom-point(size: 2pt, alpha: 0.85),),
+  width: 6cm,
+  height: 4.5cm,
+  defer: true,
+)
+
+#compose(
+  panel(aes(x: "flipper-len", y: "body-mass", colour: "species")),
+  panel(aes(x: "bill-len", y: "body-mass", colour: "species")),
+  layout: "grid",
+  columns: 2,
+)
+```
+
+:::
+
+::: {.callout-tip}
+
+## Hoisting knobs
+
+The hoisting is configurable.
+`collect:` controls which aesthetics are merged: `auto` hoists every legend identical across panels, `none` keeps each panel's own legend in place, and an array such as `("colour",)` whitelists specific aesthetics.
+`guides-placement:` sits the shared legend on `"right"`, `"left"`, `"top"`, or `"bottom"`.
+`layout:` switches between `"grid"` (with `columns:` and `gutter:`) and `"stack"` (with `direction:` such as `ttb` or `ltr`).
 
 :::
 
