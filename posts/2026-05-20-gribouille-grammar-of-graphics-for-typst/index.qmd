@@ -108,6 +108,91 @@ The library ships the [Palmer Penguins](https://allisonhorst.github.io/palmerpen
 The walk-through below builds a single figure end to end, one grammar concept at a time, with brief notes on alternatives at each step.
 It is a tighter version of the [Get Started](https://m.canouil.dev/gribouille/get-started/) page on the documentation site.
 
+Every plot you build composes the same pieces.
+[`plot()`](https://m.canouil.dev/gribouille/reference/core/plot.html) wraps a stack of layers, each sheet sitting on the one below, from data and mapping at the foundation up through theme and labels.
+
+```{typst}
+//| echo: false
+//| output-filename: "grammar.svg"
+//| style: "display: block; margin-inline: auto;"
+//| alt: "A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."
+#import "@preview/cetz:0.5.0": canvas, draw
+
+#let ink = if _typst_render_foreground != none {
+  _typst_render_foreground
+} else {
+  rgb("#1f2328")
+}
+#let accent = rgb("#3366FF")
+
+#canvas(length: 1cm, {
+  import draw: *
+
+  set-style(content: (frame: none))
+
+  let w = 7
+  let h = 0.9
+  let s = 0.6
+  let gap = 0.15
+  let n = 6
+  let pad = 0.5
+  let total-h = n * (h + gap) - gap
+
+  let palette = (
+    rgb("#E69F00"),
+    rgb("#009E73"),
+    rgb("#56B4E9"),
+    rgb("#D55E00"),
+    rgb("#0072B2"),
+    rgb("#F4B740"),
+  )
+
+  line(
+    (-pad, -pad),
+    (w + pad, -pad),
+    (w + pad + s, total-h + pad),
+    (-pad + s, total-h + pad),
+    close: true,
+    stroke: 0.8pt + accent,
+    fill: accent.transparentize(92%),
+  )
+  content(
+    ((w + 2 * s) / 2, total-h + pad + 0.35),
+    align(center, text(size: 9pt, weight: "bold", fill: accent)[`plot()`]),
+  )
+
+  let sheet(i, name, sub: none) = {
+    let y = i * (h + gap)
+    let col = palette.at(i)
+    line(
+      (0, y),
+      (w, y),
+      (w + s, y + h),
+      (s, y + h),
+      close: true,
+      stroke: 0.8pt + col,
+      fill: col.transparentize(80%),
+    )
+    let body = if sub == none {
+      text(size: 9pt, fill: ink)[#name]
+    } else {
+      text(size: 9pt, fill: ink)[
+        #name \
+        #text(size: 7.5pt)[#sub]
+      ]
+    }
+    content((w / 2 + s / 2, y + h / 2), align(center, body))
+  }
+
+  sheet(0, [data + `aes()`])
+  sheet(1, [layer], sub: [(geom + stat + position)])
+  sheet(2, [`scale-*`])
+  sheet(3, [`coord-*`])
+  sheet(4, [`facet-*`])
+  sheet(5, [theme + labs])
+})
+```
+
 The post's YAML points the `typst-render` extension at a one-line preamble file so every `{typst}` block has the library in scope:
 
 ```yaml
@@ -124,7 +209,7 @@ And `_preamble.typ` contains:
 
 You would write the same `#import` once at the top of your own Typst document.
 
-### 1. Data and aesthetics
+### Data and aesthetics
 
 Every plot starts with a dataset and an [`aes()`](https://m.canouil.dev/gribouille/reference/core/aes.html) mapping that binds column names to visual channels.
 At a minimum, [`geom-point()`](https://m.canouil.dev/gribouille/reference/geoms/geom-point.html) needs `x` and `y`.
@@ -149,7 +234,7 @@ At a minimum, [`geom-point()`](https://m.canouil.dev/gribouille/reference/geoms/
 The plot-level `mapping` is inherited by every layer.
 If only one layer needs a given mapping, you can also pass it inside that layer's `mapping:` argument and keep the plot-level mapping minimal.
 
-### 2. Encode a third variable with colour
+### Encode a third variable with colour
 
 Add `colour: "species"` and the points split visually by group.
 
@@ -198,7 +283,7 @@ Both aesthetics can be combined when accessibility matters.
 
 :::
 
-### 3. Stack a second layer
+### Stack a second layer
 
 Layers stack in the order you list them.
 Adding [`geom-smooth()`](https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html) draws one fitted line per colour group, because the `colour` aesthetic is inherited from the plot-level mapping.
@@ -232,7 +317,7 @@ Only `method: "lm"` is supported in this release; LOESS is deferred for the reas
 
 :::
 
-### 4. Pick a palette
+### Pick a palette
 
 [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) replaces the default palette.
 A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-fill-discrete.html) keeps the confidence ribbons in step with the points.
@@ -276,7 +361,7 @@ A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/
 [`scale-colour-okabe-ito()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-okabe-ito.html) exposes the same Okabe-Ito palette used in the example but as a one-liner if you do not want to spell out the colour codes.
 :::
 
-### 5. Split into small multiples
+### Split into small multiples
 
 [`facet-wrap()`](https://m.canouil.dev/gribouille/reference/facets/facet-wrap.html) lays out one panel per level of a discrete column, sharing scales across panels.
 
@@ -320,13 +405,21 @@ A matching [`scale-fill-discrete()`](https://m.canouil.dev/gribouille/reference/
 For two crossed factors, [`facet-grid()`](https://m.canouil.dev/gribouille/reference/facets/facet-grid.html) produces a matrix of panels instead.
 :::
 
-### 6. Polish
+### Polish
 
 A theme, axis labels, and the figure is ready for the page.
-[`format-comma()`](https://m.canouil.dev/gribouille/reference/helpers/format-comma.html), passed to `scale-y-continuous(labels: ...)`, turns `5000` into `5,000` on the y-axis; sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting.
+
+[`format-comma()`](https://m.canouil.dev/gribouille/reference/helpers/format-comma.html), passed to `scale-y-continuous(labels: ...)`, turns `5000` into `5,000` on the y-axis.
+Sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting.
+
 [`element-typst()`](https://m.canouil.dev/gribouille/reference/themes/element-typst.html) wires the subtitle to render as Typst markup, so the linear-fit formula `$hat(y) = beta_0 + beta_1 dot.c x$` and the per-species names appear with maths and inline colour without leaving the string.
-A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` + `palette:`) and the second subtitle line: the entries are mapped to coloured `#text(...)` snippets, joined into one Typst-markup string.
-Legend placement is controlled with [`guides()`](https://m.canouil.dev/gribouille/reference/guides/guides.html) bound to [`guide-legend(position: ...)`](https://m.canouil.dev/gribouille/reference/guides/guide-legend.html); `position:` accepts the side strings `"top"`, `"right"`, `"bottom"`, `"left"`, a Typst alignment like `bottom + right` for an inside-panel corner, or a `(dx:, dy:)` offset for arbitrary placement.
+
+A single `species-colours` dictionary feeds both [`scale-colour-discrete()`](https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html) (`limits:` plus `palette:`) and the second subtitle line.
+The entries are mapped to coloured `#text(...)` snippets, joined into one Typst-markup string.
+
+Legend placement is controlled with [`guides()`](https://m.canouil.dev/gribouille/reference/guides/guides.html) bound to [`guide-legend(position: ...)`](https://m.canouil.dev/gribouille/reference/guides/guide-legend.html).
+`position:` accepts the side strings `"top"`, `"right"`, `"bottom"`, `"left"`, a Typst alignment like `bottom + right` for an inside-panel corner, or a `(dx:, dy:)` offset for arbitrary placement.
+
 The same constructor exposes `direction`, `byrow`, `nrow`, and `ncolumn` for swatch layout, and a `"top"` or `"bottom"` placement automatically lays a colourbar or size ladder out horizontally.
 The `ncol` argument was renamed to `ncolumn` in the run-up to this release, so older snippets need updating before they compile.
 
@@ -529,6 +622,8 @@ summary
 The trailing `summary` is there on purpose, so Jupyter prints the DataFrame in the rendered output and the reader can see exactly what crossed the language boundary.
 The same `plot()` call you wrote in the previous section now reads its data from `typst_define.summary` instead of the bundled `penguins` symbol.
 
+::: {layout-ncol="2" layout-valign="center"}
+
 ```{typst}
 //| echo: true
 //| output-filename: "polars-summary.svg"
@@ -560,6 +655,8 @@ The same `plot()` call you wrote in the previous section now reads its data from
   height: 7cm,
 )
 ```
+
+:::
 
 ::: {.callout-tip}
 
@@ -594,9 +691,14 @@ Gribouille is small, focused, and modelled on the library that has shaped a gene
 
 Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day.
 
-A note on contributions.
+::: {.callout-tip}
+
+## A note on contributions
+
 Gribouille is an unfunded spare-time project, and the API is still settling.
 Bug reports and ideas are very welcome on the issue tracker.
 Pull requests are not being accepted for now: the internals shift between releases, every review costs time I have to take from the work that moves the library forward, and I am being especially careful in the current climate of unreviewed LLM-authored patches.
 Once the surface is stable I will revisit and open the door.
 Thanks in advance for your patience.
+
+:::
