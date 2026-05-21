@@ -35,4 +35,17 @@ quarto render posts/2026-02-27-typst-template-tutorial-part1
 quarto render posts/2026-03-05-typst-template-tutorial-part2
 quarto render posts/2026-04-15-quarto-brand-figures-tables
 quarto render posts/2026-04-21-quarto-revealjs-extensions
+
+# 2026-05-20-gribouille-grammar-of-graphics-for-typst
+# Post executes a Python chunk via Jupyter and renders {typst} blocks that
+# import @preview/gribouille:0.1.0 (published on Typst Universe, fetched by
+# Typst automatically). Prerequisite: a Python environment with `jupyter`,
+# `polars`, and `ipython`, exposed to Quarto as a kernel named `gribouille-post`.
+uv venv --python 3.13 .venv
+. .venv/bin/activate
+uv pip install jupyter polars ipython
+python -m ipykernel install --user --name gribouille-post --display-name "Python (gribouille-post)"
+quarto render posts/2026-05-20-gribouille-grammar-of-graphics-for-typst
+deactivate
+
 quarto render

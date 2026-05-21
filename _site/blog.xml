@@ -16,7 +16,2000 @@
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
 <generator>quarto-1.10.3</generator>
-<lastBuildDate>Tue, 21 Apr 2026 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 20 May 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Gribouille: a Grammar of Graphics for Typst</title>
+  <link>https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/</link>
+  <description><![CDATA[ 
+
+Skip to main content
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Featured card for the Gribouille release on a cream paper background. On
+the left, the Gribouille wordmark sits above the tagline &quot;Create elegant
+graphics with the Grammar of Graphics for Typst.&quot;, a small orange
+&quot;v0.1.0 release&quot; pill, and the URL m.canouil.dev/gribouille. On the
+right, a slightly rotated bordered card frames a scatter plot of Palmer
+Penguin body mass against flipper length, with three coloured point
+clouds for the species and per-species summary labels.
+" width="600"></a></p>
+</figure>
+</div>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Typst has grown from a curious newcomer to a credible alternative for scientific writing, reports, and slide decks. What it still lacked, until today, was a real grammar of graphics: a way to declare a figure with the same vocabulary you would reach for in <a href="https://ggplot2.tidyverse.org"><code>ggplot2</code></a>, then have it draw, lay out, and align with the rest of the document.</p>
+<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> (French for <em>scribble</em>) is the first cut of that library. Version 0.1.0 lands on <a href="https://typst.app/universe/package/gribouille">Typst Universe</a> with this announcement, modelled closely on <code>ggplot2</code>, drawing on top of <a href="https://cetz-package.github.io/"><code>cetz</code></a>, and shipped with a documentation site that is itself a Quarto project rendered by the <a href="https://github.com/mcanouil/quarto-typst-render"><code>quarto-typst-render</code></a> extension. Every figure in this post is a real, freshly compiled plot.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>At a glance
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><a href="https://github.com/mcanouil/gribouille">Gribouille</a> v0.1.0 on Typst Universe: <code>#import "@preview/gribouille:0.1.0": *</code>.</li>
+<li>A broad library of geoms and stats, scales spanning every aesthetic, a range of built-in themes, and full facet support.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/core/compose.html"><code>compose()</code></a> orchestrates several plots into a single figure with a shared, hoisted legend, fed by a new <code>defer: true</code> flag on <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a>.</li>
+<li><a href="https://github.com/mcanouil/quarto-typst-render"><code>quarto-typst-render</code></a> v0.13.1 ships <code>typst_define()</code>, the Python and R helper that streams arbitrary values, scalars, lists, dictionaries, and full data frames alike, straight into Typst code blocks.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="why-a-grammar-of-graphics-for-typst" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="why-a-grammar-of-graphics-for-typst"><span class="header-section-number">2</span> Why a grammar of graphics for Typst</h2>
+<p>Until now, producing a figure inside a Typst document meant taking a detour through another language. You would leave Typst to call out to <code>ggplot2</code>, <a href="https://matplotlib.org"><code>matplotlib</code></a>, or <a href="https://plotnine.org"><code>plotnine</code></a>, save a PNG or SVG, and import it back. That works, but it splits the toolchain in two: one font system on the page, another inside the figure; one colour palette in the report, another in the chart; one render pass that knows about the layout, another that does not.</p>
+<p><code>cetz</code> already gives Typst a robust low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing. That is exactly the gap Gribouille fills.</p>
+<div class="highlight">
+<p><strong>One toolchain.</strong> Same fonts, same palette, same render pass, from data to PDF.</p>
+</div>
+<p>The pay-off is a single toolchain. Give a plot an <code>alt:</code> description and Gribouille wraps the result in a Typst <code>figure</code> element with <code>kind: "gribouille-plot"</code>, so you can attach show rules, captions, or cross-references in one place; with or without it, every plot shares the document’s fonts, palette, and geometry. The YAML front-matter of this very post wires its <code>background:</code> and <code>foreground:</code> to the site’s light and dark colours, and every figure below reacts automatically when you toggle the theme. Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.</p>
+</section>
+<section id="a-respectful-nod-to-ggplot2" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="a-respectful-nod-to-ggplot2"><span class="header-section-number">3</span> A respectful nod to ggplot2</h2>
+<p>A short personal aside. I have been using <code>ggplot2</code> since almost its first release, and a large part of how I think about data visualisation comes from that work. This release would not exist without Hadley Wickham’s original vision, nor without the people carrying it forward today, in particular Thomas Lin Pedersen and Teun van den Brand, and the wider community of contributors who keep shaping the package through to the recent v4 release.</p>
+<p>Gribouille is, in many ways, a port of <code>ggplot2</code>’s vocabulary into Typst. The names line up: <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a> instead of <code>ggplot()</code>, <code>geom-point()</code> for <code>geom_point()</code>, <code>facet-wrap()</code>, <code>scale-colour-*()</code>, <a href="https://m.canouil.dev/gribouille/reference/themes/theme-minimal.html"><code>theme-minimal()</code></a>, and so on. Where the two part ways, it is because Typst is a different language, with no lazy evaluation, no plot object you can mutate after the fact, and no <code>ggsave()</code> output pipeline. Column names are plain strings. Per-aesthetic type coercion is done inline with <a href="https://m.canouil.dev/gribouille/reference/helpers/as-factor.html"><code>as-factor()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/as-numeric.html"><code>as-numeric()</code></a>. These are opinionated departures, but the mental model is the same one you already have.</p>
+</section>
+<section id="build-a-penguins-plot-one-layer-at-a-time" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="build-a-penguins-plot-one-layer-at-a-time"><span class="header-section-number">4</span> Build a penguins plot, one layer at a time</h2>
+<p>The library ships the <a href="https://allisonhorst.github.io/palmerpenguins/">Palmer Penguins</a> dataset under the <a href="https://m.canouil.dev/gribouille/reference/datasets/penguins.html"><code>penguins</code></a> symbol. The walk-through below builds a single figure end to end, one grammar concept at a time, with brief notes on alternatives at each step. It is a tighter version of the <a href="https://m.canouil.dev/gribouille/get-started/">Get Started</a> page on the documentation site.</p>
+<p>Every plot you build composes the same pieces. <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a> wraps a stack of layers, each sheet sitting on the one below, from data and mapping at the foundation up through theme and labels.</p>
+<div>
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/grammar-light.svg" class="img-fluid hero-art" style="display: block; margin-inline: auto;" alt="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/grammar-dark.svg" class="img-fluid hero-art" style="display: block; margin-inline: auto;" alt="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."></a></p>
+</div>
+</div>
+<p>The post’s YAML points the <code>typst-render</code> extension at a one-line preamble file so every <code>{typst}</code> block has the library in scope:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="yaml" style="background: #f1f3f5;"><pre class="sourceCode yaml cw-auto code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">extensions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">typst-render</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">preamble</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> _preamble.typ</span></span></code></pre></div></div>
+<p>And <code>_preamble.typ</code> contains:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"@preview/gribouille:0.1.0"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span></span></code></pre></div></div>
+<p>You would write the same <code>#import</code> once at the top of your own Typst document.</p>
+<section id="data-and-aesthetics" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="data-and-aesthetics"><span class="header-section-number">4.1</span> Data and aesthetics</h3>
+<p>Every plot starts with a dataset and an <a href="https://m.canouil.dev/gribouille/reference/core/aes.html"><code>aes()</code></a> mapping that binds column names to visual channels. At a minimum, <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-point.html"><code>geom-point()</code></a> needs <code>x</code> and <code>y</code>.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb3-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb3-4">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb3-5">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-6">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb3-7"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-1-light.svg" class="img-fluid hero-art" alt="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-1-dark.svg" class="img-fluid hero-art" alt="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>The plot-level <code>mapping</code> is inherited by every layer. If only one layer needs a given mapping, you can also pass it inside that layer’s <code>mapping:</code> argument and keep the plot-level mapping minimal.</p>
+</section>
+<section id="encode-a-third-variable-with-colour" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="encode-a-third-variable-with-colour"><span class="header-section-number">4.2</span> Encode a third variable with colour</h3>
+<p>Add <code>colour: "species"</code> and the points split visually by group.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb4-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb4-4">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-5">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-6">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-7">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb4-8">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.85</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb4-9">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-10">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb4-11"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-2a-light.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-2a-dark.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>If your figure must remain legible in greyscale, swap <code>colour: "species"</code> for <code>shape: "species"</code> and the same grouping rides the point shape instead. Both aesthetics can be combined when accessibility matters.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb5-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb5-4">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-5">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-6">    shape<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-7">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb5-8">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.85</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb5-9">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-10">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb5-11"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-2b-light.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-2b-dark.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="stack-a-second-layer" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="stack-a-second-layer"><span class="header-section-number">4.3</span> Stack a second layer</h3>
+<p>Layers stack in the order you list them. Adding <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html"><code>geom-smooth()</code></a> draws one fitted line per colour group, because the <code>colour</code> aesthetic is inherited from the plot-level mapping.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Only <code>method: "lm"</code> is supported in this release; LOESS is deferred for the reason listed in the limitations section.</p>
+</div>
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb6-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb6-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb6-4">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-5">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-6">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-7">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-8">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb6-9">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb6-10">    geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb6-11">    geom-smooth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>method<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lm"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb6-12">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb6-13">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-14">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb6-15"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-3-light.svg" class="img-fluid hero-art" alt="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-3-dark.svg" class="img-fluid hero-art" alt="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="pick-a-palette" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="pick-a-palette"><span class="header-section-number">4.4</span> Pick a palette</h3>
+<p><a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> replaces the default palette. A matching <a href="https://m.canouil.dev/gribouille/reference/scales/scale-fill-discrete.html"><code>scale-fill-discrete()</code></a> keeps the confidence ribbons in step with the points.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">cb</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb7-2">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#0072B2"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-3">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D55E00"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-4">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#009E73"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb7-6"></span>
+<span id="cb7-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb7-8">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-9">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb7-10">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-11">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-12">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-13">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-14">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-15">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb7-16">    geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-17">    geom-smooth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>method<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lm"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-18">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-19">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb7-20">    scale-colour-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> cb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-21">    scale-fill-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> cb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-22">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb7-23">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-24">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb7-25"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-4-light.svg" class="img-fluid hero-art" alt="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-4-dark.svg" class="img-fluid hero-art" alt="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-okabe-ito.html"><code>scale-colour-okabe-ito()</code></a> exposes the same Okabe-Ito palette used in the example but as a one-liner if you do not want to spell out the colour codes.</p>
+</div>
+</div>
+</section>
+<section id="split-into-small-multiples" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="split-into-small-multiples"><span class="header-section-number">4.5</span> Split into small multiples</h3>
+<p><a href="https://m.canouil.dev/gribouille/reference/facets/facet-wrap.html"><code>facet-wrap()</code></a> lays out one panel per level of a discrete column, sharing scales across panels.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">cb</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-2">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#0072B2"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-3">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D55E00"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-4">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#009E73"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb8-6"></span>
+<span id="cb8-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-8">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-9">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-10">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-11">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-12">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-13">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-14">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-15">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-16">    geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-17">    geom-smooth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>method<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lm"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-18">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-19">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb8-20">    scale-colour-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> cb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-21">    scale-fill-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> cb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-22">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-23">  facet<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> facet-wrap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"island"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb8-24">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-25">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb8-26"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-5-light.svg" class="img-fluid hero-art" alt="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-15" title="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-5-dark.svg" class="img-fluid hero-art" alt="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For two crossed factors, <a href="https://m.canouil.dev/gribouille/reference/facets/facet-grid.html"><code>facet-grid()</code></a> produces a matrix of panels instead.</p>
+</div>
+</div>
+</section>
+<section id="polish" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="polish"><span class="header-section-number">4.6</span> Polish</h3>
+<p>A theme, axis labels, and the figure is ready for the page.</p>
+<p><a href="https://m.canouil.dev/gribouille/reference/helpers/format-comma.html"><code>format-comma()</code></a>, passed to <code>scale-y-continuous(labels: ...)</code>, turns <code>5000</code> into <code>5,000</code> on the y-axis. Sibling helpers cover number, percent, currency, scientific notation, and case or wrap formatting.</p>
+<p><a href="https://m.canouil.dev/gribouille/reference/themes/element-typst.html"><code>element-typst()</code></a> wires the subtitle to render as Typst markup, so the linear-fit formula <code>$hat(y) = beta_0 + beta_1 dot.c x$</code> and the per-species names appear with maths and inline colour without leaving the string.</p>
+<p>A single <code>species-colours</code> dictionary feeds both <a href="https://m.canouil.dev/gribouille/reference/scales/scale-colour-discrete.html"><code>scale-colour-discrete()</code></a> (<code>limits:</code> plus <code>palette:</code>) and the second subtitle line. The entries are mapped to coloured <code>#text(...)</code> snippets, joined into one Typst-markup string.</p>
+<p>Legend placement is controlled with <a href="https://m.canouil.dev/gribouille/reference/guides/guides.html"><code>guides()</code></a> bound to <a href="https://m.canouil.dev/gribouille/reference/guides/guide-legend.html"><code>guide-legend(position: ...)</code></a>. <code>position:</code> accepts the side strings <code>"top"</code>, <code>"right"</code>, <code>"bottom"</code>, <code>"left"</code>, a Typst alignment like <code>bottom + right</code> for an inside-panel corner, or a <code>(dx:, dy:)</code> offset for arbitrary placement.</p>
+<p>The same constructor exposes <code>direction</code>, <code>byrow</code>, <code>nrow</code>, and <code>ncolumn</code> for swatch layout, and a <code>"top"</code> or <code>"bottom"</code> placement automatically lays a colourbar or size ladder out horizontally. The <code>ncol</code> argument was renamed to <code>ncolumn</code> in the run-up to this release, so older snippets need updating before they compile.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">species-colours</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-2">  Adelie:    rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#0072B2"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-3">  Chinstrap: rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D55E00"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-4">  Gentoo:    rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#009E73"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb9-6"></span>
+<span id="cb9-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-8">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-9">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-10">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-11">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-12">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-13">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-14">    shape<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-15">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-16">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-17">    geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-18">    geom-smooth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>method<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lm"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-19">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-20">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-21">    scale-colour-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-22">      limits<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>keys<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="cb9-23">      palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="cb9-24">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-25">    scale-fill-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-26">      limits<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>keys<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="cb9-27">      palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="cb9-28">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-29">    scale-y-continuous<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> format-comma<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()),</span></span>
+<span id="cb9-30">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-31">  facet<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> facet-wrap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"island"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-32">  guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-33">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-34">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-35">    shape<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guide-legend<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>position<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> bottom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-36">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-37">  labs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-38">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Penguin Body Mass Scales with Flipper Length"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-39">    subtitle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb9-40">      <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span>Linear fit <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$hat(y) = beta_0 + beta_1 dot.c x$</span> on every island for three species: <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">]</span></span>
+<span id="cb9-41">      species-colours<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>pairs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()</span></span>
+<span id="cb9-42">        .map<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>p <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> p<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> weight<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> p<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)))</span></span>
+<span id="cb9-43">        .join<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">", "</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb9-44">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">},</span></span>
+<span id="cb9-45">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Flipper Length (mm)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-46">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-47">    colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-48">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-49">    shape<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-50">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-51">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb9-52">    plot-title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> weight<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-53">    plot-subtitle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-typst<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-54">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb9-55">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-56">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb9-57"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-6-light.svg" class="img-fluid hero-art" alt="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-17" title="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/step-6-dark.svg" class="img-fluid hero-art" alt="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="compose-multiple-plots" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="compose-multiple-plots"><span class="header-section-number">5</span> Compose multiple plots</h2>
+<p>Sometimes a story needs more than one panel. <a href="https://m.canouil.dev/gribouille/reference/core/compose.html"><code>compose()</code></a> takes several deferred plots, lays them out on a grid or stack, and hoists their shared legend into a single guide block at the edge of the figure. The deferred plots are produced by passing <code>defer: true</code> to <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a>, which returns a spec dictionary instead of rendering immediately.</p>
+<div class="highlight">
+<p><strong>Many plots, one legend.</strong> <code>compose()</code> hoists the shared aesthetics for you.</p>
+</div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">panel</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb10-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-4">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.85</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb10-5">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-6">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.5cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-7">  defer<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">true</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-8"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb10-9"></span>
+<span id="cb10-10"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>compose<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb10-11">  panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<span id="cb10-12">  panel<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bill-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<span id="cb10-13">  layout<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grid"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-14">  columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb10-15"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/compose-light.svg" class="img-fluid hero-art" alt="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-19" title="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/compose-dark.svg" class="img-fluid hero-art" alt="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hoisting knobs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The hoisting is configurable. <code>collect:</code> controls which aesthetics are merged: <code>auto</code> hoists every legend identical across panels, <code>none</code> keeps each panel’s own legend in place, and an array such as <code>("colour",)</code> whitelists specific aesthetics. <code>guides-placement:</code> sits the shared legend on <code>"right"</code>, <code>"left"</code>, <code>"top"</code>, or <code>"bottom"</code>. <code>layout:</code> switches between <code>"grid"</code> (with <code>columns:</code> and <code>gutter:</code>) and <code>"stack"</code> (with <code>direction:</code> such as <code>ttb</code> or <code>ltr</code>).</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You only need <a href="https://m.canouil.dev/gribouille/reference/core/compose.html"><code>compose()</code></a> when you want the shared legend hoisted. A rendered plot is ordinary Typst content, so the base <a href="https://typst.app/docs/reference/layout/grid/"><code>grid</code></a> and <a href="https://typst.app/docs/reference/layout/stack/"><code>stack</code></a> functions arrange several plots just as well when each keeps its own legend.</p>
+</div>
+</div>
+</section>
+<section id="drive-gribouille-from-any-computation" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="drive-gribouille-from-any-computation"><span class="header-section-number">6</span> Drive Gribouille from any computation</h2>
+<p><code>Typst Render</code> 0.13.1 adds a small but powerful helper called <code>typst_define()</code>, available from both R and Python. It lets a code cell hand any value to every <code>{typst}</code> block in the document under a single Typst dictionary named <code>typst_define</code>. A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.</p>
+<div class="highlight">
+<p><strong>Compute anywhere, render in Typst.</strong> <code>typst_define()</code> is the bridge.</p>
+</div>
+<p>The mechanism is deliberately plain. The helper serialises the values you give it to JSON, hex-encodes them, and emits a tiny Pandoc metadata block of the form <code>---\ntypst-define: &lt;hex&gt;\n---\n</code>. The extension’s Lua filter, which runs at the <code>pre-quarto</code> stage, decodes that block and injects a <code>#let typst_define = (...)</code> preamble in front of every Typst compilation. You compute on one side, read <code>typst_define.something</code> on the other, and the two stay in step regardless of which language did the work.</p>
+<p>That bridge is what makes the rest of this section possible. The example below uses Python with <a href="https://pola.rs"><code>polars</code></a>, but the same approach works with R (<code>typst_define()</code> ships in both languages), with plain Python collections, with database queries, with REST calls, or with anything else that can produce a value. Python and Polars are one concrete illustration, not a requirement.</p>
+<section id="a-python-example" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="a-python-example"><span class="header-section-number">6.1</span> A Python example</h3>
+<p>The Python helper has explicit converters for <code>polars.DataFrame</code> and <code>numpy.ndarray</code>, which is what keeps the example short.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Source the helper yourself
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>typst_define()</code> is not auto-injected. Quarto runs the computational engine <em>before</em> any filter or shortcode, so the extension cannot stage the helper into the kernel for you. You must source it explicitly, typically inside a setup code cell marked <code>#| include: false</code>, by extending <code>sys.path</code> (Python) or <code>source()</code>-ing the file (R) from <code>_extensions/mcanouil/typst-render/_resources/</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="python" style="background: #f1f3f5;"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#| include: false</span></span>
+<span id="cb11-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> os, sys</span>
+<span id="cb11-3">sys.path.insert(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, os.path.join(</span>
+<span id="cb11-4">  os.environ.get(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"QUARTO_PROJECT_DIR"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"."</span>),</span>
+<span id="cb11-5">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_extensions"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mcanouil"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"typst-render"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_resources"</span>,</span>
+<span id="cb11-6">))</span>
+<span id="cb11-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> typst_define <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> typst_define</span></code></pre></div></div>
+<p>The code cell below inlines the same bootstrap with <code>#| echo: true</code> so you can read it in context.</p>
+</div>
+</div>
+<div id="3cf60eb7" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" data-filename="python" style="background: #f1f3f5;"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> os</span>
+<span id="cb12-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> sys</span>
+<span id="cb12-3"></span>
+<span id="cb12-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> polars <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pl</span>
+<span id="cb12-5"></span>
+<span id="cb12-6">project_dir <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.environ.get(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"QUARTO_PROJECT_DIR"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"../.."</span>)</span>
+<span id="cb12-7">sys.pycache_prefix <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.path.join(project_dir, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".cache"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pycache"</span>)</span>
+<span id="cb12-8">extension_resources <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> os.path.join(</span>
+<span id="cb12-9">  project_dir,</span>
+<span id="cb12-10">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_extensions"</span>,</span>
+<span id="cb12-11">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mcanouil"</span>,</span>
+<span id="cb12-12">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"typst-render"</span>,</span>
+<span id="cb12-13">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_resources"</span>,</span>
+<span id="cb12-14">)</span>
+<span id="cb12-15">sys.path.insert(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, extension_resources)</span>
+<span id="cb12-16"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> typst_define <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> typst_define</span>
+<span id="cb12-17"></span>
+<span id="cb12-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Network read at render time; swap for a local CSV or the `palmerpenguins`</span></span>
+<span id="cb12-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Python package when working offline.</span></span>
+<span id="cb12-20">penguins <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pl.read_csv(</span>
+<span id="cb12-21">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://raw.githubusercontent.com/allisonhorst/palmerpenguins/main/inst/extdata/penguins.csv"</span>,</span>
+<span id="cb12-22">  null_values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NA"</span>,</span>
+<span id="cb12-23">).with_columns(</span>
+<span id="cb12-24">  pl.col(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper_length_mm"</span>).cast(pl.Float64),</span>
+<span id="cb12-25">  pl.col(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body_mass_g"</span>).cast(pl.Float64),</span>
+<span id="cb12-26">)</span>
+<span id="cb12-27"></span>
+<span id="cb12-28">summary <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (</span>
+<span id="cb12-29">  penguins</span>
+<span id="cb12-30">  .drop_nulls([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper_length_mm"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body_mass_g"</span>])</span>
+<span id="cb12-31">  .group_by(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span>)</span>
+<span id="cb12-32">  .agg(</span>
+<span id="cb12-33">    pl.col(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper_length_mm"</span>).mean().<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>).alias(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper_mean"</span>),</span>
+<span id="cb12-34">    pl.col(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body_mass_g"</span>).mean().<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>).cast(pl.Int64).alias(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body_mass_mean"</span>),</span>
+<span id="cb12-35">    pl.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>().alias(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"n"</span>),</span>
+<span id="cb12-36">  )</span>
+<span id="cb12-37">  .sort(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span>)</span>
+<span id="cb12-38">)</span>
+<span id="cb12-39"></span>
+<span id="cb12-40">typst_define(summary<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>summary)</span>
+<span id="cb12-41">summary</span></code></pre></div></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 4)</small>
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">species</th>
+<th data-quarto-table-cell-role="th">flipper_mean</th>
+<th data-quarto-table-cell-role="th">body_mass_mean</th>
+<th data-quarto-table-cell-role="th">n</th>
+</tr>
+<tr class="even">
+<td>str</td>
+<td>f64</td>
+<td>i64</td>
+<td>u32</td>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>"Adelie"</td>
+<td>190.0</td>
+<td>3701</td>
+<td>151</td>
+</tr>
+<tr class="even">
+<td>"Chinstrap"</td>
+<td>195.8</td>
+<td>3733</td>
+<td>68</td>
+</tr>
+<tr class="odd">
+<td>"Gentoo"</td>
+<td>217.2</td>
+<td>5076</td>
+<td>123</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The trailing <code>summary</code> is there on purpose, so Jupyter prints the DataFrame in the rendered output and the reader can see exactly what crossed the language boundary. The same <code>plot()</code> call you wrote in the previous section now reads its data from <code>typst_define.summary</code> instead of the bundled <code>penguins</code> symbol.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row quarto-layout-valign-center">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">cb</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-2">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#0072B2"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-3">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#D55E00"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-4">  rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#009E73"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb13-6"></span>
+<span id="cb13-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-8">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> typst_define<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>summary<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-9">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-10">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-11">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body_mass_mean"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-12">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-13">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-14">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-col<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb13-15">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>scale-fill-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>palette<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> cb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="cb13-16">  labs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labs<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-17">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Mean Body Mass per Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-18">    subtitle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Computed in Polars, drawn in Gribouille"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-19">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-20">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-21">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-22">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-23">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="cb13-24">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-25">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-26"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="light-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-20" title="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/polars-summary-light.svg" class="img-fluid hero-art" alt="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."></a></p>
+</div>
+<div class="dark-content">
+<p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-21" title="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."><img src="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/assets/typst-render/polars-summary-dark.svg" class="img-fluid hero-art" alt="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Rendering notes
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Set <code>engine: jupyter</code> explicitly in the post YAML so the Python code cells run via Jupyter.</li>
+<li>Pin the kernel with <code>jupyter: &lt;name&gt;</code> (this post uses <code>python3</code>, but a dedicated kernel such as <code>gribouille-post</code> makes the env reproducible).</li>
+<li>The Python environment needs <code>polars</code> and <a href="https://ipython.org"><code>IPython</code></a> available.</li>
+<li>The Lua filter runs before any Quarto rendering, so <code>typst_define</code> is in scope for every <code>{typst}</code> block from that point in the document onward.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-limitations" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="sec-limitations"><span class="header-section-number">7</span> Current limitations</h2>
+<p>This first release is deliberately focused. Some <code>ggplot2</code>/<code>plotnine</code> features are out of scope by design; others are pending while the project matures.</p>
+<ul>
+<li>No <code>geom-violin()</code>, <code>geom-density()</code>, or <code>geom-density-2d()</code>. Kernel density estimation needs numerical machinery that pure Typst cannot run efficiently, and the realistic escape hatch is a WebAssembly helper. That route is on hold for now because I do not yet have enough hands-on WASM experience to build and ship one with confidence, and the help I have had from LLMs has not closed that gap to a level I am comfortable releasing.</li>
+<li><code>geom-smooth()</code> and <a href="https://m.canouil.dev/gribouille/reference/stats/stat-smooth.html"><code>stat-smooth()</code></a> support <code>method: "lm"</code> only. LOESS is deferred for the same reason.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-dotplot.html"><code>geom-dotplot()</code></a> uses histogram-style binning only; data-driven dot-density binning is deferred.</li>
+<li>Maps and spatial geometries (<code>ggplot2</code>’s <code>sf</code> integration) are currently out of scope.</li>
+</ul>
+</section>
+<section id="wrap-up" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">8</span> Wrap-up</h2>
+<div class="highlight">
+<p><strong>Small, focused, and modelled on the library that has shaped a generation of data visualisation.</strong></p>
+</div>
+<p>Next on the list is filling in more geoms, more themes, and more worked examples, and chasing feedback from the people writing Typst documents day to day.</p>
+<ul>
+<li>Gribouille
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/gribouille" class="uri">https://github.com/mcanouil/gribouille</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/gribouille" class="uri">https://m.canouil.dev/gribouille</a>.</li>
+<li>Typst Universe: <a href="https://typst.app/universe/package/gribouille" class="uri">https://typst.app/universe/package/gribouille</a>.</li>
+</ul></li>
+<li>Typst Render
+<ul>
+<li>Repository: &lt;https:// github.com/mcanouil/quarto-typst-render&gt;.</li>
+<li>Documentation: <a href="https://m.canouil.dev/quarto-typst-render" class="uri">https://m.canouil.dev/quarto-typst-render</a>.</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>A note on contributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Gribouille is an unfunded spare-time project, and the API is still settling. Bug reports and ideas are very welcome on the issue tracker. Pull requests are not being accepted for now: the internals shift between releases, every review costs time I have to take from the work that moves the library forward, and I am being especially careful in the current climate of unreviewed LLM-authored patches. Once the surface is stable I will revisit and open the door. Thanks in advance for your patience and your understanding.</p>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {Gribouille: A {Grammar} of {Graphics} for {Typst}},
+  date = {2026-05-20},
+  url = {https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2026-05-20). Gribouille: a Grammar of Graphics for Typst.
+<em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/">https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/</a>
+</div></div></section></div> ]]></description>
+  <category>typst</category>
+  <category>quarto</category>
+  <category>computation</category>
+  <category>grammar-of-graphics</category>
+  <guid>https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/</guid>
+  <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Quarto Reveal.js extensions to sharpen your slides</title>
   <link>https://mickael.canouil.fr/posts/2026-04-21-quarto-revealjs-extensions/</link>
@@ -124,7 +2117,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -227,7 +2220,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -312,7 +2305,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -418,7 +2411,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -470,7 +2463,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
@@ -16206,7 +18199,7 @@ font-style: inherit;">![An image]({{&lt; placeholder 900 300&gt;}})</span></span
 background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-default.qmd</span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/_demo-default.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-1"><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.html" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title=""><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="enhanced-tabset-navigation" class="level2" data-number="5">
@@ -17310,7 +19303,7 @@ background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-tabset.qmd</span></code></pre></div></div>
 <p>Now, simply use the left and right arrow keys to seamlessly transition between tabs—it’s like your presentation has its own rhythm!</p>
 <div style="text-align: center;">
-<p><a href="assets/_demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="exporting-to-pdf" class="level2" data-number="6">
@@ -17372,11 +19365,11 @@ font-style: inherit;">"my-slides.pdf"</span></span></code></pre></div></div>
 <div class="quarto-layout-row">
 <section id="default-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="default-quarto-reveal.js">Default Quarto Reveal.js</h4>
-<p><a href="assets/_demo-default.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 <section id="tabset-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="tabset-quarto-reveal.js">Tabset Quarto Reveal.js</h4>
-<p><a href="assets/_demo-tabset.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 </div>
 </div>
@@ -20279,7 +22272,7 @@ font-style: inherit;">"Penguin Species"</span></span>
 background-color: null;
 font-style: inherit;">```</span></span></code></pre></div></div>
 </details>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
