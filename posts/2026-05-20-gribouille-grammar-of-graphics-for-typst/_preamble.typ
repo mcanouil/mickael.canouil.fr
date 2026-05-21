@@ -1,6 +1,4 @@
-// Local rendering uses @local/gribouille:0.1.0 until the package is published.
-// Replace with `#import "@preview/gribouille:0.1.0": *` once on Typst Universe.
-#import "@local/gribouille:0.1.0": *
+#import "@preview/gribouille:0.1.0": *
 
 // Wrap the theme functions so each plot picks up `_typst_render_foreground`
 // and `_typst_render_background` (injected by typst-render from the light /
