@@ -57,7 +57,7 @@ options:
       extensions: [.typ]
   root:
     type: string
-    description: "Global only. Root directory for Typst compilation. Defaults to the Quarto project directory."
+    description: "Global only. Root directory for Typst compilation. Relative paths resolve against the document directory; a leading '/' means the project root. Defaults to the document directory."
     completion:
       type: directory
   font-path:
@@ -90,6 +90,15 @@ options:
     enum: [true, false, fenced]
     default: false
     description: "Show Typst source code alongside rendered output. Use 'fenced' to include code block markers."
+  code-fold:
+    type: [boolean, string]
+    enum: [true, false, show]
+    default: false
+    description: "Collapse the echoed source code in a <details> block (HTML output only). Use 'show' to render it expanded."
+  code-summary:
+    type: string
+    default: "Code"
+    description: "Summary text for the code-fold <details> block, rendered as Markdown (HTML output only)."
   eval:
     type: boolean
     default: true
@@ -97,7 +106,7 @@ options:
   include:
     type: boolean
     default: true
-    description: "Include block in output. Set false to suppress entirely."
+    description: "Embed block output in the document. Set false to still compile and write output files, but embed nothing."
   output:
     type: [boolean, string]
     enum: [true, false, asis]
@@ -186,12 +195,19 @@ attributes:
       type: [boolean, string]
       enum: [true, false, fenced]
       description: "Show source code alongside rendered output. Use 'fenced' to include code block markers."
+    code-fold:
+      type: [boolean, string]
+      enum: [true, false, show]
+      description: "Collapse the echoed source code in a <details> block (HTML output only). Use 'show' to render it expanded."
+    code-summary:
+      type: string
+      description: "Summary text for the code-fold <details> block, rendered as Markdown (HTML output only)."
     eval:
       type: boolean
       description: "Compile this block to image."
     include:
       type: boolean
-      description: "Include this block in output. Set false to suppress entirely."
+      description: "Embed this block's output in the document. Set false to still compile and write output files, but embed nothing."
     output:
       type: [boolean, string]
       enum: [true, false, asis]
