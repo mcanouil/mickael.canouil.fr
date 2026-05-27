@@ -2,9 +2,9 @@
 title: "Build LinkedIn Carousels with Typst: the `slide` Layout"
 description: |
   A LinkedIn carousel is just a multi-page document. This short tutorial shows
-  how a tiny Typst `slide` helper turns every page into a full-bleed, padded
-  canvas, then how to compile the deck to PDF and preview frames. It ends with a
-  ready-to-paste LLM prompt that drafts a similar carousel from scratch.
+  how a tiny Typst `slide` helper gives every page a full-bleed background with
+  consistent padding, then how to compile the deck to PDF and preview frames. It
+  ends with a ready-to-paste LLM prompt that drafts a similar carousel from scratch.
 date: "2026-05-28"
 categories:
   - typst
@@ -38,15 +38,15 @@ extensions:
 
 ## Introduction
 
-A carousel on LinkedIn is not a special object.
+A LinkedIn carousel is not a special thing.
 It is a multi-page document that the feed turns into swipeable cards, and you upload it as a single PDF.
-That reframing is liberating: if you can produce a tidy multi-page PDF, you can produce a carousel.
+So if you can make a multi-page PDF, you can make a carousel.
 
 [Typst](https://typst.app) is a fine tool for exactly that.
 You describe each page in plain text, compile to PDF in a fraction of a second, and keep the source under version control like any other code.
-No design application, no manual export, no nudging boxes by hand.
+No design tool, no manual export, no moving boxes around by hand.
 
-This post teaches the one pattern I use to make the whole thing pleasant: a small `slide` helper that turns every page into a full-bleed, padded canvas.
+This post shows the one helper I use to make this easy: a small `slide` helper that gives every page a full-bleed background with consistent padding.
 Every slide shown below is a real Typst compilation, rendered to SVG by the [`Typst Render` Quarto extension](https://github.com/mcanouil/quarto-typst-render), so you see the code and its result side by side.
 
 ::: {.callout-note}
@@ -55,14 +55,14 @@ Every slide shown below is a real Typst compilation, rendered to SVG by the [`Ty
 
 - Pick a ratio that suits the deck; this one uses a near-square 4:3, but 4:5 or 1:1 work just as well.
 - Set the page margin to `0cm` so backgrounds reach every edge.
-- A `slide` layout stamps a rail, a page index, and the padding onto every card.
+- A `slide` layout adds a rail, a page number, and the padding to every card.
 - Compile with `typst compile`, then upload the PDF or rasterise it to frames.
 
 :::
 
-## The page is the canvas
+## Setting up the page
 
-Start by locking the page geometry once, at the top of the file.
+Start by setting the page geometry once, at the top of the file.
 
 ```typst
 #set document(title: "My Carousel", author: "Your Name")
@@ -70,18 +70,19 @@ Start by locking the page geometry once, at the top of the file.
 #set page(width: 24cm, height: 18cm, margin: 0cm)
 ```
 
-The 24cm by 18cm size is a near-square 4:3, a deliberate contrast to the tall 4:5 most carousels reach for.
+The 24cm by 18cm size is a near-square 4:3, different from the tall 4:5 most carousels use.
 The exact dimensions do not matter, only the ratio does, so any 4:3 pair works.
 
 The important line is `margin: 0cm`.
-Carousel slides want colour and imagery that bleed to every edge, and a page margin would fence the content into a smaller box with white gutters.
-Removing the margin hands you the full page, and you reintroduce the breathing room yourself, which is what the `slide` helper is for.
+Carousel slides want colour and imagery that reach every edge, and a page margin would fence the content into a smaller box with white gutters.
+Removing the margin gives you the full page, and you add the padding back yourself.
+That is what the `slide` helper does.
 
 ## The `slide` layout
 
 A `slide` helper can do more than add padding.
-The most useful ones stamp the recurring *chrome* of the deck onto every page, so each card is born consistent.
-The layout below paints a full-height accent rail down the left edge, drops a page index in the top-right corner, then lays out your content in the space that is left.
+It can also draw the parts that repeat on every card.
+The layout below draws a full-height accent rail down the left edge, adds a page number in the top-right corner, then lays out your content in the space that is left.
 
 ```{.typst}
 #let slide(index: none, fill: paper, body) = page(fill: fill, { // <1>
@@ -95,9 +96,9 @@ The layout below paints a full-height accent rail down the left edge, drops a pa
 ```
 
 1. Start a fresh page and paint its background with `fill`, so each call is one card in the carousel.
-2. Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With `margin: 0cm` it bleeds to top, bottom, and side.
-3. Drop a small page counter like `02 / 07` in the top-right, but only when an `index` is passed; optional chrome stays out of the way until wanted.
-4. Reintroduce the padding `margin: 0cm` removed, with a wider left inset so the content clears the rail.
+2. Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With `margin: 0cm` it reaches the top, bottom, and side.
+3. Add a small page number like `02 / 07` in the top-right, but only when an `index` is passed.
+4. Add back the padding that `margin: 0cm` removed, with a wider left inset so the content clears the rail.
 5. `body` is a trailing content argument, so the helper is called as `#slide({ ... })` with the card's content in the braces.
 
 The helper is optional: a bare `#page(...)` would work too.
@@ -106,13 +107,13 @@ Defining `slide` once is what keeps the rail, the index, and the padding identic
 The page geometry, a small palette, the fonts, this `slide` layout, and a ruled `kicker` label are the file's setup.
 In this post they live in a shared preamble, so each live example below shows only the card it draws.
 
-Called with an empty body, the layout shows the chrome it stamps on its own: the rail on the left and the padded region where `body` lands.
+With an empty body, you can see what the layout draws on its own: the rail on the left and the padded area where `body` goes.
 
 ```{typst}
 //| echo: true
 //| output-filename: "layout.svg"
 //| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
-//| alt: "An otherwise empty slide showing the chrome the layout provides: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."
+//| alt: "An otherwise empty slide showing what the layout draws on its own: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."
 #slide({
   block(
     width: 100%,
@@ -126,8 +127,8 @@ Called with an empty body, the layout shows the chrome it stamps on its own: the
 
 ## Slides, live
 
-A cover card passes an `index`, pins a `kicker` to the top, and centres the headline.
-The rail and the page counter come from the layout for free.
+The cover card passes an `index`, adds a `kicker` at the top, and centres the headline.
+The rail and the page number come from the layout.
 
 ```{typst}
 //| echo: true
@@ -142,7 +143,7 @@ The rail and the page counter come from the layout for free.
     linebreak()
     text(font: display, size: 54pt, weight: "bold", fill: accent, "from text")
     v(0.4cm)
-    text(size: 20pt, fill: ink-soft, "One layout. A rail, an index, and a full-bleed canvas.")
+    text(size: 20pt, fill: ink-soft, "One layout, used on every card.")
   })
   v(1fr)
 })
@@ -172,13 +173,14 @@ A content card stacks a few numbered rows with a `grid` to keep the numbers and 
     dir: ttb,
     spacing: 0.7cm,
     row(1, "Plain text in, PDF out. Diff it, version it, regenerate it."),
-    row(2, "One layout sets the chrome of every page at once."),
+    row(2, "One layout sets the look of every page at once."),
     row(3, "No design tool, no manual export, no pixel pushing."),
   )
 })
 ```
 
-A closing card flips the background with the `fill` parameter, while the rail and index stay put.
+The closing card changes the background with the `fill` parameter.
+The rail and the page number stay the same.
 
 ```{typst}
 //| echo: true
@@ -211,23 +213,23 @@ typst compile carousel.typ carousel.pdf
 pdftoppm -r 120 carousel.pdf frame -png
 ```
 
-Upload `carousel.pdf` to LinkedIn as a document post, or stitch the PNG frames into an animated GIF if you want a quick scrollable preview.
+Upload `carousel.pdf` to LinkedIn as a document post, or turn the PNG frames into a GIF if you want a quick preview.
 
 ::: {.callout-tip}
 
-## Design that survives the feed
+## A few design tips
 
 - Keep body text at 14pt or larger so it stays legible at thumbnail size.
 - Aim for five to seven slides: a cover, the content, and a closing call to action.
-- Commit to one visual idea per deck, a palette, a type pairing, a single motif.
-- Resist copy-pasting the previous carousel, since variety is what makes each one stop the scroll.
+- Use one visual idea per deck: a palette, a font pairing, a single motif.
+- Avoid copy-pasting the previous carousel, so each one looks different.
 
 :::
 
 ## Bonus: an LLM prompt
 
 If you would rather start from a draft, paste the prompt below into your assistant of choice.
-It encodes the geometry, the `slide` helper, and the design constraints, so the output compiles with the `typst` CLI and looks the part.
+It encodes the geometry, the `slide` helper, and the design constraints, so the output compiles with the `typst` CLI.
 
 ```text
 You are designing a LinkedIn carousel as a Typst document. Produce a single
@@ -236,8 +238,8 @@ self-contained carousel.typ that compiles with `typst compile`.
 Hard requirements:
 - Page geometry: #set page(width: 24cm, height: 18cm, margin: 0cm). This is a
   near-square 4:3; keep the ratio.
-- Define one slide layout and use it for every card. It must stamp consistent
-  chrome, not just padding:
+- Define one slide layout and use it for every card. It must also draw the parts
+  that repeat, not just add padding:
     #let slide(index: none, fill: <default-bg>, body) = page(fill: fill, {
       place(left + top, rect(width: 0.55cm, height: 100%, fill: <accent>))
       if index != none {
@@ -265,4 +267,4 @@ PNG frames.
 The topic of the carousel is: <describe your announcement here>.
 ```
 
-The whole approach comes back to one idea: a single `slide` helper turns a blank page into a carousel canvas, and everything else is just content poured into it.
+In the end it is one idea: a single `slide` helper turns a blank page into a carousel page, and the rest is the content you put on it.
