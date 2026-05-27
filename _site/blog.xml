@@ -40,9 +40,9 @@ layout&quot;. Stacked rounded cards form a motif on the right.
 </div>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>A carousel on LinkedIn is not a special object. It is a multi-page document that the feed turns into swipeable cards, and you upload it as a single PDF. That reframing is liberating: if you can produce a tidy multi-page PDF, you can produce a carousel.</p>
-<p><a href="https://typst.app">Typst</a> is a fine tool for exactly that. You describe each page in plain text, compile to PDF in a fraction of a second, and keep the source under version control like any other code. No design application, no manual export, no nudging boxes by hand.</p>
-<p>This post teaches the one pattern I use to make the whole thing pleasant: a small <code>slide</code> helper that turns every page into a full-bleed, padded canvas. Every slide shown below is a real Typst compilation, rendered to SVG by the <a href="https://github.com/mcanouil/quarto-typst-render"><code>Typst Render</code> Quarto extension</a>, so you see the code and its result side by side.</p>
+<p>A LinkedIn carousel is not a special thing. It is a multi-page document that the feed turns into swipeable cards, and you upload it as a single PDF. So if you can make a multi-page PDF, you can make a carousel.</p>
+<p><a href="https://typst.app">Typst</a> is a fine tool for exactly that. You describe each page in plain text, compile to PDF in a fraction of a second, and keep the source under version control like any other code. No design tool, no manual export, no moving boxes around by hand.</p>
+<p>This post shows the one helper I use to make this easy: a small <code>slide</code> helper that gives every page a full-bleed background with consistent padding. Every slide shown below is a real Typst compilation, rendered to SVG by the <a href="https://github.com/mcanouil/quarto-typst-render"><code>Typst Render</code> Quarto extension</a>, so you see the code and its result side by side.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -56,15 +56,15 @@ layout&quot;. Stacked rounded cards form a motif on the right.
 <ul>
 <li>Pick a ratio that suits the deck; this one uses a near-square 4:3, but 4:5 or 1:1 work just as well.</li>
 <li>Set the page margin to <code>0cm</code> so backgrounds reach every edge.</li>
-<li>A <code>slide</code> layout stamps a rail, a page index, and the padding onto every card.</li>
+<li>A <code>slide</code> layout adds a rail, a page number, and the padding to every card.</li>
 <li>Compile with <code>typst compile</code>, then upload the PDF or rasterise it to frames.</li>
 </ul>
 </div>
 </div>
 </section>
-<section id="the-page-is-the-canvas" class="level2">
-<h2 class="anchored" data-anchor-id="the-page-is-the-canvas">The page is the canvas</h2>
-<p>Start by locking the page geometry once, at the top of the file.</p>
+<section id="setting-up-the-page" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-the-page">Setting up the page</h2>
+<p>Start by setting the page geometry once, at the top of the file.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb1-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -125,12 +125,12 @@ background-color: null;
 font-style: inherit;">0cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span></code></pre></div></div>
-<p>The 24cm by 18cm size is a near-square 4:3, a deliberate contrast to the tall 4:5 most carousels reach for. The exact dimensions do not matter, only the ratio does, so any 4:3 pair works.</p>
-<p>The important line is <code>margin: 0cm</code>. Carousel slides want colour and imagery that bleed to every edge, and a page margin would fence the content into a smaller box with white gutters. Removing the margin hands you the full page, and you reintroduce the breathing room yourself, which is what the <code>slide</code> helper is for.</p>
+<p>The 24cm by 18cm size is a near-square 4:3, different from the tall 4:5 most carousels use. The exact dimensions do not matter, only the ratio does, so any 4:3 pair works.</p>
+<p>The important line is <code>margin: 0cm</code>. Carousel slides want colour and imagery that reach every edge, and a page margin would fence the content into a smaller box with white gutters. Removing the margin gives you the full page, and you add the padding back yourself. That is what the <code>slide</code> helper does.</p>
 </section>
 <section id="the-slide-layout" class="level2">
 <h2 class="anchored" data-anchor-id="the-slide-layout">The <code>slide</code> layout</h2>
-<p>A <code>slide</code> helper can do more than add padding. The most useful ones stamp the recurring <em>chrome</em> of the deck onto every page, so each card is born consistent. The layout below paints a full-height accent rail down the left edge, drops a page index in the top-right corner, then lays out your content in the space that is left.</p>
+<p>A <code>slide</code> helper can do more than add padding. It can also draw the parts that repeat on every card. The layout below draws a full-height accent rail down the left edge, adds a page number in the top-right corner, then lays out your content in the space that is left.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -282,15 +282,15 @@ font-style: inherit;">})</span></span><div class="code-annotation-gutter-bg"></d
 </dd>
 <dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="2" data-code-annotation="2">Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With <code>margin: 0cm</code> it bleeds to top, bottom, and side.</span>
+<span data-code-cell="annotated-cell-2" data-code-lines="2" data-code-annotation="2">Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With <code>margin: 0cm</code> it reaches the top, bottom, and side.</span>
 </dd>
 <dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="3">Drop a small page counter like <code>02 / 07</code> in the top-right, but only when an <code>index</code> is passed; optional chrome stays out of the way until wanted.</span>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="3">Add a small page number like <code>02 / 07</code> in the top-right, but only when an <code>index</code> is passed.</span>
 </dd>
 <dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="7" data-code-annotation="4">Reintroduce the padding <code>margin: 0cm</code> removed, with a wider left inset so the content clears the rail.</span>
+<span data-code-cell="annotated-cell-2" data-code-lines="7" data-code-annotation="4">Add back the padding that <code>margin: 0cm</code> removed, with a wider left inset so the content clears the rail.</span>
 </dd>
 <dt data-target-cell="annotated-cell-2" data-target-annotation="5">5</dt>
 <dd>
@@ -299,7 +299,7 @@ font-style: inherit;">})</span></span><div class="code-annotation-gutter-bg"></d
 </dl>
 <p>The helper is optional: a bare <code>#page(...)</code> would work too. Defining <code>slide</code> once is what keeps the rail, the index, and the padding identical on every card, and every call site short.</p>
 <p>The page geometry, a small palette, the fonts, this <code>slide</code> layout, and a ruled <code>kicker</code> label are the file’s setup. In this post they live in a shared preamble, so each live example below shows only the card it draws.</p>
-<p>Called with an empty body, the layout shows the chrome it stamps on its own: the rail on the left and the padded region where <code>body</code> lands.</p>
+<p>With an empty body, you can see what the layout draws on its own: the rail on the left and the padded area where <code>body</code> goes.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -372,11 +372,11 @@ font-style: inherit;">)</span></span>
 <span id="cb2-9"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
-<p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/layout.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="An otherwise empty slide showing the chrome the layout provides: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/layout.svg" class="img-fluid w-50 mx-auto d-block rounded-3 border" alt="An otherwise empty slide showing the chrome the layout provides: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."></a></p>
+<p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/layout.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="An otherwise empty slide showing what the layout draws on its own: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/layout.svg" class="img-fluid w-50 mx-auto d-block rounded-3 border" alt="An otherwise empty slide showing what the layout draws on its own: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."></a></p>
 </section>
 <section id="slides-live" class="level2">
 <h2 class="anchored" data-anchor-id="slides-live">Slides, live</h2>
-<p>A cover card passes an <code>index</code>, pins a <code>kicker</code> to the top, and centres the headline. The rail and the page counter come from the layout for free.</p>
+<p>The cover card passes an <code>index</code>, adds a <code>kicker</code> at the top, and centres the headline. The rail and the page number come from the layout.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -494,7 +494,7 @@ font-style: inherit;">:</span> ink-soft<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"One layout. A rail, an index, and a full-bleed canvas."</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"One layout, used on every card."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
 <span id="cb3-10">  <span class="op" style="color: #5E5E5E;
@@ -713,7 +713,7 @@ font-style: inherit;">2</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"One layout sets the chrome of every page at once."</span><span class="op" style="color: #5E5E5E;
+font-style: inherit;">"One layout sets the look of every page at once."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
 <span id="cb4-19">    row<span class="op" style="color: #5E5E5E;
@@ -734,7 +734,7 @@ font-style: inherit;">)</span></span>
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 <p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/content.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Content card with the rail, a '03 / 07' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/content.svg" class="img-fluid w-50 mx-auto d-block rounded-3 border" alt="Content card with the rail, a '03 / 07' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."></a></p>
-<p>A closing card flips the background with the <code>fill</code> parameter, while the rail and index stay put.</p>
+<p>The closing card changes the background with the <code>fill</code> parameter. The rail and the page number stay the same.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -866,37 +866,37 @@ background-color: null;
 font-style: inherit;">-r</span> 120 carousel.pdf frame <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">-png</span></span></code></pre></div></div>
-<p>Upload <code>carousel.pdf</code> to LinkedIn as a document post, or stitch the PNG frames into an animated GIF if you want a quick scrollable preview.</p>
+<p>Upload <code>carousel.pdf</code> to LinkedIn as a document post, or turn the PNG frames into a GIF if you want a quick preview.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Design that survives the feed
+<span class="screen-reader-only">Tip</span>A few design tips
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <ul>
 <li>Keep body text at 14pt or larger so it stays legible at thumbnail size.</li>
 <li>Aim for five to seven slides: a cover, the content, and a closing call to action.</li>
-<li>Commit to one visual idea per deck, a palette, a type pairing, a single motif.</li>
-<li>Resist copy-pasting the previous carousel, since variety is what makes each one stop the scroll.</li>
+<li>Use one visual idea per deck: a palette, a font pairing, a single motif.</li>
+<li>Avoid copy-pasting the previous carousel, so each one looks different.</li>
 </ul>
 </div>
 </div>
 </section>
 <section id="bonus-an-llm-prompt" class="level2">
 <h2 class="anchored" data-anchor-id="bonus-an-llm-prompt">Bonus: an LLM prompt</h2>
-<p>If you would rather start from a draft, paste the prompt below into your assistant of choice. It encodes the geometry, the <code>slide</code> helper, and the design constraints, so the output compiles with the <code>typst</code> CLI and looks the part.</p>
+<p>If you would rather start from a draft, paste the prompt below into your assistant of choice. It encodes the geometry, the <code>slide</code> helper, and the design constraints, so the output compiles with the <code>typst</code> CLI.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="text" style="background: #f1f3f5;"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1">You are designing a LinkedIn carousel as a Typst document. Produce a single</span>
 <span id="cb7-2">self-contained carousel.typ that compiles with `typst compile`.</span>
 <span id="cb7-3"></span>
 <span id="cb7-4">Hard requirements:</span>
 <span id="cb7-5">- Page geometry: #set page(width: 24cm, height: 18cm, margin: 0cm). This is a</span>
 <span id="cb7-6">  near-square 4:3; keep the ratio.</span>
-<span id="cb7-7">- Define one slide layout and use it for every card. It must stamp consistent</span>
-<span id="cb7-8">  chrome, not just padding:</span>
+<span id="cb7-7">- Define one slide layout and use it for every card. It must also draw the parts</span>
+<span id="cb7-8">  that repeat, not just add padding:</span>
 <span id="cb7-9">    #let slide(index: none, fill: &lt;default-bg&gt;, body) = page(fill: fill, {</span>
 <span id="cb7-10">      place(left + top, rect(width: 0.55cm, height: 100%, fill: &lt;accent&gt;))</span>
 <span id="cb7-11">      if index != none {</span>
@@ -922,7 +922,7 @@ font-style: inherit;">-png</span></span></code></pre></div></div>
 <span id="cb7-31">PNG frames.</span>
 <span id="cb7-32"></span>
 <span id="cb7-33">The topic of the carousel is: &lt;describe your announcement here&gt;.</span></code></pre></div></div>
-<p>The whole approach comes back to one idea: a single <code>slide</code> helper turns a blank page into a carousel canvas, and everything else is just content poured into it.</p>
+<p>In the end it is one idea: a single <code>slide</code> helper turns a blank page into a carousel page, and the rest is the content you put on it.</p>
 
 
 </section>
@@ -23202,7 +23202,7 @@ font-style: inherit;">"Penguin Species"</span></span>
 background-color: null;
 font-style: inherit;">```</span></span></code></pre></div></div>
 </details>
-<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
+<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
