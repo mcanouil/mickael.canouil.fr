@@ -1,6 +1,6 @@
 #set document(author: "Mickaël Canouil")
 #set text(lang: "en")
-#set page(width: 24cm, height: 18cm, margin: 0cm)
+#set page(width: 21cm, height: 21cm, margin: 0cm)
 
 // ── palette ──────────────────────────────────────────────────────────────
 #let paper = rgb("#f4f6f5")

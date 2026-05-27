@@ -53,7 +53,7 @@ Every slide shown below is a real Typst compilation, rendered to SVG by the [`Ty
 
 ## At a glance
 
-- Pick a ratio that suits the deck; this one uses a near-square 4:3, but 4:5 or 1:1 work just as well.
+- LinkedIn shows carousels as a square 1080 by 1080, so this deck uses a 1:1 page.
 - Set the page margin to `0cm` so backgrounds reach every edge.
 - A `slide` layout adds a rail, a page number, and the padding to every card.
 - Compile with `typst compile`, then upload the PDF or rasterise it to frames.
@@ -67,11 +67,12 @@ Start by setting the page geometry once, at the top of the file.
 ```typst
 #set document(title: "My Carousel", author: "Your Name")
 #set text(lang: "en")
-#set page(width: 24cm, height: 18cm, margin: 0cm)
+#set page(width: 21cm, height: 21cm, margin: 0cm)
 ```
 
-The 24cm by 18cm size is a near-square 4:3, different from the tall 4:5 most carousels use.
-The exact dimensions do not matter, only the ratio does, so any 4:3 pair works.
+The 21cm by 21cm size is a square 1:1.
+LinkedIn shows carousels as a square 1080 by 1080, or a 4:5 portrait, per the [LinkedIn image size guide](https://www.linkedin.com/pulse/linkedin-image-size-guide-2026-jan-van-musscher-wslwe/).
+The exact dimensions do not matter, only the ratio does, so any square pair works.
 
 The important line is `margin: 0cm`.
 Carousel slides want colour and imagery that reach every edge, and a page margin would fence the content into a smaller box with white gutters.
@@ -138,7 +139,7 @@ The rail and the page number come from the layout.
 #slide(index: "01 / 07", {
   kicker("Typst · Carousel")
   v(1fr)
-  block(width: 18cm, {
+  block(width: 16cm, {
     text(font: display, size: 54pt, weight: "bold", fill: ink, "Build decks")
     linebreak()
     text(font: display, size: 54pt, weight: "bold", fill: accent, "from text")
@@ -159,14 +160,14 @@ A content card stacks a few numbered rows with a `grid` to keep the numbers and 
 #slide(index: "03 / 07", {
   kicker("Why Typst")
   v(0.5cm)
-  block(width: 18cm, text(font: display, size: 32pt, weight: "bold", fill: ink, "Three reasons it fits carousels."))
+  block(width: 16cm, text(font: display, size: 32pt, weight: "bold", fill: ink, "Three reasons it fits carousels."))
   v(0.7cm)
 
   let row(n, t) = grid(
     columns: (1.3cm, 1fr),
     align: (left + top, left + top),
     text(font: mono, size: 22pt, weight: "bold", fill: accent, str(n)),
-    block(width: 17cm, text(size: 18pt, fill: ink, t)),
+    block(width: 15cm, text(size: 18pt, fill: ink, t)),
   )
 
   stack(
@@ -198,7 +199,7 @@ The rail and the page number stay the same.
 })
 ```
 
-Each card renders at the true 4:3 proportion, so what you see is what the feed will show.
+Each card renders as a true square, so what you see is what the feed will show.
 
 ## Compile the whole deck
 
@@ -236,8 +237,8 @@ You are designing a LinkedIn carousel as a Typst document. Produce a single
 self-contained carousel.typ that compiles with `typst compile`.
 
 Hard requirements:
-- Page geometry: #set page(width: 24cm, height: 18cm, margin: 0cm). This is a
-  near-square 4:3; keep the ratio.
+- Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm). This is a
+  square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.
 - Define one slide layout and use it for every card. It must also draw the parts
   that repeat, not just add padding:
     #let slide(index: none, fill: <default-bg>, body) = page(fill: fill, {
