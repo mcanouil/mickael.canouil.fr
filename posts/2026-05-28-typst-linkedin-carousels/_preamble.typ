@@ -8,11 +8,11 @@
 #let ink-soft = rgb("#5a6b66")
 #let accent = rgb("#1f9d72")
 
-// ── fonts (fall back to defaults if missing) ───────────────────────────────
-#let display = "Space Grotesk"
-#let body = "Inter"
-#let mono = "JetBrains Mono"
-#set text(font: body, fill: ink, size: 18pt)
+// ── fonts (Typst built-ins, identical on every machine and in CI) ──────────
+#let display = "Libertinus Serif"
+#let body = "Libertinus Serif"
+#let mono = "DejaVu Sans Mono"
+#set text(font: body, fill: ink, size: 19pt)
 
 // ── the slide layout taught in the post ────────────────────────────────────
 // A full-height accent rail on the left edge and an optional page index,

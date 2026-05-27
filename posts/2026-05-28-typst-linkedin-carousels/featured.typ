@@ -12,9 +12,9 @@
 #let ink-soft = rgb("#5a6b66")
 #let accent = rgb("#1f9d72")
 
-#let display = "Space Grotesk"
-#let body = "Inter"
-#let mono = "JetBrains Mono"
+#let display = "Libertinus Serif"
+#let body = "Libertinus Serif"
+#let mono = "DejaVu Sans Mono"
 #set text(font: body, fill: ink)
 
 #let kicker(t) = grid(
