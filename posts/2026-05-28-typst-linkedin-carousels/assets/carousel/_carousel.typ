@@ -1,7 +1,7 @@
 // Standalone carousel: every slide in one document, used to build carousel.gif.
 // Reuses the shared setup (page, palette, fonts, slide, kicker) from _preamble.typ.
 
-#import "_preamble.typ": *
+#import "../../_preamble.typ": *
 
 #set document(title: "Build LinkedIn Carousels with Typst", author: "Mickaël Canouil")
 #set text(lang: "en")
