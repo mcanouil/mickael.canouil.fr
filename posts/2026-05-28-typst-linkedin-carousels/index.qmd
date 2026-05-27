@@ -46,14 +46,14 @@ That reframing is liberating: if you can produce a tidy multi-page PDF, you can 
 You describe each page in plain text, compile to PDF in a fraction of a second, and keep the source under version control like any other code.
 No design application, no manual export, no nudging boxes by hand.
 
-This post teaches the one pattern that makes the whole thing pleasant: a small `slide` helper that turns every page into a full-bleed, padded canvas.
-Every slide shown below is a real Typst compilation, rendered to SVG by the [`quarto-typst-render`](https://github.com/mcanouil/quarto-typst-render) extension, so you see the code and its result side by side.
+This post teaches the one pattern I use to make the whole thing pleasant: a small `slide` helper that turns every page into a full-bleed, padded canvas.
+Every slide shown below is a real Typst compilation, rendered to SVG by the [`Typst Render` Quarto extension](https://github.com/mcanouil/quarto-typst-render), so you see the code and its result side by side.
 
 ::: {.callout-note}
 
 ## At a glance
 
-- A carousel page is a near-square 4:3, a calm shape that stands out from the usual tall cards.
+- Pick a ratio that suits the deck; this one uses a near-square 4:3, but 4:5 or 1:1 work just as well.
 - Set the page margin to `0cm` so backgrounds reach every edge.
 - A `slide` layout stamps a rail, a page index, and the padding onto every card.
 - Compile with `typst compile`, then upload the PDF or rasterise it to frames.
@@ -105,6 +105,24 @@ Defining `slide` once is what keeps the rail, the index, and the padding identic
 
 The page geometry, a small palette, the fonts, this `slide` layout, and a ruled `kicker` label are the file's setup.
 In this post they live in a shared preamble, so each live example below shows only the card it draws.
+
+Called with an empty body, the layout shows the chrome it stamps on its own: the rail on the left and the padded region where `body` lands.
+
+```{typst}
+//| echo: true
+//| output-filename: "layout.svg"
+//| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
+//| alt: "An otherwise empty slide showing the chrome the layout provides: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."
+#slide({
+  block(
+    width: 100%,
+    height: 100%,
+    stroke: (paint: ink-soft, thickness: 1pt, dash: "dashed"),
+    radius: 8pt,
+    align(center + horizon, text(font: mono, fill: ink-soft, "body goes here")),
+  )
+})
+```
 
 ## Slides, live
 
