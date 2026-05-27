@@ -58,10 +58,10 @@ Every slide shown below is a real Typst compilation, rendered to SVG by the [`Ty
 
 ## At a glance
 
-- LinkedIn shows carousels as a square 1080 by 1080, so this deck uses a 1:1 page.
+- This deck uses a square 1:1 page, the format LinkedIn shows carousels in.
 - Set the page margin to `0cm` so backgrounds reach every edge.
 - A `slide` layout adds a rail, a page number, and the padding to every card.
-- Compile with `typst compile`, then upload the PDF or rasterise it to frames.
+- Compile with `typst compile`, then upload the PDF or export PNG frames.
 
 :::
 
@@ -131,12 +131,12 @@ The layout below draws a full-height accent rail down the left edge, adds a page
 
 1. Start a fresh page and paint its background with `fill`, so each call is one card in the carousel.
 2. Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With `margin: 0cm` it reaches the top, bottom, and side.
-3. Add a small page number like `02 / 07` in the top-right, but only when an `index` is passed.
+3. Add a small page number like `2 / 3` in the top-right, but only when an `index` is passed.
 4. Add back the padding that `margin: 0cm` removed, with a wider left inset so the content clears the rail.
 5. `body` is a trailing content argument, so the helper is called as `#slide({ ... })` with the card's content in the braces.
 
 The helper is optional: a bare `#page(...)` would work too.
-Defining `slide` once is what keeps the rail, the index, and the padding identical on every card, and every call site short.
+Defining `slide` once is what keeps the rail, the page number, and the padding identical on every card, and every call site short.
 
 ::: {.highlight}
 
@@ -158,8 +158,8 @@ The rail and the page number come from the layout.
 //| echo: true
 //| output-filename: "cover.svg"
 //| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
-//| alt: "Cover card with a green rail down the left edge, a '01 / 07' index top-right, a ruled 'TYPST · CAROUSEL' kicker, and a large two-line headline 'Build decks from text'."
-#slide(index: "01 / 07", {
+//| alt: "Cover card with an emerald rail down the left edge, a '1 / 3' index top-right, a ruled 'TYPST · CAROUSEL' kicker, and a large two-line headline 'Build decks from text'."
+#slide(index: "1 / 3", {
   kicker("Typst · Carousel")
   v(1fr)
   block(width: 16cm, {
@@ -179,8 +179,8 @@ A content card stacks a few numbered rows with a `grid` to keep the numbers and 
 //| echo: true
 //| output-filename: "content.svg"
 //| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
-//| alt: "Content card with the rail, a '03 / 07' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."
-#slide(index: "03 / 07", {
+//| alt: "Content card with the rail, a '2 / 3' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."
+#slide(index: "2 / 3", {
   kicker("Why Typst")
   v(0.5cm)
   block(
@@ -216,8 +216,8 @@ The rail and the page number stay the same.
 //| echo: true
 //| output-filename: "cta.svg"
 //| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
-//| alt: "Closing card on a dark green-black background with the rail and a '07 / 07' index, reading 'Compile and post.' above the command to compile the carousel to PDF."
-#slide(index: "07 / 07", fill: ink, {
+//| alt: "Closing card on a dark green-black background with the rail and a '3 / 3' index, reading 'Compile and post.' above the command to compile the carousel to PDF."
+#slide(index: "3 / 3", fill: ink, {
   v(1fr)
   kicker("Ship it")
   v(0.5cm)
