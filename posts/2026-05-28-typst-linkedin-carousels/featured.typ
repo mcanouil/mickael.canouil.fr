@@ -46,12 +46,12 @@
     block(width: 16cm, {
       text(font: display, size: 42pt, weight: "bold", fill: ink, tracking: -1pt, "Build LinkedIn")
       linebreak()
-      text(font: display, size: 42pt, weight: "bold", fill: ink, tracking: -1pt, "carousels with ")
+      text(font: display, size: 42pt, weight: "bold", fill: ink, tracking: -1pt, "Carousels with ")
       text(font: display, size: 42pt, weight: "bold", fill: accent, tracking: -1pt, "Typst")
       v(0.45cm)
-      text(font: display, size: 24pt, weight: "medium", fill: ink-soft, "the ")
-      text(font: display, size: 24pt, weight: "medium", fill: accent, "slide")
-      text(font: display, size: 24pt, weight: "medium", fill: ink-soft, " layout")
+      text(font: display, size: 24pt, weight: "medium", fill: ink-soft, "The ")
+      text(font: display, size: 24pt, weight: "medium", fill: accent, "Slide")
+      text(font: display, size: 24pt, weight: "medium", fill: ink-soft, " Layout")
     })
     v(1fr)
     grid(
