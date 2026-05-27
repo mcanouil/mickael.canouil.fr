@@ -242,26 +242,19 @@ self-contained carousel.typ that compiles with `typst compile`.
 Hard requirements:
 - Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm). This is a
   square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.
-- Define one slide layout and use it for every card. It must also draw the parts
-  that repeat, not just add padding:
-    #let slide(index: none, fill: <default-bg>, body) = page(fill: fill, {
-      place(left + top, rect(width: 0.55cm, height: 100%, fill: <accent>))
-      if index != none {
-        place(top + right, dx: -1.4cm, dy: 1.4cm,
-          text(font: <mono>, size: 14pt, fill: <soft-ink>, index))
-      }
-      block(width: 100%, height: 100%,
-        inset: (left: 2.6cm, right: 1.7cm, y: 1.7cm), body)
+- Define one `slide` layout and use it for every card. Build it from a full-page
+  block with zero page margin and an inset, so the background reaches every edge
+  and the content keeps consistent padding:
+    #let slide(fill: <default-bg>, body) = page(fill: fill, {
+      block(width: 100%, height: 100%, inset: 1.7cm, body)
     })
-  Zero page margin lets the rail bleed to every edge; the inset adds the padding
-  back and clears the rail on the left.
+  Add any repeated parts you want on top of that (a header, a page number, ...).
 - Invent a small palette (background, ink, soft ink, one accent) and a font trio
   (display, body, mono). Prefer fonts that render anywhere; Typst's built-in
   `Libertinus Serif` and `DejaVu Sans Mono` need no installation. No purple,
   lavender, violet, fuchsia, or magenta.
 - Five to seven cards following the arc: cover, then content, then a closing
-  call to action. Pass an `index` like "03 / 07" to each, and use one card with
-  `fill: <accent-or-dark>` to invert the look.
+  call to action. Use one card with `fill: <accent-or-dark>` to invert the look.
 - Body text at least 14pt; headlines 30 to 56pt, so everything reads at thumbnail
   size. Use place, grid, stack, and v()/h() for layout.
 
@@ -269,6 +262,9 @@ Then tell me the two commands to compile it to PDF and to rasterise the pages to
 PNG frames.
 
 The topic of the carousel is: <describe your announcement here>.
+Layout and style (optional): <describe any layout or look you want, for example a
+side rail, page numbers, a colour band, a serif or a sans display; leave blank to
+let you pick a clean design>.
 ```
 
 In the end it is one idea: a single `slide` helper turns a blank page into a carousel page, and the rest is the content you put on it.
