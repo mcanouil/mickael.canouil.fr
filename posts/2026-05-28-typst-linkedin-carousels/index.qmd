@@ -1,10 +1,9 @@
 ---
 title: "Build LinkedIn Carousels with Typst: the `slide` Layout"
 description: |
-  A LinkedIn carousel is just a multi-page document. This short tutorial shows
-  how a tiny Typst `slide` helper gives every page a full-bleed background with
-  consistent padding, then how to compile the deck to PDF and preview frames. It
-  ends with a ready-to-paste LLM prompt that drafts a similar carousel from scratch.
+  A LinkedIn carousel is just a multi-page document.
+  This short tutorial shows how a tiny Typst `slide` helper gives every page a full-bleed background with consistent padding, then how to compile the deck to PDF and preview frames.
+  It ends with a ready-to-paste LLM prompt that drafts a similar carousel from scratch.
 date: "2026-05-28"
 categories:
   - typst
@@ -14,11 +13,9 @@ categories:
   - productivity
 image: featured.png
 image-alt: |
-  Wide social card on a pale grey-green background with a slim emerald rail
-  down the left edge. A ruled monospace kicker reads "TYPST · TUTORIAL" above
-  large display type that spells "Build LinkedIn Carousels with Typst", the
-  word "Typst" in emerald, then a smaller line "The Slide Layout". Stacked
-  rounded cards form a motif on the right.
+  Wide social card on a pale grey-green background with a slim emerald rail down the left edge.
+  A ruled monospace kicker reads "TYPST · TUTORIAL" above large display type that spells "Build LinkedIn Carousels with Typst", the word "Typst" in emerald, then a smaller line "The Slide Layout".
+  Stacked rounded cards form a motif on the right.
 number-sections: false
 engine: markdown
 extensions:
@@ -96,8 +93,13 @@ That is what the `slide` helper does.
 A `slide` helper can do more than add padding.
 It can also draw the parts that repeat on every card.
 The layout below draws a full-height accent rail down the left edge, adds a page number in the top-right corner, then lays out your content in the space that is left.
+Here it is, defined and then called with an empty body so you can see the rail and the padded area where `body` goes.
 
-```{.typst}
+```{typst}
+//| echo: true
+//| output-filename: "layout.svg"
+//| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
+//| alt: "An otherwise empty slide showing what the layout draws on its own: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."
 #let slide(index: none, fill: paper, body) = page(fill: fill, { // <1>
   place(left + top, rect(width: 0.55cm, height: 100%, fill: accent)) // <2>
   if index != none { // <3>
@@ -111,6 +113,15 @@ The layout below draws a full-height accent rail down the left edge, adds a page
     body // <4>
   ) // <4>
 }) // <5>
+
+#slide({
+  block(
+    width: 100%, height: 100%,
+    stroke: (paint: ink-soft, thickness: 1pt, dash: "dashed"),
+    radius: 8pt,
+    align(center + horizon, text(font: mono, fill: ink-soft, "body goes here")),
+  )
+})
 ```
 
 1. Start a fresh page and paint its background with `fill`, so each call is one card in the carousel.
@@ -130,24 +141,6 @@ Defining `slide` once is what keeps the rail, the page number, and the padding i
 
 The page geometry, a small palette, the fonts, this `slide` layout, and a ruled `kicker` label are the file's setup.
 In this post they live in a shared preamble, so each live example below shows only the card it draws.
-
-With an empty body, you can see what the layout draws on its own: the rail on the left and the padded area where `body` goes.
-
-```{typst}
-//| echo: false
-//| output-filename: "layout.svg"
-//| classes: "img-fluid w-50 mx-auto d-block rounded-3 border"
-//| alt: "An otherwise empty slide showing what the layout draws on its own: the emerald rail down the left edge and a dashed outline marking the padded content area where the body is placed."
-#slide({
-  block(
-    width: 100%,
-    height: 100%,
-    stroke: (paint: ink-soft, thickness: 1pt, dash: "dashed"),
-    radius: 8pt,
-    align(center + horizon, text(font: mono, fill: ink-soft, "body goes here")),
-  )
-})
-```
 
 ## Slides, live
 
