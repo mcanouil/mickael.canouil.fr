@@ -81,9 +81,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-f078ba1c2ecb64eea0582052e3691ba2.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-2386bb157c4f1cb8b6a4abeb739909b0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-43598c451b3dadb9c1d82313929da49a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-2386bb157c4f1cb8b6a4abeb739909b0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-c598403edacb02308986d1f7309247ba.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-f098f57d80b16128dff1126ec3a59a4d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-c598403edacb02308986d1f7309247ba.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -456,6 +456,7 @@ rounded cards form a motif on the right.
   <li><a href="#the-slide-layout" id="toc-the-slide-layout" class="nav-link" data-scroll-target="#the-slide-layout">The <code>slide</code> layout</a></li>
   <li><a href="#slides-live" id="toc-slides-live" class="nav-link" data-scroll-target="#slides-live">Slides, live</a></li>
   <li><a href="#compile-the-whole-deck" id="toc-compile-the-whole-deck" class="nav-link" data-scroll-target="#compile-the-whole-deck">Compile the whole deck</a></li>
+  <li><a href="#want-a-gif-for-another-platform" id="toc-want-a-gif-for-another-platform" class="nav-link" data-scroll-target="#want-a-gif-for-another-platform">Want a GIF for another platform?</a></li>
   <li><a href="#bonus-an-llm-prompt" id="toc-bonus-an-llm-prompt" class="nav-link" data-scroll-target="#bonus-an-llm-prompt">Bonus: an LLM prompt</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-05-28-typst-linkedin-carousels/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -635,7 +636,14 @@ Layout&quot;. Stacked rounded cards form a motif on the right.
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Typst can also export one PNG per page, no extra tool needed</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">typst</span> compile carousel.typ <span class="st">"carousel-{p}.png"</span> <span class="at">--ppi</span> 144</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Upload <code>carousel.pdf</code> to LinkedIn as a document post, or use the PNG frames if you want a preview or a GIF.</p>
+<p>Upload <code>carousel.pdf</code> to LinkedIn as a document post, and keep the PNG frames for a preview.</p>
+</section>
+<section id="want-a-gif-for-another-platform" class="level2">
+<h2 class="anchored" data-anchor-id="want-a-gif-for-another-platform">Want a GIF for another platform?</h2>
+<p>LinkedIn takes the PDF, but some places want a GIF. Build one from the PNG frames with <a href="https://imagemagick.org">ImageMagick</a>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Assemble the exported PNG frames into a looping GIF</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">magick</span> <span class="at">-delay</span> 250 <span class="at">-loop</span> 0 carousel-<span class="pp">*</span>.png carousel.gif</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>-delay 250</code> holds each frame for 2.5 seconds, and <code>-loop 0</code> loops forever.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -658,35 +666,33 @@ Layout&quot;. Stacked rounded cards form a motif on the right.
 <section id="bonus-an-llm-prompt" class="level2">
 <h2 class="anchored" data-anchor-id="bonus-an-llm-prompt">Bonus: an LLM prompt</h2>
 <p>If you would rather start from a draft, paste the prompt below into your assistant of choice. It encodes the geometry, the <code>slide</code> helper, and the design constraints, so the output compiles with the <code>typst</code> CLI.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="text"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>You are designing a LinkedIn carousel as a Typst document. Produce a single</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>self-contained carousel.typ that compiles with `typst compile`.</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Hard requirements:</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>- Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm). This is a</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>- Define one `slide` layout and use it for every card. Build it from a full-page</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  block with zero page margin and an inset, so the background reaches every edge</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  and the content keeps consistent padding:</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    #let slide(fill: &lt;default-bg&gt;, body) = page(fill: fill, {</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      block(width: 100%, height: 100%, inset: 1.7cm, body)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  Add any repeated parts you want on top of that (a header, a page number, ...).</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>- Invent a small palette (background, ink, soft ink, one accent) and a font trio</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  (display, body, mono). Prefer fonts that render anywhere; Typst's built-in</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  `Libertinus Serif` and `DejaVu Sans Mono` need no installation. No purple,</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  lavender, violet, fuchsia, or magenta.</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>- Five to seven cards following the arc: cover, then content, then a closing</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  call to action. Use one card with `fill: &lt;accent-or-dark&gt;` to invert the look.</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>- Body text at least 14pt; headlines 30 to 56pt, so everything reads at thumbnail</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  size. Use place, grid, stack, and v()/h() for layout.</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>Then tell me the two `typst compile` commands to export it to PDF and to one PNG</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>per page.</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>The topic of the carousel is: &lt;describe your announcement here&gt;.</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>Layout and style (optional): &lt;describe any layout or look you want, for example a</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>side rail, page numbers, a colour band, a serif or a sans display; leave blank to</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>let you pick a clean design&gt;.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="text"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>You are designing a LinkedIn carousel as a Typst document. Produce a single</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>self-contained carousel.typ that compiles with `typst compile`.</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>Hard requirements:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>- Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm). This is a</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>- Define one `slide` layout and use it for every card. Build it from a full-page</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  block with zero page margin and an inset, so the background reaches every edge</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  and the content keeps consistent padding:</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    #let slide(fill: &lt;default-bg&gt;, body) = page(fill: fill, {</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      block(width: 100%, height: 100%, inset: 1.7cm, body)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  Add any repeated parts you want on top of that (a header, a page number, ...).</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>- Invent a small palette (background, ink, soft ink, one accent) and a font trio</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  (display, body, mono). Prefer legible fonts.</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>- Five to seven cards following the arc: cover, then content, then a closing</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  call to action. Use one card with `fill: &lt;accent-or-dark&gt;` to invert the look.</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>- Body text at least 14pt; headlines 30 to 56pt, so everything reads at thumbnail</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  size. Use place, grid, stack, and v()/h() for layout.</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>Then tell me the two `typst compile` commands to export it to PDF and to one PNG</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>per page.</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>The topic of the carousel is: &lt;describe your announcement here&gt;.</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>Layout and style (optional): &lt;describe any layout or look you want, for example a</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>side rail, page numbers, a colour band, a serif or a sans display; leave blank to</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>let you pick a clean design&gt;.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="highlight">
 <p><strong>It comes down to one idea:</strong> a single <code>slide</code> helper turns a blank page into a carousel page, and the rest is the content you put on it.</p>
 </div>
