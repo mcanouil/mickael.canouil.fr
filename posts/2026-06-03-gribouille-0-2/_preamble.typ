@@ -1,4 +1,4 @@
-#import "@preview/gribouille:0.2.0": *
+#import "@preview/gribouille:0.2.1": *
 
 // Wrap the theme functions so each plot picks up `_typst_render_foreground`
 // and `_typst_render_background` (injected by typst-render from the light /

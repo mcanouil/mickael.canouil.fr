@@ -1,21 +1,22 @@
 ---
-title: "Gribouille 0.2.0: Composing Plots and a Sturdier Core"
+title: "Gribouille 0.2.0 and 0.2.1: Composing Plots and a Sturdier Core"
 description: |
-  Gribouille 0.2.0 is the first feature update since the launch. `compose()`
-  can now number panels, nest, carry its own titles, and hoist a single shared
-  legend, `facet-grid()` gains free scales, and labels and guides get tidier
-  controls. Most of the work, though, went into the internals, where a long
-  list of panics became clear errors and correct output.
-date: "2026-06-05"
+  Gribouille 0.2.0 is the first feature update since the launch, and 0.2.1
+  follows shortly after. `compose()` can now number panels, nest, carry its
+  own titles, hoist a single shared legend, and line panels up across the grid
+  with `align-panels`, `facet-grid()` gains free scales, and labels and guides
+  get tidier controls. Most of the work, though, went into the internals, where
+  a long list of panics became clear errors and correct output.
+date: "2026-06-03"
 categories:
   - typst
   - quarto
   - grammar-of-graphics
 image: featured.png
 image-alt: |
-  Featured card for the Gribouille 0.2.0 release on a cream paper background.
+  Featured card for the Gribouille 0.2.1 release on a cream paper background.
   On the left, the Gribouille wordmark sits above the tagline "Create elegant
-  graphics with the Grammar of Graphics for Typst.", a small orange "v0.2.0
+  graphics with the Grammar of Graphics for Typst.", a small orange "v0.2.1
   release" pill, and the URL m.canouil.dev/gribouille. On the right, a slightly
   rotated bordered card frames a scatter plot titled "Penguins Dataset" of
   Palmer Penguin body mass against flipper length, the three species shown as
@@ -35,9 +36,10 @@ metadata-files:
 
 ## Introduction
 
-[Gribouille](https://github.com/mcanouil/gribouille) shipped its [first version](../2026-05-20-gribouille-grammar-of-graphics-for-typst/index.qmd) ten days ago.
-This is the first feature update, and it has two faces.
-On the surface, [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) learned to number, nest, title, and share a legend across panels, `facet-grid()` got free scales, and labels and guides became easier to control.
+[Gribouille](https://github.com/mcanouil/gribouille) shipped its [first version](../2026-05-20-gribouille-grammar-of-graphics-for-typst/index.qmd) a fortnight ago.
+This is the first feature update: 0.2.0 landed first, and 0.2.1 followed shortly after with `align-panels` and two more fixes, so this post covers the 0.2 update as a whole.
+It has two faces.
+On the surface, [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) learned to number, nest, title, share a legend across panels, and line those panels up across the grid, `facet-grid()` got free scales, and labels and guides became easier to control.
 Underneath, most of the time went into the internals, turning a long list of panics into clear errors and correct output.
 
 Every figure in this post is a real, freshly compiled plot.
@@ -46,17 +48,18 @@ Every figure in this post is a real, freshly compiled plot.
 
 ## At a glance
 
-- [Gribouille](https://github.com/mcanouil/gribouille) 0.2.0 on Typst Universe: `#import "@preview/gribouille:0.2.0": *`.
+- [Gribouille](https://github.com/mcanouil/gribouille) 0.2.1 on Typst Universe: `#import "@preview/gribouille:0.2.1": *`.
 - [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) can tag panels (`A`, `1`, `i`, ...), nest into another `compose()`, carry its own `labs`, control the shared legend through `guides`, and size itself with `width`/`height` and relative `widths`/`heights`.
+- [`compose(align-panels: true)`](https://m.canouil.dev/gribouille/reference/core/compose.html) shares panel margins grid-wise, so the plot areas line up across rows and columns even when their axis labels differ in width (0.2.1).
 - [`facet-grid(scales: ...)`](https://m.canouil.dev/gribouille/reference/facets/facet-grid.html) supports `"free_x"`, `"free_y"`, and `"free"`, matching `ggplot2`.
 - A layer's `data` accepts a function applied to the plot data, for per-layer subsets or transforms without a second dataset.
 - [`guides()`](https://m.canouil.dev/gribouille/reference/guides/guides.html) gains a `default` entry, a fallback inherited by every aesthetic without its own override.
 - [`labs()`](https://m.canouil.dev/gribouille/reference/labs/labs.html) fields default to `auto`; pass `none` to drop an axis or legend title and reclaim the space it reserved.
-- A long internals pass: many operations that used to panic now report a clear error or handle the edge, and `after-scale`/`stage` channels resolve correctly.
+- A long internals pass: many operations that used to panic now report a clear error or handle the edge, `after-scale`/`stage` channels resolve correctly, and `geom-segment()`/`geom-curve()`/`geom-ribbon()`/`geom-area()` draw on discrete scales instead of nothing (0.2.1).
 
 :::
 
-Every `{typst}` block below pulls the library in through a one-line preamble, `#import "@preview/gribouille:0.2.0": *`, exactly as the [launch post](../2026-05-20-gribouille-grammar-of-graphics-for-typst/index.qmd) explained.
+Every `{typst}` block below pulls the library in through a one-line preamble, `#import "@preview/gribouille:0.2.1": *`, exactly as the [launch post](../2026-05-20-gribouille-grammar-of-graphics-for-typst/index.qmd) explained.
 
 ## Compose grew up
 
@@ -113,6 +116,40 @@ A `compose()` call also accepts `defer: true`, so it can become a panel inside a
 A per-depth `tag-levels` array then continues the numbering down the tree, giving tags such as `B.1` and `B.2`.
 
 :::
+
+The 0.2.1 release adds one more control and tidies the tags.
+By default each panel keeps its own margins, so when one panel carries wide axis labels and another narrow ones, their plot areas start at different offsets and never quite line up.
+`align-panels: true` shares the margins grid-wise, left and right per column, top and bottom per row, so the data areas align across the grid the way `patchwork` and `cowplot` do.
+The panel tags also reserve their own band now, sitting above each panel instead of overlapping the data.
+
+```{typst}
+//| echo: true
+//| align: center
+//| output-filename: "align-panels.svg"
+//| alt: "Two stacked scatter panels tagged (a) and (b): body mass with four-digit y labels above bill length with two-digit y labels, both against flipper length and coloured by species. With align-panels on, the two plot areas share a left edge despite the different label widths, and the tags sit in a band above each panel rather than over the data. A shared species legend runs along the bottom."
+#let panel(y, title) = plot(
+  data: penguins,
+  mapping: aes(x: "flipper-len", y: y, colour: "species"),
+  layers: (geom-point(size: 2pt, alpha: 0.85),),
+  labs: labs(title: title, x: none),
+  theme: theme-minimal(),
+  defer: true,
+)
+
+#compose(
+  panel("body-mass", "Body Mass (g)"),
+  panel("bill-len", "Bill Length (mm)"),
+  columns: 1,
+  align-panels: true,                                         // <1>
+  tag-levels: "a",                                            // <2>
+  guides: guides(default: guide-legend(position: "bottom")),
+  width: 12cm,
+  height: 14cm,
+)
+```
+
+1. `align-panels: true` makes the two plot areas share a left edge, even though the four-digit body-mass labels are wider than the two-digit bill-length labels.
+2. The tags now reserve their own band above each panel instead of overlapping the data.
 
 ## Free the facet scales
 
@@ -222,7 +259,7 @@ A `geom-col()` on a continuous axis with a single distinct value, an empty `valu
 
 ::: {.highlight}
 
-**Most of 0.2.0 is invisible:** the figures look the same, but far fewer inputs make the compiler give up.
+**Most of the 0.2 work is invisible:** the figures look the same, but far fewer inputs make the compiler give up.
 
 :::
 
@@ -232,6 +269,7 @@ A second group is about getting the right answer rather than not crashing.
 - [`coord-cartesian(xlim:, ylim:)`](https://m.canouil.dev/gribouille/reference/coord/coord-cartesian.html) zooms the axes instead of being ignored, and [`coord-flip(reverse: true)`](https://m.canouil.dev/gribouille/reference/coord/coord-flip.html) keeps a `log10` or `sqrt` transform.
 - A column mapped to both a positional and a grouping aesthetic, for example `aes(x: "species", fill: "species")`, now resolves the grouping across aggregating stats instead of drawing every mark in the ink colour with an empty guide.
 - Number formatters round correctly, so `0.9999995` no longer renders as `0.1`, and continuous scales honour an explicit `breaks`.
+- [`geom-segment()`](https://m.canouil.dev/gribouille/reference/geoms/geom-segment.html), [`geom-curve()`](https://m.canouil.dev/gribouille/reference/geoms/geom-curve.html), [`geom-ribbon()`](https://m.canouil.dev/gribouille/reference/geoms/geom-ribbon.html), and [`geom-area()`](https://m.canouil.dev/gribouille/reference/geoms/geom-area.html) draw on a discrete scale instead of silently rendering nothing (0.2.1).
 
 A third group, and a big one, is about layout space: what a plot reserves, and what it reclaims when it is not needed.
 The `labs(none)` and `element-blank()` controls shown above are the visible handles, but most of the work was below them, deciding how much room each part of a figure should take.
