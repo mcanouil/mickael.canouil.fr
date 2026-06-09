@@ -35,6 +35,10 @@ quarto render posts/2026-02-27-typst-template-tutorial-part1
 quarto render posts/2026-03-05-typst-template-tutorial-part2
 quarto render posts/2026-04-15-quarto-brand-figures-tables
 quarto render posts/2026-04-21-quarto-revealjs-extensions
+quarto render posts/2026-05-28-typst-linkedin-carousels
+quarto render posts/2026-06-03-gribouille-0-2
+Rscript posts/2026-06-10-why-quarto-stuck/assets/scripts/quarto-cli-activity.R
+quarto render posts/2026-06-10-why-quarto-stuck
 
 # 2026-05-20-gribouille-grammar-of-graphics-for-typst
 # Post executes a Python chunk via Jupyter and renders {typst} blocks that
