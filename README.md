@@ -9,4 +9,5 @@
 
 Repository for [mickael.canouil.fr](https://mickael.canouil.fr).
 
-Website content is under [CC-BY-NC-SA-4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+Website content (blog posts, images) is licensed under [CC-BY-NC-SA-4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+Code (SCSS, JS, etc.) is licensed under [MIT](LICENSE), unless stated otherwise (some code originates from third-party repositories and retains its original licence).
