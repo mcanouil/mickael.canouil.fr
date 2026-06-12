@@ -1,4 +1,8 @@
 <%
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
 const SELF_FAMILY = "Canouil";
 const SELF_GIVEN = "Mickaël";
 

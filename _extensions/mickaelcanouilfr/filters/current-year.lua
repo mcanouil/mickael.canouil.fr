@@ -1,3 +1,7 @@
+--- @license MIT
+--- @copyright 2026 Mickaël Canouil
+--- @author Mickaël Canouil
+--
 -- Replace the contents of the `[]{#current-year}` placeholder with the
 -- current four-digit year. Used by the page footer to keep the copyright
 -- line up to date without client-side JS.

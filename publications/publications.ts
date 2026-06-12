@@ -3,6 +3,10 @@
 // (publications/publications.yml) and a Quarto listing page
 // (publications/index.qmd) wired to assets/listing-templates/publications.ejs.
 // Executed by Quarto's bundled Deno runtime; paths are relative to project root.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
 export {};
 
 const AUTHOR_FAMILY = "Canouil";
