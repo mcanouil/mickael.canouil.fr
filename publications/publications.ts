@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Pre-render: convert publications/publications.bib to a CSL YAML feed
 // (publications/publications.yml) and a Quarto listing page
-// (publications/index.qmd) wired to assets/listing-templates/publications.ejs.
+// (publications/index.qmd) wired to assets/listing-templates/publications.ejs.md.
 // Executed by Quarto's bundled Deno runtime; paths are relative to project root.
 //
 // @license MIT
@@ -284,7 +284,7 @@ function buildQmd(flagged: number, middle: number): string {
     "  - id: publications",
     "    contents:",
     "      - publications.yml",
-    "    template: ../assets/listing-templates/publications.ejs",
+    "    template: ../assets/listing-templates/publications.ejs.md",
     "    page-size: 1000",
     "    sort: 'issued desc'",
     "    categories: false",
