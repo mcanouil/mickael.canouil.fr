@@ -1,4 +1,8 @@
 <%
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
 const featured = items.filter(i => i.featured === true);
 
 function renderCategoryChips(item) {

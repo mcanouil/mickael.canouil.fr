@@ -1,4 +1,8 @@
 <%
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
 function renderThumb(item, klass) {
   const inner = item.image
     ? `<img src="${item.image}" alt="" loading="lazy">`

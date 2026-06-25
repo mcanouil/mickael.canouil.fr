@@ -1,4 +1,8 @@
 <%
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
 // =============================================================================
 // Talks listing — year-grouped speaking history. Items declared inline in
 // talks.qmd; no individual talk pages. Each row surfaces the metadata a
