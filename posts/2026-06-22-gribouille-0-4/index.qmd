@@ -287,6 +287,9 @@ It leans on a good share of this release:
 //| code-fold: true
 //| code-summary: "Show the full Typst source"
 //| align: center
+//| width: 16cm
+//| height: 18cm
+//| margin: 0cm
 //| output-filename: "star-history.svg"
 //| alt: "Midnight-sky line chart of Gribouille's cumulative GitHub stars per day from April to June 2026, titled 'Gribouille, a Rising Star'. A luminous gold step trail rises from zero across a long flat run labelled 'Quietly built in private', lifts at a gold dashed marker labelled 'Made public 17th of May', then climbs through dashed release markers to a final amber spike annotated with a one-day jump."
 // Loads a daily-cumulative star count and release markers from CSV and plots
@@ -305,8 +308,6 @@ It leans on a good share of this release:
   cloud: rgb("#28406f"), // annotation boxes: moonlit cloud, lighter than the sky
   cloud-edge: rgb("#6b7cb0"), // faint rim catching the moonlight
 )
-
-#set page(width: 16cm, height: 18cm, margin: 0cm, fill: palette.sky-deep)
 
 #let raw-stars = csv("/assets/star-history/star-history.csv", row-type: dictionary).map(row => (
   date: row.date,
@@ -512,8 +513,11 @@ It leans on a good share of this release:
     annotate(
       "typst",
       x: head-x - 3.5,
-      y: 125,
-      label: [+#str(peak-jump) in a day],
+      y: 115,
+      label: [#align(right)[
+        +#str(peak-jump) in a day \
+        #text(size: 0.75em)[Hacker News Front Page]
+      ]],
       colour: palette.peak,
       size: 13pt,
       anchor: "east",
@@ -626,6 +630,13 @@ It leans on a good share of this release:
   ),
   width: auto,
   height: auto,
+  alt: "Midnight-sky line chart of Gribouille's cumulative GitHub stars per day from April to June 2026, titled \"Gribouille, a Rising Star\". A luminous gold step trail rises from zero across a long flat run labelled \"Quietly built in private\", lifts at a gold dashed marker labelled \"Made public 17th of May\", then climbs through dashed release markers (v0.1.0 onward) to a final amber spike of "
+    + str(int(peak.stars))
+    + " stars, annotated \"+"
+    + str(peak-jump)
+    + " in a day\". The y axis counts stars in steps of "
+    + str(y-step)
+    + "; the x axis spans months.",
 )
 ```
 
