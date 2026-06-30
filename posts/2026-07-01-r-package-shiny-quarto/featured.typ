@@ -31,7 +31,7 @@
   [],
   // title + subtitle
   pad(x: 52pt,
-    stack(spacing: 7pt,
+    stack(spacing: 12pt,
       text(size: 40pt, weight: "bold", fill: text-main, tracking: -0.5pt)[R Package Architecture],
       text(size: 18pt, fill: accent)[S7 · targets · Shiny · Quarto],
     )
