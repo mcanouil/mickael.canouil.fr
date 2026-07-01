@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
+<meta name="description" content="Most of my work is in R: statistical analysis of omics data, building packages. This post walks through the architecture I use to structure an analysis package that embeds a modular Shiny app and delivers branded reports through a bundled Quarto extension.">
 
-<title>Quarto Q&amp;A: How to publish your Quarto content as a Docker container? – Mickaël CANOUIL</title>
+<title>R Package Architecture: Shiny, Quarto, targets, and S7 – Mickaël CANOUIL</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -185,20 +185,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Quarto Q&amp;A: How to publish your Quarto content as a Docker container? - mickael.canouil.fr">
-<meta property="og:description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/featured.png">
+<meta property="og:title" content="R Package Architecture: Shiny, Quarto, targets, and S7 - mickael.canouil.fr">
+<meta property="og:description" content="Most of my work is in R: statistical analysis of omics data, building packages. This post walks through the architecture I use to structure an analysis package that embeds a modular Shiny app and delivers branded reports through a bundled Quarto extension.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/featured.png">
 <meta property="og:site_name" content="Mickaël CANOUIL">
-<meta property="og:image:height" content="1080">
-<meta property="og:image:width" content="1920">
-<meta property="og:image:alt" content="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale.
+<meta property="og:image:height" content="806">
+<meta property="og:image:width" content="1536">
+<meta property="og:image:alt" content="Dark card on a navy background. Bold white text reads &quot;R Package Architecture&quot;.
+Below in blue: &quot;S7 · targets · Shiny · Quarto&quot;.
+Four cards in a row show the R, targets, Shiny, and Quarto hex logos,
+labelled S7 object model, targets pipeline, Shiny app, and Quarto extension.
 ">
-<meta name="twitter:title" content="Quarto Q&amp;A: How to publish your Quarto content as a Docker container? – Mickaël CANOUIL">
-<meta name="twitter:description" content="In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/featured.png">
-<meta name="twitter:image-height" content="1080">
-<meta name="twitter:image-width" content="1920">
-<meta name="twitter:image:alt" content="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale.
+<meta name="twitter:title" content="R Package Architecture: Shiny, Quarto, targets, and S7 – Mickaël CANOUIL">
+<meta name="twitter:description" content="Most of my work is in R: statistical analysis of omics data, building packages. This post walks through the architecture I use to structure an analysis package that embeds a modular Shiny app and delivers branded reports through a bundled Quarto extension.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/featured.png">
+<meta name="twitter:image-height" content="806">
+<meta name="twitter:image-width" content="1536">
+<meta name="twitter:image:alt" content="Dark card on a navy background. Bold white text reads &quot;R Package Architecture&quot;.
+Below in blue: &quot;S7 · targets · Shiny · Quarto&quot;.
+Four cards in a row show the R, targets, Shiny, and Quarto hex logos,
+labelled S7 object model, targets pipeline, Shiny app, and Quarto extension.
 ">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -438,16 +444,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Quarto Q&amp;A: How to publish your Quarto content as a Docker container?</h1>
+      <h1 class="title">R Package Architecture: Shiny, Quarto, targets, and S7</h1>
                   <div>
         <div class="description">
-          <p>In this blog post of the “Quarto Q&amp;A” series you will learn how to publish your Quarto project as a Docker container.</p>
+          <p>Most of my work is in R: statistical analysis of omics data, building packages. This post walks through the architecture I use to structure an analysis package that embeds a modular Shiny app and delivers branded reports through a bundled Quarto extension.</p>
         </div>
       </div>
                           <div class="quarto-categories">
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">shiny</div>
                 <div class="quarto-category">quarto</div>
-                <div class="quarto-category">q&amp;a</div>
-                <div class="quarto-category">docker</div>
+                <div class="quarto-category">s7</div>
+                <div class="quarto-category">targets</div>
               </div>
                   </div>
   </div>
@@ -470,7 +478,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Sunday, the 7th of May, 2023</p>
+        <p class="date">Wednesday, the 1st of July, 2026</p>
       </div>
     </div>
     
@@ -486,25 +494,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-questionproblem" id="toc-the-questionproblem" class="nav-link active" data-scroll-target="#the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</a></li>
-  <li><a href="#the-answersolution" id="toc-the-answersolution" class="nav-link" data-scroll-target="#the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</a>
-  <ul>
-  <li><a href="#create-a-project" id="toc-create-a-project" class="nav-link" data-scroll-target="#create-a-project"><span class="header-section-number">2.1</span> Create a project</a></li>
-  <li><a href="#renv" id="toc-renv" class="nav-link" data-scroll-target="#renv"><span class="header-section-number">2.2</span> <code>renv</code></a>
-  <ul class="collapse">
-  <li><a href="#setup-renv" id="toc-setup-renv" class="nav-link" data-scroll-target="#setup-renv"><span class="header-section-number">2.2.1</span> Setup <code>renv</code></a></li>
-  <li><a href="#the-dockerfile" id="toc-the-dockerfile" class="nav-link" data-scroll-target="#the-dockerfile"><span class="header-section-number">2.2.2</span> The Dockerfile</a></li>
-  </ul></li>
-  <li><a href="#pak" id="toc-pak" class="nav-link" data-scroll-target="#pak"><span class="header-section-number">2.3</span> <code>pak</code></a>
-  <ul class="collapse">
-  <li><a href="#setup-pak" id="toc-setup-pak" class="nav-link" data-scroll-target="#setup-pak"><span class="header-section-number">2.3.1</span> Setup <code>pak</code></a></li>
-  <li><a href="#the-dockerfile-1" id="toc-the-dockerfile-1" class="nav-link" data-scroll-target="#the-dockerfile-1"><span class="header-section-number">2.3.2</span> The Dockerfile</a></li>
-  </ul></li>
-  <li><a href="#build-the-image" id="toc-build-the-image" class="nav-link" data-scroll-target="#build-the-image"><span class="header-section-number">2.4</span> Build the image</a></li>
-  <li><a href="#deploy-a-container" id="toc-deploy-a-container" class="nav-link" data-scroll-target="#deploy-a-container"><span class="header-section-number">2.5</span> Deploy a container</a></li>
-  </ul></li>
+  <li><a href="#when-does-this-pattern-fit" id="toc-when-does-this-pattern-fit" class="nav-link active" data-scroll-target="#when-does-this-pattern-fit"><span class="header-section-number">1</span> When does this pattern fit?</a></li>
+  <li><a href="#the-four-pillars" id="toc-the-four-pillars" class="nav-link" data-scroll-target="#the-four-pillars"><span class="header-section-number">2</span> The four pillars</a></li>
+  <li><a href="#an-s7-object-model" id="toc-an-s7-object-model" class="nav-link" data-scroll-target="#an-s7-object-model"><span class="header-section-number">3</span> An S7 object model</a></li>
+  <li><a href="#a-config-driven-pipeline" id="toc-a-config-driven-pipeline" class="nav-link" data-scroll-target="#a-config-driven-pipeline"><span class="header-section-number">4</span> A config-driven pipeline</a></li>
+  <li><a href="#a-bundled-quarto-extension" id="toc-a-bundled-quarto-extension" class="nav-link" data-scroll-target="#a-bundled-quarto-extension"><span class="header-section-number">5</span> A bundled Quarto extension</a></li>
+  <li><a href="#a-modular-shiny-app" id="toc-a-modular-shiny-app" class="nav-link" data-scroll-target="#a-modular-shiny-app"><span class="header-section-number">6</span> A modular Shiny app</a></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together"><span class="header-section-number">7</span> Putting it all together</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-05-07-quarto-docker/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-01-r-package-shiny-quarto/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -520,254 +518,360 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>A new blog post of the “Quarto Q&amp;A” series.<br>
-This time, I will show how to publish your Quarto project as a Docker container as light as possible.</p>
+<p>My recent posts have all been about Quarto and Typst. This one is different: it is about R (<em>yet, still a bit about Quarto too</em>). My day job is to conduct statistical analysis of omics data, and most of it is spent writing R code through packages, Shiny apps, scripts, things used by everyone from data scientists to clinicians who never open a terminal. This post is about the package shape I settled on in my most recent projects, where the analysis logic, the interactive app, and the report all need to share the same code.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Docker logo with a whale and containers on top of it, and Quarto logo with text inside the whale."></a></p>
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Dark card on a navy background. Bold white text reads &quot;R Package
+Architecture&quot;. Below in blue: &quot;S7 · targets · Shiny · Quarto&quot;. Four
+cards in a row show the R, targets, Shiny, and Quarto hex logos,
+labelled S7 object model, targets pipeline, Shiny app, and Quarto
+extension.
+" width="600"></a></p>
 </figure>
 </div>
-<section id="the-questionproblem" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
-<p>There are different ways to publish a Quarto project, either if it is a document, a book or a website:</p>
-<ul>
-<li><a href="https://quarto.org/docs/publishing/quarto-pub.html">Quarto Pub</a>,</li>
-<li><a href="https://quarto.org/docs/publishing/github-pages.html">GitHub Pages</a>,</li>
-<li><a href="https://quarto.org/docs/publishing/rstudio-connect.html">Posit Connect</a>,</li>
-<li><a href="https://quarto.org/docs/publishing/netlify.html">Netlify</a>,</li>
-<li><a href="https://quarto.org/docs/publishing/confluence.html">Confluence</a>.</li>
-</ul>
-<p>But, what if you want to publish your Quarto project as a Docker container, as an app?</p>
+<section id="when-does-this-pattern-fit" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="when-does-this-pattern-fit"><span class="header-section-number">1</span> When does this pattern fit?</h2>
+<p>The pattern earns its complexity when several things are true at once. You have a domain object that several verbs operate on, such as load, summarise, and export. You want the same logic available interactively, in a batch pipeline, and in a report. You need branded, consistent output across formats: HTML, PDF, slides.</p>
+<p>If you only need a handful of functions, this is too much structure. The cost is worth paying once the object model and the reporting start to repeat.</p>
 </section>
-<section id="the-answersolution" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</h2>
-<p>Again, there are several ways to do it. I will show you one way to publish your Quarto project as a Docker container, as light as possible. To do so, I will use a Dockerfile with staged builds and a Quarto website project.</p>
-<section id="create-a-project" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="create-a-project"><span class="header-section-number">2.1</span> Create a project</h3>
-<p>First, I create a website using the Quarto CLI and add a code cell to the <code>about.qmd</code> file that uses the <code>palmerpenguins</code> <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> package.<br>
-I will publish this Quarto project as a Docker container.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> create-project <span class="at">--type</span> website:blog mywebsite</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> mywebsite</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'```{r}</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">library(ggplot2)</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">library(palmerpenguins)</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">ggplot(penguins) +</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">  aes(x = bill_length_mm, y = bill_depth_mm) +</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_point(aes(colour = species)) +</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">  geom_smooth(method = "lm", se = FALSE)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">```'</span> <span class="op">&gt;&gt;</span> about.qmd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="the-four-pillars" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-four-pillars"><span class="header-section-number">2</span> The four pillars</h2>
+<p>The package rests on four parts that compose cleanly.</p>
+<div id="fig-architecture" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around."><img src="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-light.svg" class="img-fluid figure-img" alt="Architecture diagram with four boxes inside a border labelled acme.toolkit. Top row: S7 object model on the left connected by a right arrow to targets pipeline on the right. Bottom row: Shiny app on the left, Quarto extension on the right. Vertical down arrows connect the top row to the bottom row in each column."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around."><img src="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-dark.svg" class="img-fluid figure-img" alt="Architecture diagram with four boxes inside a border labelled acme.toolkit. Top row: S7 object model on the left connected by a right arrow to targets pipeline on the right. Bottom row: Shiny app on the left, Quarto extension on the right. Vertical down arrows connect the top row to the bottom row in each column."></a></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around.
+</figcaption>
+</figure>
+</div>
+<p>Each pillar is a distinct tool with a different job. <a href="https://rconsortium.github.io/S7/">S7</a> defines the typed data structures the rest of the package operates on. <a href="https://docs.ropensci.org/targets/">targets</a> is a build system: it caches intermediate results and only re-runs steps whose inputs have changed. <a href="https://shiny.posit.co/r/">Shiny</a> turns R functions into an interactive web app, with no JavaScript needed. Quarto renders documents from a single source file: HTML pages, PDFs, slide decks, all from the same prose and code.</p>
+<p>The S7 objects are the currency that flows between the four parts. The pipeline, the report, and the Shiny app all pass them around and call the same generics.</p>
 </section>
-<section id="renv" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="renv"><span class="header-section-number">2.2</span> <code>renv</code></h3>
-<p><em>See <a href="https://rstudio.github.io/renv/" class="uri">https://rstudio.github.io/renv/</a>.</em></p>
-<section id="setup-renv" class="level4" data-number="2.2.1">
-<h4 data-number="2.2.1" class="anchored" data-anchor-id="setup-renv"><span class="header-section-number">2.2.1</span> Setup <code>renv</code></h4>
-<p>I am using <code>renv</code> to record the dependencies of the project<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'library(knitr)</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">library(rmarkdown)</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">library(ggplot2)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">library(palmerpenguins)'</span> <span class="op">&gt;&gt;</span> _dependencies.R</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'install.packages("renv")'</span> <span class="at">-e</span> <span class="st">"renv::init()"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"renv::hydrate()"</span> <span class="at">-e</span> <span class="st">"renv::snapshot()"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="the-dockerfile" class="level4" data-number="2.2.2">
-<h4 data-number="2.2.2" class="anchored" data-anchor-id="the-dockerfile"><span class="header-section-number">2.2.2</span> The Dockerfile</h4>
-<p>Here, I am using “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> versions.<br>
-This allows to change the versions without having to change the Dockerfile itself.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="bash"><pre class="sourceCode bash cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> QUARTO_VERSION=<span class="st">"1.3.340"</span></span>
-<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> ghcr.io/quarto-dev/quarto:<span class="va">${QUARTO_VERSION}</span> AS builder</span>
-<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> RIG_VERSION=<span class="st">"latest"</span></span>
-<span id="annotated-cell-3-6"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> R_VERSION=<span class="st">"release"</span></span>
-<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> install-rig.sh /tmp/install-rig.sh</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-8" class="code-annotation-target"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> bash /tmp/install-rig.sh <span class="st">"</span><span class="va">${RIG_VERSION}</span><span class="st">"</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-9" class="code-annotation-target"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> rig add <span class="va">${R_VERSION}</span> <span class="kw">&amp;&amp;</span> <span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'pak::pkg_install("renv")'</span></span>
-<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-3-11" class="code-annotation-target"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> mywebsite /app</span>
-<span id="annotated-cell-3-12"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /app</span>
-<span id="annotated-cell-3-13"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> Rscript <span class="at">-e</span> <span class="st">"renv::restore()"</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-3-14" class="code-annotation-target"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> quarto render .</span>
-<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-3-16" class="code-annotation-target"><a href="#annotated-cell-3-16" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> httpd:alpine</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-3-17" class="code-annotation-target"><a href="#annotated-cell-3-17" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> <span class="at">--from</span><span class="op">=</span>builder /app/_site/ /usr/local/apache2/htdocs/</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="an-s7-object-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="an-s7-object-model"><span class="header-section-number">3</span> An S7 object model</h2>
+<p>R is a functional language, but it lets you define your own types. A class is a named structure with rules: it says what fields a value must have, what types those fields must be, and what makes a value valid. Once you have a class, you can write functions whose behaviour changes depending on what type of object you pass them. That is the whole idea.</p>
+<p><a href="https://rconsortium.github.io/S7/">S7</a> is the R Consortium’s current answer to “how should R do this”. It replaces the older S3 and S4 systems with a cleaner API: you declare properties (the fields), a validator (the rules), and a constructor (how to build one). You call <code>@</code> to read a field, just like <code>$</code> for a list.</p>
+<p>The package has three classes. <code>Dataset</code> wraps a <code>data.frame</code> and records when it was created. <code>AnalysisResult</code> holds the summary table and method name produced by one analysis run. <code>Project</code> owns a dataset and an ordered list of results.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/aab-classes.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="R/aab-classes.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a>Dataset <span class="ot">&lt;-</span> S7<span class="sc">::</span><span class="fu">new_class</span>(</span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"Dataset"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">properties =</span> <span class="fu">list</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-4" class="code-annotation-target"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> S7<span class="sc">::</span>class_any,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> S7<span class="sc">::</span><span class="fu">new_property</span>(<span class="at">class =</span> S7<span class="sc">::</span>class_character, <span class="at">default =</span> <span class="st">""</span>),</span>
+<span id="annotated-cell-1-6"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">created =</span> S7<span class="sc">::</span><span class="fu">new_property</span>(<span class="at">class =</span> S7<span class="sc">::</span>class_any, <span class="at">default =</span> <span class="cn">NULL</span>)</span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-8" class="code-annotation-target"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">validator =</span> <span class="cf">function</span>(self) {</span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(self<span class="sc">@</span>data) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.data.frame</span>(self<span class="sc">@</span>data)) {</span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">"@data must be a data.frame or NULL"</span>)</span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(self<span class="sc">@</span>name) <span class="sc">!=</span> <span class="dv">1</span>L) {</span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(<span class="st">"@name must be a single string"</span>)</span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cn">NULL</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a>  },</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-17" class="code-annotation-target"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">constructor =</span> <span class="cf">function</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="at">name =</span> <span class="st">""</span>) {</span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>    S7<span class="sc">::</span><span class="fu">new_object</span>(</span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>      S7<span class="sc">::</span><span class="fu">S7_object</span>(),</span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> data,</span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> name,</span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">created =</span> <span class="fu">Sys.time</span>()</span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Properties are typed slots; every instance must carry a value for each.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2"><code>class_any</code> accepts any R object with no type check.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="3"><code>new_property()</code> adds a class constraint and a default value; omitting <code>name</code> gives <code>""</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="8" data-code-annotation="4">All invariants go in <code>validator</code>; returning a string fails construction with that message.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="5">The constructor stamps <code>created</code> automatically; callers only supply <code>data</code> and <code>name</code>.</span>
+</dd>
+</dl>
+<p>Verbs are S7 generics. A generic is a function that looks at the type of its first argument and calls the right implementation. You define the generic once, then attach a separate implementation for each class. Generics go in <code>aaa-generics.R</code>, before the class files, so the implementations can attach to them when R loads the package.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/aaa-generics.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="R/aaa-generics.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a>analyse <span class="ot">&lt;-</span> S7<span class="sc">::</span><span class="fu">new_generic</span>(</span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"analyse"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"object"</span>,</span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(object, <span class="at">method =</span> <span class="st">"describe"</span>, ...) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>    S7<span class="sc">::</span><span class="fu">S7_dispatch</span>()</span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">The dispatch argument: S7 picks the method based on the class of <code>object</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="2">Must call <code>S7_dispatch()</code> in the body; this triggers method lookup and execution.</span>
+</dd>
+</dl>
+<p>The <code>Project</code> method delegates to the <code>Dataset</code> method, stores the result, and updates the timestamp.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/analyse.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="R/analyse.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a>S7<span class="sc">::</span><span class="fu">method</span>(analyse, Project) <span class="ot">&lt;-</span> <span class="cf">function</span>(object, <span class="at">method =</span> <span class="st">"describe"</span>, ...) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">analyse</span>(object<span class="sc">@</span>data, <span class="at">method =</span> method, ...)</span>
+<span id="annotated-cell-3-3"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>  object<span class="sc">@</span>results <span class="ot">&lt;-</span> <span class="fu">c</span>(object<span class="sc">@</span>results, <span class="fu">list</span>(result))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-4" class="code-annotation-target"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>  object<span class="sc">@</span>modified <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a>  object</span>
+<span id="annotated-cell-3-6"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
-The “<em>builder</em>” stage is used to install the specified <code>rig</code> and <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> version, and to render the website.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="1" data-code-annotation="1">Attaches a method to the <code>analyse</code> generic specifically for <code>Project</code> objects.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="8" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="2" data-code-annotation="2">Delegates to the <code>Dataset</code> method by passing <code>object@data</code>; no logic is duplicated.</span>
 </dd>
 <dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="9" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> version and install the <code>renv</code> package.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="11" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="14" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="16" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
-</dd>
-<dt data-target-cell="annotated-cell-3" data-target-annotation="7">7</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="17" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="4" data-code-annotation="3">S7 slot assignment uses <code>@&lt;-</code>, the same accessor as reading (<code>@</code>).</span>
 </dd>
 </dl>
+<p>One more thing worth keeping: the <code>filter()</code> generic uses a search-path fallback so the package’s own <code>filter()</code> method works on <code>Dataset</code> objects while <a href="https://dplyr.tidyverse.org/">dplyr</a>’s <code>filter()</code> still works on data frames. The default method walks the search path and delegates to the next plain function of the same name.</p>
+<div class="highlight">
+<p><strong>One generic, many callers:</strong> <code>analyse(dataset)</code> and <code>analyse(project)</code> look identical at the call site. S7 routes each to the right implementation. No type-checking <code>if</code> branches anywhere in the calling code.</p>
+</div>
 </section>
+<section id="a-config-driven-pipeline" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="a-config-driven-pipeline"><span class="header-section-number">4</span> A config-driven pipeline</h2>
+<p>Most people who run an analysis are not R developers. They know what data they have and what question they want to answer, but they should not need to open a <code>.R</code> file to say so.</p>
+<p>A YAML config makes this possible. It reads like plain English: here is the data file, here are the analyses to run, here is what the report should be called. No R syntax, no package knowledge, no risk of accidentally breaking the pipeline logic. The package owns the code; the config owns the decisions.</p>
+<p>R developers who want more control are not forced through the config. They can call <code>Dataset()</code>, <code>analyse()</code>, and the rest of the verbs directly, compose them however they like, and build their own pipeline. The config-driven workflow is a convenience layer on top, not a gate.</p>
+<p><code>generate_pipeline()</code> validates the config, fills a <a href="https://cran.r-project.org/package=whisker">whisker</a>/Mustache template, and writes a <code>_targets.R</code> file. <code>run_pipeline()</code> calls <a href="https://docs.ropensci.org/targets/">targets</a>’ <code>tar_make()</code> to execute it. <code>report_pipeline()</code> renders the Quarto report from the store.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>pipeline-config.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="pipeline-config.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">file</span><span class="kw">:</span><span class="at"> demo.csv</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> demo</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">analyses</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">summary</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> describe</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pairs</span><span class="kw">:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">method</span><span class="kw">:</span><span class="at"> correlate</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">report</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Acme Analysis Report"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> acme-html</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The template is the interesting part. Each analysis in the config becomes one <code>targets</code> target. The whisker <code>{#analyses} ... {{/analyses}}</code> section expands once per entry.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>inst/templates/_targets.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="inst/templates/_targets.R"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tar_target</span>(input_file, <span class="st">"{{{data_file}}}"</span>, <span class="at">format =</span> <span class="st">"file"</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tar_target</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    dataset,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    acme.toolkit<span class="sc">::</span><span class="fu">Dataset</span>(<span class="at">data =</span> utils<span class="sc">::</span><span class="fu">read.csv</span>(input_file), <span class="at">name =</span> <span class="st">"{{{data_name}}}"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  ){{<span class="co">#analyses}},</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tar_target</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    {{name}},</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    acme.toolkit<span class="sc">::</span><span class="fu">analyse</span>(dataset, <span class="at">method =</span> <span class="st">"{{method}}"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  ){{<span class="sc">/</span>analyses}}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="er">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The leading comma belongs at the start of each repeated block, after the always-present <code>dataset</code> target. This avoids a trailing comma in the generated list, which would be a parse error.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The config hash is written into the file header at generation time. If the config drifts from what was used to generate the pipeline, a later run can warn about it.</p>
+</div>
+</div>
 </section>
-<section id="pak" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="pak"><span class="header-section-number">2.3</span> <code>pak</code></h3>
-<p><em>See <a href="https://pak.r-lib.org/" class="uri">https://pak.r-lib.org/</a>.</em></p>
-<section id="setup-pak" class="level4" data-number="2.3.1">
-<h4 data-number="2.3.1" class="anchored" data-anchor-id="setup-pak"><span class="header-section-number">2.3.1</span> Setup <code>pak</code></h4>
-<p>Alternatively to <code>renv</code>, it’s also possible de record (and restore) the dependencies of a project<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))'</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'pak::lockfile_create(c("knitr", "rmarkdown", "ggplot2", "palmerpenguins"))'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="a-bundled-quarto-extension" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="a-bundled-quarto-extension"><span class="header-section-number">5</span> A bundled Quarto extension</h2>
+<p>Branding lives in exactly one place: a Quarto extension under <code>inst/_extensions/acme/</code>. One <code>_extension.yml</code> defines three formats.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>inst/_extensions/acme/_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="inst/_extensions/acme/_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> Acme</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1.0</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quarto-required</span><span class="kw">:</span><span class="at"> </span><span class="st">"&gt;=1.5.0"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">contributes</span><span class="kw">:</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">project</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brand</span><span class="kw">:</span><span class="at"> _brand.yml</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">common</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">filters</span><span class="kw">:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> filters/prose-divs.lua</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> filters/copyright-year.lua</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">toc</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">number-sections</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">html</span><span class="kw">:</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">cosmo</span><span class="kw">,</span><span class="at"> brand</span><span class="kw">,</span><span class="at"> acme.scss</span><span class="kw">]</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">embed-resources</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">title-block-banner</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">typst</span><span class="kw">:</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">papersize</span><span class="kw">:</span><span class="at"> a4</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">margin</span><span class="kw">:</span><span class="at"> </span><span class="kw">{</span><span class="fu">top</span><span class="kw">:</span><span class="at"> 2.5cm</span><span class="kw">,</span><span class="at"> </span><span class="fu">bottom</span><span class="kw">:</span><span class="at"> 2.5cm</span><span class="kw">,</span><span class="at"> </span><span class="fu">left</span><span class="kw">:</span><span class="at"> 2cm</span><span class="kw">,</span><span class="at"> </span><span class="fu">right</span><span class="kw">:</span><span class="at"> 2cm</span><span class="kw">}</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">revealjs</span><span class="kw">:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">default</span><span class="kw">,</span><span class="at"> brand</span><span class="kw">,</span><span class="at"> revealjs/theme.scss</span><span class="kw">]</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">embed-resources</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>A document opts in with one line.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="yaml"><pre class="sourceCode yaml cw-auto code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span><span class="at"> acme-html</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Colours, fonts, and logos live in <code>_brand.yml</code>. Quarto’s native brand support feeds them into every format, so the SCSS files only add layout rules.</p>
+<p>The extension ships inside the package at <code>inst/_extensions/acme/</code>. When the pipeline is generated, <code>.install_acme_extension()</code> copies it into the project directory. Quarto resolves <code>_extensions/</code> from the document’s directory, so the copy must be local. Re-skinning the whole system means editing three files: <code>_brand.yml</code>, <code>acme.scss</code>, and <code>revealjs/theme.scss</code>.</p>
+<div class="highlight">
+<p><strong>One extension, three formats:</strong> <code>acme-html</code>, <code>acme-typst</code>, and <code>acme-revealjs</code> all draw from the same <code>_brand.yml</code>. Swap the palette once and every output follows.</p>
+</div>
 </section>
-<section id="the-dockerfile-1" class="level4" data-number="2.3.2">
-<h4 data-number="2.3.2" class="anchored" data-anchor-id="the-dockerfile-1"><span class="header-section-number">2.3.2</span> The Dockerfile</h4>
-<p>Again, I am using “build arguments” (<em>i.e.</em>, <code>ARGS</code>) to specify the <a href="https://quarto.org/">Quarto</a>, the <a href="https://github.com/r-lib/rig">rig</a> and the <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> versions.<br>
-This allows to change the versions without having to change the Dockerfile.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="bash"><pre class="sourceCode bash cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> QUARTO_VERSION=<span class="st">"1.3.340"</span></span>
-<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-3" class="code-annotation-target"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> ghcr.io/quarto-dev/quarto:<span class="va">${QUARTO_VERSION}</span> AS builder</span>
-<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> RIG_VERSION=<span class="st">"latest"</span></span>
-<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">ARG</span> R_VERSION=<span class="st">"release"</span></span>
-<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> install-rig.sh /tmp/install-rig.sh</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-8" class="code-annotation-target"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> bash /tmp/install-rig.sh <span class="st">"</span><span class="va">${RIG_VERSION}</span><span class="st">"</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-5-9" class="code-annotation-target"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> rig add <span class="va">${R_VERSION}</span></span>
-<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-5-11" class="code-annotation-target"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> mywebsite /app</span>
-<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">WORKDIR</span> /app</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-5-13" class="code-annotation-target"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a><span class="ex">RUN</span> Rscript <span class="at">-e</span> <span class="st">"pak::lockfile_install()"</span> <span class="kw">&amp;&amp;</span> <span class="ex">quarto</span> render .</span>
-<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-5-15" class="code-annotation-target"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a><span class="ex">FROM</span> httpd:alpine</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="7" onclick="event.preventDefault();">7</a><span id="annotated-cell-5-16" class="code-annotation-target"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a><span class="ex">COPY</span> <span class="at">--from</span><span class="op">=</span>builder /app/_site/ /usr/local/apache2/htdocs/</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="a-modular-shiny-app" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="a-modular-shiny-app"><span class="header-section-number">6</span> A modular Shiny app</h2>
+<p>The <a href="https://shiny.posit.co/r/">Shiny</a> app reuses the package’s analysis code. It does not re-implement it. The modules call <code>analyse()</code>, the same generic the batch pipeline calls.</p>
+<p>Shiny modules exist to solve a scoping problem. In a plain Shiny app, every input and output shares a single namespace, so names clash as the app grows. A module wraps a piece of UI and its server logic into an isolated unit with its own namespace. You can drop it into any app by calling two functions: one for the UI, one for the server.</p>
+<p>That last point matters here. The three modules are not just internal implementation details of this package’s bundled app. They are the public interface for other <a href="https://shiny.posit.co/r/">Shiny</a> apps. If you already have a Shiny app and you want to add an acme.toolkit analysis panel to it, you call <code>mod_analysis_ui()</code> and <code>mod_analysis_server()</code> and you are done. No copy-pasting, no re-implementing the analysis logic.</p>
+<div class="highlight">
+<p><strong>Modules as a public API:</strong> the three modules ship as the embeddable interface for any Shiny app. Drop them into an existing app the same way you drop them into the bundled one.</p>
+</div>
+<p><code>mod_input</code> loads a CSV and writes a <code>Dataset</code> into shared state. <code>mod_analysis</code> reads the dataset, runs <code>analyse()</code>, and writes the result. <code>mod_report</code> reads the result and offers a Quarto report as a download.</p>
+<p>The top-level server owns the shared state and passes it into each module.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/app_server.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-8" data-filename="R/app_server.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a>app_server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-2" class="code-annotation-target"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a>  dataset <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="cn">NULL</span>)</span>
+<span id="annotated-cell-8-3"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">reactiveVal</span>(<span class="cn">NULL</span>)</span>
+<span id="annotated-cell-8-4"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-5"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mod_input_server</span>(<span class="st">"input"</span>, <span class="at">dataset =</span> dataset)</span>
+<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mod_analysis_server</span>(<span class="st">"analysis"</span>, <span class="at">dataset =</span> dataset, <span class="at">result =</span> result)</span>
+<span id="annotated-cell-8-7"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mod_report_server</span>(<span class="st">"report"</span>, <span class="at">result =</span> result)</span>
+<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-9"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(<span class="cn">NULL</span>)</span>
+<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="3" data-code-annotation="1">The base Docker image used as the “<em>builder</em>”, <em>i.e.</em>, the image with all requirements to build your Quarto project. Here it is the Quarto image which is an Ubuntu based image with Quarto pre-installed.<br>
-The “<em>builder</em>” stage is used to install the specified <code>rig</code> and <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> version, and to render the website.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="8" data-code-annotation="2">The <code>install-rig.sh</code> script is used to install the <code>rig</code> software.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="9" data-code-annotation="3">Using <code>rig</code>, we add the specified <iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="R" title="R"></iconify-icon> version which already includes <code>pak</code>.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="11" data-code-annotation="4">Copy the Quarto project into the <code>/app</code> directory of the “<em>builder</em>”.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="5">Restore the <code>lockfile</code> created with <code>pak</code> and render the website with Quarto CLI.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="15" data-code-annotation="6">The second and last stage is based on the <code>httpd:alpine</code> image which is a light image with Apache pre-installed.</span>
-</dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="7">7</dt>
-<dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="16" data-code-annotation="7">Copy the rendered website from the “<em>builder</em>” to the <code>/usr/local/apache2/htdocs/</code> directory of the second stage image.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="2,3" data-code-annotation="1">Shared state lives here. Modules never reach into each other.</span>
 </dd>
 </dl>
-</section>
-</section>
-<section id="build-the-image" class="level3" data-number="2.4">
-<h3 data-number="2.4" class="anchored" data-anchor-id="build-the-image"><span class="header-section-number">2.4</span> Build the image</h3>
-<p>It’s time to build the image using the Dockerfile and the <a href="https://docs.docker.com/engine/reference/commandline/buildx_build/"><code>docker buildx build</code></a> command.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename="bash"><pre class="sourceCode bash cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> buildx build <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-2" class="code-annotation-target"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>--platform <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-3" class="code-annotation-target"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>--build-arg QUARTO_VERSION=1.3.340 <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-6-4" class="code-annotation-target"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>--tag <span class="st">"mywebsite:1.0.0"</span> <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-6-5" class="code-annotation-target"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>--push <span class="dt">\</span></span>
-<span id="annotated-cell-6-6"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>.</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The data flows in a straight line.</p>
+<div id="fig-data-flow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other."><img src="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-light.svg" class="img-fluid figure-img" alt="Horizontal flow diagram. Five boxes left to right: mod_input, dataset, mod_analysis, result, mod_report. Each consecutive pair is connected by an arrow labelled writes or reads."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other."><img src="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-dark.svg" class="img-fluid figure-img" alt="Horizontal flow diagram. Five boxes left to right: mod_input, dataset, mod_analysis, result, mod_report. Each consecutive pair is connected by an arrow labelled writes or reads."></a></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other.
+</figcaption>
+</figure>
+</div>
+<p>Inside <code>mod_analysis</code>, the call is simply:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/mod_analysis.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-9" data-filename="R/mod_analysis.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a>shiny<span class="sc">::</span><span class="fu">observeEvent</span>(input[[<span class="st">"run"</span>]], {</span>
+<span id="annotated-cell-9-2"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a>  ds <span class="ot">&lt;-</span> <span class="fu">dataset</span>()</span>
+<span id="annotated-cell-9-3"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(ds)) {</span>
+<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a>    shiny<span class="sc">::</span><span class="fu">showNotification</span>(<span class="st">"Load a dataset first."</span>, <span class="at">type =</span> <span class="st">"warning"</span>)</span>
+<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>()</span>
+<span id="annotated-cell-9-6"><a href="#annotated-cell-9-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-7" class="code-annotation-target"><a href="#annotated-cell-9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">result</span>(<span class="fu">analyse</span>(ds, <span class="at">method =</span> input[[<span class="st">"method"</span>]]))</span>
+<span id="annotated-cell-9-8"><a href="#annotated-cell-9-8" aria-hidden="true" tabindex="-1"></a>})</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="2" data-code-annotation="1">The platform to build the image for.</span>
-</dd>
-<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="3" data-code-annotation="2">The Quarto version to use when building the image.</span>
-</dd>
-<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="4" data-code-annotation="3">The tag to use to label the image, <em>i.e.</em>, the name <code>mywebsite</code> and the version <code>1.0.0</code>. This is useful to be able to identify the image later.</span>
-</dd>
-<dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-6" data-code-lines="5" data-code-annotation="4">(Optional) Assuming you have access to a registry (<code>docker login</code>), push the image to the registry, such as Docker Hub.</span>
+<span data-code-cell="annotated-cell-9" data-code-lines="7" data-code-annotation="1">Same <code>analyse()</code> generic as the pipeline. No logic is duplicated.</span>
 </dd>
 </dl>
+<p>The module does not know how <code>analyse()</code> works. If you update the analysis logic inside the package, both the pipeline and the Shiny app pick it up.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/shiny-app.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The Input tab of the acme.toolkit Shiny app. The sidebar lets the user choose between a demo dataset and a CSV upload; the main panel shows the loaded data immediately."><img src="assets/shiny-app.png" class="hero-art img-fluid figure-img" alt="Screenshot of the acme.toolkit Shiny app. The navbar has a navy blue background showing the Acme logo mark (a white square with an orange inner square) followed by 'acme.toolkit' in white and tabs Input, Analysis, Report. The active Input tab is underlined in orange. The left sidebar has a light blue background and shows a Data source section with Demo dataset selected, an Upload CSV option, and a Dataset name field. The main area shows a table with columns id, group, height, weight, and score."></a></p>
+<figcaption>The Input tab of the acme.toolkit Shiny app. The sidebar lets the user choose between a demo dataset and a CSV upload; the main panel shows the loaded data immediately.</figcaption>
+</figure>
+</div>
 </section>
-<section id="deploy-a-container" class="level3" data-number="2.5">
-<h3 data-number="2.5" class="anchored" data-anchor-id="deploy-a-container"><span class="header-section-number">2.5</span> Deploy a container</h3>
-<p>Finally, deploying locally the image as a Docker container using <a href="https://docs.docker.com/engine/reference/commandline/container_run/"><code>docker container run</code></a> and access the website from your browser at <a href="http://localhost:8080" class="uri">http://localhost:8080</a>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-7" data-filename="bash"><pre class="sourceCode bash cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode bash"><span id="annotated-cell-7-1"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container run <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-2" class="code-annotation-target"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a>   <span class="at">--detach</span> <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-7-3" class="code-annotation-target"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">--platform</span> <span class="st">"linux/amd64"</span> <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-7-4" class="code-annotation-target"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">--name</span> mywebsite <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-7-5" class="code-annotation-target"><a href="#annotated-cell-7-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">--publish</span> 8080:80 <span class="dt">\</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-7-6" class="code-annotation-target"><a href="#annotated-cell-7-6" aria-hidden="true" tabindex="-1"></a>   mywebsite:1.0.0</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="2" data-code-annotation="1">The container in detached mode, <em>i.e.</em>, the container runs in the background.</span>
-</dd>
-<dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="3" data-code-annotation="2">The platform to run the container on, <em>i.e.</em>, same as the platform used to build the image in this case.</span>
-</dd>
-<dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="4" data-code-annotation="3">The name of the container for easy identification, <em>i.e.</em>, <code>mywebsite</code>.</span>
-</dd>
-<dt data-target-cell="annotated-cell-7" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="5" data-code-annotation="4">The port mapping, <em>i.e.</em>, we publish the port <code>8080</code> of the host to the port <code>80</code> of the container. This is useful to be able to access the website from the host.</span>
-</dd>
-<dt data-target-cell="annotated-cell-7" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="6" data-code-annotation="5">The image to use to run the container, <em>i.e.</em>, <code>mywebsite:1.0.0</code>.</span>
-</dd>
-</dl>
+<section id="putting-it-all-together" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="putting-it-all-together"><span class="header-section-number">7</span> Putting it all together</h2>
+<p>Depending on who you are, you interact with the package differently.</p>
+<p>If you are a clinician or analyst who does not write R, you fill in a YAML config file. You say which data to use, which analyses to run, and what to call the report. Then you call <code>run_pipeline()</code>. A branded HTML or PDF report appears in your project folder. You never open a <code>.R</code> file.</p>
+<p>If you want to explore the data interactively, you open the Shiny app with <code>run_app()</code>. You upload a CSV, pick an analysis method, and download the result. The app calls the same <code>analyse()</code> function the batch pipeline calls.</p>
+<p>If you are an R developer who wants to extend or customise the analysis, you work directly with the S7 classes and generics. You write a new method, add a property, or compose the verbs in a custom script. The change flows into the pipeline, the Shiny app, and the report without touching any of those.</p>
+<p>That is what the architecture is for. The same analysis logic runs in a terminal, in a browser, and in a PDF. Keeping it in one place is the only way to keep it consistent.</p>
+<p>The full working package is at <a href="https://github.com/mcanouil/demo-r-package-shiny-quarto">mcanouil/demo-r-package-shiny-quarto</a>. It builds clean with zero errors, warnings, and notes.</p>
+<p>Happy coding!</p>
 
 
 </section>
-</section>
 
-
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>See <a href="https://rstudio.github.io/renv/articles/renv.html#snapshotting-dependencies"><code>renv</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>See <a href="https://pak.r-lib.org/reference/index.html#lock-files"><code>pak</code> documentation</a> for more information on snapshotting dependencies.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2023,
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
   author = {CANOUIL, Mickaël},
-  title = {Quarto {Q\&amp;A:} {How} to Publish Your {Quarto} Content as a
-    {Docker} Container?},
-  date = {2023-05-07},
-  url = {https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/},
+  title = {R {Package} {Architecture:} {Shiny,} {Quarto,} Targets, and
+    {S7}},
+  date = {2026-07-01},
+  url = {https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/},
   langid = {en-GB}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2023" class="csl-entry quarto-appendix-citeas" role="listitem">
-CANOUIL, M. (2023-05-07). Quarto Q&amp;A: How to publish your Quarto
-content as a Docker container? <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/">https://mickael.canouil.fr/posts/2023-05-07-quarto-docker/</a>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-07-01). R Package Architecture: Shiny, Quarto,
+targets, and S7. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/">https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/</a>
 </div></div></section></div></main> <!-- /main -->
 <script id="mc-base64" type="text/javascript">
   /**
@@ -1676,7 +1780,7 @@ content as a Docker container? <em>Mickael.canouil.fr</em>. <a href="https://mic
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-05-07-quarto-docker/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-01-r-package-shiny-quarto/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
 </div>

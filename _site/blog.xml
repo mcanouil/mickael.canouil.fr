@@ -15,8 +15,1068 @@
 <title>Mickaël CANOUIL</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.10.13</generator>
-<lastBuildDate>Mon, 22 Jun 2026 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.10.14</generator>
+<lastBuildDate>Wed, 01 Jul 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>R Package Architecture: Shiny, Quarto, targets, and S7</title>
+  <link>https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/</link>
+  <description><![CDATA[ 
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+Skip to main content
+
+
+
+
+
+<p>My recent posts have all been about Quarto and Typst. This one is different: it is about R (<em>yet, still a bit about Quarto too</em>). My day job is to conduct statistical analysis of omics data, and most of it is spent writing R code through packages, Shiny apps, scripts, things used by everyone from data scientists to clinicians who never open a terminal. This post is about the package shape I settled on in my most recent projects, where the analysis logic, the interactive app, and the report all need to share the same code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Dark card on a navy background. Bold white text reads &quot;R Package
+Architecture&quot;. Below in blue: &quot;S7 · targets · Shiny · Quarto&quot;. Four
+cards in a row show the R, targets, Shiny, and Quarto hex logos,
+labelled S7 object model, targets pipeline, Shiny app, and Quarto
+extension.
+" width="600"></a></p>
+</figure>
+</div>
+<section id="when-does-this-pattern-fit" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="when-does-this-pattern-fit"><span class="header-section-number">1</span> When does this pattern fit?</h2>
+<p>The pattern earns its complexity when several things are true at once. You have a domain object that several verbs operate on, such as load, summarise, and export. You want the same logic available interactively, in a batch pipeline, and in a report. You need branded, consistent output across formats: HTML, PDF, slides.</p>
+<p>If you only need a handful of functions, this is too much structure. The cost is worth paying once the object model and the reporting start to repeat.</p>
+</section>
+<section id="the-four-pillars" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-four-pillars"><span class="header-section-number">2</span> The four pillars</h2>
+<p>The package rests on four parts that compose cleanly.</p>
+<div id="fig-architecture" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around."><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/assets/typst-render/fig-architecture-light.svg" class="img-fluid figure-img" alt="Architecture diagram with four boxes inside a border labelled acme.toolkit. Top row: S7 object model on the left connected by a right arrow to targets pipeline on the right. Bottom row: Shiny app on the left, Quarto extension on the right. Vertical down arrows connect the top row to the bottom row in each column."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-architecture-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around."><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/assets/typst-render/fig-architecture-dark.svg" class="img-fluid figure-img" alt="Architecture diagram with four boxes inside a border labelled acme.toolkit. Top row: S7 object model on the left connected by a right arrow to targets pipeline on the right. Bottom row: Shiny app on the left, Quarto extension on the right. Vertical down arrows connect the top row to the bottom row in each column."></a></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-architecture-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The four pillars of acme.toolkit. S7 objects are the shared currency: the pipeline, the report, and the Shiny app all pass them around.
+</figcaption>
+</figure>
+</div>
+<p>Each pillar is a distinct tool with a different job. <a href="https://rconsortium.github.io/S7/">S7</a> defines the typed data structures the rest of the package operates on. <a href="https://docs.ropensci.org/targets/">targets</a> is a build system: it caches intermediate results and only re-runs steps whose inputs have changed. <a href="https://shiny.posit.co/r/">Shiny</a> turns R functions into an interactive web app, with no JavaScript needed. Quarto renders documents from a single source file: HTML pages, PDFs, slide decks, all from the same prose and code.</p>
+<p>The S7 objects are the currency that flows between the four parts. The pipeline, the report, and the Shiny app all pass them around and call the same generics.</p>
+</section>
+<section id="an-s7-object-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="an-s7-object-model"><span class="header-section-number">3</span> An S7 object model</h2>
+<p>R is a functional language, but it lets you define your own types. A class is a named structure with rules: it says what fields a value must have, what types those fields must be, and what makes a value valid. Once you have a class, you can write functions whose behaviour changes depending on what type of object you pass them. That is the whole idea.</p>
+<p><a href="https://rconsortium.github.io/S7/">S7</a> is the R Consortium’s current answer to “how should R do this”. It replaces the older S3 and S4 systems with a cleaner API: you declare properties (the fields), a validator (the rules), and a constructor (how to build one). You call <code>@</code> to read a field, just like <code>$</code> for a list.</p>
+<p>The package has three classes. <code>Dataset</code> wraps a <code>data.frame</code> and records when it was created. <code>AnalysisResult</code> holds the summary table and method name produced by one analysis run. <code>Project</code> owns a dataset and an ordered list of results.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/aab-classes.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="R/aab-classes.R" style="background: #f1f3f5;"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1">Dataset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_class</span>(</span>
+<span id="annotated-cell-1-2">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Dataset"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">properties =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-4" class="code-annotation-target">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>class_any,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-5" class="code-annotation-target">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_property</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>class_character, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">default =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>),</span>
+<span id="annotated-cell-1-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">created =</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_property</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>class_any, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">default =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="annotated-cell-1-7">  ),</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-8" class="code-annotation-target">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">validator =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(self) {</span>
+<span id="annotated-cell-1-9">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.null</span>(self<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>data) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;&amp;</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.data.frame</span>(self<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>data)) {</span>
+<span id="annotated-cell-1-10">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"@data must be a data.frame or NULL"</span>)</span>
+<span id="annotated-cell-1-11">    }</span>
+<span id="annotated-cell-1-12">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(self<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>name) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>L) {</span>
+<span id="annotated-cell-1-13">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"@name must be a single string"</span>)</span>
+<span id="annotated-cell-1-14">    }</span>
+<span id="annotated-cell-1-15">    <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span></span>
+<span id="annotated-cell-1-16">  },</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-17" class="code-annotation-target">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">constructor =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>) {</span>
+<span id="annotated-cell-1-18">    S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_object</span>(</span>
+<span id="annotated-cell-1-19">      S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">S7_object</span>(),</span>
+<span id="annotated-cell-1-20">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> data,</span>
+<span id="annotated-cell-1-21">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> name,</span>
+<span id="annotated-cell-1-22">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">created =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Sys.time</span>()</span>
+<span id="annotated-cell-1-23">    )</span>
+<span id="annotated-cell-1-24">  }</span>
+<span id="annotated-cell-1-25">)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Properties are typed slots; every instance must carry a value for each.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2"><code>class_any</code> accepts any R object with no type check.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="3"><code>new_property()</code> adds a class constraint and a default value; omitting <code>name</code> gives <code>""</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="8" data-code-annotation="4">All invariants go in <code>validator</code>; returning a string fails construction with that message.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="5">The constructor stamps <code>created</code> automatically; callers only supply <code>data</code> and <code>name</code>.</span>
+</dd>
+</dl>
+<p>Verbs are S7 generics. A generic is a function that looks at the type of its first argument and calls the right implementation. You define the generic once, then attach a separate implementation for each class. Generics go in <code>aaa-generics.R</code>, before the class files, so the implementations can attach to them when R loads the package.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/aaa-generics.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="R/aaa-generics.R" style="background: #f1f3f5;"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-2-1">analyse <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_generic</span>(</span>
+<span id="annotated-cell-2-2">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"analyse"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"object"</span>,</span>
+<span id="annotated-cell-2-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(object, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"describe"</span>, ...) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-5" class="code-annotation-target">    S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">S7_dispatch</span>()</span>
+<span id="annotated-cell-2-6">  }</span>
+<span id="annotated-cell-2-7">)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">The dispatch argument: S7 picks the method based on the class of <code>object</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="2">Must call <code>S7_dispatch()</code> in the body; this triggers method lookup and execution.</span>
+</dd>
+</dl>
+<p>The <code>Project</code> method delegates to the <code>Dataset</code> method, stores the result, and updates the timestamp.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/analyse.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="R/analyse.R" style="background: #f1f3f5;"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target">S7<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">method</span>(analyse, Project) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(object, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"describe"</span>, ...) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target">  result <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">analyse</span>(object<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> method, ...)</span>
+<span id="annotated-cell-3-3">  object<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(object<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>results, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(result))</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-4" class="code-annotation-target">  object<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">@</span>modified <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Sys.time</span>()</span>
+<span id="annotated-cell-3-5">  object</span>
+<span id="annotated-cell-3-6">}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="1" data-code-annotation="1">Attaches a method to the <code>analyse</code> generic specifically for <code>Project</code> objects.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="2" data-code-annotation="2">Delegates to the <code>Dataset</code> method by passing <code>object@data</code>; no logic is duplicated.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="4" data-code-annotation="3">S7 slot assignment uses <code>@&lt;-</code>, the same accessor as reading (<code>@</code>).</span>
+</dd>
+</dl>
+<p>One more thing worth keeping: the <code>filter()</code> generic uses a search-path fallback so the package’s own <code>filter()</code> method works on <code>Dataset</code> objects while <a href="https://dplyr.tidyverse.org/">dplyr</a>’s <code>filter()</code> still works on data frames. The default method walks the search path and delegates to the next plain function of the same name.</p>
+<div class="highlight">
+<p><strong>One generic, many callers:</strong> <code>analyse(dataset)</code> and <code>analyse(project)</code> look identical at the call site. S7 routes each to the right implementation. No type-checking <code>if</code> branches anywhere in the calling code.</p>
+</div>
+</section>
+<section id="a-config-driven-pipeline" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="a-config-driven-pipeline"><span class="header-section-number">4</span> A config-driven pipeline</h2>
+<p>Most people who run an analysis are not R developers. They know what data they have and what question they want to answer, but they should not need to open a <code>.R</code> file to say so.</p>
+<p>A YAML config makes this possible. It reads like plain English: here is the data file, here are the analyses to run, here is what the report should be called. No R syntax, no package knowledge, no risk of accidentally breaking the pipeline logic. The package owns the code; the config owns the decisions.</p>
+<p>R developers who want more control are not forced through the config. They can call <code>Dataset()</code>, <code>analyse()</code>, and the rest of the verbs directly, compose them however they like, and build their own pipeline. The config-driven workflow is a convenience layer on top, not a gate.</p>
+<p><code>generate_pipeline()</code> validates the config, fills a <a href="https://cran.r-project.org/package=whisker">whisker</a>/Mustache template, and writes a <code>_targets.R</code> file. <code>run_pipeline()</code> calls <a href="https://docs.ropensci.org/targets/">targets</a>’ <code>tar_make()</code> to execute it. <code>report_pipeline()</code> renders the Quarto report from the store.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>pipeline-config.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="pipeline-config.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">file</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> demo.csv</span></span>
+<span id="cb1-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> demo</span></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">analyses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">method</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> describe</span></span>
+<span id="cb1-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pairs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">method</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> correlate</span></span>
+<span id="cb1-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">report</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Acme Analysis Report"</span></span>
+<span id="cb1-11"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formats</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-12"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> acme-html</span></span></code></pre></div></div>
+</div>
+<p>The template is the interesting part. Each analysis in the config becomes one <code>targets</code> target. The whisker <code>{#analyses} ... {{/analyses}}</code> section expands once per entry.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>inst/templates/_targets.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="inst/templates/_targets.R" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb2-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tar_target</span>(input_file, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{{{data_file}}}"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">format =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"file"</span>),</span>
+<span id="cb2-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tar_target</span>(</span>
+<span id="cb2-4">    dataset,</span>
+<span id="cb2-5">    acme.toolkit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Dataset</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> utils<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read.csv</span>(input_file), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">name =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{{{data_name}}}"</span>)</span>
+<span id="cb2-6">  ){{<span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#analyses}},</span></span>
+<span id="cb2-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tar_target</span>(</span>
+<span id="cb2-8">    {{name}},</span>
+<span id="cb2-9">    acme.toolkit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">analyse</span>(dataset, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{{method}}"</span>)</span>
+<span id="cb2-10">  ){{<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>analyses}}</span>
+<span id="cb2-11"><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</div>
+<p>The leading comma belongs at the start of each repeated block, after the always-present <code>dataset</code> target. This avoids a trailing comma in the generated list, which would be a parse error.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The config hash is written into the file header at generation time. If the config drifts from what was used to generate the pipeline, a later run can warn about it.</p>
+</div>
+</div>
+</section>
+<section id="a-bundled-quarto-extension" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="a-bundled-quarto-extension"><span class="header-section-number">5</span> A bundled Quarto extension</h2>
+<p>Branding lives in exactly one place: a Quarto extension under <code>inst/_extensions/acme/</code>. One <code>_extension.yml</code> defines three formats.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>inst/_extensions/acme/_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="inst/_extensions/acme/_extension.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Acme</span></span>
+<span id="cb3-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1.0</span></span>
+<span id="cb3-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quarto-required</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&gt;=1.5.0"</span></span>
+<span id="cb3-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contributes</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">metadata</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">project</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">brand</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> _brand.yml</span></span>
+<span id="cb3-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formats</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-9"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">common</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filters</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-11"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> filters/prose-divs.lua</span></span>
+<span id="cb3-12"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> filters/copyright-year.lua</span></span>
+<span id="cb3-13"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toc</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb3-14"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">number-sections</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb3-15"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">html</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-16"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">[</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cosmo</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> brand</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> acme.scss</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">]</span></span>
+<span id="cb3-17"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">embed-resources</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb3-18"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title-block-banner</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb3-19"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">typst</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-20"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">papersize</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> a4</span></span>
+<span id="cb3-21"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">margin</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">{</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">top</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> 2.5cm</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bottom</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> 2.5cm</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">left</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> 2cm</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">right</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> 2cm</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">}</span></span>
+<span id="cb3-22"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">revealjs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-23"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">[</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">default</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> brand</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> revealjs/theme.scss</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">]</span></span>
+<span id="cb3-24"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">embed-resources</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span></code></pre></div></div>
+</div>
+<p>A document opts in with one line.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="yaml" style="background: #f1f3f5;"><pre class="sourceCode yaml cw-auto code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">format</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> acme-html</span></span></code></pre></div></div>
+<p>Colours, fonts, and logos live in <code>_brand.yml</code>. Quarto’s native brand support feeds them into every format, so the SCSS files only add layout rules.</p>
+<p>The extension ships inside the package at <code>inst/_extensions/acme/</code>. When the pipeline is generated, <code>.install_acme_extension()</code> copies it into the project directory. Quarto resolves <code>_extensions/</code> from the document’s directory, so the copy must be local. Re-skinning the whole system means editing three files: <code>_brand.yml</code>, <code>acme.scss</code>, and <code>revealjs/theme.scss</code>.</p>
+<div class="highlight">
+<p><strong>One extension, three formats:</strong> <code>acme-html</code>, <code>acme-typst</code>, and <code>acme-revealjs</code> all draw from the same <code>_brand.yml</code>. Swap the palette once and every output follows.</p>
+</div>
+</section>
+<section id="a-modular-shiny-app" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="a-modular-shiny-app"><span class="header-section-number">6</span> A modular Shiny app</h2>
+<p>The <a href="https://shiny.posit.co/r/">Shiny</a> app reuses the package’s analysis code. It does not re-implement it. The modules call <code>analyse()</code>, the same generic the batch pipeline calls.</p>
+<p>Shiny modules exist to solve a scoping problem. In a plain Shiny app, every input and output shares a single namespace, so names clash as the app grows. A module wraps a piece of UI and its server logic into an isolated unit with its own namespace. You can drop it into any app by calling two functions: one for the UI, one for the server.</p>
+<p>That last point matters here. The three modules are not just internal implementation details of this package’s bundled app. They are the public interface for other <a href="https://shiny.posit.co/r/">Shiny</a> apps. If you already have a Shiny app and you want to add an acme.toolkit analysis panel to it, you call <code>mod_analysis_ui()</code> and <code>mod_analysis_server()</code> and you are done. No copy-pasting, no re-implementing the analysis logic.</p>
+<div class="highlight">
+<p><strong>Modules as a public API:</strong> the three modules ship as the embeddable interface for any Shiny app. Drop them into an existing app the same way you drop them into the bundled one.</p>
+</div>
+<p><code>mod_input</code> loads a CSV and writes a <code>Dataset</code> into shared state. <code>mod_analysis</code> reads the dataset, runs <code>analyse()</code>, and writes the result. <code>mod_report</code> reads the result and offers a Quarto report as a download.</p>
+<p>The top-level server owns the shared state and passes it into each module.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/app_server.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-8" data-filename="R/app_server.R" style="background: #f1f3f5;"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1">app_server <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(input, output, session) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-2" class="code-annotation-target">  dataset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> shiny<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reactiveVal</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="annotated-cell-8-3">  result <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> shiny<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reactiveVal</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="annotated-cell-8-4"></span>
+<span id="annotated-cell-8-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mod_input_server</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"input"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dataset =</span> dataset)</span>
+<span id="annotated-cell-8-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mod_analysis_server</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"analysis"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dataset =</span> dataset, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">result =</span> result)</span>
+<span id="annotated-cell-8-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mod_report_server</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"report"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">result =</span> result)</span>
+<span id="annotated-cell-8-8"></span>
+<span id="annotated-cell-8-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">invisible</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>)</span>
+<span id="annotated-cell-8-10">}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="2,3" data-code-annotation="1">Shared state lives here. Modules never reach into each other.</span>
+</dd>
+</dl>
+<p>The data flows in a straight line.</p>
+<div id="fig-data-flow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-data-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other."><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/assets/typst-render/fig-data-flow-light.svg" class="img-fluid figure-img" alt="Horizontal flow diagram. Five boxes left to right: mod_input, dataset, mod_analysis, result, mod_report. Each consecutive pair is connected by an arrow labelled writes or reads."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-01-r-package-shiny-quarto/./assets/typst-render/fig-data-flow-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other."><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/assets/typst-render/fig-data-flow-dark.svg" class="img-fluid figure-img" alt="Horizontal flow diagram. Five boxes left to right: mod_input, dataset, mod_analysis, result, mod_report. Each consecutive pair is connected by an arrow labelled writes or reads."></a></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-data-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Data flows in one direction through shared reactive state. Modules never reach into each other.
+</figcaption>
+</figure>
+</div>
+<p>Inside <code>mod_analysis</code>, the call is simply:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>R/mod_analysis.R</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-9" data-filename="R/mod_analysis.R" style="background: #f1f3f5;"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-9-1">shiny<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">observeEvent</span>(input[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"run"</span>]], {</span>
+<span id="annotated-cell-9-2">  ds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dataset</span>()</span>
+<span id="annotated-cell-9-3">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.null</span>(ds)) {</span>
+<span id="annotated-cell-9-4">    shiny<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">showNotification</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Load a dataset first."</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"warning"</span>)</span>
+<span id="annotated-cell-9-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>()</span>
+<span id="annotated-cell-9-6">  }</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-7" class="code-annotation-target">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">result</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">analyse</span>(ds, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> input[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"method"</span>]]))</span>
+<span id="annotated-cell-9-8">})</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="7" data-code-annotation="1">Same <code>analyse()</code> generic as the pipeline. No logic is duplicated.</span>
+</dd>
+</dl>
+<p>The module does not know how <code>analyse()</code> works. If you update the analysis logic inside the package, both the pipeline and the Shiny app pick it up.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/shiny-app.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The Input tab of the acme.toolkit Shiny app. The sidebar lets the user choose between a demo dataset and a CSV upload; the main panel shows the loaded data immediately."><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/assets/shiny-app.png" class="hero-art img-fluid figure-img" alt="Screenshot of the acme.toolkit Shiny app. The navbar has a navy blue background showing the Acme logo mark (a white square with an orange inner square) followed by 'acme.toolkit' in white and tabs Input, Analysis, Report. The active Input tab is underlined in orange. The left sidebar has a light blue background and shows a Data source section with Demo dataset selected, an Upload CSV option, and a Dataset name field. The main area shows a table with columns id, group, height, weight, and score."></a></p>
+<figcaption>The Input tab of the acme.toolkit Shiny app. The sidebar lets the user choose between a demo dataset and a CSV upload; the main panel shows the loaded data immediately.</figcaption>
+</figure>
+</div>
+</section>
+<section id="putting-it-all-together" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="putting-it-all-together"><span class="header-section-number">7</span> Putting it all together</h2>
+<p>Depending on who you are, you interact with the package differently.</p>
+<p>If you are a clinician or analyst who does not write R, you fill in a YAML config file. You say which data to use, which analyses to run, and what to call the report. Then you call <code>run_pipeline()</code>. A branded HTML or PDF report appears in your project folder. You never open a <code>.R</code> file.</p>
+<p>If you want to explore the data interactively, you open the Shiny app with <code>run_app()</code>. You upload a CSV, pick an analysis method, and download the result. The app calls the same <code>analyse()</code> function the batch pipeline calls.</p>
+<p>If you are an R developer who wants to extend or customise the analysis, you work directly with the S7 classes and generics. You write a new method, add a property, or compose the verbs in a custom script. The change flows into the pipeline, the Shiny app, and the report without touching any of those.</p>
+<p>That is what the architecture is for. The same analysis logic runs in a terminal, in a browser, and in a PDF. Keeping it in one place is the only way to keep it consistent.</p>
+<p>The full working package is at <a href="https://github.com/mcanouil/demo-r-package-shiny-quarto">mcanouil/demo-r-package-shiny-quarto</a>. It builds clean with zero errors, warnings, and notes.</p>
+<p>Happy coding!</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {R {Package} {Architecture:} {Shiny,} {Quarto,} Targets, and
+    {S7}},
+  date = {2026-07-01},
+  url = {https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2026-07-01). R Package Architecture: Shiny, Quarto,
+targets, and S7. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/">https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/</a>
+</div></div></section></div> ]]></description>
+  <category>r</category>
+  <category>shiny</category>
+  <category>quarto</category>
+  <category>s7</category>
+  <category>targets</category>
+  <guid>https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/</guid>
+  <pubDate>Wed, 01 Jul 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Gribouille 0.4.0: Temporal Scales, Any-Glyph Markers, and a Finer Grid</title>
   <link>https://mickael.canouil.fr/posts/2026-06-22-gribouille-0-4/</link>
@@ -9575,7 +10635,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -9678,7 +10738,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -9763,7 +10823,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -9869,7 +10929,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -9921,7 +10981,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
@@ -25714,7 +26774,7 @@ font-style: inherit;">![An image]({{&lt; placeholder 900 300&gt;}})</span></span
 background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-default.qmd</span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/_demo-default.html" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title=""><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-1"><embed src="assets/_demo-default.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="enhanced-tabset-navigation" class="level2" data-number="5">
@@ -26818,7 +27878,7 @@ background-color: null;
 font-style: inherit;">quarto</span> render assets/_demo-tabset.qmd</span></code></pre></div></div>
 <p>Now, simply use the left and right arrow keys to seamlessly transition between tabs—it’s like your presentation has its own rhythm!</p>
 <div style="text-align: center;">
-<p><a href="assets/_demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/_demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="exporting-to-pdf" class="level2" data-number="6">
@@ -26880,11 +27940,11 @@ font-style: inherit;">"my-slides.pdf"</span></span></code></pre></div></div>
 <div class="quarto-layout-row">
 <section id="default-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="default-quarto-reveal.js">Default Quarto Reveal.js</h4>
-<p><a href="assets/_demo-default.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-default.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/_demo-default.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 <section id="tabset-quarto-reveal.js" class="level4 unnumbered unlisted quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <h4 class="unnumbered unlisted anchored" data-anchor-id="tabset-quarto-reveal.js">Tabset Quarto Reveal.js</h4>
-<p><a href="assets/_demo-tabset.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/_demo-tabset.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/_demo-tabset.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </section>
 </div>
 </div>
@@ -28560,1305 +29620,6 @@ CANOUIL, M. (2024-12-30). Quarto: Publishing to GitHub Pages.
   <guid>https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/</guid>
   <pubDate>Mon, 30 Dec 2024 00:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/featured.png" medium="image" type="image/png" height="81" width="144"/>
-</item>
-<item>
-  <title>Quarto Q&amp;A: How to have images for both light and dark theme?</title>
-  <link>https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/</link>
-  <description><![CDATA[ 
-
-<!--
-@license MIT
-@copyright 2026 Mickaël Canouil
-@author Mickaël Canouil
--->
-Skip to main content
-
-
-
-
-
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Quarto (&gt;= 1.7) supports computing light and dark mode images natively using the <code>renderings</code> option, see <a href="https://quarto.org/docs/computations/execution-options.html#cell-renderings" class="uri">https://quarto.org/docs/computations/execution-options.html#cell-renderings</a> and <a href="https://quarto.org/docs/output-formats/html-themes.html#mode-specific-content" class="uri">https://quarto.org/docs/output-formats/html-themes.html#mode-specific-content</a> for more details.</p>
-</div>
-</div>
-<p>A new blog post of the “Quarto Q&amp;A” series.<br>
-This time, I will show how to have images both for light and dark theme, when switching between them.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="featured.gif" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/featured.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Animated GIF showing a ggplot2 figure switching from light to dark on theme toggle switch."></a></p>
-</figure>
-</div>
-<!-- gifski --fps 10 --height 1080 --width 1920 -o features.gif assets/light-dark.mov -->
-<section id="the-questionproblem" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
-<p>When you build a website with Quarto, you can use the <code>theme</code> option to specify the theme you want to use for <code>light</code> and <code>dark</code> mode<sup>1</sup>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="yml" style="background: #f1f3f5;"><pre class="sourceCode yml cw-auto code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb1-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">light</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> united</span></span>
-<span id="cb1-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">dark</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> slate</span></span></code></pre></div></div>
-<p>However, if you want to have images for both themes, you need to have two versions of the same image, one for <code>light</code> and one for <code>dark</code> mode. But how can you do that and how can you switch between them automatically?</p>
-</section>
-<section id="the-answersolution" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</h2>
-<p>Let’s use <code>knitr</code><sup>2</sup> as the engine to generate the images. For example, you can use <code>svglite</code> to generate SVG images and/or any custom <code>knitr</code> handler.</p>
-<ol type="1">
-<li><p>Set the <code>dev</code> option to use <code>svglite</code> for <code>light</code> mode and <code>darksvglite</code> for <code>dark</code> mode and <code>fig.ext</code> to set the generated images extensions.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-startfrom="11" data-filename="yaml" style="background: #f1f3f5;"><pre class="sourceCode yaml cw-auto code-with-copy"><code class="sourceCode yaml" style="counter-reset: source-line 10;"><span id="cb2-11"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">knitr</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span></span>
-<span id="cb2-12"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">opts_chunk</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span></span>
-<span id="cb2-13"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">dev</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">[</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">svglite</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">,</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> darksvglite</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">]</span></span>
-<span id="cb2-14"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">fig.ext</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">[</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.light.svg</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">,</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> .dark.svg</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">]</span></span></code></pre></div></div></li>
-<li><p>Create <code>ggplot2</code> themes for <code>light</code> and <code>dark</code> images.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true" href="">Light</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false" href="">Dark</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" aria-labelledby="tabset-1-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-startfrom="23" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r" style="counter-reset: source-line 22;"><span id="cb3-23">theme_light <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>() {</span>
-<span id="cb3-24">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">base_size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">11</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%+%</span></span>
-<span id="cb3-25">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span>(</span>
-<span id="cb3-26">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.border =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb3-27">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb3-28">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb3-29">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb3-30">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb3-31">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb3-32">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb3-33">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rect =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb3-34">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">plot.background =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span>),</span>
-<span id="cb3-35">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.line =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb3-36">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.ticks =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>)</span>
-<span id="cb3-37">  )</span>
-<span id="cb3-38">}</span></code></pre></div></div>
-</div>
-<div id="tabset-1-2" class="tab-pane" aria-labelledby="tabset-1-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-startfrom="40" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r" style="counter-reset: source-line 39;"><span id="cb4-40">theme_dark <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>() {</span>
-<span id="cb4-41">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">base_size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">11</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%+%</span></span>
-<span id="cb4-42">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span>(</span>
-<span id="cb4-43">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.border =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb4-44">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb4-45">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb4-46">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb4-47">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb4-48">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb4-49">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb4-50">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rect =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>),</span>
-<span id="cb4-51">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">plot.background =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span>),</span>
-<span id="cb4-52">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.line =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb4-53">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.ticks =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>)</span>
-<span id="cb4-54">  )</span>
-<span id="cb4-55">}</span></code></pre></div></div>
-</div>
-</div>
-</div></li>
-<li><p>Create a new function to save the <code>dark</code> images.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-startfrom="57" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r" style="counter-reset: source-line 56;"><span id="cb5-57">darksvglite <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(file, width, height) {</span>
-<span id="cb5-58">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on.exit</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">reset_theme_settings</span>())</span>
-<span id="cb5-59">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_set</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_dark</span>())</span>
-<span id="cb5-60">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggsave</span>(</span>
-<span id="cb5-61">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">filename =</span> file,</span>
-<span id="cb5-62">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">width =</span> width,</span>
-<span id="cb5-63">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">height =</span> height,</span>
-<span id="cb5-64">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">dev =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"svg"</span>,</span>
-<span id="cb5-65">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">bg =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"transparent"</span></span>
-<span id="cb5-66">  )</span>
-<span id="cb5-67">}</span></code></pre></div></div></li>
-<li><p>The <code>ggplot2</code> code to build an image.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-startfrom="75" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r" style="counter-reset: source-line 74;"><span id="cb6-75"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb6-76"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(palmerpenguins)</span>
-<span id="cb6-77"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_set</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_light</span>())</span>
-<span id="cb6-78"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> penguins) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb6-79">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(</span>
-<span id="cb6-80">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> flipper_length_mm,</span>
-<span id="cb6-81">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> body_mass_g <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1e3</span>,</span>
-<span id="cb6-82">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> species,</span>
-<span id="cb6-83">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">shape =</span> species</span>
-<span id="cb6-84">  ) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb6-85">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.8</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb6-86">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">scale_colour_manual</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"darkorange"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"purple"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"cyan4"</span>)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb6-87">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">labs</span>(</span>
-<span id="cb6-88">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Flipper Length (mm)"</span>,</span>
-<span id="cb6-89">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Body Mass (kg)"</span>,</span>
-<span id="cb6-90">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Penguin Species"</span>,</span>
-<span id="cb6-91">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">shape =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Penguin Species"</span></span>
-<span id="cb6-92">  )</span></code></pre></div></div></li>
-<li><p>The JavaScript code to switch between the two images (<em>i.e.</em>, <code>.light.svg</code> and <code>.dark.svg</code>)<sup>3</sup>.</p>
-<details>
-<summary>
-<p>JavaScript code</p>
-</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="javascript" style="background: #f1f3f5;"><pre class="sourceCode javascript cw-auto code-with-copy"><code class="sourceCode javascript"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Author: Mickaël Canouil</span></span>
-<span id="cb7-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Version: &lt;1.0.0&gt;</span></span>
-<span id="cb7-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Description: Change image src depending on body class (quarto-light or quarto-dark)</span></span>
-<span id="cb7-4"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// License: MIT</span></span>
-<span id="cb7-5"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">updateImageSrc</span>() {</span>
-<span id="cb7-6">  <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> bodyClass <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">window</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">document</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">body</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">classList</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-7">  <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> images <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">window</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">document</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">getElementsByTagName</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'img'</span>)<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-8">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span> (<span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> i <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span> i <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span> images<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">length</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span> i<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">++</span>) {</span>
-<span id="cb7-9">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> image <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> images[i]<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-10">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> src <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> image<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">src</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-11">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> newSrc <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> src<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-12">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (bodyClass<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">contains</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'quarto-light'</span>) <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;&amp;</span> src<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">includes</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.dark'</span>)) {</span>
-<span id="cb7-13">      newSrc <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> src<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">replace</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.dark'</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.light'</span>)<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-14">    } <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (bodyClass<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">contains</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'quarto-dark'</span>) <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;&amp;</span> src<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">includes</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.light'</span>)) {</span>
-<span id="cb7-15">      newSrc <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> src<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">replace</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.light'</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'.dark'</span>)<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-16">    }</span>
-<span id="cb7-17">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (newSrc <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!==</span> src) {</span>
-<span id="cb7-18">      image<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">src</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> newSrc<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-19">    }</span>
-<span id="cb7-20">  }</span>
-<span id="cb7-21">}</span>
-<span id="cb7-22"></span>
-<span id="cb7-23"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">var</span> observer <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">new</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">MutationObserver</span>(<span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(mutations) {</span>
-<span id="cb7-24">  mutations<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">forEach</span>(<span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(mutation) {</span>
-<span id="cb7-25">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> (mutation<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">type</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">===</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'attributes'</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;&amp;</span> mutation<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">attributeName</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">===</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'class'</span>) {</span>
-<span id="cb7-26">      <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">updateImageSrc</span>()<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-27">    }</span>
-<span id="cb7-28">  })<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-29">})<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-30"></span>
-<span id="cb7-31">observer<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">observe</span>(<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">window</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">document</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">body</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> {</span>
-<span id="cb7-32">  <span class="dt" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">attributes</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">true</span></span>
-<span id="cb7-33">})<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span>
-<span id="cb7-34"></span>
-<span id="cb7-35"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">updateImageSrc</span>()<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">;</span></span></code></pre></div></div>
-</details></li>
-<li><p>Finally, the whole Quarto document code.</p>
-<details>
-<summary>
-<p>Quarto document code</p>
-</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="md" style="background: #f1f3f5;"><pre class="sourceCode md cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">---</span></span>
-<span id="cb8-2"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">title:</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"> "Generated images for dark and light mode"</span></span>
-<span id="cb8-3"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">format:</span></span>
-<span id="cb8-4"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  html:</span></span>
-<span id="cb8-5"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    theme:</span></span>
-<span id="cb8-6"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">      light: united</span></span>
-<span id="cb8-7"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">      dark: slate</span></span>
-<span id="cb8-8"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">execute:</span></span>
-<span id="cb8-9"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  echo: false</span></span>
-<span id="cb8-10"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  warning: false</span></span>
-<span id="cb8-11"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">knitr:</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"> </span></span>
-<span id="cb8-12"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  opts_chunk: </span></span>
-<span id="cb8-13"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    dev: [svglite, darksvglite]</span></span>
-<span id="cb8-14"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    fig.ext: [.light.svg, .dark.svg]</span></span>
-<span id="cb8-15"><span class="an" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">include-after-body:</span></span>
-<span id="cb8-16"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">  text: |</span></span>
-<span id="cb8-17"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">    &lt;script type="application/javascript" src="light-dark.js"&gt;&lt;/script&gt;</span></span>
-<span id="cb8-18"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">---</span></span>
-<span id="cb8-19"></span>
-<span id="cb8-20"><span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">```{r}</span></span>
-<span id="cb8-21"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#| include: false</span></span>
-<span id="cb8-22"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb8-23">theme_light <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>() {</span>
-<span id="cb8-24">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">base_size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">11</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%+%</span></span>
-<span id="cb8-25">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span>(</span>
-<span id="cb8-26">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.border =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-27">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-28">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-29">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-30">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-31">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb8-32">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb8-33">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rect =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb8-34">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">plot.background =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span>),</span>
-<span id="cb8-35">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.line =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>),</span>
-<span id="cb8-36">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.ticks =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"black"</span>)</span>
-<span id="cb8-37">  )</span>
-<span id="cb8-38">}</span>
-<span id="cb8-39"></span>
-<span id="cb8-40">theme_dark <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>() {</span>
-<span id="cb8-41">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">base_size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">11</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%+%</span></span>
-<span id="cb8-42">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span>(</span>
-<span id="cb8-43">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.border =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-44">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-45">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.y =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-46">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.major.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-47">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">panel.grid.minor.x =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_blank</span>(),</span>
-<span id="cb8-48">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb8-49">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.text =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb8-50">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rect =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>),</span>
-<span id="cb8-51">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">plot.background =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#272b30"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span>),</span>
-<span id="cb8-52">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.line =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>),</span>
-<span id="cb8-53">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">axis.ticks =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_line</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>)</span>
-<span id="cb8-54">  )</span>
-<span id="cb8-55">}</span>
-<span id="cb8-56"></span>
-<span id="cb8-57">darksvglite <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">function</span>(file, width, height) {</span>
-<span id="cb8-58">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on.exit</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">reset_theme_settings</span>())</span>
-<span id="cb8-59">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_set</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_dark</span>())</span>
-<span id="cb8-60">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggsave</span>(</span>
-<span id="cb8-61">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">filename =</span> file,</span>
-<span id="cb8-62">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">width =</span> width,</span>
-<span id="cb8-63">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">height =</span> height,</span>
-<span id="cb8-64">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">dev =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"svg"</span>,</span>
-<span id="cb8-65">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">bg =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"transparent"</span></span>
-<span id="cb8-66">  )</span>
-<span id="cb8-67">}</span>
-<span id="cb8-68"><span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">```</span></span>
-<span id="cb8-69"></span>
-<span id="cb8-70"><span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">```{r}</span></span>
-<span id="cb8-71"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#| column: screen-inset</span></span>
-<span id="cb8-72"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#| fig-width: !expr 16/2</span></span>
-<span id="cb8-73"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#| fig-height: !expr 9/2</span></span>
-<span id="cb8-74"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#| out-width: 80%</span></span>
-<span id="cb8-75"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb8-76"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(palmerpenguins)</span>
-<span id="cb8-77"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_set</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_light</span>())</span>
-<span id="cb8-78"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> penguins) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb8-79">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(</span>
-<span id="cb8-80">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> flipper_length_mm,</span>
-<span id="cb8-81">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> body_mass_g <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1e3</span>,</span>
-<span id="cb8-82">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">colour =</span> species,</span>
-<span id="cb8-83">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">shape =</span> species</span>
-<span id="cb8-84">  ) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb8-85">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.8</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb8-86">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">scale_colour_manual</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"darkorange"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"purple"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"cyan4"</span>)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb8-87">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">labs</span>(</span>
-<span id="cb8-88">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Flipper Length (mm)"</span>,</span>
-<span id="cb8-89">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Body Mass (kg)"</span>,</span>
-<span id="cb8-90">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Penguin Species"</span>,</span>
-<span id="cb8-91">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">shape =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Penguin Species"</span></span>
-<span id="cb8-92">  )</span>
-<span id="cb8-93"><span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">```</span></span></code></pre></div></div>
-</details>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/light.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Light mode ON"><img src="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/assets/light.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Scatter plot on a light background with light mode switched on."></a></p>
-</figure>
-</div>
-<figcaption><strong>Light</strong> mode <strong>ON</strong></figcaption>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/dark.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Dark mode ON"><img src="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/assets/dark.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Scatter plot on a dark background width dark mode switched on."></a></p>
-</figure>
-</div>
-<figcaption><strong>Dark</strong> mode <strong>ON</strong></figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div></li>
-</ol>
-
-
-</section>
-
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>See <a href="https://quarto.org/docs/output-formats/html-themes.html#dark-mode" class="uri">https://quarto.org/docs/output-formats/html-themes.html#dark-mode</a>.↩︎</p></li>
-<li id="fn2"><p>What matters is that you have two different images, one for <code>light</code> and one for <code>dark</code> mode, respectively with <code>.light</code> and <code>.dark</code> in their names.↩︎</p></li>
-<li id="fn3"><p>The JavaScript code does not actually look for the images extensions, but for the images names.↩︎</p></li>
-</ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2023,
-  author = {CANOUIL, Mickaël},
-  title = {Quarto {Q\&amp;A:} {How} to Have Images for Both Light and Dark
-    Theme?},
-  date = {2023-05-30},
-  url = {https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/},
-  langid = {en-GB}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2023" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2023-05-30). Quarto Q&amp;A: How to have images for both
-light and dark theme? <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/">https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/</a>
-</div></div></section></div> ]]></description>
-  <category>quarto</category>
-  <category>q&amp;a</category>
-  <category>javascript</category>
-  <category>theme</category>
-  <category>dark mode</category>
-  <category>light mode</category>
-  <guid>https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/</guid>
-  <pubDate>Tue, 30 May 2023 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2023-05-30-quarto-light-dark/featured.gif" medium="image" type="image/gif"/>
 </item>
 </channel>
 </rss>
