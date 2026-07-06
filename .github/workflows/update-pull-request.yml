@@ -75,58 +75,43 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Restore _site from Base Branch
-        env:
-          BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
-        run: |
-          git fetch origin "${BASE_REF}"
-
-          # Restore _site from base branch before merge
-          if git ls-tree -r "origin/${BASE_REF}" --name-only | grep -q "^_site/"; then
-            echo "Restoring _site directory from ${BASE_REF}"
-            git restore --source="origin/${BASE_REF}" --staged --worktree -- _site
-            git commit -m "ci: restore _site from ${BASE_REF} before merge" || echo "No changes to _site"
-          else
-            echo "No _site directory found in ${BASE_REF}"
-          fi
-
       - name: Update PR Branch with Base Branch
         id: merge
         env:
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
         run: |
-          # Check if the last commit is the _site restore commit
-          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-          HAS_RESTORE_COMMIT=false
-          if echo "${LAST_COMMIT_MSG}" | grep -q "^ci: restore _site from ${BASE_REF} before merge$"; then
-            HAS_RESTORE_COMMIT=true
-            echo "Found _site restore commit to squash"
-          fi
+          git fetch origin "${BASE_REF}"
 
-          # Attempt merge
+          # Attempt a real merge (keeps ${BASE_REF} as a parent so GitHub sees the branch updated)
           if git merge "origin/${BASE_REF}" --no-edit -m "ci: update PR branch with ${BASE_REF}"; then
-            # If we have the restore commit, squash it with the merge commit
-            if [ "${HAS_RESTORE_COMMIT}" = true ]; then
-              echo "Squashing _site restore commit with merge commit"
-              git reset --soft HEAD~2
-              git commit -m "ci: update PR branch with ${BASE_REF}"
+            echo "merge-status=success" >> "${GITHUB_OUTPUT}"
+            echo "Merge completed cleanly"
+          else
+            # _site is generated per-branch: take ${BASE_REF}'s version wholesale for any conflict
+            if git diff --name-only --diff-filter=U | grep -q "^_site/"; then
+              echo "Resolving _site conflicts using ${BASE_REF}"
+              rm -rf _site
+              git checkout "origin/${BASE_REF}" -- _site
+              git add -A _site
             fi
 
-            echo "merge-status=success" >> "${GITHUB_OUTPUT}"
-            echo "Merge completed successfully"
-          else
-            # Check if there are conflicts
+            # Any remaining conflicts are outside _site and require manual resolution
             if git diff --name-only --diff-filter=U | grep -q .; then
               CONFLICTS=$(git diff --name-only --diff-filter=U)
               echo "merge-status=conflict" >> "${GITHUB_OUTPUT}"
-              echo "conflicts<<EOF" >> "${GITHUB_OUTPUT}"
-              echo "${CONFLICTS}" >> "${GITHUB_OUTPUT}"
-              echo "EOF" >> "${GITHUB_OUTPUT}"
+              {
+                echo "conflicts<<EOF"
+                echo "${CONFLICTS}"
+                echo "EOF"
+              } >> "${GITHUB_OUTPUT}"
               git merge --abort
               exit 1
-            else
-              echo "merge-status=success" >> "${GITHUB_OUTPUT}"
             fi
+
+            # Only _site conflicts remained; complete the merge commit
+            git commit --no-edit
+            echo "merge-status=success" >> "${GITHUB_OUTPUT}"
+            echo "Merge completed with _site taken from ${BASE_REF}"
           fi
 
       - name: Push Updated Branch
