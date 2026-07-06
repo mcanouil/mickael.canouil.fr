@@ -16,412 +16,7 @@
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
 <generator>quarto-1.10.14</generator>
-<lastBuildDate>Mon, 06 Jul 2026 00:00:00 GMT</lastBuildDate>
-<item>
-  <title>Serving a Shiny app and its docs from one process</title>
-  <link>https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/</link>
-  <description><![CDATA[ 
-
-<!--
-@license MIT
-@copyright 2026 Mickaël Canouil
-@author Mickaël Canouil
--->
-Skip to main content
-
-
-
-
-
-<p>When a Shiny app and its package documentation live as two separate services, you get two URLs to keep in sync and two processes to run. This post shows how to put both at the same origin: the app at <code>/</code> and the API reference at <code>/docs/</code>, launched with a single command.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Dark navy background. Bold white text reads &quot;One URL. One Process.&quot;
-Below in light blue: &quot;Shiny for Python + great-docs, served together&quot;.
-Two cards side by side: the Shiny hex logo labelled &quot;/&quot; and the Quarto
-icon labelled &quot;/docs/&quot; in green monospace text.
-" width="600"></a></p>
-</figure>
-</div>
-<p>The companion repository is <a href="https://github.com/mcanouil/demo-shiny-great-docs">mcanouil/demo-shiny-great-docs</a>. The package is a small Palmer Penguins analysis module; the pattern is the point, not the subject matter.</p>
-<section id="the-documentation-great-docs" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="the-documentation-great-docs"><span class="header-section-number">1</span> The documentation: great-docs</h2>
-<p><a href="https://posit-dev.github.io/great-docs/">great-docs</a> is Posit’s API documentation tool for Python packages. You point it at a module, give it a small YAML config, and it generates a Quarto-based site from your docstrings. The result is close to what pkgdown gives you for R: a landing page, an API reference, and whatever extra pages you add.</p>
-<p>The config for this project is short.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>great-docs.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="great-docs.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">parser</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> numpy</span></span>
-<span id="cb1-2"></span>
-<span id="cb1-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">authors</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb1-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Mickaël Canouil</span></span>
-<span id="cb1-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">role</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Author</span></span>
-<span id="cb1-6"></span>
-<span id="cb1-7"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">reference</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb1-8"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Functions</span></span>
-<span id="cb1-9"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">desc</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Utility functions</span></span>
-<span id="cb1-10"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb1-11"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> body_mass_distribution</span></span>
-<span id="cb1-12"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> load_penguins</span></span>
-<span id="cb1-13"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mass_flipper_corr</span></span>
-<span id="cb1-14"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mass_vs_flipper</span></span>
-<span id="cb1-15"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> species_counts</span></span>
-<span id="cb1-16"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> summarise_by_species</span></span></code></pre></div></div>
-</div>
-<p><code>parser: numpy</code> tells great-docs how to read the docstrings. The <code>reference:</code> block controls which names appear in the generated API page and in what order.</p>
-<p>Building the site copies the output into a <code>docs/</code> folder the app will serve.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>scripts/build-docs.sh</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="scripts/build-docs.sh" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">uv</span> run great-docs build</span>
-<span id="cb2-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rm</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-rf</span> docs</span>
-<span id="cb2-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cp</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-R</span> great-docs/_site docs</span></code></pre></div></div>
-</div>
-</section>
-<section id="the-app-shiny-for-python" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="the-app-shiny-for-python"><span class="header-section-number">2</span> The app: Shiny for Python</h2>
-<p>The <code>penguin_analysis</code> module loads the dataset with <code>polars</code>, computes summaries, and draws <code>plotnine</code> plots. The Shiny app wraps those functions in an interactive UI.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>app.py</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="app.py" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">app_ui <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> ui.page_navbar(</span>
-<span id="cb3-2">    ui.nav_panel(</span>
-<span id="cb3-3">        <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Explore"</span>,</span>
-<span id="cb3-4">        ui.layout_sidebar(</span>
-<span id="cb3-5">            ui.sidebar(</span>
-<span id="cb3-6">                ui.input_selectize(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"species"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Species"</span>, choices<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>_SPECIES,</span>
-<span id="cb3-7">                                   selected<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>_SPECIES, multiple<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">True</span>),</span>
-<span id="cb3-8">            ),</span>
-<span id="cb3-9">            ui.output_text(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"correlation"</span>),</span>
-<span id="cb3-10">            ui.output_data_frame(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"table"</span>),</span>
-<span id="cb3-11">        ),</span>
-<span id="cb3-12">    ),</span>
-<span id="cb3-13">    ui.nav_panel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Plots"</span>,</span>
-<span id="cb3-14">        ui.output_plot(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"scatter"</span>),</span>
-<span id="cb3-15">        ui.output_plot(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"distribution"</span>),</span>
-<span id="cb3-16">    ),</span>
-<span id="cb3-17">    ui.nav_panel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Summary"</span>, ui.output_data_frame(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"summary"</span>)),</span>
-<span id="cb3-18">    ui.nav_spacer(),</span>
-<span id="cb3-19">    ui.nav_control(ui.a(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Documentation"</span>, href<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/docs/"</span>, target<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"_blank"</span>)),</span>
-<span id="cb3-20">    title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Palmer Penguins"</span>,</span>
-<span id="cb3-21">)</span></code></pre></div></div>
-</div>
-<p>The navbar links to <code>/docs/</code> so the user can jump from the app to the reference without leaving the same origin.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/shiny-app.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="The Palmer Penguins Shiny app on the Explore tab. Three species are selected; the main panel shows a correlation value and the first rows of the filtered dataset. The Documentation link in the top-right corner routes to the same-origin API reference."><img src="https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/assets/shiny-app.png" class="img-fluid figure-img" alt="Screenshot of the Palmer Penguins Shiny app. The navbar has a teal background showing the scatter-plot logo mark (glass-effect square with white and amber dots) followed by 'Palmer Penguins' in white and tabs Explore, Plots, Summary. The active Explore tab is underlined in amber. The left sidebar has a light teal background with a Species filter showing Adelie, Chinstrap, and Gentoo selected. The main area shows 'Body mass vs flipper length correlation: 0.873' and a data table."></a></p>
-<figcaption>The Palmer Penguins Shiny app on the Explore tab. Three species are selected; the main panel shows a correlation value and the first rows of the filtered dataset. The Documentation link in the top-right corner routes to the same-origin API reference.</figcaption>
-</figure>
-</div>
-</section>
-<section id="serving-both-from-one-process" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="serving-both-from-one-process"><span class="header-section-number">3</span> Serving both from one process</h2>
-<p>Shiny for Python serves static files through its own handler, which matches file paths literally. That means a URL like <code>/docs/reference/</code> returns a 404 because there is no file called <code>reference</code> at that path. What great-docs emits are clean directory links, and those 404 under Shiny’s handler.</p>
-<p>The fix is to wrap the Shiny app in a Starlette application and mount the <code>docs/</code> folder with <code>StaticFiles(html=True)</code>.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>app.py</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-4" data-filename="app.py" style="background: #f1f3f5;"><pre class="sourceCode python code-annotation-code code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-4-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> starlette.applications <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Starlette</span>
-<span id="annotated-cell-4-2"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> starlette.routing <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> Mount</span>
-<span id="annotated-cell-4-3"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> starlette.staticfiles <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> StaticFiles</span>
-<span id="annotated-cell-4-4"></span>
-<span id="annotated-cell-4-5">_DOCS_DIR <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> Path(<span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">__file__</span>).parent <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"docs"</span></span>
-<span id="annotated-cell-4-6"></span>
-<span id="annotated-cell-4-7">app <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> Starlette(</span>
-<span id="annotated-cell-4-8">    routes<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>[</span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-9" class="code-annotation-target">        Mount(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/docs"</span>, app<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>StaticFiles(directory<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>_DOCS_DIR, html<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">True</span>), name<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"docs"</span>),</span>
-<span id="annotated-cell-4-10">        Mount(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"/"</span>, app<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>shiny_app, name<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"shiny"</span>),</span>
-<span id="annotated-cell-4-11">    ]</span>
-<span id="annotated-cell-4-12">)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-4" data-code-lines="9" data-code-annotation="1"><code>html=True</code> resolves <code>/docs/reference/</code> to <code>docs/reference/index.html</code> instead of returning a 404.</span>
-</dd>
-</dl>
-<div class="highlight">
-<p><strong><code>html=True</code> is the key detail.</strong> Without it, Starlette’s <code>StaticFiles</code> also returns 404 for directory URLs. With it, any URL that points to a directory resolves to that directory’s <code>index.html</code>, which is exactly what great-docs generates.</p>
-</div>
-<p>Because Starlette and Shiny both speak ASGI, <code>shiny run app.py</code> still works after wrapping. uvicorn accepts any ASGI application, so the development workflow does not change.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/docs-site.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="The great-docs site at /docs/. It explains the integration, shows the Starlette routing code, and links to the API reference. The penguin-analysis logo appears in the navbar alongside a Reference link."><img src="https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/assets/docs-site.png" class="img-fluid figure-img" alt="Screenshot of the great-docs site served at /docs/. The navbar shows the brand logo mark (teal square with scatter dots) and a Reference link. The page hero shows the same logo mark and the title 'penguin-analysis'. The main content shows a heading 'demo-shiny-great-docs', a description of the integration, a 'How the integration works' section explaining the StaticFiles html=True trick, and a code block showing the Starlette routing. The right sidebar shows Links, AI/Agents, Developers (Mickaël Canouil), and Community sections."></a></p>
-<figcaption>The great-docs site at <code>/docs/</code>. It explains the integration, shows the Starlette routing code, and links to the API reference. The penguin-analysis logo appears in the navbar alongside a Reference link.</figcaption>
-</figure>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The <code>docs/</code> folder is generated output and is not committed to the repository. Run <code>scripts/build-docs.sh</code> whenever the module changes.</p>
-</div>
-</div>
-</section>
-<section id="quick-start" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="quick-start"><span class="header-section-number">4</span> Quick start</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">uv</span> sync <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--extra</span> app <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--extra</span> dev</span>
-<span id="cb4-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">bash</span> scripts/build-docs.sh</span>
-<span id="cb4-3"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">uv</span> run shiny run app.py <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--port</span> 8000</span></code></pre></div></div>
-<p>Then <code>http://localhost:8000</code> is the app and <code>http://localhost:8000/docs/</code> is the reference.</p>
-<p>Happy coding!</p>
-
-
-</section>
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
-  author = {CANOUIL, Mickaël},
-  title = {Serving a {Shiny} App and Its Docs from One Process},
-  date = {2026-07-06},
-  url = {https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/},
-  langid = {en-GB}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2026-07-06). Serving a Shiny app and its docs from one
-process. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/">https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/</a>
-</div></div></section></div> ]]></description>
-  <category>python</category>
-  <category>shiny</category>
-  <category>quarto</category>
-  <category>documentation</category>
-  <guid>https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/</guid>
-  <pubDate>Mon, 06 Jul 2026 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2026-07-06-shiny-great-docs/featured.png" medium="image" type="image/png" height="76" width="144"/>
-</item>
+<lastBuildDate>Wed, 01 Jul 2026 00:00:00 GMT</lastBuildDate>
 <item>
   <title>R Package Architecture: Shiny, Quarto, targets, and S7</title>
   <link>https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/</link>
@@ -11040,7 +10635,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -11143,7 +10738,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -11228,7 +10823,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -11334,7 +10929,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -11386,7 +10981,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
@@ -28389,6 +27984,1642 @@ CANOUIL, M. (2025-04-21). Quarto: Unleash Dynamic Tabset Navigation
   <guid>https://mickael.canouil.fr/posts/2025-04-21-quarto-revealjs-tabset-pdf/</guid>
   <pubDate>Mon, 21 Apr 2025 00:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-04-21-quarto-revealjs-tabset-pdf/featured.gif" medium="image" type="image/gif"/>
+</item>
+<item>
+  <title>Quarto: Publishing to GitHub Pages</title>
+  <link>https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/</link>
+  <description><![CDATA[ 
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+Skip to main content
+
+
+
+
+
+<p>Publishing Quarto projects to GitHub Pages can seem daunting, but with the right approach, it’s a breeze.<br>
+This blog post will walk you through various methods to deploy your Quarto creations, from simple manual steps to automated workflows using GitHub Actions.<br>
+By the end, you’ll have the know-how to share your dynamic documents, books, and websites seamlessly with the world.</p>
+<p>Let’s dive into the essentials of making your Quarto project live on GitHub Pages.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/featured.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%" alt="Quarto icon and text logo above GitHub Pages logo."></a></p>
+</figure>
+</div>
+<section id="prerequisites" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="prerequisites"><span class="header-section-number">1</span> Prerequisites</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before proceeding, ensure you have enabled and configured GitHub Pages for your repository (<em>i.e.</em>, <code>https://github.com/&lt;username&gt;/&lt;repository&gt;/settings/pages</code>), see <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages documentation</a> for more details.</p>
+</div>
+</div>
+<p>The following methods mostly assume your GitHub repository is public. If your repository is private, you may need to adjust the settings to allow GitHub Pages to access the repository using a personal access token.</p>
+<p>You can use the Quarto project created with the <code>quarto create project website</code> command as a demo project to try out the methods described in this guide. This will provide a practical example to follow along with.</p>
+</section>
+<section id="manual-approach" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="manual-approach"><span class="header-section-number">2</span> Manual Approach</h2>
+<section id="using-quarto-cli" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="using-quarto-cli"><span class="header-section-number">2.1</span> Using Quarto CLI</h3>
+<p>The manual method involves using the Quarto Command Line Interface (CLI) to publish your project. This method is straightforward and requires minimal setup.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="sh" style="background: #f1f3f5;"><pre class="sourceCode sh cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> publish gh-pages</span></code></pre></div></div>
+<p>Check out the Quarto CLI help and <a href="https://quarto.org/docs/publishing/github-pages.html">Quarto’s documentation</a> for more details on the <code>publish</code> command.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="sh" style="background: #f1f3f5;"><pre class="sourceCode sh cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> publish <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">--help</span></span></code></pre></div></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>gh-pages</code> branch is used to publish to GitHub Pages.</p>
+<p><code>quarto publish gh-pages</code> setups the <code>gh-pages</code> branch, renders your project, and pushes the output to the branch.<br>
+You can use the <code>--no-render</code> flag to skip rendering and only push a previously rendered project.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="automated-approach" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="automated-approach"><span class="header-section-number">3</span> Automated Approach</h2>
+<p>Automation can streamline the publishing process and reduce the risk of errors. Here are two automated methods using GitHub Actions.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ensure you have the necessary permissions to create and manage GitHub Actions workflows in your repository (<em>i.e.</em>, <code>https://github.com/&lt;username&gt;/&lt;repository&gt;/settings/actions</code>), see <a href="https://docs.github.com/en/actions">GitHub Actions documentation</a> for more details.</p>
+</div>
+</div>
+<section id="quarto-publish-github-action" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="quarto-publish-github-action"><span class="header-section-number">3.1</span> Quarto Publish GitHub Action</h3>
+<p>Quarto provides an official GitHub Action that simplifies the publishing process. This action takes care of the entire workflow but <strong>requires</strong> to use <code>quarto publish gh-pages</code> locally at least once to set up the <code>gh-pages</code> branch.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/deploy.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename=".github/workflows/deploy.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Deploy</span></span>
+<span id="cb3-2"></span>
+<span id="cb3-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> main</span></span>
+<span id="cb3-8"></span>
+<span id="cb3-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> read</span></span>
+<span id="cb3-11"></span>
+<span id="cb3-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">concurrency</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-13"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ${{ github.workflow }}</span></span>
+<span id="cb3-14"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cancel-in-progress</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="cb3-15"></span>
+<span id="cb3-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-17"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deploy</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-18"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ubuntu-latest</span></span>
+<span id="cb3-19"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span></span>
+<span id="cb3-20"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="cb3-21"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pages</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="cb3-22"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-23"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Checkout repository</span></span>
+<span id="cb3-24"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/checkout@v4</span></span>
+<span id="cb3-25"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Install Quarto</span></span>
+<span id="cb3-26"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="cb3-27"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-28"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> pre-release</span></span>
+<span id="cb3-29"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">      # Add any additional steps as needed, such as installing dependencies</span></span>
+<span id="cb3-30"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Build and Deploy</span></span>
+<span id="cb3-31"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> quarto-dev/quarto-actions/publish@v2</span></span>
+<span id="cb3-32"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-33"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">target</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> gh-pages</span></span></code></pre></div></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>quarto-dev/quarto-actions</code> GitHub Actions are maintained by the Quarto team.<br>
+You can find more information about these actions in the <a href="https://github.com/quarto-dev/quarto-actions">Quarto Actions repository</a>.</p>
+</div>
+</div>
+</section>
+<section id="custom-github-actions-workflow" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="custom-github-actions-workflow"><span class="header-section-number">3.2</span> Custom GitHub Actions Workflow</h3>
+<p>For more control over the publishing process, you can set up a custom GitHub Actions workflow. I’ll discuss two scenarios:</p>
+<ul>
+<li><p><strong>Deploy from a branch</strong> (<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-from-a-branch">Deploy from a branch - GitHub</a>)<br>
+<em>Classic Pages experience, where the content is published from a specific branch root or <code>/docs</code> folder.</em></p></li>
+<li><p><strong>GitHub Actions</strong> (<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow">GitHub Actions - GitHub</a>)<br>
+<em>Best for using frameworks and customizing your build process.</em></p></li>
+</ul>
+<section id="deploy-from-a-branch" class="level4" data-number="3.2.1">
+<h4 data-number="3.2.1" class="anchored" data-anchor-id="deploy-from-a-branch"><span class="header-section-number">3.2.1</span> Deploy From a Branch</h4>
+<p>You can configure a workflow to publish your Quarto project whenever changes are pushed to a specific branch (<em>e.g.</em>, <code>main</code>) and deploy the output to GitHub Pages from a specific folder/branch.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The GitHub Action workflow described in Quarto Publish GitHub Action uses <code>gh-pages</code> root as the source for GitHub Pages.</p>
+</div>
+</div>
+<section id="deploying-from-the-docs-folder-e.g.-main-branch" class="level5" data-number="3.2.1.1">
+<h5 data-number="3.2.1.1" class="anchored" data-anchor-id="deploying-from-the-docs-folder-e.g.-main-branch"><span class="header-section-number">3.2.1.1</span> Deploying From the <code>docs</code> Folder (<em>e.g.</em>, <code>main</code> Branch)</h5>
+<p>Using the <code>docs</code> folder as the source for GitHub Pages. Be sure to use a Quarto project (<em>i.e.</em>, <code>_quarto.yml</code>) to be able to set <code>output-dir</code>.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/deploy.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-4" data-filename=".github/workflows/deploy.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Deploy</span></span>
+<span id="annotated-cell-4-2"></span>
+<span id="annotated-cell-4-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> main</span></span>
+<span id="annotated-cell-4-8"></span>
+<span id="annotated-cell-4-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> read</span></span>
+<span id="annotated-cell-4-11"></span>
+<span id="annotated-cell-4-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">concurrency</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-13"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ${{ github.workflow }}</span></span>
+<span id="annotated-cell-4-14"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cancel-in-progress</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="annotated-cell-4-15"></span>
+<span id="annotated-cell-4-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-17"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deploy</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-18"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ubuntu-latest</span></span>
+<span id="annotated-cell-4-19"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span></span>
+<span id="annotated-cell-4-20"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="annotated-cell-4-21"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-22"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Checkout repository</span></span>
+<span id="annotated-cell-4-23"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/checkout@v4</span></span>
+<span id="annotated-cell-4-24"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Install Quarto</span></span>
+<span id="annotated-cell-4-25"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="annotated-cell-4-26"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-4-27"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> pre-release</span></span>
+<span id="annotated-cell-4-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">      # Add any additional steps as needed, such as installing dependencies</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-29" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Build"</span></span>
+<span id="annotated-cell-4-30"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">shell</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> bash</span></span>
+<span id="annotated-cell-4-31"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">        run</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">: </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">|</span></span>
+<span id="annotated-cell-4-32">          [ ! -f _quarto.yml ] &amp;&amp; echo -e "project:\n  output-dir: docs" &gt; _quarto.yml</span>
+<span id="annotated-cell-4-33">          if grep -q "output-dir: docs" _quarto.yml; then</span>
+<span id="annotated-cell-4-34">            quarto render</span>
+<span id="annotated-cell-4-35">          else</span>
+<span id="annotated-cell-4-36">            quarto render --output-dir docs</span>
+<span id="annotated-cell-4-37">          fi</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-4-38" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Deploy"</span></span>
+<span id="annotated-cell-4-39"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">shell</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> bash</span></span>
+<span id="annotated-cell-4-40"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">        run</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">: </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">|</span></span>
+<span id="annotated-cell-4-41">          git config --local user.name github-actions[bot]</span>
+<span id="annotated-cell-4-42">          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com</span>
+<span id="annotated-cell-4-43">          git add docs || echo "No changes."</span>
+<span id="annotated-cell-4-44">          git commit -m "ci: quarto render" || echo "No changes."</span>
+<span id="annotated-cell-4-45">          git push origin || echo "No changes."</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="29" data-code-annotation="1">This step creates a <code>_quarto.yml</code> project file if it doesn’t exist, allowing to set the output directory to <code>_site</code>. If the <code>_quarto.yml</code> file already specifies the output directory as <code>_site</code>, it simply runs <code>quarto render</code> at the project level. Otherwise, it uses the <code>--output-dir</code> option to specify the output directory.</span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="38" data-code-annotation="2">This step configures Git to use the <code>github-actions[bot]</code> user for commits and pushes the changes to the <code>main</code> branch. It adds the contents of the <code>docs</code> folder to Git, commits them, and pushes them to the <code>main</code> branch. If there are no changes to commit, it will output “No changes.”</span>
+</dd>
+</dl>
+</section>
+<section id="deploying-from-the-root-e.g.-gh-pages-branch" class="level5" data-number="3.2.1.2">
+<h5 data-number="3.2.1.2" class="anchored" data-anchor-id="deploying-from-the-root-e.g.-gh-pages-branch"><span class="header-section-number">3.2.1.2</span> Deploying From the Root (<em>e.g.</em>, <code>gh-pages</code> Branch)</h5>
+<p>Using the root of the <code>gh-pages</code> branch as the source for GitHub Pages.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This method offers an advantage over <code>quarto publish gh-pages</code> as it does not necessitate a local run to create the <code>gh-pages</code> branch beforehand.<br>
+Additionally, it provides some insight into the processes that occur behind the scenes when using <code>quarto publish gh-pages</code>, thus when using the Quarto Publish GitHub Action.</p>
+</div>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/deploy.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename=".github/workflows/deploy.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Deploy</span></span>
+<span id="annotated-cell-5-2"></span>
+<span id="annotated-cell-5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> main</span></span>
+<span id="annotated-cell-5-8"></span>
+<span id="annotated-cell-5-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> read</span></span>
+<span id="annotated-cell-5-11"></span>
+<span id="annotated-cell-5-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">concurrency</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-13"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ${{ github.workflow }}</span></span>
+<span id="annotated-cell-5-14"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cancel-in-progress</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">true</span></span>
+<span id="annotated-cell-5-15"></span>
+<span id="annotated-cell-5-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-17"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deploy</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-18"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ubuntu-latest</span></span>
+<span id="annotated-cell-5-19"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span></span>
+<span id="annotated-cell-5-20"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="annotated-cell-5-21"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-22"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Checkout repository</span></span>
+<span id="annotated-cell-5-23"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/checkout@v4</span></span>
+<span id="annotated-cell-5-24"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Install Quarto</span></span>
+<span id="annotated-cell-5-25"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="annotated-cell-5-26"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-27"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> pre-release</span></span>
+<span id="annotated-cell-5-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">      # Add any additional steps as needed, such as installing dependencies</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-29" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Build"</span></span>
+<span id="annotated-cell-5-30"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">shell</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> bash</span></span>
+<span id="annotated-cell-5-31"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">        run</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">: </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">|</span></span>
+<span id="annotated-cell-5-32">          [ ! -f _quarto.yml ] &amp;&amp; echo -e "project:\n  output-dir: _site" &gt; _quarto.yml</span>
+<span id="annotated-cell-5-33">          if grep -q "output-dir: _site" _quarto.yml; then</span>
+<span id="annotated-cell-5-34">            quarto render</span>
+<span id="annotated-cell-5-35">          else</span>
+<span id="annotated-cell-5-36">            quarto render --output-dir _site</span>
+<span id="annotated-cell-5-37">          fi</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-38" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Deploy"</span></span>
+<span id="annotated-cell-5-39"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">shell</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> bash</span></span>
+<span id="annotated-cell-5-40"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">env</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-5-41"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">GH_PAGES</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> gh-pages</span></span>
+<span id="annotated-cell-5-42"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">        run</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">: </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">|</span></span>
+<span id="annotated-cell-5-43">          git config --local user.name github-actions[bot]</span>
+<span id="annotated-cell-5-44">          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com</span>
+<span id="annotated-cell-5-45">          BUILD_DIR=$(mktemp -d)</span>
+<span id="annotated-cell-5-46">          mv _site "${BUILD_DIR}/quarto-output"</span>
+<span id="annotated-cell-5-47">          if git ls-remote --exit-code origin "${GH_PAGES}"; then</span>
+<span id="annotated-cell-5-48">            git fetch origin "${GH_PAGES}"</span>
+<span id="annotated-cell-5-49">            git checkout origin/"${GH_PAGES}"</span>
+<span id="annotated-cell-5-50">          else</span>
+<span id="annotated-cell-5-51">            git checkout --orphan "${GH_PAGES}"</span>
+<span id="annotated-cell-5-52">            git rm -rf .</span>
+<span id="annotated-cell-5-53">          fi</span>
+<span id="annotated-cell-5-54">          mv ${BUILD_DIR}/quarto-output/* .</span>
+<span id="annotated-cell-5-55">          git add . || echo "No changes."</span>
+<span id="annotated-cell-5-56">          git commit --allow-empty -m "ci: quarto render" || echo "No changes."</span>
+<span id="annotated-cell-5-57">          git push origin "${GH_PAGES}" || echo "No changes."</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="29" data-code-annotation="1">This step creates a <code>_quarto.yml</code> project file if it doesn’t exist, allowing to set the output directory to <code>_site</code>. If the <code>_quarto.yml</code> file already specifies the output directory as <code>_site</code>, it simply runs <code>quarto render</code> at the project level. Otherwise, it uses the <code>--output-dir</code> option to specify the output directory.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="38" data-code-annotation="2">This step creates a temporary directory to store the build output and moves the <code>_site</code> folder to that directory. It then checks if the <code>gh-pages</code> branch exists, and if so, it fetches and checks it out. If the branch doesn’t exist, it creates a new orphan branch named <code>gh-pages</code>. Finally, it moves the contents of the temporary directory to the root of the repository, adds them to Git, commits them, and pushes them to the <code>gh-pages</code> branch.</span>
+</dd>
+</dl>
+</section>
+</section>
+<section id="github-actions" class="level4" data-number="3.2.2">
+<h4 data-number="3.2.2" class="anchored" data-anchor-id="github-actions"><span class="header-section-number">3.2.2</span> GitHub Actions</h4>
+<p>For more sophisticated workflows, you have the option to customise the build process, thus eliminating the need to set up the <code>gh-pages</code> or <code>docs</code> folder. This approach is particularly advantageous as it ensures that the source repository remains uncluttered, maintaining a clear separation between the source code and the build/deploy process and environment.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/workflows/deploy.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename=".github/workflows/deploy.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Deploy</span></span>
+<span id="annotated-cell-6-2"></span>
+<span id="annotated-cell-6-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> main</span></span>
+<span id="annotated-cell-6-8"></span>
+<span id="annotated-cell-6-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> read</span></span>
+<span id="annotated-cell-6-11"></span>
+<span id="annotated-cell-6-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">concurrency</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-13"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pages"</span></span>
+<span id="annotated-cell-6-14"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cancel-in-progress</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">false</span></span>
+<span id="annotated-cell-6-15"></span>
+<span id="annotated-cell-6-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-17"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deploy</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-18"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ubuntu-latest</span></span>
+<span id="annotated-cell-6-19"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-20"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pages</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="annotated-cell-6-21"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">id-token</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> write</span></span>
+<span id="annotated-cell-6-22"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">environment</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-23"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> github-pages</span></span>
+<span id="annotated-cell-6-24"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> ${{ steps.deployment.outputs.page_url }}</span></span>
+<span id="annotated-cell-6-25"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-26"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Checkout repository</span></span>
+<span id="annotated-cell-6-27"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/checkout@v4</span></span>
+<span id="annotated-cell-6-28"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Install Quarto</span></span>
+<span id="annotated-cell-6-29"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="annotated-cell-6-30"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-31"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> pre-release</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-32" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Build"</span></span>
+<span id="annotated-cell-6-33"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">shell</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> bash</span></span>
+<span id="annotated-cell-6-34"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">        run</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">: </span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">|</span></span>
+<span id="annotated-cell-6-35">          [ ! -f _quarto.yml ] &amp;&amp; echo -e "project:\n  output-dir: _site" &gt; _quarto.yml</span>
+<span id="annotated-cell-6-36">          if grep -q "output-dir: _site" _quarto.yml; then</span>
+<span id="annotated-cell-6-37">            quarto render</span>
+<span id="annotated-cell-6-38">          else</span>
+<span id="annotated-cell-6-39">            quarto render --output-dir _site</span>
+<span id="annotated-cell-6-40">          fi</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-41" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Configure GitHub Pages"</span></span>
+<span id="annotated-cell-6-42"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/configure-pages@v5</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-6-43" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Upload Pages Artifact"</span></span>
+<span id="annotated-cell-6-44"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/upload-pages-artifact@v3</span></span>
+<span id="annotated-cell-6-45"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="annotated-cell-6-46"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">path</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"_site"</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-6-47" class="code-annotation-target"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Deploy"</span></span>
+<span id="annotated-cell-6-48"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">id</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> deployment</span></span>
+<span id="annotated-cell-6-49"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> actions/deploy-pages@v4</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="32" data-code-annotation="1">This step creates a <code>_quarto.yml</code> project file if it doesn’t exist, allowing to set the output directory to <code>_site</code>. If the <code>_quarto.yml</code> file already specifies the output directory as <code>_site</code>, it simply runs <code>quarto render</code> at the project level. Otherwise, it uses the <code>--output-dir</code> option to specify the output directory.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="41" data-code-annotation="2">This step configures the GitHub Pages deployment environment using the <code>actions/configure-pages</code> action. This action sets up the environment for deploying to GitHub Pages.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="43" data-code-annotation="3">This step uploads the contents of the <code>_site</code> directory as an artifact using the <code>actions/upload-pages-artifact</code> action. This action allows you to upload files to be used in the deployment process.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="47" data-code-annotation="4">This step deploys the uploaded artifact to GitHub Pages using the <code>actions/deploy-pages</code> action. This action handles the deployment process and makes the files available on GitHub Pages.</span>
+</dd>
+</dl>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The workflow above utilises <code>_site</code> as the output directory, which is the default output directory for Quarto website projects. You can modify the output directory as necessary, provided it aligns with the <code>Upload Pages Artifact</code> step.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="keeping-your-github-actions-workflow-up-to-date" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="keeping-your-github-actions-workflow-up-to-date"><span class="header-section-number">3.3</span> Keeping Your GitHub Actions Workflow Up-to-Date</h3>
+<p>GitHub Actions workflows are versioned, and new versions are released periodically. To ensure your workflows are up-to-date, you can use Dependabot to automatically create pull requests when new versions of your dependencies are available.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>.github/dependabot.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename=".github/dependabot.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span></span>
+<span id="cb4-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">updates</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb4-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">package-ecosystem</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"github-actions"</span></span>
+<span id="cb4-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">directory</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/"</span></span>
+<span id="cb4-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">schedule</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb4-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">interval</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"weekly"</span></span></code></pre></div></div>
+</div>
+<p>This configuration file instructs Dependabot to check for updates to GitHub Actions workflows weekly.</p>
+<p>For more information on Dependabot, see the <a href="https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates">Dependabot documentation</a>.</p>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4</span> Conclusion</h2>
+<p>By following these methods, you’ll be able to publish your Quarto projects to GitHub Pages efficiently.<br>
+Choose the approach that best suits your needs and workflow.</p>
+<p>Happy publishing!</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2024,
+  author = {CANOUIL, Mickaël},
+  title = {Quarto: {Publishing} to {GitHub} {Pages}},
+  date = {2024-12-30},
+  url = {https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2024" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2024-12-30). Quarto: Publishing to GitHub Pages.
+<em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/">https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/</a>
+</div></div></section></div> ]]></description>
+  <category>quarto</category>
+  <category>github pages</category>
+  <category>publishing</category>
+  <category>deployment</category>
+  <category>github actions</category>
+  <guid>https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/</guid>
+  <pubDate>Mon, 30 Dec 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2024-12-30-quarto-github-pages/featured.png" medium="image" type="image/png" height="81" width="144"/>
 </item>
 </channel>
 </rss>
