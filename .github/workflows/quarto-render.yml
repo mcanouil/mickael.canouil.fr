@@ -27,6 +27,7 @@ concurrency:
 
 jobs:
   quarto-render:
+    if: ${{ !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -208,12 +209,8 @@ jobs:
           echo "" >> ${GITHUB_STEP_SUMMARY}
           if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
             echo "## Pull Request Actions" >> ${GITHUB_STEP_SUMMARY}
-            if [[ "${GITHUB_ACTOR}" == *"[bot]"* ]]; then
-              echo "- ⏭️ Skipped Quarto rendering (PR created by bot)" >> ${GITHUB_STEP_SUMMARY}
-            else
-              echo "- Rendered Quarto project" >> ${GITHUB_STEP_SUMMARY}
-              echo "- Committed changes to PR branch" >> ${GITHUB_STEP_SUMMARY}
-            fi
+            echo "- Rendered Quarto project" >> ${GITHUB_STEP_SUMMARY}
+            echo "- Committed changes to PR branch" >> ${GITHUB_STEP_SUMMARY}
           else
             echo "## Actions Taken" >> ${GITHUB_STEP_SUMMARY}
             echo "- Rendered Quarto project" >> ${GITHUB_STEP_SUMMARY}
