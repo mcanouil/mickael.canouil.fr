@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.15">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Gribouille 0.5.0 brings native kernel density estimation to Typst: densities, violins, two-dimensional densities, ridgelines, and a LOESS smoother, all computed in pure markup. It also rewrites the scale system so the per-aesthetic scale-* constructors collapse into a single keyed scales(), the largest breaking change of the release. Streamgraphs, bump charts, and waffle charts join the roster too.">
+
+<title>Gribouille 0.5.0: Native Density, and Scales Keyed by Aesthetic – Mickaël CANOUIL</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-26acba4886787335e1a35b541bbcf9c0.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-db239bfb483616e90f4f9a58e3f10cb4.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-26acba4886787335e1a35b541bbcf9c0.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-486ea2e2658aa483df40a73776864512.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-6fd7668161e579dcaa9c932b3d718bed.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-486ea2e2658aa483df40a73776864512.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
+<script>document.addEventListener("DOMContentLoaded",function(){
+  var DEFAULT_COLLAPSE=null;
+  document.querySelectorAll("pre.cw-auto").forEach(function(pre){
+    var fn=pre.closest("[data-filename]");
+    if(!fn)return;
+    var name=fn.getAttribute("data-filename");
+    if(!name)return;
+    var scaffold=pre.closest(".code-copy-outer-scaffold")||pre.closest(".sourceCode");
+    if(!scaffold)return;
+    var w=document.createElement("div");
+    w.className="code-with-filename code-window-auto";
+    var tb=document.createElement("div");
+    tb.className="code-with-filename-file";
+    var tp=document.createElement("pre");
+    var ts=document.createElement("strong");
+    ts.textContent=name;
+    tp.appendChild(ts);tb.appendChild(tp);
+    scaffold.parentNode.insertBefore(w,scaffold);
+    w.appendChild(tb);w.appendChild(scaffold);
+    pre.classList.remove("cw-auto");
+  });
+  function findMarkerSource(el){
+    return el.querySelector('pre[class*="cw-style-"],pre[class*="cw-collapse-"],pre[data-code-window-lines-label]')
+      ||el.querySelector('[class*="cw-style-"],[class*="cw-collapse-"],[data-code-window-lines-label]');
+  }
+  document.querySelectorAll(".code-with-filename").forEach(function(el){
+    var marker=findMarkerSource(el);
+    var styleApplied=/\bcode-window-(macos|windows|default)\b/.test(el.className);
+    if(!styleApplied){
+      var sm=marker&&marker.className.match(/cw-style-(\w+)/);
+      if(sm){el.classList.add("code-window-"+sm[1]);marker.classList.remove(sm[0]);}
+      else{el.classList.add("code-window-macos");}
+    }
+    var collapse=null;
+    if(marker){
+      var cm=marker.className.match(/cw-collapse-(open|closed)/);
+      if(cm){collapse=cm[1];marker.classList.remove(cm[0]);}
+    }
+    if(collapse===null&&DEFAULT_COLLAPSE){collapse=DEFAULT_COLLAPSE;}
+    if(marker&&marker.hasAttribute("data-code-window-lines-label")){
+      var spec=marker.getAttribute("data-code-window-lines-label");
+      marker.removeAttribute("data-code-window-lines-label");
+      var titleBar=el.querySelector(".code-with-filename-file");
+      if(titleBar&&!titleBar.querySelector(".code-with-filename-lines")){
+        var chip=document.createElement("span");
+        chip.className="code-with-filename-lines";
+        chip.textContent="L"+spec;
+        titleBar.appendChild(chip);
+      }
+    }
+    if(collapse&&!el.classList.contains("code-window-collapsible")){
+      var titleBar=el.querySelector(".code-with-filename-file");
+      if(titleBar){
+        var details=document.createElement("details");
+        details.className=el.className+" code-window-collapsible";
+        if(collapse==="open"){details.open=true;}
+        var summaryEl=document.createElement("summary");
+        summaryEl.className="code-with-filename-file";
+        while(titleBar.firstChild){summaryEl.appendChild(titleBar.firstChild);}
+        titleBar.parentNode.removeChild(titleBar);
+        details.appendChild(summaryEl);
+        while(el.firstChild){details.appendChild(el.firstChild);}
+        el.parentNode.replaceChild(details,el);
+      }
+    }
+  });
+});</script>
+<script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Gribouille 0.5.0: Native Density, and Scales Keyed by Aesthetic - mickael.canouil.fr">
+<meta property="og:description" content="Gribouille 0.5.0 brings native kernel density estimation to Typst: densities, violins, two-dimensional densities, ridgelines, and a LOESS smoother, all computed in pure markup. It also rewrites the scale system so the per-aesthetic scale-* constructors collapse into a single keyed scales(), the largest breaking change of the release. Streamgraphs, bump charts, and waffle charts join the roster too.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-07-13-gribouille-0-5/featured.png">
+<meta property="og:site_name" content="Mickaël CANOUIL">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:alt" content="Featured card for the Gribouille 0.5.0 release on a cream paper background.
+On the left, the Gribouille wordmark sits above the tagline &quot;Create elegant
+graphics with the Grammar of Graphics for Typst.&quot;, a small orange &quot;v0.5.0
+release&quot; pill, and the URL m.canouil.dev/gribouille. On the right, a slightly
+rotated bordered card frames a two-by-two grid of four small charts: a
+pattern-filled ridgeline, a violin with a beeswarm inside it, a streamgraph,
+and a bump chart with filled points.
+">
+<meta name="twitter:title" content="Gribouille 0.5.0: Native Density, and Scales Keyed by Aesthetic – Mickaël CANOUIL">
+<meta name="twitter:description" content="Gribouille 0.5.0 brings native kernel density estimation to Typst: densities, violins, two-dimensional densities, ridgelines, and a LOESS smoother, all computed in pure markup. It also rewrites the scale system so the per-aesthetic scale-* constructors collapse into a single keyed scales(), the largest breaking change of the release. Streamgraphs, bump charts, and waffle charts join the roster too.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-07-13-gribouille-0-5/featured.png">
+<meta name="twitter:image-height" content="1260">
+<meta name="twitter:image-width" content="2400">
+<meta name="twitter:image:alt" content="Featured card for the Gribouille 0.5.0 release on a cream paper background.
+On the left, the Gribouille wordmark sits above the tagline &quot;Create elegant
+graphics with the Grammar of Graphics for Typst.&quot;, a small orange &quot;v0.5.0
+release&quot; pill, and the URL m.canouil.dev/gribouille. On the right, a slightly
+rotated bordered card frames a two-by-two grid of four small charts: a
+pattern-filled ridgeline, a violin with a beeswarm inside it, a streamgraph,
+and a bump chart with filled points.
+">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo light-content">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mickaël CANOUIL</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/index.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks/index.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications/index.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://bsky.app/profile/mickael.canouil.fr" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:bluesky" aria-label="BlueSky" title="BlueSky"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.linkedin.com/in/mickaelcanouil" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:linkedin" aria-label="LinkedIn" title="LinkedIn"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://fosstodon.org/@MickaelCanouil" rel="noopener noreferrer me" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:mastodon" aria-label="Mastodon" title="Mastodon"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/mcanouil" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:mark-github-16" aria-label="GitHub" title="GitHub"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/sponsors/mcanouil?o=esb" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="GitHub Sponsor" title="GitHub Sponsor"></iconify-icon></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Gribouille 0.5.0: Native Density, and Scales Keyed by Aesthetic</h1>
+                  <div>
+        <div class="description">
+          <p>Gribouille 0.5.0 brings native kernel density estimation to Typst: densities, violins, two-dimensional densities, ridgelines, and a LOESS smoother, all computed in pure markup. It also rewrites the scale system so the per-aesthetic <code>scale-*</code> constructors collapse into a single keyed <code>scales()</code>, the largest breaking change of the release. Streamgraphs, bump charts, and waffle charts join the roster too.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">grammar-of-graphics</div>
+                <div class="quarto-category">gribouille</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><!--
+  @license MIT
+  @copyright 2026 Mickaël Canouil
+  @author Mickaël Canouil
+  -->
+  <a href="https://mickael.canouil.fr">Mickaël CANOUIL</a><span class="quarto-title-author-degree">, Ph.D.</span> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Monday, the 13th of July, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link active" data-scroll-target="#breaking-changes"><span class="header-section-number">1</span> <iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> Breaking changes</a></li>
+  <li><a href="#a-keyed-scales" id="toc-a-keyed-scales" class="nav-link" data-scroll-target="#a-keyed-scales"><span class="header-section-number">2</span> A keyed <code>scales()</code></a></li>
+  <li><a href="#native-density" id="toc-native-density" class="nav-link" data-scroll-target="#native-density"><span class="header-section-number">3</span> Native density</a></li>
+  <li><a href="#violins-and-beeswarms" id="toc-violins-and-beeswarms" class="nav-link" data-scroll-target="#violins-and-beeswarms"><span class="header-section-number">4</span> Violins and beeswarms</a></li>
+  <li><a href="#two-dimensions-at-once" id="toc-two-dimensions-at-once" class="nav-link" data-scroll-target="#two-dimensions-at-once"><span class="header-section-number">5</span> Two dimensions at once</a></li>
+  <li><a href="#ridgelines" id="toc-ridgelines" class="nav-link" data-scroll-target="#ridgelines"><span class="header-section-number">6</span> Ridgelines</a></li>
+  <li><a href="#a-loess-smoother" id="toc-a-loess-smoother" class="nav-link" data-scroll-target="#a-loess-smoother"><span class="header-section-number">7</span> A LOESS smoother</a></li>
+  <li><a href="#difference-bands" id="toc-difference-bands" class="nav-link" data-scroll-target="#difference-bands"><span class="header-section-number">8</span> Difference bands</a></li>
+  <li><a href="#pattern-fills" id="toc-pattern-fills" class="nav-link" data-scroll-target="#pattern-fills"><span class="header-section-number">9</span> Pattern fills</a></li>
+  <li><a href="#new-chart-types" id="toc-new-chart-types" class="nav-link" data-scroll-target="#new-chart-types"><span class="header-section-number">10</span> New chart types</a>
+  <ul class="collapse">
+  <li><a href="#streamgraphs" id="toc-streamgraphs" class="nav-link" data-scroll-target="#streamgraphs"><span class="header-section-number">10.1</span> Streamgraphs</a></li>
+  </ul></li>
+  <li><a href="#agents-and-plugins" id="toc-agents-and-plugins" class="nav-link" data-scroll-target="#agents-and-plugins"><span class="header-section-number">11</span> Agents and plugins</a></li>
+  <li><a href="#under-the-hood" id="toc-under-the-hood" class="nav-link" data-scroll-target="#under-the-hood"><span class="header-section-number">12</span> Under the hood</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up"><span class="header-section-number">13</span> Wrap-up</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-13-gribouille-0-5/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<a href="#quarto-document-content" class="visually-hidden-focusable skip-link">Skip to main content</a>
+
+
+
+
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="https://github.com/typst/packages">Gribouille 0.5.0 is awaiting approval on Typst Universe</a>. Once it is approved and merged, this post will show and compile the figures correctly.</p>
+</div>
+</div>
+<p>Another <a href="https://github.com/mcanouil/gribouille">Gribouille</a> release. Gribouille 0.5.0 is all about density but not just that. Kernel density estimation runs natively now, in pure Typst, so densities, violins, two-dimensional densities, and ridgeline plots all draw without leaving the document. The LOESS smoother lands in the same pass. In addition to density, the one thing to watch when you upgrade is the scale system: the per-aesthetic <code>scale-*</code> constructors collapse into a single keyed <code>scales()</code>, so <code>scale-colour-viridis-d()</code> becomes <code>scales(colour: scale-viridis-d())</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Featured card for the Gribouille 0.5.0 release on a cream paper
+background. On the left, the Gribouille wordmark sits above the tagline
+&quot;Create elegant graphics with the Grammar of Graphics for Typst.&quot;, a
+small orange &quot;v0.5.0 release&quot; pill, and the URL
+m.canouil.dev/gribouille. On the right, a slightly rotated bordered card
+frames a two-by-two grid of four small charts: a pattern-filled
+ridgeline, a violin with a beeswarm inside it, a streamgraph, and a bump
+chart with filled points.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>At a glance
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.5.0 on Typst Universe: <code>#import "@preview/gribouille:0.5.0": *</code>.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density.html"><code>geom-density()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-violin.html"><code>geom-violin()</code></a> draw native Gaussian kernel densities, with <code>bw</code>, <code>adjust</code>, and <code>trim</code> control.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density-2d.html"><code>geom-density-2d()</code></a> and <code>geom-density-2d-filled()</code> trace or shade a two-dimensional density; <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density-ridges.html"><code>geom-density-ridges()</code></a> stacks one ridge per group.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html"><code>geom-smooth()</code></a> gains <code>method: "loess"</code> with <code>span</code> and <code>degree</code> control, next to the existing <code>"lm"</code>.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-beeswarm.html"><code>geom-beeswarm()</code></a> lays overplotted points into a deterministic swarm, and <code>stat-difference</code> shades the band between two series by which one is on top.</li>
+<li>Streamgraphs (<code>position-stack(offset:)</code>), bump charts (<code>stat-connect(connection: "sigmoid")</code>), and waffle charts (<code>stat-waffle</code>) join the chart types.</li>
+<li>Fills accept native Typst <code>tiling</code> patterns, both as a fixed <code>fill:</code> and through <code>scale-manual(values:)</code>.</li>
+<li><iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> the per-aesthetic <code>scale-*</code> constructors collapse into a keyed <code>scales()</code>; the aesthetic comes from the key, so <code>scale-colour-viridis-d()</code> becomes <code>scales(colour: scale-viridis-d())</code> and <code>scale-x-log10()</code> becomes <code>scales(x: scale-log10())</code>. <code>plot(scales:)</code> now takes only the <code>scales()</code> dictionary.</li>
+<li><iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> <code>linetype</code> defaults to <code>auto</code> on the line-drawing geoms, honouring a mapped linetype scale instead of pinning <code>"solid"</code>.</li>
+</ul>
+</div>
+</div>
+<p>Every figure in this post is a real, freshly compiled plot.</p>
+<section id="breaking-changes" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="breaking-changes"><span class="header-section-number">1</span> <iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> Breaking changes</h2>
+<p>Two changes need your attention before your old code compiles. Neither changes what a plot looks like, only how you spell the scales.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Migrate these names
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>The per-aesthetic <code>scale-*</code> constructors are gone. Wrap the aesthetic-agnostic constructor in <code>scales()</code> and let the key carry the aesthetic: <code>scale-colour-viridis-d()</code> becomes <code>scales(colour: scale-viridis-d())</code>, and <code>scale-x-log10()</code> becomes <code>scales(x: scale-log10())</code>. <code>plot(scales:)</code> takes only the <code>scales()</code> dictionary, no positional array, and <code>expand-limits()</code> returns an aesthetic-keyed dictionary.</li>
+<li><code>linetype</code> now defaults to <code>auto</code> on <code>geom-segment</code>, <code>geom-curve</code>, <code>geom-spoke</code>, <code>geom-errorbar</code>, <code>geom-errorbarh</code>, <code>geom-linerange</code>, and <code>geom-pointrange</code>. A mapped linetype scale is honoured instead of being overridden by a pinned <code>"solid"</code>. Pass <code>linetype: "solid"</code> on the geom if you want the old fixed look.</li>
+</ul>
+</div>
+</div>
+<p>There is one more change, but it is internal. Every constructor dictionary now stores its concrete type under a single <code>name:</code> key. This only matters if you pattern-match the dictionaries a constructor returns; the way you call them in a plot is unchanged.</p>
+</section>
+<section id="a-keyed-scales" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="a-keyed-scales"><span class="header-section-number">2</span> A keyed <code>scales()</code></h2>
+<p>The old scale names spelled the aesthetic into the function: <code>scale-colour-viridis-d</code>, <code>scale-x-log10</code>, <code>scale-fill-manual</code>. That meant one constructor per aesthetic, and a long list of near-duplicates. Now there is one aesthetic-agnostic set, and the aesthetic comes from the key you bind it to inside <code>scales()</code>, exactly like <a href="https://m.canouil.dev/gribouille/reference/guides/guides.html"><code>guides()</code></a>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"flipper-len"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span>geom-point<span class="op">(</span></span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>    size<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span></span>
+<span id="annotated-cell-1-6"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">:</span> <span class="fl">0.8</span><span class="op">,</span></span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>    stroke<span class="op">:</span> <span class="fl">1pt</span><span class="op">,</span></span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> rgb<span class="op">(</span><span class="st">"#fafafa"</span><span class="op">)</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">),),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-10" class="code-annotation-target"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-11" class="code-annotation-target"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-log10<span class="op">(</span>breaks<span class="op">:</span> <span class="op">(</span><span class="dv">3000</span><span class="op">,</span> <span class="dv">4000</span><span class="op">,</span> <span class="dv">5000</span><span class="op">,</span> <span class="dv">6000</span><span class="op">)),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-12" class="code-annotation-target"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-okabe-ito<span class="op">(),</span></span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"One scales(), Keyed by Aesthetic"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">8cm</span><span class="op">,</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="1"><code>scales()</code> is keyed by aesthetic and named only. A stray positional argument is rejected.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="11" data-code-annotation="2"><code>scale-x-log10()</code> is now <code>scale-log10()</code> under the <code>y</code> key. The same constructor serves the <code>x</code> axis.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="12" data-code-annotation="3"><code>scale-colour-okabe-ito()</code> is now <code>scale-okabe-ito()</code> under the <code>colour</code> key. Use it under <code>fill</code> for a fill scale.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/keyed-scales-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Penguin scatter of body mass against flipper length, points coloured by species on a colour-blind-friendly palette, with the y-axis on a base-10 log scale."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/keyed-scales-light.svg" class="img-fluid hero-art" alt="Penguin scatter of body mass against flipper length, points coloured by species on a colour-blind-friendly palette, with the y-axis on a base-10 log scale."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/keyed-scales-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Penguin scatter of body mass against flipper length, points coloured by species on a colour-blind-friendly palette, with the y-axis on a base-10 log scale."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/keyed-scales-dark.svg" class="img-fluid hero-art" alt="Penguin scatter of body mass against flipper length, points coloured by species on a colour-blind-friendly palette, with the y-axis on a base-10 log scale."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p><code>scales()</code> is more than a tidy wrapper. You could hand <code>plot()</code> a plain named dictionary, <code>(colour: scale-okabe-ito())</code>, and it would look the same. The difference is that <code>scales()</code> checks every entry as it binds it, before the plot draws. A positional argument, an aesthetic key that does not exist, or a value that is not a scale spec each stops with a clear message that lists the valid names. A plain dictionary would keep a misspelled key like <code>colur:</code> and quietly drop the scale, so the plot would render with the wrong colours and no error to point at. An unknown argument to a <code>scale-*</code> constructor is caught at the same moment, reported with the keys that scale accepts for that aesthetic.</p>
+<div class="highlight">
+<p><strong>A dictionary swallows a typo; <code>scales()</code> rejects it:</strong> a wrong aesthetic key or a non-scale value fails loudly instead of drawing a misleading plot.</p>
+</div>
+</section>
+<section id="native-density" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="native-density"><span class="header-section-number">3</span> Native density</h2>
+<p>Density estimation is the heart of this release. <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density.html"><code>geom-density()</code></a> evaluates a Gaussian kernel on a grid and draws the smooth curve, all in Typst, with no external runtime. The bandwidth is chosen by Silverman’s rule and tuned with <code>adjust</code>; <code>trim</code> cuts the curve to the data range.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-2-3"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"flipper-len"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-5" class="code-annotation-target"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>    geom-density<span class="op">(</span>alpha<span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span> adjust<span class="op">:</span> <span class="dv">1</span><span class="op">),</span></span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-okabe-ito<span class="op">()),</span></span>
+<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Flipper Length, One Density per Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Density"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-12"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-13"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-2-16"><a href="#annotated-cell-2-16" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-2-17"><a href="#annotated-cell-2-17" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="5" data-code-annotation="1"><code>adjust</code> scales the automatic bandwidth; <code>bw</code> pins it outright, and <code>trim: true</code> clips the curve to the observed range. Map <code>aes(weight: ...)</code> for a weighted density.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Three overlapping filled density curves of penguin flipper length, one per species, on a minimal theme with a species legend on the right."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-light.svg" class="img-fluid hero-art" alt="Three overlapping filled density curves of penguin flipper length, one per species, on a minimal theme with a species legend on the right."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Three overlapping filled density curves of penguin flipper length, one per species, on a minimal theme with a species legend on the right."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-dark.svg" class="img-fluid hero-art" alt="Three overlapping filled density curves of penguin flipper length, one per species, on a minimal theme with a species legend on the right."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>The stat exposes the usual after-stat columns, <code>_density</code>, <code>_count</code>, <code>_scaled</code>, and <code>_n</code>, so you can map <code>y</code> to a count instead of a density when that reads better.</p>
+</section>
+<section id="violins-and-beeswarms" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="violins-and-beeswarms"><span class="header-section-number">4</span> Violins and beeswarms</h2>
+<p>A violin is the same density, mirrored and turned on its side. <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-violin.html"><code>geom-violin()</code></a> draws one silhouette per group, normalised by <code>scale</code>. <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-beeswarm.html"><code>geom-beeswarm()</code></a> spreads the raw points into a deterministic, density-shaped swarm, a reproducible alternative to jitter. Layer the swarm over the violin and every penguin sits inside its own silhouette.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-3" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-3-3"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"species"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-5" class="code-annotation-target"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a>    geom-violin<span class="op">(</span>scale<span class="op">:</span> <span class="st">"width"</span><span class="op">,</span> trim<span class="op">:</span> <span class="bu">false</span><span class="op">,</span> alpha<span class="op">:</span> <span class="fl">0.4</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-6" class="code-annotation-target"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a>    geom-beeswarm<span class="op">(</span></span>
+<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a>      size<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span></span>
+<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a>      colour<span class="op">:</span> rgb<span class="op">(</span><span class="st">"#fafafa"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-9"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a>      stroke<span class="op">:</span> <span class="fl">0.4pt</span><span class="op">,</span></span>
+<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a>      alpha<span class="op">:</span> <span class="fl">0.95</span><span class="op">,</span></span>
+<span id="annotated-cell-3-11"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">),</span></span>
+<span id="annotated-cell-3-12"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-3-13"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-okabe-ito<span class="op">()),</span></span>
+<span id="annotated-cell-3-14"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Every Penguin in Its Violin"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-16"><a href="#annotated-cell-3-16" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-17"><a href="#annotated-cell-3-17" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-18"><a href="#annotated-cell-3-18" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-19"><a href="#annotated-cell-3-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-3-20"><a href="#annotated-cell-3-20" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-3-21"><a href="#annotated-cell-3-21" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-3-22"><a href="#annotated-cell-3-22" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-3-23"><a href="#annotated-cell-3-23" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">8cm</span><span class="op">,</span></span>
+<span id="annotated-cell-3-24"><a href="#annotated-cell-3-24" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="5" data-code-annotation="1"><code>scale: "width"</code> gives every violin the same maximum width; <code>"area"</code> (the default) equalises area, and <code>"count"</code> scales width by the group size. Overlapping groups dodge with <code>position: "dodge"</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="6" data-code-annotation="2">The swarm spreads the points on the discrete axis directly, no <code>as-factor</code> needed; <code>position-beeswarm(width:, adjust:)</code> tunes the spread.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/violin-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Three violin silhouettes of penguin body mass, one per species, each holding a beeswarm of the individual penguins as filled circles with a thin white-ish outline, spread sideways by local density, on a minimal theme."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/violin-light.svg" class="img-fluid hero-art" alt="Three violin silhouettes of penguin body mass, one per species, each holding a beeswarm of the individual penguins as filled circles with a thin white-ish outline, spread sideways by local density, on a minimal theme."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/violin-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Three violin silhouettes of penguin body mass, one per species, each holding a beeswarm of the individual penguins as filled circles with a thin white-ish outline, spread sideways by local density, on a minimal theme."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/violin-dark.svg" class="img-fluid hero-art" alt="Three violin silhouettes of penguin body mass, one per species, each holding a beeswarm of the individual penguins as filled circles with a thin white-ish outline, spread sideways by local density, on a minimal theme."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="two-dimensions-at-once" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="two-dimensions-at-once"><span class="header-section-number">5</span> Two dimensions at once</h2>
+<p>For a scatter that is too dense to read, a two-dimensional density shows where the mass sits. <code>geom-density-2d-filled()</code> shades filled iso-bands of the joint density; <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density-2d.html"><code>geom-density-2d()</code></a> draws the iso-lines instead.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-4" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-4-3"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"flipper-len"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">),</span></span>
+<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-5" class="code-annotation-target"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a>    geom-density-2d-filled<span class="op">(),</span></span>
+<span id="annotated-cell-4-6"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-4-7"><a href="#annotated-cell-4-7" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-4-8"><a href="#annotated-cell-4-8" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> scale-continuous<span class="op">(</span>expand<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">)),</span></span>
+<span id="annotated-cell-4-9"><a href="#annotated-cell-4-9" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-continuous<span class="op">(</span>expand<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">)),</span></span>
+<span id="annotated-cell-4-10"><a href="#annotated-cell-4-10" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-fermenter<span class="op">(</span>palette<span class="op">:</span> <span class="st">"YlGnBu"</span><span class="op">)</span></span>
+<span id="annotated-cell-4-11"><a href="#annotated-cell-4-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-4-12"><a href="#annotated-cell-4-12" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-4-13"><a href="#annotated-cell-4-13" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Where the Penguins Cluster"</span><span class="op">,</span></span>
+<span id="annotated-cell-4-14"><a href="#annotated-cell-4-14" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="annotated-cell-4-15"><a href="#annotated-cell-4-15" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-4-16"><a href="#annotated-cell-4-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-4-17"><a href="#annotated-cell-4-17" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-4-18"><a href="#annotated-cell-4-18" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-4-19"><a href="#annotated-cell-4-19" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-4-20"><a href="#annotated-cell-4-20" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">8cm</span><span class="op">,</span></span>
+<span id="annotated-cell-4-21"><a href="#annotated-cell-4-21" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="5" data-code-annotation="1"><code>bw</code> sets the per-axis bandwidth (a number or an <code>(x, y)</code> pair) and <code>n</code> the grid resolution. Map <code>fill: after-stat("_level")</code> on <code>geom-density-2d()</code> to shade the lines by level.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-2d-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="A two-dimensional density of penguin body mass against flipper length drawn as filled contour bands, from pale low-density to deep blue-green high-density, with two clusters along the flipper-length to body-mass diagonal."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-2d-light.svg" class="img-fluid hero-art" alt="A two-dimensional density of penguin body mass against flipper length drawn as filled contour bands, from pale low-density to deep blue-green high-density, with two clusters along the flipper-length to body-mass diagonal."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-2d-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="A two-dimensional density of penguin body mass against flipper length drawn as filled contour bands, from pale low-density to deep blue-green high-density, with two clusters along the flipper-length to body-mass diagonal."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/density-2d-dark.svg" class="img-fluid hero-art" alt="A two-dimensional density of penguin body mass against flipper length drawn as filled contour bands, from pale low-density to deep blue-green high-density, with two clusters along the flipper-length to body-mass diagonal."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="ridgelines" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="ridgelines"><span class="header-section-number">6</span> Ridgelines</h2>
+<p>When a plain overlap gets crowded, a ridgeline offsets each density up the panel. <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-density-ridges.html"><code>geom-density-ridges()</code></a> draws one ridge per <code>y</code> level, with heights normalised across levels so they compare fairly.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"species"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-5" class="code-annotation-target"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>    geom-density-ridges<span class="op">(</span>scale<span class="op">:</span> <span class="fl">1.5</span><span class="op">,</span> alpha<span class="op">:</span> <span class="fl">0.85</span><span class="op">),</span></span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-8" class="code-annotation-target"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-discrete<span class="op">(</span>expand<span class="op">:</span> <span class="op">(</span><span class="bu">auto</span><span class="op">,</span> <span class="fl">55%</span><span class="op">)),</span></span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-okabe-ito<span class="op">(),</span></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Body Mass, Ridge by Ridge"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-5-19"><a href="#annotated-cell-5-19" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-5-20"><a href="#annotated-cell-5-20" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">8cm</span><span class="op">,</span></span>
+<span id="annotated-cell-5-21"><a href="#annotated-cell-5-21" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="5" data-code-annotation="1"><code>scale</code> is measured in y-level units: <code>1</code> lets a ridge just reach the next baseline, and a larger value lets them overlap. The stat supplies the <code>height</code> channel the geom draws from, so keep the default stat.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="8" data-code-annotation="2">The discrete y-scale needs a little headroom on top so the tallest ridge is not clipped.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/ridges-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Three stacked ridgeline densities of penguin body mass, one per species climbing up the panel, each filled by species on a minimal theme."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/ridges-light.svg" class="img-fluid hero-art" alt="Three stacked ridgeline densities of penguin body mass, one per species climbing up the panel, each filled by species on a minimal theme."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/ridges-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Three stacked ridgeline densities of penguin body mass, one per species climbing up the panel, each filled by species on a minimal theme."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/ridges-dark.svg" class="img-fluid hero-art" alt="Three stacked ridgeline densities of penguin body mass, one per species climbing up the panel, each filled by species on a minimal theme."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="a-loess-smoother" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="a-loess-smoother"><span class="header-section-number">7</span> A LOESS smoother</h2>
+<p>Until now, fitted straight lines were the only smoothers <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html"><code>geom-smooth()</code></a> could draw (<code>method: "lm"</code>). Now <code>geom-smooth()</code> also takes <code>method: "loess"</code>, a local polynomial fit with a pointwise confidence band.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-6" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-6-3"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"flipper-len"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">),</span></span>
+<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>    geom-point<span class="op">(</span>size<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> alpha<span class="op">:</span> <span class="fl">0.5</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-6" class="code-annotation-target"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>    geom-smooth<span class="op">(</span>method<span class="op">:</span> <span class="st">"loess"</span><span class="op">,</span> span<span class="op">:</span> <span class="fl">0.75</span><span class="op">,</span> degree<span class="op">:</span> <span class="dv">2</span><span class="op">),</span></span>
+<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"A Local Fit, Not a Straight Line"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-10"><a href="#annotated-cell-6-10" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-11"><a href="#annotated-cell-6-11" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-12"><a href="#annotated-cell-6-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-6-13"><a href="#annotated-cell-6-13" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-6-14"><a href="#annotated-cell-6-14" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-6-15"><a href="#annotated-cell-6-15" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">8cm</span><span class="op">,</span></span>
+<span id="annotated-cell-6-16"><a href="#annotated-cell-6-16" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="6" data-code-annotation="1"><code>span</code> sets the fraction of points in each local window, and <code>degree</code> the local polynomial order (<code>0</code>, <code>1</code>, or <code>2</code>). The default <code>method: "lm"</code> still draws the straight-line fit.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/loess-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="Penguin scatter of body mass against flipper length with a curved LOESS trend line and a shaded confidence band following the bend in the data."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/loess-light.svg" class="img-fluid hero-art" alt="Penguin scatter of body mass against flipper length with a curved LOESS trend line and a shaded confidence band following the bend in the data."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/loess-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="Penguin scatter of body mass against flipper length with a curved LOESS trend line and a shaded confidence band following the bend in the data."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/loess-dark.svg" class="img-fluid hero-art" alt="Penguin scatter of body mass against flipper length with a curved LOESS trend line and a shaded confidence band following the bend in the data."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="difference-bands" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="difference-bands"><span class="header-section-number">8</span> Difference bands</h2>
+<p><code>stat-difference</code> shades the band between two series by which one is on top. Feed it <code>ymin</code> and <code>ymax</code>, map <code>fill: after-stat("_sign")</code>, and it splits the ribbon at every crossover, filling the gap in the colour of whichever line leads.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-7" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-7-1"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">d</span> <span class="op">=</span> range<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">25</span><span class="op">).</span>map<span class="op">(</span>i <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="annotated-cell-7-2"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">x</span> <span class="op">=</span> i / <span class="dv">2</span></span>
+<span id="annotated-cell-7-3"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>x: x<span class="op">,</span> a: <span class="dv">10</span> <span class="op">+</span> <span class="dv">4</span> * calc<span class="op">.</span>sin<span class="op">(</span>x * <span class="fl">0.7</span><span class="op">),</span> b: <span class="dv">10</span> <span class="op">+</span> <span class="fl">3.2</span> * calc<span class="op">.</span>cos<span class="op">(</span>x * <span class="fl">0.55</span><span class="op">))</span></span>
+<span id="annotated-cell-7-4"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span>
+<span id="annotated-cell-7-5"><a href="#annotated-cell-7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-7-6"><a href="#annotated-cell-7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-7-7"><a href="#annotated-cell-7-7" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> d<span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-8" class="code-annotation-target"><a href="#annotated-cell-7-8" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> ymin<span class="op">:</span> <span class="st">"a"</span><span class="op">,</span> ymax<span class="op">:</span> <span class="st">"b"</span><span class="op">,</span> fill<span class="op">:</span> after-stat<span class="op">(</span><span class="st">"_sign"</span><span class="op">)),</span></span>
+<span id="annotated-cell-7-9"><a href="#annotated-cell-7-9" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<span id="annotated-cell-7-10"><a href="#annotated-cell-7-10" aria-hidden="true" tabindex="-1"></a>    geom-ribbon<span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-7-11" class="code-annotation-target"><a href="#annotated-cell-7-11" aria-hidden="true" tabindex="-1"></a>      stat<span class="op">:</span> stat-difference<span class="op">(</span>levels<span class="op">:</span> <span class="op">(</span><span class="st">"A leads"</span><span class="op">,</span> <span class="st">"B leads"</span><span class="op">)),</span></span>
+<span id="annotated-cell-7-12"><a href="#annotated-cell-7-12" aria-hidden="true" tabindex="-1"></a>      alpha<span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span></span>
+<span id="annotated-cell-7-13"><a href="#annotated-cell-7-13" aria-hidden="true" tabindex="-1"></a>      stroke<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="annotated-cell-7-14"><a href="#annotated-cell-7-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">),</span></span>
+<span id="annotated-cell-7-15"><a href="#annotated-cell-7-15" aria-hidden="true" tabindex="-1"></a>    geom-line<span class="op">(</span>mapping<span class="op">:</span> aes<span class="op">(</span>y<span class="op">:</span> <span class="st">"a"</span><span class="op">),</span> linewidth<span class="op">:</span> <span class="fl">1pt</span><span class="op">),</span></span>
+<span id="annotated-cell-7-16"><a href="#annotated-cell-7-16" aria-hidden="true" tabindex="-1"></a>    geom-line<span class="op">(</span>mapping<span class="op">:</span> aes<span class="op">(</span>y<span class="op">:</span> <span class="st">"b"</span><span class="op">),</span> linewidth<span class="op">:</span> <span class="fl">1pt</span><span class="op">,</span> linetype<span class="op">:</span> <span class="st">"dashed"</span><span class="op">),</span></span>
+<span id="annotated-cell-7-17"><a href="#annotated-cell-7-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-7-18"><a href="#annotated-cell-7-18" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> <span class="op">(</span>rgb<span class="op">(</span><span class="st">"#0072B2"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#D55E00"</span><span class="op">)))),</span></span>
+<span id="annotated-cell-7-19"><a href="#annotated-cell-7-19" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span>title<span class="op">:</span> <span class="st">"Which Series Is on Top"</span><span class="op">,</span> x<span class="op">:</span> <span class="st">"Week"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"Value"</span><span class="op">,</span> fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-7-20"><a href="#annotated-cell-7-20" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-7-21"><a href="#annotated-cell-7-21" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-7-22"><a href="#annotated-cell-7-22" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-7-23"><a href="#annotated-cell-7-23" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="8" data-code-annotation="1">The two series enter as <code>ymin</code> and <code>ymax</code>; <code>fill: after-stat("_sign")</code> colours each run by which one is higher.</span>
+</dd>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="11" data-code-annotation="2"><code>levels:</code> names the two states, and exact crossovers are inserted as shared vertices so the bands meet cleanly.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/difference-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="Two wavy series over twelve weeks, one a solid line and one dashed, with the band between them shaded blue where the first leads and orange where the second leads; the colour flips at each crossover."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/difference-light.svg" class="img-fluid hero-art" alt="Two wavy series over twelve weeks, one a solid line and one dashed, with the band between them shaded blue where the first leads and orange where the second leads; the colour flips at each crossover."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/difference-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-15" title="Two wavy series over twelve weeks, one a solid line and one dashed, with the band between them shaded blue where the first leads and orange where the second leads; the colour flips at each crossover."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/difference-dark.svg" class="img-fluid hero-art" alt="Two wavy series over twelve weeks, one a solid line and one dashed, with the band between them shaded blue where the first leads and orange where the second leads; the colour flips at each crossover."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="pattern-fills" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="pattern-fills"><span class="header-section-number">9</span> Pattern fills</h2>
+<p>A <code>fill</code> no longer has to be a flat colour. When colour/fill is not enough or is too much, a pattern can carry the information instead which helps improve accessibility and printability. Fills now accept native Typst <code>tiling</code> patterns, both as a fixed <code>fill:</code> and through <code>scale-manual(values:)</code>, and the legend swatches draw the patterns too. This is what keeps a bar chart readable once it is printed in black and white.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-8" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cb</span> <span class="op">=</span> <span class="op">(</span>rgb<span class="op">(</span><span class="st">"#0072B2"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#D55E00"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#009E73"</span><span class="op">))</span></span>
+<span id="annotated-cell-8-2"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-3" class="code-annotation-target"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">stripes</span> <span class="op">=</span> tiling<span class="op">(</span>size<span class="op">:</span> <span class="op">(</span><span class="fl">6pt</span><span class="op">,</span> <span class="fl">6pt</span><span class="op">))[</span></span>
+<span id="annotated-cell-8-4"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">0</span><span class="op">).</span>lighten<span class="op">(</span><span class="fl">60%</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-5"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">1pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">0</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="annotated-cell-8-7"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">dots</span> <span class="op">=</span> tiling<span class="op">(</span>size<span class="op">:</span> <span class="op">(</span><span class="fl">7pt</span><span class="op">,</span> <span class="fl">7pt</span><span class="op">))[</span></span>
+<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">1</span><span class="op">).</span>lighten<span class="op">(</span><span class="fl">60%</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-9"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>dx<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> dy<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> circle<span class="op">(</span>radius<span class="op">:</span> <span class="fl">1.5pt</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">1</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="annotated-cell-8-11"><a href="#annotated-cell-8-11" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cross</span> <span class="op">=</span> tiling<span class="op">(</span>size<span class="op">:</span> <span class="op">(</span><span class="fl">7pt</span><span class="op">,</span> <span class="fl">7pt</span><span class="op">))[</span></span>
+<span id="annotated-cell-8-12"><a href="#annotated-cell-8-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">2</span><span class="op">).</span>lighten<span class="op">(</span><span class="fl">60%</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-13"><a href="#annotated-cell-8-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">0.8pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">2</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-14"><a href="#annotated-cell-8-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">0.8pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">2</span><span class="op">)))</span></span>
+<span id="annotated-cell-8-15"><a href="#annotated-cell-8-15" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="annotated-cell-8-16"><a href="#annotated-cell-8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-17"><a href="#annotated-cell-8-17" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-8-18"><a href="#annotated-cell-8-18" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-8-19"><a href="#annotated-cell-8-19" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"species"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-8-20"><a href="#annotated-cell-8-20" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span>geom-bar<span class="op">(),),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-8-21" class="code-annotation-target"><a href="#annotated-cell-8-21" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> <span class="op">(</span>stripes<span class="op">,</span> dots<span class="op">,</span> cross<span class="op">))),</span></span>
+<span id="annotated-cell-8-22"><a href="#annotated-cell-8-22" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-8-23"><a href="#annotated-cell-8-23" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Bars You Can Read in Greyscale"</span><span class="op">,</span></span>
+<span id="annotated-cell-8-24"><a href="#annotated-cell-8-24" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-8-25"><a href="#annotated-cell-8-25" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Count"</span><span class="op">,</span></span>
+<span id="annotated-cell-8-26"><a href="#annotated-cell-8-26" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-8-27"><a href="#annotated-cell-8-27" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-8-28"><a href="#annotated-cell-8-28" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-8-29"><a href="#annotated-cell-8-29" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-8-30"><a href="#annotated-cell-8-30" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-8-31"><a href="#annotated-cell-8-31" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="3" data-code-annotation="1">Each pattern is a plain Typst <code>tiling</code>: a full-tile background box, then the marks on top. A tiling works anywhere a colour does.</span>
+</dd>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="21" data-code-annotation="2"><code>scale-manual</code> binds one pattern per level. The legend swatches render the patterns, not flat colours.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/patterns-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-16" title="A bar chart of penguin counts per species, each bar filled with a different Typst tiling pattern, diagonal stripes, dots, and cross-hatch, with a legend whose swatches show the same patterns."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/patterns-light.svg" class="img-fluid hero-art" alt="A bar chart of penguin counts per species, each bar filled with a different Typst tiling pattern, diagonal stripes, dots, and cross-hatch, with a legend whose swatches show the same patterns."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/patterns-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-17" title="A bar chart of penguin counts per species, each bar filled with a different Typst tiling pattern, diagonal stripes, dots, and cross-hatch, with a legend whose swatches show the same patterns."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/patterns-dark.svg" class="img-fluid hero-art" alt="A bar chart of penguin counts per species, each bar filled with a different Typst tiling pattern, diagonal stripes, dots, and cross-hatch, with a legend whose swatches show the same patterns."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="new-chart-types" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="new-chart-types"><span class="header-section-number">10</span> New chart types</h2>
+<p>A few new stats and positions turn familiar geoms into charts they could not draw before.</p>
+<section id="streamgraphs" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="streamgraphs"><span class="header-section-number">10.1</span> Streamgraphs</h3>
+<p><code>position-stack</code> gains a streamgraph baseline. Pass <code>offset: "silhouette"</code> to centre each stack on zero, or <code>offset: "wiggle"</code> for the Byron-Wattenberg baseline, and a stacked <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-area.html"><code>geom-area()</code></a> becomes a streamgraph.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-9" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cb</span> <span class="op">=</span> <span class="op">(</span>rgb<span class="op">(</span><span class="st">"#0072B2"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#D55E00"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#009E73"</span><span class="op">),</span> rgb<span class="op">(</span><span class="st">"#E69F00"</span><span class="op">))</span></span>
+<span id="annotated-cell-9-2"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-9-3" class="code-annotation-target"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">pat</span><span class="op">(</span>i<span class="op">,</span> body<span class="op">)</span> <span class="op">=</span> tiling<span class="op">(</span>size<span class="op">:</span> <span class="op">(</span><span class="fl">7pt</span><span class="op">,</span> <span class="fl">7pt</span><span class="op">))[</span></span>
+<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span>i<span class="op">).</span>lighten<span class="op">(</span><span class="fl">55%</span><span class="op">)))</span></span>
+<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>body</span>
+<span id="annotated-cell-9-6"><a href="#annotated-cell-9-6" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="annotated-cell-9-7"><a href="#annotated-cell-9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">stripes</span> <span class="op">=</span> pat<span class="op">(</span><span class="dv">0</span><span class="op">)[</span><span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">1pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">0</span><span class="op">)))]</span></span>
+<span id="annotated-cell-9-8"><a href="#annotated-cell-9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">dots</span> <span class="op">=</span> pat<span class="op">(</span><span class="dv">1</span><span class="op">)[</span><span class="kw">#</span>place<span class="op">(</span>dx<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> dy<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> circle<span class="op">(</span>radius<span class="op">:</span> <span class="fl">1.4pt</span><span class="op">,</span> fill<span class="op">:</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">1</span><span class="op">)))]</span></span>
+<span id="annotated-cell-9-9"><a href="#annotated-cell-9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cross</span> <span class="op">=</span> pat<span class="op">(</span><span class="dv">2</span><span class="op">)[</span></span>
+<span id="annotated-cell-9-10"><a href="#annotated-cell-9-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">0.8pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">2</span><span class="op">)))</span></span>
+<span id="annotated-cell-9-11"><a href="#annotated-cell-9-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">0%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">100%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">0.8pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">2</span><span class="op">)))</span></span>
+<span id="annotated-cell-9-12"><a href="#annotated-cell-9-12" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span>
+<span id="annotated-cell-9-13"><a href="#annotated-cell-9-13" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">hlines</span> <span class="op">=</span> pat<span class="op">(</span><span class="dv">3</span><span class="op">)[</span><span class="kw">#</span>place<span class="op">(</span>line<span class="op">(</span>start<span class="op">:</span> <span class="op">(</span><span class="fl">0%</span><span class="op">,</span> <span class="fl">50%</span><span class="op">),</span> end<span class="op">:</span> <span class="op">(</span><span class="fl">100%</span><span class="op">,</span> <span class="fl">50%</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">1pt</span> <span class="op">+</span> cb<span class="op">.</span>at<span class="op">(</span><span class="dv">3</span><span class="op">)))]</span></span>
+<span id="annotated-cell-9-14"><a href="#annotated-cell-9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-15"><a href="#annotated-cell-9-15" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">series</span> <span class="op">=</span> <span class="op">()</span></span>
+<span id="annotated-cell-9-16"><a href="#annotated-cell-9-16" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span><span class="cf">for</span> g <span class="cf">in</span> <span class="op">(</span><span class="st">"A"</span><span class="op">,</span> <span class="st">"B"</span><span class="op">,</span> <span class="st">"C"</span><span class="op">,</span> <span class="st">"D"</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="annotated-cell-9-17"><a href="#annotated-cell-9-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">peak</span> <span class="op">=</span> <span class="op">(</span>A: <span class="dv">8</span><span class="op">,</span> B: <span class="dv">20</span><span class="op">,</span> C: <span class="dv">12</span><span class="op">,</span> D: <span class="dv">4</span><span class="op">).</span>at<span class="op">(</span>g<span class="op">)</span></span>
+<span id="annotated-cell-9-18"><a href="#annotated-cell-9-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> x <span class="cf">in</span> range<span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">21</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="annotated-cell-9-19"><a href="#annotated-cell-9-19" aria-hidden="true" tabindex="-1"></a>    series<span class="op">.</span>push<span class="op">((</span></span>
+<span id="annotated-cell-9-20"><a href="#annotated-cell-9-20" aria-hidden="true" tabindex="-1"></a>      x: x<span class="op">,</span></span>
+<span id="annotated-cell-9-21"><a href="#annotated-cell-9-21" aria-hidden="true" tabindex="-1"></a>      y: <span class="dv">2</span> <span class="op">+</span> <span class="dv">4</span> * calc<span class="op">.</span>exp<span class="op">(-</span><span class="fl">0.02</span> * calc<span class="op">.</span>pow<span class="op">(</span>x <span class="op">-</span> peak<span class="op">,</span> <span class="dv">2</span><span class="op">)),</span></span>
+<span id="annotated-cell-9-22"><a href="#annotated-cell-9-22" aria-hidden="true" tabindex="-1"></a>      grp: g<span class="op">,</span></span>
+<span id="annotated-cell-9-23"><a href="#annotated-cell-9-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">))</span></span>
+<span id="annotated-cell-9-24"><a href="#annotated-cell-9-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="annotated-cell-9-25"><a href="#annotated-cell-9-25" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="annotated-cell-9-26"><a href="#annotated-cell-9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-27"><a href="#annotated-cell-9-27" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-9-28"><a href="#annotated-cell-9-28" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> series<span class="op">,</span></span>
+<span id="annotated-cell-9-29"><a href="#annotated-cell-9-29" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"grp"</span><span class="op">),</span></span>
+<span id="annotated-cell-9-30"><a href="#annotated-cell-9-30" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-9-31" class="code-annotation-target"><a href="#annotated-cell-9-31" aria-hidden="true" tabindex="-1"></a>    geom-area<span class="op">(</span>position<span class="op">:</span> position-stack<span class="op">(</span>offset<span class="op">:</span> <span class="st">"silhouette"</span><span class="op">),</span> stroke<span class="op">:</span> <span class="fl">0.5pt</span><span class="op">),</span></span>
+<span id="annotated-cell-9-32"><a href="#annotated-cell-9-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-9-33"><a href="#annotated-cell-9-33" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> <span class="op">(</span>stripes<span class="op">,</span> dots<span class="op">,</span> cross<span class="op">,</span> hlines<span class="op">))),</span></span>
+<span id="annotated-cell-9-34"><a href="#annotated-cell-9-34" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span>title<span class="op">:</span> <span class="st">"A Streamgraph"</span><span class="op">,</span> x<span class="op">:</span> <span class="st">"Time"</span><span class="op">,</span> y<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"Series"</span><span class="op">),</span></span>
+<span id="annotated-cell-9-35"><a href="#annotated-cell-9-35" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>y<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-9-36"><a href="#annotated-cell-9-36" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-9-37"><a href="#annotated-cell-9-37" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-9-38"><a href="#annotated-cell-9-38" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-9-39"><a href="#annotated-cell-9-39" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="3" data-code-annotation="1">Each band gets its own <code>tiling</code> pattern, so the streamgraph stays legible without relying on colour alone.</span>
+</dd>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="31" data-code-annotation="2"><code>offset: "wiggle"</code> gives the classic streamgraph baseline instead; <code>"none"</code> (the default) stacks from zero as before.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/stream-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-18" title="A four-series streamgraph, each band flowing left to right and centred on a common baseline so the stack swells and narrows over time, every band filled with its own Typst tiling pattern (stripes, dots, cross-hatch, and horizontal lines)."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/stream-light.svg" class="img-fluid hero-art" alt="A four-series streamgraph, each band flowing left to right and centred on a common baseline so the stack swells and narrows over time, every band filled with its own Typst tiling pattern (stripes, dots, cross-hatch, and horizontal lines)."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/stream-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-19" title="A four-series streamgraph, each band flowing left to right and centred on a common baseline so the stack swells and narrows over time, every band filled with its own Typst tiling pattern (stripes, dots, cross-hatch, and horizontal lines)."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/stream-dark.svg" class="img-fluid hero-art" alt="A four-series streamgraph, each band flowing left to right and centred on a common baseline so the stack swells and narrows over time, every band filled with its own Typst tiling pattern (stripes, dots, cross-hatch, and horizontal lines)."></a></p>
+</div>
+</div>
+</div>
+</div>
+<section id="bump-charts" class="level4" data-number="10.1.1">
+<h4 data-number="10.1.1" class="anchored" data-anchor-id="bump-charts"><span class="header-section-number">10.1.1</span> Bump charts</h4>
+<p><code>stat-connect</code> gains a <code>"sigmoid"</code> connector. Paired with <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-line.html"><code>geom-line()</code></a> and a reversed y-scale, it draws a bump chart, one smooth S-curve between each pair of ranks.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-10" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-10-1"><a href="#annotated-cell-10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cb</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="annotated-cell-10-2"><a href="#annotated-cell-10-2" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#0072B2"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-3"><a href="#annotated-cell-10-3" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#D55E00"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-4"><a href="#annotated-cell-10-4" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#009E73"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-5"><a href="#annotated-cell-10-5" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#E69F00"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-6"><a href="#annotated-cell-10-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-10-7"><a href="#annotated-cell-10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-8"><a href="#annotated-cell-10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">standings</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="annotated-cell-10-9"><a href="#annotated-cell-10-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">1</span><span class="op">,</span> rank: <span class="dv">1</span><span class="op">,</span> team: <span class="st">"A"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">2</span><span class="op">,</span> rank: <span class="dv">3</span><span class="op">,</span> team: <span class="st">"A"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-10"><a href="#annotated-cell-10-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">3</span><span class="op">,</span> rank: <span class="dv">2</span><span class="op">,</span> team: <span class="st">"A"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">4</span><span class="op">,</span> rank: <span class="dv">1</span><span class="op">,</span> team: <span class="st">"A"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-11"><a href="#annotated-cell-10-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">1</span><span class="op">,</span> rank: <span class="dv">2</span><span class="op">,</span> team: <span class="st">"B"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">2</span><span class="op">,</span> rank: <span class="dv">1</span><span class="op">,</span> team: <span class="st">"B"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-12"><a href="#annotated-cell-10-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">3</span><span class="op">,</span> rank: <span class="dv">1</span><span class="op">,</span> team: <span class="st">"B"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">4</span><span class="op">,</span> rank: <span class="dv">2</span><span class="op">,</span> team: <span class="st">"B"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-13"><a href="#annotated-cell-10-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">1</span><span class="op">,</span> rank: <span class="dv">3</span><span class="op">,</span> team: <span class="st">"C"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">2</span><span class="op">,</span> rank: <span class="dv">2</span><span class="op">,</span> team: <span class="st">"C"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-14"><a href="#annotated-cell-10-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">3</span><span class="op">,</span> rank: <span class="dv">4</span><span class="op">,</span> team: <span class="st">"C"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">4</span><span class="op">,</span> rank: <span class="dv">3</span><span class="op">,</span> team: <span class="st">"C"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-15"><a href="#annotated-cell-10-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">1</span><span class="op">,</span> rank: <span class="dv">4</span><span class="op">,</span> team: <span class="st">"D"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">2</span><span class="op">,</span> rank: <span class="dv">4</span><span class="op">,</span> team: <span class="st">"D"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-16"><a href="#annotated-cell-10-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>t: <span class="dv">3</span><span class="op">,</span> rank: <span class="dv">3</span><span class="op">,</span> team: <span class="st">"D"</span><span class="op">),</span> <span class="op">(</span>t: <span class="dv">4</span><span class="op">,</span> rank: <span class="dv">4</span><span class="op">,</span> team: <span class="st">"D"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-17"><a href="#annotated-cell-10-17" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-10-18"><a href="#annotated-cell-10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-10-19"><a href="#annotated-cell-10-19" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-10-20"><a href="#annotated-cell-10-20" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> standings<span class="op">,</span></span>
+<span id="annotated-cell-10-21"><a href="#annotated-cell-10-21" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"t"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"rank"</span><span class="op">,</span> colour<span class="op">:</span> <span class="st">"team"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"team"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-22"><a href="#annotated-cell-10-22" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-10-23" class="code-annotation-target"><a href="#annotated-cell-10-23" aria-hidden="true" tabindex="-1"></a>    geom-line<span class="op">(</span>stat<span class="op">:</span> stat-connect<span class="op">(</span>connection<span class="op">:</span> <span class="st">"sigmoid"</span><span class="op">),</span> linewidth<span class="op">:</span> <span class="fl">1.5pt</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-10-24" class="code-annotation-target"><a href="#annotated-cell-10-24" aria-hidden="true" tabindex="-1"></a>    geom-point<span class="op">(</span>size<span class="op">:</span> <span class="fl">5pt</span><span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-10-25"><a href="#annotated-cell-10-25" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-10-26"><a href="#annotated-cell-10-26" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-10-27"><a href="#annotated-cell-10-27" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> scale-continuous<span class="op">(</span>breaks<span class="op">:</span> <span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">)),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-10" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-10-28" class="code-annotation-target"><a href="#annotated-cell-10-28" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-reverse<span class="op">(</span>breaks<span class="op">:</span> <span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">)),</span></span>
+<span id="annotated-cell-10-29"><a href="#annotated-cell-10-29" aria-hidden="true" tabindex="-1"></a>    colour<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> cb<span class="op">),</span></span>
+<span id="annotated-cell-10-30"><a href="#annotated-cell-10-30" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> cb<span class="op">),</span></span>
+<span id="annotated-cell-10-31"><a href="#annotated-cell-10-31" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-10-32"><a href="#annotated-cell-10-32" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span>title<span class="op">:</span> <span class="st">"A Bump Chart"</span><span class="op">,</span> x<span class="op">:</span> <span class="st">"Round"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"Rank"</span><span class="op">,</span> colour<span class="op">:</span> <span class="st">"Team"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"Team"</span><span class="op">),</span></span>
+<span id="annotated-cell-10-33"><a href="#annotated-cell-10-33" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-10-34"><a href="#annotated-cell-10-34" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-10-35"><a href="#annotated-cell-10-35" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-10-36"><a href="#annotated-cell-10-36" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-10-37"><a href="#annotated-cell-10-37" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-10" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="23" data-code-annotation="1"><code>stat-connect(connection: "sigmoid")</code> eases each line between its ranks; <code>smooth</code> sets how sharp the transition is.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="24" data-code-annotation="2">Mapping <code>fill</code> and setting <code>stroke: none</code> draws filled circles; <code>fill</code> paints the marker body, <code>colour</code> its outline.</span>
+</dd>
+<dt data-target-cell="annotated-cell-10" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-10" data-code-lines="28" data-code-annotation="3">A reversed y-scale puts rank 1 at the top.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/bump-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-20" title="A bump chart of four teams over four rounds, each team a coloured line that eases up and down between integer ranks with a filled circle at every round; rank 1 is at the top."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/bump-light.svg" class="img-fluid hero-art" alt="A bump chart of four teams over four rounds, each team a coloured line that eases up and down between integer ranks with a filled circle at every round; rank 1 is at the top."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/bump-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-21" title="A bump chart of four teams over four rounds, each team a coloured line that eases up and down between integer ranks with a filled circle at every round; rank 1 is at the top."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/bump-dark.svg" class="img-fluid hero-art" alt="A bump chart of four teams over four rounds, each team a coloured line that eases up and down between integer ranks with a filled circle at every round; rank 1 is at the top."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="waffle-charts" class="level4" data-number="10.1.2">
+<h4 data-number="10.1.2" class="anchored" data-anchor-id="waffle-charts"><span class="header-section-number">10.1.2</span> Waffle charts</h4>
+<p><code>stat-waffle</code> turns per-group counts into unit cells on a grid. Map <code>fill</code> to the group and draw with <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-tile.html"><code>geom-tile()</code></a>; each square is one observation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-11" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-11-1"><a href="#annotated-cell-11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cb</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="annotated-cell-11-2"><a href="#annotated-cell-11-2" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#0072B2"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-3"><a href="#annotated-cell-11-3" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#D55E00"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-4"><a href="#annotated-cell-11-4" aria-hidden="true" tabindex="-1"></a>  rgb<span class="op">(</span><span class="st">"#009E73"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-5"><a href="#annotated-cell-11-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-11-6"><a href="#annotated-cell-11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-11-7"><a href="#annotated-cell-11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-11-8"><a href="#annotated-cell-11-8" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-11-9"><a href="#annotated-cell-11-9" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-10"><a href="#annotated-cell-11-10" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-11" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-11-11" class="code-annotation-target"><a href="#annotated-cell-11-11" aria-hidden="true" tabindex="-1"></a>    geom-tile<span class="op">(</span></span>
+<span id="annotated-cell-11-12"><a href="#annotated-cell-11-12" aria-hidden="true" tabindex="-1"></a>      stat<span class="op">:</span> stat-waffle<span class="op">(</span>rows<span class="op">:</span> <span class="dv">12</span><span class="op">),</span></span>
+<span id="annotated-cell-11-13"><a href="#annotated-cell-11-13" aria-hidden="true" tabindex="-1"></a>      width<span class="op">:</span> <span class="fl">0.85</span><span class="op">,</span></span>
+<span id="annotated-cell-11-14"><a href="#annotated-cell-11-14" aria-hidden="true" tabindex="-1"></a>      height<span class="op">:</span> <span class="fl">0.85</span><span class="op">,</span></span>
+<span id="annotated-cell-11-15"><a href="#annotated-cell-11-15" aria-hidden="true" tabindex="-1"></a>      stroke<span class="op">:</span> <span class="fl">1pt</span> <span class="op">+</span> rgb<span class="op">(</span><span class="st">"#fafafa"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-16"><a href="#annotated-cell-11-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">),</span></span>
+<span id="annotated-cell-11-17"><a href="#annotated-cell-11-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-11-18"><a href="#annotated-cell-11-18" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-11-19"><a href="#annotated-cell-11-19" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-manual<span class="op">(</span>values<span class="op">:</span> cb<span class="op">)</span></span>
+<span id="annotated-cell-11-20"><a href="#annotated-cell-11-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-11-21"><a href="#annotated-cell-11-21" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span>title<span class="op">:</span> <span class="st">"Penguins as a Waffle"</span><span class="op">,</span> x<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> y<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">),</span></span>
+<span id="annotated-cell-11-22"><a href="#annotated-cell-11-22" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>x<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> y<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-11-23"><a href="#annotated-cell-11-23" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-void<span class="op">(),</span></span>
+<span id="annotated-cell-11-24"><a href="#annotated-cell-11-24" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-11-25"><a href="#annotated-cell-11-25" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-11-26"><a href="#annotated-cell-11-26" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-11" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-11" data-code-lines="11" data-code-annotation="1"><code>rows</code> sets the grid height in cells and columns grow to hold the total; the page-coloured stroke keeps the cells apart. Map <code>weight</code> instead when the data is already counted, one row per group.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/waffle-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-22" title="A waffle chart of the penguins dataset, one square per bird laid on a grid and coloured by species, the three species filling consecutive runs of cells."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/waffle-light.svg" class="img-fluid hero-art" alt="A waffle chart of the penguins dataset, one square per bird laid on a grid and coloured by species, the three species filling consecutive runs of cells."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/waffle-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-23" title="A waffle chart of the penguins dataset, one square per bird laid on a grid and coloured by species, the three species filling consecutive runs of cells."><img src="../../posts/2026-07-13-gribouille-0-5/./assets/typst-render/waffle-dark.svg" class="img-fluid hero-art" alt="A waffle chart of the penguins dataset, one square per bird laid on a grid and coloured by species, the three species filling consecutive runs of cells."></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="agents-and-plugins" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="agents-and-plugins"><span class="header-section-number">11</span> Agents and plugins</h2>
+<p>Gribouille ships an installable agent skill that teaches a coding assistant to write correct plots, checking every argument against the documentation. It installs with:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npx</span> skills add mcanouil/gribouille</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The repository doubles as a Claude Code plugin marketplace, so you can wire the same skill into Claude Code:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/plugin</span> marketplace add mcanouil/gribouille</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/plugin</span> install gribouille@gribouille</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="under-the-hood" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">12</span> Under the hood</h2>
+<p>As always, a good share of the release is fixes rather than features.</p>
+<div class="highlight">
+<p><strong>Errors fail loudly now:</strong> an unknown aesthetic, theme key, stat, or column stops with a clear message instead of a misleading plot.</p>
+</div>
+<p>The biggest is stricter validation. An unknown <code>aes()</code> channel, such as the US spelling <code>color</code>, now fails with the list of valid channels instead of drawing an empty plot. <code>theme()</code> rejects a misspelled element key, an unknown <code>stat</code> or scale <code>transform</code> fails with a clear message rather than rendering as identity, and mapping an aesthetic to a missing column names the column and lists the ones that exist.</p>
+<p>Two rendering fixes are worth calling out. Abutting opaque fills, such as tiles, hexes, and stacked bars, are now stroked with their own fill colour, which removes the hairline seams that antialiasing used to bleed through between them. And <code>stat-quantile</code> drops its cubic pair enumeration for an exact <code>O(n^2 log n)</code> search, so <code>geom-quantile</code> scales to thousands of rows.</p>
+<p>Facets and compositions also gain spacing control. <code>facet-wrap</code> and <code>facet-grid</code> take a <code>gutter</code> argument, and a new <code>theme(panel-spacing:)</code> default sets the gap for both axes at once (a length, or a <code>(x:, y:)</code> dictionary); <code>compose</code>’s <code>gutter</code> now accepts the same dictionary form.</p>
+</section>
+<section id="wrap-up" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">13</span> Wrap-up</h2>
+<div class="highlight">
+<p><strong>Kernel density estimation, in pure Typst, plus one keyed <code>scales()</code> in place of a constructor per aesthetic.</strong></p>
+</div>
+<p>Next on the list is more geoms and more worked examples. If you run into something unexpected, the issue tracker is the right place for it.</p>
+<ul>
+<li>Gribouille
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/gribouille" class="uri">https://github.com/mcanouil/gribouille</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/gribouille" class="uri">https://m.canouil.dev/gribouille</a>.</li>
+<li>Typst Universe: <a href="https://typst.app/universe/package/gribouille" class="uri">https://typst.app/universe/package/gribouille</a>.</li>
+</ul></li>
+<li>Typst Render
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/quarto-typst-render" class="uri">https://github.com/mcanouil/quarto-typst-render</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/quarto-typst-render" class="uri">https://m.canouil.dev/quarto-typst-render</a>.</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>A note on contributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Gribouille is an unfunded spare-time project, and the API is still settling. Bug reports and ideas are very welcome on the issue tracker. Pull requests are not being accepted for now, for the reasons set out in the <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">launch post</a>. Thanks in advance for your patience.</p>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {Gribouille 0.5.0: {Native} {Density,} and {Scales} {Keyed} by
+    {Aesthetic}},
+  date = {2026-07-13},
+  url = {https://mickael.canouil.fr/posts/2026-07-13-gribouille-0-5/},
+  langid = {en-GB}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-07-13). Gribouille 0.5.0: Native Density, and Scales
+Keyed by Aesthetic. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-13-gribouille-0-5/">https://mickael.canouil.fr/posts/2026-07-13-gribouille-0-5/</a>
+</div></div></section></div></main> <!-- /main -->
+<script id="mc-base64" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  window.mcDecodeB64 = function (b64) {
+    try {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch {
+      return "";
+    }
+  };
+</script>
+<script id="publications-bibtex-clipboard" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    const chips = document.querySelectorAll(".pub-chip[data-bibtex]");
+    if (chips.length === 0) return;
+
+    chips.forEach((btn) => {
+      btn.setAttribute("aria-live", "polite");
+      const original = btn.textContent;
+      let pending = false;
+      btn.addEventListener("click", async () => {
+        if (pending) return;
+        pending = true;
+        const text = window.mcDecodeB64(btn.getAttribute("data-bibtex") || "");
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copied";
+        } catch {
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copy failed";
+        }
+        setTimeout(() => {
+          btn.classList.remove("pub-chip--copied");
+          btn.textContent = original;
+          pending = false;
+        }, 1500);
+      });
+    });
+  });
+</script>
+<script id="year-toc" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    const configs = [
+      { bodyClass: "publications-page", headerSelector: "h2.pub-year[id]", yearSelector: ".pub-year-num", idPrefix: "pub-year-" },
+      { bodyClass: "talks-page", headerSelector: "section.talks-section[id]", yearSelector: ".talks-year", idPrefix: "talks-" },
+    ];
+    const config = configs.find((c) => document.body.classList.contains(c.bodyClass));
+    if (!config) return;
+
+    const headers = Array.from(document.querySelectorAll(config.headerSelector));
+    if (headers.length === 0) return;
+
+    const sidebar = document.getElementById("quarto-margin-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.remove("zindex-bottom");
+
+    const tocTitle = document.createElement("h2");
+    tocTitle.id = "toc-title";
+    tocTitle.textContent = "Years";
+
+    const list = document.createElement("ul");
+
+    const anchors = new Map();
+    headers.forEach((h) => {
+      const id = h.id;
+      const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.id = `toc-${id}`;
+      a.className = "nav-link";
+      a.setAttribute("data-scroll-target", `#${id}`);
+      a.textContent = year;
+      li.appendChild(a);
+      list.appendChild(li);
+      anchors.set(id, a);
+    });
+
+    const nav = document.createElement("nav");
+    nav.id = "TOC";
+    nav.setAttribute("role", "doc-toc");
+    nav.className = "toc-active";
+    nav.appendChild(tocTitle);
+    nav.appendChild(list);
+
+    const tocActions = sidebar.querySelector(".toc-actions");
+    if (tocActions) {
+      nav.appendChild(tocActions);
+    }
+    sidebar.insertBefore(nav, sidebar.firstChild);
+
+    let activeId = null;
+    const setActive = (targetId) => {
+      if (activeId === targetId) return;
+      anchors.get(activeId)?.classList.remove("active");
+      anchors.get(targetId)?.classList.add("active");
+      activeId = targetId;
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible.length > 0) {
+            setActive(visible[0].target.id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      );
+      headers.forEach((h) => observer.observe(h));
+    }
+
+    if (headers.length > 0) {
+      setActive(headers[0].id);
+    }
+  });
+</script>
+<script id="ordinal-dates" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    const SELECTOR = [
+      ".date",
+      ".date-modified",
+      ".listing-date",
+      ".listing-file-modified",
+      ".blog-date",
+      ".project-date",
+      ".talks-date",
+      ".pub-date",
+    ].join(", ");
+    const PATTERN = /(\d+)(st|nd|rd|th)\b/g;
+
+    function wrapTextNode(node) {
+      const text = node.nodeValue;
+      const fragment = document.createDocumentFragment();
+      let cursor = 0;
+      let match;
+      PATTERN.lastIndex = 0;
+      while ((match = PATTERN.exec(text)) !== null) {
+        const [full, digits, suffix] = match;
+        const start = match.index;
+        if (start > cursor) {
+          fragment.appendChild(document.createTextNode(text.slice(cursor, start)));
+        }
+        fragment.appendChild(document.createTextNode(digits));
+        const sup = document.createElement("sup");
+        sup.className = "ordinal-suffix";
+        sup.textContent = suffix;
+        fragment.appendChild(sup);
+        cursor = start + full.length;
+      }
+      if (cursor === 0) return;
+      if (cursor < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(cursor)));
+      }
+      node.parentNode.replaceChild(fragment, node);
+    }
+
+    const elements = document.querySelectorAll(SELECTOR);
+    if (elements.length === 0) return;
+    elements.forEach(function (el) {
+      if (el.dataset.ordinalDates === "wrapped") return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (node.parentNode && node.parentNode.classList && node.parentNode.classList.contains("ordinal-suffix")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const targets = [];
+      let current = walker.nextNode();
+      while (current) {
+        targets.push(current);
+        current = walker.nextNode();
+      }
+      targets.forEach(wrapTextNode);
+      el.dataset.ordinalDates = "wrapped";
+    });
+  });
+</script>
+<script id="navbar-tooltips" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window.tippy !== "function") return;
+
+    const config = {
+      theme: "mc",
+      placement: "bottom",
+      arrow: false,
+      delay: [100, 0],
+      offset: [0, 6],
+      allowHTML: false,
+      appendTo: function () { return document.body; },
+    };
+
+    function bind(el, content) {
+      if (!el || !content || el.dataset.tippyBound === "1") return;
+      el.removeAttribute("title");
+      window.tippy(el, Object.assign({ content: content }, config));
+      el.dataset.tippyBound = "1";
+    }
+
+    document.querySelectorAll(".navbar a.nav-link, a.about-link").forEach(function (link) {
+      const icon = link.querySelector("iconify-icon[aria-label], iconify-icon[title]");
+      if (!icon) return;
+      const titleFirst = link.classList.contains("about-link");
+      const label = titleFirst
+        ? (icon.getAttribute("title") || icon.getAttribute("aria-label"))
+        : (icon.getAttribute("aria-label") || icon.getAttribute("title"));
+      icon.removeAttribute("title");
+      bind(link, label);
+    });
+
+    document.querySelectorAll("a.quarto-color-scheme-toggle").forEach(function (toggle) {
+      bind(toggle, toggle.getAttribute("title") || toggle.getAttribute("aria-label"));
+    });
+
+    document.querySelectorAll("a.navbar-brand-logo").forEach(function (logo) {
+      bind(logo, "Home");
+    });
+
+    const aboutImages = document.querySelectorAll("img.about-image");
+    if (aboutImages.length > 0) {
+      const titleEl = document.querySelector("header#title-block-header h1.title, h1.title");
+      const titleText = (titleEl && titleEl.textContent.trim()) || "";
+      aboutImages.forEach(function (img) {
+        bind(img, titleText || img.getAttribute("alt") || "Profile picture");
+      });
+    }
+  });
+</script>
+<script id="title-block-header-empty-clean" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('header#title-block-header div, header#title-block-header p').forEach(function (el) {
+      if (!el.textContent.trim()) {
+        el.style.display = "none";
+      }
+    });
+  });
+</script>
+<script id="a11y-fixes" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Logo link: Quarto emits <a class="navbar-brand-logo"> with an inner <img alt>
+    // but axe sees no accessible name when the img is hidden by CSS.
+    document.querySelectorAll("a.navbar-brand-logo:not([aria-label])").forEach((a) => {
+      a.setAttribute("aria-label", "Mickaël CANOUIL — home");
+    });
+
+    // Color scheme toggle: Quarto adds title= but no aria-label.
+    document.querySelectorAll("a.quarto-color-scheme-toggle:not([aria-label])").forEach((a) => {
+      a.setAttribute("aria-label", a.getAttribute("title") || "Toggle colour scheme");
+    });
+
+    // Navbar search input: Quarto's inline button has no visible label.
+    const searchInput = document.querySelector(
+      ".aa-Input, input.aa-Input, input[placeholder='Search'], input[type='search']"
+    );
+    if (searchInput && !searchInput.getAttribute("aria-label")) {
+      searchInput.setAttribute("aria-label", "Search the site");
+    }
+
+    // CSL bibliography appendix: Quarto emits role="listitem" without role="list"
+    // parent. Promote each listitem itself to a list (it already wraps its own
+    // content); avoids adding role="list" to a parent that also contains
+    // unrelated children (axe rejects buttons inside role="list").
+    document.querySelectorAll('[role="listitem"]').forEach((el) => {
+      el.removeAttribute("role");
+    });
+
+    // Disambiguate duplicate banner landmarks. The Quarto title-block header
+    // (page-level) is also a <header>, which axe flags as a duplicate banner
+    // role alongside the site navbar. Strip the implicit banner role from the
+    // title-block via role="presentation" (header element disallows region).
+    const siteHeader = document.getElementById("quarto-header");
+    if (siteHeader && !siteHeader.getAttribute("aria-label")) {
+      siteHeader.setAttribute("aria-label", "Site banner");
+    }
+    const titleHeader = document.querySelector("header#title-block-header, header.quarto-title-block");
+    if (titleHeader) {
+      titleHeader.setAttribute("role", "presentation");
+    }
+    const navbarPrimary = document.querySelector(".navbar");
+    if (navbarPrimary && !navbarPrimary.getAttribute("aria-label")) {
+      navbarPrimary.setAttribute("aria-label", "Primary");
+    }
+    const tocNav = document.querySelector("#TOC, nav#TOC, .sidebar-toc nav");
+    if (tocNav && !tocNav.getAttribute("aria-label")) {
+      tocNav.setAttribute("aria-label", "On this page");
+    }
+
+    // Listing category sidebar: Quarto emits <h5>Categories</h5> after page <h1>,
+    // breaking the heading order. Re-tag to <h2> so the document outline stays
+    // monotonic, and put the sidebar block in a labelled landmark.
+    document.querySelectorAll("h5.quarto-listing-category-title").forEach((h5) => {
+      const h2 = document.createElement("h2");
+      for (const attr of h5.attributes) h2.setAttribute(attr.name, attr.value);
+      h2.innerHTML = h5.innerHTML;
+      h5.replaceWith(h2);
+    });
+
+    // Wrap orphan listing-category, listing-category-title, margin-header, and
+    // title-banner in labelled landmarks so axe's region rule passes. Skip if
+    // already inside another landmark (axe rejects nested top-level complementary).
+    const insideLandmark = (el) =>
+      el && el.closest('main, [role="main"], aside, [role="complementary"], nav, [role="navigation"], section[aria-label], section[aria-labelledby]');
+    const labelOnce = (el, role, label) => {
+      if (!el || el.getAttribute("role") || insideLandmark(el.parentElement)) return;
+      el.setAttribute("role", role);
+      if (!el.getAttribute("aria-label")) el.setAttribute("aria-label", label);
+    };
+
+    // Group the listing categories title and list as one complementary landmark.
+    // Use <div role="complementary"> instead of <aside>: Quarto's quarto.js treats
+    // any <aside> as a margin-column conflict element and collapses the entire
+    // margin-sidebar into a navbar toggle when it intersects.
+    document.querySelectorAll(".quarto-listing-category-title").forEach((title) => {
+      const next = title.nextElementSibling;
+      if (next && next.classList.contains("quarto-listing-category") && !insideLandmark(title.parentElement)) {
+        const wrap = document.createElement("div");
+        wrap.setAttribute("role", "complementary");
+        wrap.setAttribute("aria-label", "Listing filters");
+        title.parentNode.insertBefore(wrap, title);
+        wrap.appendChild(title);
+        wrap.appendChild(next);
+      }
+    });
+    // Skip the mobile sidebar-toggle clone; it duplicates the desktop sidebar
+    // and would create non-unique landmarks.
+    const inToggleClone = (el) => el && el.closest(".quarto-sidebar-toggle-contents, .quarto-sidebar-toggle");
+
+    document.querySelectorAll(".quarto-listing-category").forEach((el) => {
+      if (inToggleClone(el)) return;
+      labelOnce(el, "complementary", "Listing filters");
+    });
+    document.querySelectorAll(".quarto-margin-header").forEach((el) => {
+      if (inToggleClone(el)) return;
+      if (el.querySelector('aside[aria-label="Listing filters"], .quarto-listing-category')) return;
+      labelOnce(el, "complementary", "Page metadata");
+    });
+    document.querySelectorAll(".quarto-title-banner").forEach((el) => labelOnce(el, "region", "Page header"));
+    document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
+
+    // Quarto's sidebar-toggle clones the labelled landmarks into a mobile-only
+    // container after our handlers run. Suffix the cloned landmarks' labels so
+    // axe sees them as unique from the desktop originals.
+    const dedupeCloneLandmarks = () => {
+      document
+        .querySelectorAll('.quarto-sidebar-toggle-contents [role="complementary"], .quarto-sidebar-toggle-contents [role="region"], .quarto-sidebar-toggle-contents aside')
+        .forEach((el) => {
+          const label = el.getAttribute("aria-label");
+          if (label && !/\(mobile\)$/.test(label)) {
+            el.setAttribute("aria-label", `${label} (mobile)`);
+          }
+        });
+    };
+    dedupeCloneLandmarks();
+    setTimeout(dedupeCloneLandmarks, 50);
+    setTimeout(dedupeCloneLandmarks, 250);
+  });
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/mickael\.canouil\.fr");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "mcanouil/gribouille";
+    script.dataset.repoId = "R_kgDOSGUuww";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOSGUuw84C7KIV";
+    script.dataset.mapping = "og:title";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Powered by <a href="https://quarto.org" target="_blank" rel="noopener noreferrer"><iconify-icon role="img" inline="" icon="simple-icons:quarto" aria-label="Quarto Logo" title="Quarto Logo"></iconify-icon> Quarto</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+<p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-13-gribouille-0-5/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
+</div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>
