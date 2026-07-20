@@ -11633,12 +11633,188 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <p><strong>Zero page margin is the trick:</strong> the background reaches every edge, and the <code>slide</code> helper adds the padding back inside.</p>
 </div>
 <p>Carousel slides want colour and imagery that reach every edge, and a page margin would fence the content into a smaller box with white gutters. Removing the margin gives you the full page, and you add the padding back yourself. That is what the <code>slide</code> helper does.</p>
-</section>
-<section id="the-slide-layout" class="level2">
-<h2 class="anchored" data-anchor-id="the-slide-layout">The <code>slide</code> layout</h2>
-<p>A <code>slide</code> helper can do more than add padding. It can also draw the parts that repeat on every card. The layout below draws a full-height accent rail down the left edge, adds a page number in the top-right corner, then lays out your content in the space that is left. Here it is, defined and then called with an empty body so you can see the rail and the padded area where <code>body</code> goes.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+<p>For convenience, I keep the page geometry, a small palette, the fonts, and the <code>slide</code> layout in a shared preamble file.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">document</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>author<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Mickaël Canouil"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">text</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>lang<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"en"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">page</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">21cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">21cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> margin<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-4"></span>
+<span id="cb2-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ── palette ──────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-6"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">paper</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#f4f6f5"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-7"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">ink</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#0f1f1c"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-8"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">ink-soft</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#5a6b66"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-9"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">accent</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> rgb<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"#1f9d72"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-10"></span>
+<span id="cb2-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ── fonts (Typst built-ins, identical on every machine and in CI) ──────────</span></span>
+<span id="cb2-12"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">display</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Libertinus Serif"</span></span>
+<span id="cb2-13"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">body</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Libertinus Serif"</span></span>
+<span id="cb2-14"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">mono</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"DejaVu Sans Mono"</span></span>
+<span id="cb2-15"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">text</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> body<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> ink<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">19pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-16"></span>
+<span id="cb2-17"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ── the slide layout taught in the post ────────────────────────────────────</span></span>
+<span id="cb2-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// A full-height accent rail on the left edge and an optional page index,</span></span>
+<span id="cb2-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// stamped on every page; content sits in an inset cleared past the rail.</span></span>
+<span id="cb2-20"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -11668,7 +11844,7 @@ background-color: null;
 font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-2" class="code-annotation-target">  place<span class="op" style="color: #5E5E5E;
+<span id="cb2-21">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>left <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11693,7 +11869,7 @@ background-color: null;
 font-style: inherit;">:</span> accent<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-3" class="code-annotation-target">  <span class="cf" style="color: #003B4F;
+<span id="cb2-22">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> index <span class="op" style="color: #5E5E5E;
@@ -11703,10 +11879,254 @@ background-color: null;
 font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="annotated-cell-2-4">    place<span class="op" style="color: #5E5E5E;
+<span id="cb2-23">    place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>top <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> dx<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> dy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> mono<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">14pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> ink-soft<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> index<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="cb2-24">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb2-25">  block<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> inset<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>left: <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2.6cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> right: <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y: <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> body<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb2-26"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">})</span></span>
+<span id="cb2-27"></span>
+<span id="cb2-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// ── ruled kicker label used by the examples ────────────────────────────────</span></span>
+<span id="cb2-29"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">kicker</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>t<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> grid<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="annotated-cell-2-5">      top <span class="op" style="color: #5E5E5E;
+<span id="cb2-30">  columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">auto</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb2-31">  column-gutter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.35cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb2-32">  align<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> horizon<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb2-33">  line<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> accent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb2-34">  text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> mono<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">13pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> weight<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"medium"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> ink-soft<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> tracking<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> upper<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>t<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<span id="cb2-35"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+</section>
+<section id="the-slide-layout" class="level2">
+<h2 class="anchored" data-anchor-id="the-slide-layout">The <code>slide</code> layout</h2>
+<p>A <code>slide</code> helper can do more than add padding. It can also draw the parts that repeat on every card. The layout below draws a full-height accent rail down the left edge, adds a page number in the top-right corner, then lays out your content in the space that is left. Here it is, defined and then called with an empty body so you can see the rail and the padded area where <code>body</code> goes.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">slide</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>index<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> paper<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> body<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> page<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target">  place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>left <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> top<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> rect<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.55cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> accent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-3" class="code-annotation-target">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="annotated-cell-3-4">    place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-5">      top <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> right<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11725,7 +12145,7 @@ background-color: null;
 font-style: inherit;">1.4cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="annotated-cell-2-6">      text<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-6">      text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11744,16 +12164,16 @@ background-color: null;
 font-style: inherit;">,</span> index<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="annotated-cell-2-7">    <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-7">    <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="annotated-cell-2-8">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-8">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-2-9" class="code-annotation-target">  block<span class="op" style="color: #5E5E5E;
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-3-9" class="code-annotation-target">  block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="annotated-cell-2-10">    width<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-10">    width<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -11782,24 +12202,24 @@ background-color: null;
 font-style: inherit;">1.7cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="annotated-cell-2-11">    body</span>
-<span id="annotated-cell-2-12">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-11">    body</span>
+<span id="annotated-cell-3-12">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-2-13" class="code-annotation-target"><span class="op" style="color: #5E5E5E;
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-3-13" class="code-annotation-target"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span>
-<span id="annotated-cell-2-14"></span>
-<span id="annotated-cell-2-15"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-3-14"></span>
+<span id="annotated-cell-3-15"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>slide<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">({</span></span>
-<span id="annotated-cell-2-16">  block<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-16">  block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="annotated-cell-2-17">    width<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-17">    width<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -11812,7 +12232,7 @@ background-color: null;
 font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="annotated-cell-2-18">    stroke<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-18">    stroke<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11827,14 +12247,14 @@ background-color: null;
 font-style: inherit;">"dashed"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="annotated-cell-2-19">    radius<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-19">    radius<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">8pt</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="annotated-cell-2-20">    align<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-20">    align<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>center <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11855,33 +12275,33 @@ background-color: null;
 font-style: inherit;">"body goes here"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)),</span></span>
-<span id="annotated-cell-2-21">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-21">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="annotated-cell-2-22"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-3-22"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="1" data-code-annotation="1">Start a fresh page and paint its background with <code>fill</code>, so each call is one card in the carousel.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="1" data-code-annotation="1">Start a fresh page and paint its background with <code>fill</code>, so each call is one card in the carousel.</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="2" data-code-annotation="2">Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With <code>margin: 0cm</code> it reaches the top, bottom, and side.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="2" data-code-annotation="2">Draw the rail: a thin rectangle pinned to the left edge, the full height of the page. With <code>margin: 0cm</code> it reaches the top, bottom, and side.</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="3">Add a small page number like <code>2 / 3</code> in the top-right, but only when an <code>index</code> is passed.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="3">Add a small page number like <code>2 / 3</code> in the top-right, but only when an <code>index</code> is passed.</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="4">4</dt>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="9,10,11,12" data-code-annotation="4">Add back the padding that <code>margin: 0cm</code> removed, with a wider left inset so the content clears the rail.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="9,10,11,12" data-code-annotation="4">Add back the padding that <code>margin: 0cm</code> removed, with a wider left inset so the content clears the rail.</span>
 </dd>
-<dt data-target-cell="annotated-cell-2" data-target-annotation="5">5</dt>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="5">5</dt>
 <dd>
-<span data-code-cell="annotated-cell-2" data-code-lines="13" data-code-annotation="5"><code>body</code> is a trailing content argument, so the helper is called as <code>#slide({ ... })</code> with the card’s content in the braces.</span>
+<span data-code-cell="annotated-cell-3" data-code-lines="13" data-code-annotation="5"><code>body</code> is a trailing content argument, so the helper is called as <code>#slide({ ... })</code> with the card’s content in the braces.</span>
 </dd>
 </dl>
 </div>
@@ -11896,7 +12316,7 @@ font-style: inherit;">})</span></span><div class="code-annotation-gutter-bg"></d
 <section id="slides-live" class="level2">
 <h2 class="anchored" data-anchor-id="slides-live">Slides, live</h2>
 <p>The cover card passes an <code>index</code>, adds a <code>kicker</code> at the top, and centres the headline. The rail and the page number come from the layout.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>slide<span class="op" style="color: #5E5E5E;
@@ -11910,21 +12330,21 @@ background-color: null;
 font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb2-2">  kicker<span class="op" style="color: #5E5E5E;
+<span id="cb3-2">  kicker<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Typst · Carousel"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-3">  v<span class="op" style="color: #5E5E5E;
+<span id="cb3-3">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-4">  block<span class="op" style="color: #5E5E5E;
+<span id="cb3-4">  block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11935,7 +12355,7 @@ background-color: null;
 font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb2-5">    text<span class="op" style="color: #5E5E5E;
+<span id="cb3-5">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11962,10 +12382,10 @@ background-color: null;
 font-style: inherit;">"Build decks"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-6">    linebreak<span class="op" style="color: #5E5E5E;
+<span id="cb3-6">    linebreak<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">()</span></span>
-<span id="cb2-7">    text<span class="op" style="color: #5E5E5E;
+<span id="cb3-7">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -11992,14 +12412,14 @@ background-color: null;
 font-style: inherit;">"from text"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-8">    v<span class="op" style="color: #5E5E5E;
+<span id="cb3-8">    v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.4cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-9">    text<span class="op" style="color: #5E5E5E;
+<span id="cb3-9">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12016,22 +12436,22 @@ background-color: null;
 font-style: inherit;">"One layout, used on every card."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-10">  <span class="op" style="color: #5E5E5E;
+<span id="cb3-10">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span>
-<span id="cb2-11">  v<span class="op" style="color: #5E5E5E;
+<span id="cb3-11">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb2-12"><span class="op" style="color: #5E5E5E;
+<span id="cb3-12"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 <p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/cover.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Cover card with an emerald rail down the left edge, a '1 / 3' index top-right, a ruled 'TYPST · CAROUSEL' kicker, and a large two-line headline 'Build decks from text'."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/cover.svg" class="img-fluid hero-art w-50 mx-auto d-block" alt="Cover card with an emerald rail down the left edge, a '1 / 3' index top-right, a ruled 'TYPST · CAROUSEL' kicker, and a large two-line headline 'Build decks from text'."></a></p>
 <p>A content card stacks a few numbered rows with a <code>grid</code> to keep the numbers and text aligned.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb3-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>slide<span class="op" style="color: #5E5E5E;
@@ -12045,34 +12465,34 @@ background-color: null;
 font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb3-2">  kicker<span class="op" style="color: #5E5E5E;
+<span id="cb4-2">  kicker<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Why Typst"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-3">  v<span class="op" style="color: #5E5E5E;
+<span id="cb4-3">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-4">  block<span class="op" style="color: #5E5E5E;
+<span id="cb4-4">  block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb3-5">    width<span class="op" style="color: #5E5E5E;
+<span id="cb4-5">    width<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">16cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb3-6">    text<span class="op" style="color: #5E5E5E;
+<span id="cb4-6">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb3-7">      font<span class="op" style="color: #5E5E5E;
+<span id="cb4-7">      font<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> display<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12093,24 +12513,24 @@ background-color: null;
 font-style: inherit;">:</span> ink<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb3-8">      <span class="st" style="color: #20794D;
+<span id="cb4-8">      <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Three reasons it fits carousels."</span></span>
-<span id="cb3-9">    <span class="op" style="color: #5E5E5E;
+<span id="cb4-9">    <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-10">  <span class="op" style="color: #5E5E5E;
+<span id="cb4-10">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-11">  v<span class="op" style="color: #5E5E5E;
+<span id="cb4-11">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.7cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-12"></span>
-<span id="cb3-13">  <span class="kw" style="color: #003B4F;
+<span id="cb4-12"></span>
+<span id="cb4-13">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">let</span> <span class="va" style="color: #111111;
@@ -12126,7 +12546,7 @@ background-color: null;
 font-style: inherit;">=</span> grid<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb3-14">    columns<span class="op" style="color: #5E5E5E;
+<span id="cb4-14">    columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12139,7 +12559,7 @@ background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb3-15">    align<span class="op" style="color: #5E5E5E;
+<span id="cb4-15">    align<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12152,7 +12572,7 @@ background-color: null;
 font-style: inherit;">+</span> horizon<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb3-16">    text<span class="op" style="color: #5E5E5E;
+<span id="cb4-16">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12179,7 +12599,7 @@ background-color: null;
 font-style: inherit;">(</span>n<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)),</span></span>
-<span id="cb3-17">    block<span class="op" style="color: #5E5E5E;
+<span id="cb4-17">    block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12202,26 +12622,26 @@ background-color: null;
 font-style: inherit;">,</span> t<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)),</span></span>
-<span id="cb3-18">  <span class="op" style="color: #5E5E5E;
+<span id="cb4-18">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-19"></span>
-<span id="cb3-20">  stack<span class="op" style="color: #5E5E5E;
+<span id="cb4-19"></span>
+<span id="cb4-20">  stack<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb3-21">    dir<span class="op" style="color: #5E5E5E;
+<span id="cb4-21">    dir<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> ttb<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb3-22">    spacing<span class="op" style="color: #5E5E5E;
+<span id="cb4-22">    spacing<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.7cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb3-23">    row<span class="op" style="color: #5E5E5E;
+<span id="cb4-23">    row<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -12232,7 +12652,7 @@ background-color: null;
 font-style: inherit;">"Plain text in, PDF out. Diff it, version it, regenerate it."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb3-24">    row<span class="op" style="color: #5E5E5E;
+<span id="cb4-24">    row<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -12243,7 +12663,7 @@ background-color: null;
 font-style: inherit;">"One layout sets the look of every page at once."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb3-25">    row<span class="op" style="color: #5E5E5E;
+<span id="cb4-25">    row<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -12254,15 +12674,15 @@ background-color: null;
 font-style: inherit;">"No design tool, no manual export, no pixel pushing."</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb3-26">  <span class="op" style="color: #5E5E5E;
+<span id="cb4-26">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb3-27"><span class="op" style="color: #5E5E5E;
+<span id="cb4-27"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 <p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/content.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Content card with the rail, a '2 / 3' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/content.svg" class="img-fluid hero-art w-50 mx-auto d-block" alt="Content card with the rail, a '2 / 3' index, the heading 'Three reasons it fits carousels.', and a numbered list of three short benefits."></a></p>
 <p>The closing card changes the background with the <code>fill</code> parameter. The rail and the page number stay the same.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>slide<span class="op" style="color: #5E5E5E;
@@ -12280,31 +12700,31 @@ background-color: null;
 font-style: inherit;">,</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb4-2">  v<span class="op" style="color: #5E5E5E;
+<span id="cb5-2">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-3">  kicker<span class="op" style="color: #5E5E5E;
+<span id="cb5-3">  kicker<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Ship it"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-4">  v<span class="op" style="color: #5E5E5E;
+<span id="cb5-4">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-5">  text<span class="op" style="color: #5E5E5E;
+<span id="cb5-5">  text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb4-6">    font<span class="op" style="color: #5E5E5E;
+<span id="cb5-6">    font<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> display<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12325,23 +12745,23 @@ background-color: null;
 font-style: inherit;">:</span> paper<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb4-7">    <span class="st" style="color: #20794D;
+<span id="cb5-7">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Compile and post."</span></span>
-<span id="cb4-8">  <span class="op" style="color: #5E5E5E;
+<span id="cb5-8">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-9">  v<span class="op" style="color: #5E5E5E;
+<span id="cb5-9">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.6cm</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-10">  text<span class="op" style="color: #5E5E5E;
+<span id="cb5-10">  text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb4-11">    font<span class="op" style="color: #5E5E5E;
+<span id="cb5-11">    font<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> mono<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -12360,20 +12780,20 @@ background-color: null;
 font-style: inherit;">"#8fa49d"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb4-12">    <span class="st" style="color: #20794D;
+<span id="cb5-12">    <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"typst compile carousel.typ carousel.pdf"</span></span>
-<span id="cb4-13">  <span class="op" style="color: #5E5E5E;
+<span id="cb5-13">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-14">  v<span class="op" style="color: #5E5E5E;
+<span id="cb5-14">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-15"><span class="op" style="color: #5E5E5E;
+<span id="cb5-15"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 <p><a href="../../posts/2026-05-28-typst-linkedin-carousels/./assets/typst-render/cta.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Closing card on a dark green-black background with the rail and a '3 / 3' index, reading 'Compile and post.' above the command to compile the carousel to PDF."><img src="https://mickael.canouil.fr/posts/2026-05-28-typst-linkedin-carousels/assets/typst-render/cta.svg" class="img-fluid hero-art w-50 mx-auto d-block" alt="Closing card on a dark green-black background with the rail and a '3 / 3' index, reading 'Compile and post.' above the command to compile the carousel to PDF."></a></p>
@@ -12382,17 +12802,17 @@ font-style: inherit;">})</span></span></code></pre></div></div>
 <section id="compile-the-whole-deck" class="level2">
 <h2 class="anchored" data-anchor-id="compile-the-whole-deck">Compile the whole deck</h2>
 <p>Stack your slides in one <code>carousel.typ</code> file, then compile it. Each <code>#slide(...)</code> becomes one page, and the PDF is the carousel.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Each #slide is one page; the PDF is the carousel</span></span>
-<span id="cb5-2"><span class="ex" style="color: null;
+<span id="cb6-2"><span class="ex" style="color: null;
 background-color: null;
 font-style: inherit;">typst</span> compile carousel.typ carousel.pdf</span>
-<span id="cb5-3"></span>
-<span id="cb5-4"><span class="co" style="color: #5E5E5E;
+<span id="cb6-3"></span>
+<span id="cb6-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Typst can also export one PNG per page, no extra tool needed</span></span>
-<span id="cb5-5"><span class="ex" style="color: null;
+<span id="cb6-5"><span class="ex" style="color: null;
 background-color: null;
 font-style: inherit;">typst</span> compile carousel.typ <span class="st" style="color: #20794D;
 background-color: null;
@@ -12404,10 +12824,10 @@ font-style: inherit;">--ppi</span> 144</span></code></pre></div></div>
 <section id="want-a-gif-for-another-platform" class="level2">
 <h2 class="anchored" data-anchor-id="want-a-gif-for-another-platform">Want a GIF for another platform?</h2>
 <p>LinkedIn takes the PDF, but some places want a GIF. Build one from the PNG frames with <a href="https://imagemagick.org">ImageMagick</a>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Assemble the exported PNG frames into a looping GIF</span></span>
-<span id="cb6-2"><span class="ex" style="color: null;
+<span id="cb7-2"><span class="ex" style="color: null;
 background-color: null;
 font-style: inherit;">magick</span> <span class="at" style="color: #657422;
 background-color: null;
@@ -12445,30 +12865,30 @@ font-style: inherit;">*</span>.png carousel.gif</span></code></pre></div></div>
 <section id="bonus-an-llm-prompt" class="level2">
 <h2 class="anchored" data-anchor-id="bonus-an-llm-prompt">Bonus: an LLM prompt</h2>
 <p>If you would rather start from a draft, paste the prompt below into your assistant of choice. It encodes the geometry, the <code>slide</code> helper, and the design constraints, so the output compiles with the <code>typst</code> CLI.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="text" style="background: #f1f3f5;"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1">You are designing a LinkedIn carousel as a Typst document.</span>
-<span id="cb7-2">Produce a single self-contained carousel.typ that compiles with `typst compile`.</span>
-<span id="cb7-3"></span>
-<span id="cb7-4">Hard requirements:</span>
-<span id="cb7-5"></span>
-<span id="cb7-6">- Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm).</span>
-<span id="cb7-7">  This is a square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.</span>
-<span id="cb7-8">- Define one `slide` layout and use it for every card.</span>
-<span id="cb7-9">  Build it from a full-page block with zero page margin and an inset, so the background reaches every edge and the content keeps consistent padding:</span>
-<span id="cb7-10">    #let slide(fill: &lt;default-bg&gt;, body) = page(fill: fill, {</span>
-<span id="cb7-11">      block(width: 100%, height: 100%, inset: 1.7cm, body)</span>
-<span id="cb7-12">    })</span>
-<span id="cb7-13">  Add any repeated parts you want on top of that (a header, a page number, ...).</span>
-<span id="cb7-14">- Invent a small palette (background, ink, soft ink, one accent) and a font trio (display, body, mono).</span>
-<span id="cb7-15">  Prefer legible fonts.</span>
-<span id="cb7-16">- Five to seven cards following the arc: cover, then content, then a closing call to action.</span>
-<span id="cb7-17">  Use one card with `fill: &lt;accent-or-dark&gt;` to invert the look.</span>
-<span id="cb7-18">- Body text at least 14pt; headlines 30 to 56pt, so everything reads at thumbnail size.</span>
-<span id="cb7-19">  Use place, grid, stack, and v()/h() for layout.</span>
-<span id="cb7-20"></span>
-<span id="cb7-21">Then tell me the two `typst compile` commands to export it to PDF and to one PNG per page.</span>
-<span id="cb7-22"></span>
-<span id="cb7-23">The topic of the carousel is: &lt;describe your announcement here&gt;.</span>
-<span id="cb7-24">Layout and style (optional): &lt;describe any layout or look you want, for example a side rail, page numbers, a colour band, a serif or a sans display; leave blank to let you pick a clean design&gt;.</span></code></pre></div></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="text" style="background: #f1f3f5;"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1">You are designing a LinkedIn carousel as a Typst document.</span>
+<span id="cb8-2">Produce a single self-contained carousel.typ that compiles with `typst compile`.</span>
+<span id="cb8-3"></span>
+<span id="cb8-4">Hard requirements:</span>
+<span id="cb8-5"></span>
+<span id="cb8-6">- Page geometry: #set page(width: 21cm, height: 21cm, margin: 0cm).</span>
+<span id="cb8-7">  This is a square 1:1 (LinkedIn shows carousels at 1080 by 1080); keep the ratio.</span>
+<span id="cb8-8">- Define one `slide` layout and use it for every card.</span>
+<span id="cb8-9">  Build it from a full-page block with zero page margin and an inset, so the background reaches every edge and the content keeps consistent padding:</span>
+<span id="cb8-10">    #let slide(fill: &lt;default-bg&gt;, body) = page(fill: fill, {</span>
+<span id="cb8-11">      block(width: 100%, height: 100%, inset: 1.7cm, body)</span>
+<span id="cb8-12">    })</span>
+<span id="cb8-13">  Add any repeated parts you want on top of that (a header, a page number, ...).</span>
+<span id="cb8-14">- Invent a small palette (background, ink, soft ink, one accent) and a font trio (display, body, mono).</span>
+<span id="cb8-15">  Prefer legible fonts.</span>
+<span id="cb8-16">- Five to seven cards following the arc: cover, then content, then a closing call to action.</span>
+<span id="cb8-17">  Use one card with `fill: &lt;accent-or-dark&gt;` to invert the look.</span>
+<span id="cb8-18">- Body text at least 14pt; headlines 30 to 56pt, so everything reads at thumbnail size.</span>
+<span id="cb8-19">  Use place, grid, stack, and v()/h() for layout.</span>
+<span id="cb8-20"></span>
+<span id="cb8-21">Then tell me the two `typst compile` commands to export it to PDF and to one PNG per page.</span>
+<span id="cb8-22"></span>
+<span id="cb8-23">The topic of the carousel is: &lt;describe your announcement here&gt;.</span>
+<span id="cb8-24">Layout and style (optional): &lt;describe any layout or look you want, for example a side rail, page numbers, a colour band, a serif or a sans display; leave blank to let you pick a clean design&gt;.</span></code></pre></div></div>
 <div class="highlight">
 <p><strong>It comes down to one idea:</strong> a single <code>slide</code> helper turns a blank page into a carousel page, and the rest is the content you put on it.</p>
 </div>
@@ -14609,7 +15029,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -14712,7 +15132,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -14797,7 +15217,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -14903,7 +15323,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -14955,7 +15375,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
