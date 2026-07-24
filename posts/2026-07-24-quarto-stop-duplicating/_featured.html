@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #040810;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      position: relative;
+    }
+
+    .bg-grad {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 900px 500px at 50% -10%, rgba(30, 80, 160, .28) 0%, transparent 70%),
+        radial-gradient(ellipse 600px 400px at 10% 90%, rgba(59, 191, 195, .10) 0%, transparent 60%),
+        radial-gradient(ellipse 600px 400px at 90% 90%, rgba(232, 160, 59, .10) 0%, transparent 60%);
+    }
+
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .rainbow-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #58a6e8 0%, #3bbfc3 50%, #e8a03b 100%);
+      opacity: .9;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      padding: 44px 52px 40px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .header h1 {
+      font-size: 34px;
+      font-weight: 800;
+      color: #e6edf3;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .header h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #58a6e8, #3bbfc3 60%, #5bc8cb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 200px 1fr;
+      align-items: center;
+    }
+
+    .source {
+      --a: #e6edf3;
+      border-radius: 16px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, rgba(230, 237, 243, .45) 0%, rgba(230, 237, 243, .10) 55%, transparent 100%);
+      box-shadow: 0 0 36px rgba(230, 237, 243, .07);
+    }
+
+    .source-inner {
+      background: linear-gradient(145deg, #0c1420 0%, #080d15 100%);
+      border-radius: 15px;
+      padding: 30px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .source-name {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 27px;
+      font-weight: 700;
+      color: #e6edf3;
+      letter-spacing: -.6px;
+      line-height: 1;
+    }
+
+    .source-desc {
+      font-size: 14px;
+      color: #7d8fa3;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .fan {
+      height: 100%;
+    }
+
+    .outputs {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 600px;
+    }
+
+    .out {
+      --a: #58a6e8;
+      --ag: color-mix(in srgb, var(--a) 50%, transparent);
+      --al: color-mix(in srgb, var(--a) 12%, transparent);
+      border-radius: 14px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, var(--ag) 0%, var(--al) 55%, transparent 100%);
+      box-shadow: 0 0 28px color-mix(in srgb, var(--a) 10%, transparent);
+    }
+
+    .out-inner {
+      background: linear-gradient(145deg, #0c1420 0%, #080d15 100%);
+      border-radius: 13px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .out-inner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--ag) 40%, transparent 100%);
+    }
+
+    .out-name {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--a);
+      letter-spacing: -.5px;
+      line-height: 1;
+    }
+
+    .out-desc {
+      font-size: 14px;
+      color: #7d8fa3;
+      line-height: 1.4;
+    }
+
+    .o1 {
+      --a: #58a6e8;
+    }
+
+    .o2 {
+      --a: #e8a03b;
+    }
+
+    .o3 {
+      --a: #3bbfc3;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filters-label {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #55657a;
+    }
+
+    .chip {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 16px;
+      font-weight: 600;
+      color: #c2d0dd;
+      border: 1px solid rgba(230, 237, 243, .14);
+      background: rgba(230, 237, 243, .04);
+      border-radius: 999px;
+      padding: 8px 18px;
+      line-height: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-grad"></div>
+  <div class="grid-lines"></div>
+  <div class="rainbow-bar"></div>
+
+  <div class="content">
+    <div class="header">
+      <h1>Stop <em>Duplicating</em> Your Quarto Source</h1>
+    </div>
+
+    <div class="stage">
+
+      <div class="source">
+        <div class="source-inner">
+          <div class="source-name">index.qmd</div>
+          <div class="source-desc">One source, written once.</div>
+        </div>
+      </div>
+
+      <svg class="fan" width="200" height="330" viewBox="0 0 200 330" fill="none">
+        <path d="M0 165 C 90 165, 110 55, 200 55" stroke="#58a6e8" stroke-width="2" stroke-opacity=".55" />
+        <path d="M0 165 C 90 165, 110 165, 200 165" stroke="#e8a03b" stroke-width="2" stroke-opacity=".55" />
+        <path d="M0 165 C 90 165, 110 275, 200 275" stroke="#3bbfc3" stroke-width="2" stroke-opacity=".55" />
+        <circle cx="0" cy="165" r="5" fill="#e6edf3" fill-opacity=".8" />
+        <circle cx="198" cy="55" r="4" fill="#58a6e8" />
+        <circle cx="198" cy="165" r="4" fill="#e8a03b" />
+        <circle cx="198" cy="275" r="4" fill="#3bbfc3" />
+      </svg>
+
+      <div class="outputs">
+
+        <div class="out o1">
+          <div class="out-inner">
+            <div class="out-name">HTML</div>
+            <div class="out-desc">The handout on the web.</div>
+          </div>
+        </div>
+
+        <div class="out o2">
+          <div class="out-inner">
+            <div class="out-name">Typst</div>
+            <div class="out-desc">The same content as a PDF.</div>
+          </div>
+        </div>
+
+        <div class="out o3">
+          <div class="out-inner">
+            <div class="out-name">Reveal.js</div>
+            <div class="out-desc">The same content as slides.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filters-label">Filters</div>
+      <div class="chip">offset-headings</div>
+      <div class="chip">prism</div>
+      <div class="chip">cascade</div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.16">
+<meta name="generator" content="quarto-1.11.0">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,10 +13,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -76,14 +79,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1b7f1d13bbd45303796fc677d50fdf7d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f7223cea046bf3a6552cc1c9fe57c739.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-1b7f1d13bbd45303796fc677d50fdf7d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c86c67f2eb2b6c9ea83445e77d77b87f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f771398aef2be3c9b28d40a927732b28.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c86c67f2eb2b6c9ea83445e77d77b87f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-486ea2e2658aa483df40a73776864512.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-6fd7668161e579dcaa9c932b3d718bed.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-486ea2e2658aa483df40a73776864512.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-53c58bda03f86e609e4529e7a14b2ea8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-fb41d50f2c772e2c937983707a5f71c1.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-53c58bda03f86e609e4529e7a14b2ea8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
@@ -1745,6 +1748,35 @@ Bridge (Part 1). <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.f
     document.querySelectorAll("a.navbar-brand-logo").forEach(function (logo) {
       bind(logo, "Home");
     });
+
+    const searchEl = document.getElementById("quarto-search");
+    if (searchEl) {
+      // autocomplete.js renders the search button asynchronously, so it may not
+      // exist yet. Bind now if it does, otherwise watch until it appears.
+      const bindSearch = function () {
+        const button = searchEl.querySelector(".aa-DetachedSearchButton");
+        if (!button) return false;
+        const label = button.getAttribute("title") || searchEl.getAttribute("title");
+        // The wrapper carries its own title, which the browser would show as a
+        // native tooltip on top of the tippy one.
+        searchEl.removeAttribute("title");
+        // The title is the button's only accessible name and bind() strips it,
+        // so move it to aria-label first. a11y-fixes.html runs on
+        // DOMContentLoaded, too early to see this asynchronously rendered button.
+        if (label && !button.hasAttribute("aria-label")) {
+          button.setAttribute("aria-label", label);
+        }
+        bind(button, label);
+        return true;
+      };
+
+      if (!bindSearch()) {
+        const observer = new MutationObserver(function () {
+          if (bindSearch()) observer.disconnect();
+        });
+        observer.observe(searchEl, { childList: true, subtree: true });
+      }
+    }
 
     const aboutImages = document.querySelectorAll("img.about-image");
     if (aboutImages.length > 0) {
