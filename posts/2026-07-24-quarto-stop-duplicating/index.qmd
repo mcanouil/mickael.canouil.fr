@@ -223,7 +223,7 @@ Same paragraph, two sizes.
 
 It works on divs, spans, code blocks, and headings.
 The format name is matched exactly against the Quarto target format, which includes custom formats.
-Under a custom `mcanouil-typst` format, only `mcanouil-typst:` matches, not `typst:`, and PDF goes through Pandoc's `latex` writer, so the prefix there is `latex:`.
+Under a custom `mcanouil-typst` format, only `mcanouil-typst:` matches, not `typst:`, and the built-in PDF format is targeted with `pdf:`, since that is the format name Quarto requests, not the writer it happens to use underneath.
 
 Two prefixes save repetition.
 `slide:` covers every HTML slide format, and `default:` provides a fallback used only when nothing more specific matched.
@@ -296,7 +296,8 @@ The `---` splits the slide, and `cascade` puts `### From a CSV file` back on top
 ```{.markdown include="assets/_demo/demo.qmd" start-line=18 end-line=25 filename="demo.qmd"}
 ```
 
-The table gets a width in the prose formats and a smaller font on the deck, from a single wrapper.
+The table gets a width in the HTML handout and a smaller font on the deck, from a single wrapper.
+Typst ignores `max-width`, so the PDF falls back to its own table sizing.
 
 ```{.markdown include="assets/_demo/demo.qmd" start-line=39 end-line=47 filename="demo.qmd"}
 ```
@@ -358,7 +359,7 @@ Three things caught me out while writing real modules with these filters.
 
 - Quarto's own conditional-content filter rewrites `.content-visible` and `.content-hidden` divs and strips custom attributes from them, so a `prism` attribute placed on that fence disappears without a word.
   Put it on an inner div instead.
-- `prism` does not process `.panel-tabset` fences, so wrap the tabset in a plain div and put the attribute there.
+- `cascade` does not hoist a `---` that sits inside a `.panel-tabset` div, so a slide break there is left alone rather than split into a continuation slide.
 - The first child of a section heading should be a heading, not prose.
   Otherwise `cascade` reads the slide level wrongly and repeats the wrong heading on the continuation slides.
 
