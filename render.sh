@@ -35,10 +35,6 @@ quarto render posts/2026-02-27-typst-template-tutorial-part1
 quarto render posts/2026-03-05-typst-template-tutorial-part2
 quarto render posts/2026-04-15-quarto-brand-figures-tables
 quarto render posts/2026-04-21-quarto-revealjs-extensions
-quarto render posts/2026-05-28-typst-linkedin-carousels
-quarto render posts/2026-06-03-gribouille-0-2
-Rscript posts/2026-06-10-why-quarto-stuck/assets/scripts/quarto-cli-activity.R
-quarto render posts/2026-06-10-why-quarto-stuck
 
 # 2026-05-20-gribouille-grammar-of-graphics-for-typst
 # Post executes a Python chunk via Jupyter and renders {typst} blocks that
@@ -51,5 +47,21 @@ uv pip install jupyter polars ipython
 python -m ipykernel install --user --name gribouille-post --display-name "Python (gribouille-post)"
 quarto render posts/2026-05-20-gribouille-grammar-of-graphics-for-typst
 deactivate
+
+quarto render posts/2026-05-28-typst-linkedin-carousels
+quarto render posts/2026-06-03-gribouille-0-2
+Rscript posts/2026-06-10-why-quarto-stuck/assets/scripts/quarto-cli-activity.R
+quarto render posts/2026-06-10-why-quarto-stuck
+quarto render posts/2026-06-15-gribouille-0-3
+quarto render posts/2026-06-22-gribouille-0-4
+quarto render posts/2026-07-01-r-package-shiny-quarto
+quarto render posts/2026-07-06-shiny-great-docs
+
+# 2026-07-24-quarto-stop-duplicating
+# The post shows one demo source rendered to HTML, Typst, and reveal.js by the
+# `offset-headings`, `prism`, and `cascade` filters. Its outputs are committed
+# under `assets/output/`, so they are only rebuilt when the demo changes.
+(cd posts/2026-07-24-quarto-stop-duplicating/assets/_demo && quarto render)
+quarto render posts/2026-07-24-quarto-stop-duplicating
 
 quarto render

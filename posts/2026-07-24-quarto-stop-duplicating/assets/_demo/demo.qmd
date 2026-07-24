@@ -1,0 +1,57 @@
+---
+title: "Reading Data in R"
+subtitle: "Module 3"
+engine: markdown
+---
+
+## Reading a File {revealjs:offset-headings-by="-1" revealjs:offset-headings-depth="1"}
+
+### From a CSV file
+
+`read.csv()` reads a comma separated file and returns a data frame.
+
+```{.r revealjs:style="font-size: 0.7em;"}
+penguins <- read.csv("penguins.csv")
+str(penguins)
+```
+
+The `str()` call prints the structure of the object, so you can check the column types before going further.
+
+---
+
+Two arguments matter more than the others.
+
+- `stringsAsFactors` controls whether character columns become factors.
+- `na.strings` lists the values to read as missing.
+
+### From an Excel file
+
+R has no built-in reader for Excel files, so you need a package.
+
+```{.r}
+readxl::read_excel("penguins.xlsx", sheet = "data")
+```
+
+## Common Pitfalls {revealjs:offset-headings-by="-1" revealjs:offset-headings-depth="1"}
+
+### Separators and decimal marks
+
+::: {revealjs:style="font-size: 0.6em;" default:style="max-width: 40em;"}
+
+| Function | Separator | Decimal mark |
+| --- | --- | --- |
+| `read.csv()` | `,` | `.` |
+| `read.csv2()` | `;` | `,` |
+| `read.delim()` | tab | `.` |
+
+:::
+
+Pick the reader that matches the file you were given, rather than reading the file and repairing it afterwards.
+
+### Checking your work {.no-cascade}
+
+Always print the dimensions of what you read.
+
+```{.r}
+dim(penguins)
+```
