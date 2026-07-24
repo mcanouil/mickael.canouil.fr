@@ -43,6 +43,35 @@
       bind(logo, "Home");
     });
 
+    const searchEl = document.getElementById("quarto-search");
+    if (searchEl) {
+      // autocomplete.js renders the search button asynchronously, so it may not
+      // exist yet. Bind now if it does, otherwise watch until it appears.
+      const bindSearch = function () {
+        const button = searchEl.querySelector(".aa-DetachedSearchButton");
+        if (!button) return false;
+        const label = button.getAttribute("title") || searchEl.getAttribute("title");
+        // The wrapper carries its own title, which the browser would show as a
+        // native tooltip on top of the tippy one.
+        searchEl.removeAttribute("title");
+        // The title is the button's only accessible name and bind() strips it,
+        // so move it to aria-label first. a11y-fixes.html runs on
+        // DOMContentLoaded, too early to see this asynchronously rendered button.
+        if (label && !button.hasAttribute("aria-label")) {
+          button.setAttribute("aria-label", label);
+        }
+        bind(button, label);
+        return true;
+      };
+
+      if (!bindSearch()) {
+        const observer = new MutationObserver(function () {
+          if (bindSearch()) observer.disconnect();
+        });
+        observer.observe(searchEl, { childList: true, subtree: true });
+      }
+    }
+
     const aboutImages = document.querySelectorAll("img.about-image");
     if (aboutImages.length > 0) {
       const titleEl = document.querySelector("header#title-block-header h1.title, h1.title");
