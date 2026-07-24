@@ -636,6 +636,60 @@ img.about-image {
   }
 }
 
+// ===========================
+// NAVBAR CONTROL SIZING
+// ===========================
+// Nav links, the theme toggle, and the overlay search button are three separate
+// Quarto components with three different box models (2.5rem / inline / ~28px)
+// and ad-hoc margins.  Pin them to one control box so heights and gaps match.
+$_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
+$_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
+$_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
+
+.navbar {
+  // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
+  // height of its own and sits on a different baseline to the nav links.
+  .quarto-navbar-tools {
+    display: inline-flex;
+    align-items: center;
+
+    .quarto-navigation-tool {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: $_navbar-control-height;
+      // !important is required: Bootstrap's .px-1 utility is itself !important.
+      padding-inline: $_navbar-control-padding-x !important;
+    }
+  }
+
+  // Overlay search renders a detached <button>; Quarto pins it to a 40px box
+  // with a 26px icon, both larger than every other navbar control.
+  #quarto-search.type-overlay {
+    margin-left: 0;
+
+    .aa-Autocomplete {
+      width: auto;
+    }
+
+    .aa-DetachedSearchButton {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: $_navbar-control-height;
+      padding-inline: $_navbar-control-padding-x;
+    }
+
+    // `.aa-Autocomplete` is in the selector to match the specificity of
+    // Quarto's own 26px rule, which would otherwise win.
+    .aa-Autocomplete .aa-DetachedSearchButtonIcon svg,
+    .aa-Autocomplete svg.aa-SubmitIcon {
+      width: $_navbar-control-icon-size;
+      height: $_navbar-control-icon-size;
+    }
+  }
+}
+
 // Quarto's `body .nav-footer` sets border-top to #dee2e6 — match that
 // specificity with `body` prefix.
 body .nav-footer,
