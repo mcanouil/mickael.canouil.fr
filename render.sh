@@ -2,6 +2,24 @@
 
 set -euo pipefail
 
+# Icon set and social card.
+# Every raster below is derived from `assets/images/icon.svg`, and the card
+# from `assets/og-image.typ`, so the committed binaries can always be rebuilt
+# from source. Needs `rsvg-convert` (librsvg), ImageMagick, and Typst.
+# The Apple touch icon is composited onto a larger opaque canvas rather than
+# scaled, so it carries the padding and the flat background that Apple asks
+# for, with no self-applied rounded corners. `-strip` drops the creation
+# timestamp ImageMagick would otherwise write, which made every run produce a
+# different file and show up as a spurious diff.
+rsvg-convert -w 192 -h 192 assets/images/icon.svg -o assets/images/icon-192.png
+rsvg-convert -w 512 -h 512 assets/images/icon.svg -o assets/images/icon-512.png
+rsvg-convert -w 160 -h 160 assets/images/icon.svg -o /tmp/mc-icon-160.png
+magick -size 180x180 xc:'#111827' /tmp/mc-icon-160.png -gravity center -composite -alpha off -strip assets/images/apple-touch-icon.png
+rsvg-convert -w 32 -h 32 assets/images/icon.svg -o /tmp/mc-icon-32.png
+magick /tmp/mc-icon-32.png -define icon:auto-resize=32 favicon.ico
+# 1200pt by 630pt at 72 ppi is exactly the 1200x630 Open Graph expects.
+typst compile --root . assets/og-image.typ assets/images/og-image.png --ppi 72
+
 Rscript -e "renv::activate(profile = '2020-05-06-ggpacman'); renv::restore()"
 quarto render posts/2020-05-06-ggpacman
 

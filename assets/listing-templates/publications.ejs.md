@@ -114,6 +114,18 @@ function titleCase(s) {
   return String(s == null ? "" : s).replace(/(^|[\s\-\(\[\{:;])([a-z])/g, (_, sep, c) => sep + c.toUpperCase());
 }
 
+// BibTeX titles carry `[nCounter]{.nocase}` spans that protect casing. Mask
+// them before title-casing, then restore them verbatim, so the markup never
+// reaches the page and the protected words keep their own capitalisation.
+function formatTitle(raw) {
+  const protected_ = [];
+  const masked = stripStars(raw).replace(/\[([^\]]*)\]\{\.nocase\}/g, (_, inner) => {
+    protected_.push(inner);
+    return `@@${protected_.length - 1}@@`;
+  });
+  return titleCase(masked).replace(/@@(\d+)@@/g, (_, i) => protected_[Number(i)]);
+}
+
 function venueText(item) {
   const journal = stripStars(item["journal-title"] || item["container-title"] || "");
   const meta = [];
@@ -136,7 +148,7 @@ function entryHtml(item) {
   const dateLabel = formatDate(item);
   const isFirst = String(item.first || "").includes("first");
   const isLast = String(item.last || "").includes("last");
-  const titleText = titleCase(stripStars(item.title || ""));
+  const titleText = formatTitle(item.title || "");
   const linkTarget = safeUrl(item.path || item.url);
   const doi = item.doi;
   const doiHref = doi ? safeUrl(`https://doi.org/${doi}`) : "";

@@ -578,6 +578,17 @@ img.about-image {
       flex-wrap: wrap !important;
     }
   }
+
+  // Quarto declares `align-items: start` on the solana entity outside any media
+  // query, after the block that centres the stacked layout, so below the lg
+  // breakpoint the column-reverse stack keeps the profile image pinned left.
+  // `align-self` on the image beats the container's `align-items` without
+  // touching the contents column.
+  @media (max-width: $_breakpoint-lg) {
+    >.about-image {
+      align-self: center;
+    }
+  }
 }
 
 // Trestles template about links
@@ -636,6 +647,19 @@ img.about-image {
   }
 }
 
+// Collapsed navbar: Quarto orders the bar as toggler, brand, tools, search and
+// pins the brand's inline margins to 0 !important, so with the search margin
+// cut back to the control gap below, `justify-content: space-between` spreads
+// all four controls across the bar.  Give the brand the auto margins instead:
+// the free space lands either side of it, leaving the toggler left, the brand
+// centred, and the theme toggle and search grouped right.
+// !important is required to beat Quarto's own !important margins.
+@media (max-width: $_breakpoint-lg) {
+  .navbar.navbar-expand-lg .navbar-container>.navbar-brand-container {
+    margin-inline: auto !important;
+  }
+}
+
 // ===========================
 // NAVBAR CONTROL SIZING
 // ===========================
@@ -645,6 +669,7 @@ img.about-image {
 $_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
 $_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
 $_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
+$_navbar-control-gap: 0.4rem; // boundary between navbar-right controls
 
 .navbar {
   // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
@@ -664,9 +689,11 @@ $_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
   }
 
   // Overlay search renders a detached <button>; Quarto pins it to a 40px box
-  // with a 26px icon, both larger than every other navbar control.
+  // with a 26px icon, both larger than every other navbar control, and gives it
+  // an `auto` left margin when collapsed.  Replace that margin with the control
+  // gap so the search keeps a small space from the theme toggle at every width.
   #quarto-search.type-overlay {
-    margin-left: 0;
+    margin-left: $_navbar-control-gap;
 
     .aa-Autocomplete {
       width: auto;
@@ -1361,7 +1388,14 @@ main a:not(:where(.nav-link,
   margin: 2.5rem 0 0;
   max-width: 800px;
 
-  p {
+  // Prose paragraphs only. A blanket `p` rule here also reached the paragraphs
+  // *inside* components placed on the home page (cards, listings, stats), and
+  // overrode their own font-size and margins, so the selector is explicit
+  // about the prose positions instead.
+  > p,
+  > .highlight > p,
+  > section.level2 > p,
+  > section.level2 > .highlight > p {
     font-size: 1.1rem;
     line-height: 1.75;
     margin-bottom: $_space-lg;
@@ -1563,10 +1597,11 @@ body.quarto-about-solana,
     }
   }
 
-  // Education section: vertical timeline (rail + year badge per entry).
-  // Lives inside the about-solana wrapper so its specificity beats the
+  // Education and experience sections: vertical timeline (rail + year badge per
+  // entry). Lives inside the about-solana wrapper so its specificity beats the
   // generic `section.level2 ul li` rules above.
-  section.education > ul {
+  section.education > ul,
+  section.experience > ul {
     list-style: none;
     padding: 0.5rem 0 0.25rem 4.5rem;
     position: relative;
@@ -1644,6 +1679,15 @@ body.quarto-about-solana,
         font-size: 0.95em;
       }
 
+      // Third line of a timeline entry: what the role or degree involved.
+      .role-detail {
+        display: inline-block;
+        margin-top: 0.3rem;
+        color: rgba($body-color, 0.75);
+        font-size: 0.9em;
+        line-height: 1.6;
+      }
+
       strong em {
         color: $mc-accent;
         font-style: normal;
@@ -1658,6 +1702,7 @@ body.quarto-about-solana,
     list-style: none;
     padding: 0;
     margin-top: 1rem;
+    margin-bottom: $_space-lg;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -3590,31 +3635,6 @@ body.quarto-about-solana #quarto-content.page-rows-contents,
 
   > p:last-child {
     margin-bottom: 0;
-  }
-}
-
-// Same `■` rail for an explicit Skills list.
-section.skills > ul,
-ul.skills {
-  list-style: none;
-  padding-left: 1rem;
-  border-left: 2px solid $mc-accent;
-  margin-top: 1rem;
-
-  > li {
-    position: relative;
-    padding: 0.25rem 0 0.5rem 1rem;
-
-    &::before {
-      content: "\25A0";
-      color: $mc-accent;
-      position: absolute;
-      left: -0.55rem;
-      top: 0.3rem;
-      font-size: 0.6em;
-      background: $body-bg;
-      padding: 0 0.2em;
-    }
   }
 }
 
