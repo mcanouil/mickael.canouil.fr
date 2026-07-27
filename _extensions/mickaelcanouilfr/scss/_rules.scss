@@ -649,10 +649,10 @@ img.about-image {
 
 // Collapsed navbar: Quarto orders the bar as toggler, brand, tools, search and
 // pins the brand's inline margins to 0 !important, so with the search margin
-// zeroed below, `justify-content: space-between` spreads all four controls
-// across the bar.  Give the brand the auto margins instead: the free space
-// lands either side of it, leaving the toggler left, the brand centred, and
-// the theme toggle and search grouped right.
+// cut back to the control gap below, `justify-content: space-between` spreads
+// all four controls across the bar.  Give the brand the auto margins instead:
+// the free space lands either side of it, leaving the toggler left, the brand
+// centred, and the theme toggle and search grouped right.
 // !important is required to beat Quarto's own !important margins.
 @media (max-width: $_breakpoint-lg) {
   .navbar.navbar-expand-lg .navbar-container>.navbar-brand-container {
@@ -669,6 +669,7 @@ img.about-image {
 $_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
 $_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
 $_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
+$_navbar-control-gap: 0.4rem; // boundary between navbar-right controls
 
 .navbar {
   // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
@@ -688,9 +689,11 @@ $_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
   }
 
   // Overlay search renders a detached <button>; Quarto pins it to a 40px box
-  // with a 26px icon, both larger than every other navbar control.
+  // with a 26px icon, both larger than every other navbar control, and gives it
+  // an `auto` left margin when collapsed.  Replace that margin with the control
+  // gap so the search keeps a small space from the theme toggle at every width.
   #quarto-search.type-overlay {
-    margin-left: 0;
+    margin-left: $_navbar-control-gap;
 
     .aa-Autocomplete {
       width: auto;
