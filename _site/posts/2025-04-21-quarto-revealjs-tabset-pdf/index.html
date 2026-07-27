@@ -832,6 +832,36 @@ CANOUIL, M. (2025-04-21). Quarto: Unleash Dynamic Tabset Navigation
     }
   };
 </script>
+<script id="mc-email" type="text/javascript">
+  /**
+   * Restore the `mailto:` links that `filters/email-obfuscation.lua` encoded,
+   * so the address never appears in the served HTML. Decoding happens on the
+   * first interaction as well as on load, so a link works even if this runs
+   * late.
+   *
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  (function () {
+    const restore = (link) => {
+      const payload = link.getAttribute("data-mc-email");
+      if (!payload) return;
+      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
+      if (!address) return;
+      link.setAttribute("href", "mailto:" + address);
+      link.removeAttribute("data-mc-email");
+      link.classList.add("mc-email--ready");
+    };
+
+    const restoreAll = () => {
+      window.document.querySelectorAll("a.mc-email[data-mc-email]").forEach(restore);
+    };
+
+    window.document.addEventListener("DOMContentLoaded", restoreAll);
+    if (window.document.readyState !== "loading") restoreAll();
+  })();
+</script>
 <script id="publications-bibtex-clipboard" type="text/javascript">
   /**
    * @license MIT
