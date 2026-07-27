@@ -19,6 +19,7 @@ contributes:
         - assets/scripts/skip-link.html
       include-after-body:
         - assets/scripts/base64.html
+        - assets/scripts/email.html
         - assets/scripts/publications-clipboard.html
         - assets/scripts/year-toc.html
         - assets/scripts/ordinal-dates.html
@@ -30,6 +31,10 @@ contributes:
       filters:
         - filters/current-year.lua
         - filters/social-metadata.lua
+        # Runs late: the `about` block's links are built by Quarto's own
+        # filters, so an earlier stage would not see them.
+        - at: post-quarto
+          path: filters/email-obfuscation.lua
       lang: en-GB
       # Quarto builds the canonical link from `website.site-url`, giving a
       # directory index the URL of its directory. Set `canonical-url: false`
