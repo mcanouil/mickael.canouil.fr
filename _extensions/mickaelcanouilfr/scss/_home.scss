@@ -1,0 +1,469 @@
+// =============================================================================
+// HOME PAGE COMPONENTS — call-to-action row, stats strip, featured cards,
+// technical-stack rows, FAQ toggles, and "view all" links.
+// Tokens come from `_defaults.scss` and the scales at the top of `_rules.scss`,
+// which is imported before this file.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+// =============================================================================
+
+// ===========================
+// CALL-TO-ACTION ROW
+// ===========================
+.mc-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $_space-sm $_space-md;
+  margin: $_space-lg 0 $_space-xl;
+
+  > p {
+    display: contents;
+  }
+}
+
+.mc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.35rem;
+  border: 1.5px solid $mc-accent;
+  border-radius: 999px;
+  background: transparent;
+  color: $mc-accent-link;
+  font-family: $font-family-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition:
+    background $_anim-fast $_easing-standard,
+    color $_anim-fast $_easing-standard,
+    transform $_anim-fast $_easing-standard,
+    box-shadow $_anim-fast $_easing-standard;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba($mc-accent, 0.12);
+    color: $mc-accent-link;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($mc-accent, 0.2);
+  }
+
+  iconify-icon {
+    font-size: 1.05em;
+    flex-shrink: 0;
+  }
+}
+
+.mc-cta--primary {
+  background: $mc-accent;
+  color: $mc-paper;
+
+  &:hover,
+  &:focus-visible {
+    background: darken($mc-accent, 6%);
+    color: $mc-paper;
+  }
+}
+
+@media (max-width: $_breakpoint-sm) {
+  .mc-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ===========================
+// STATS STRIP
+// ===========================
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: $_space-xl 0;
+  border-top: 1px solid rgba($mc-accent, 0.35);
+  border-bottom: 1px solid rgba($mc-accent, 0.35);
+
+  .stat {
+    padding: $_space-md 0.5rem;
+    text-align: center;
+
+    + .stat {
+      border-left: 1px solid rgba($mc-accent, 0.25);
+    }
+
+    > p {
+      margin: 0;
+      font-size: inherit;
+      line-height: inherit;
+    }
+  }
+
+  .stat-figure {
+    display: block;
+    font-family: $font-family-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: $mc-accent;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .stat-label {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba($body-color, 0.7);
+  }
+
+  @media (max-width: $_breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+
+    .stat:nth-child(odd) {
+      border-left: 0;
+    }
+
+    .stat:nth-child(n + 3) {
+      border-top: 1px solid rgba($mc-accent, 0.25);
+    }
+
+    .stat-figure {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// ===========================
+// FEATURED CARDS
+// ===========================
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $_space-md;
+  margin: $_space-lg 0 $_space-md;
+  padding: 0;
+  list-style: none;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  border: 1px solid $mc-rule-web;
+  border-radius: $_radius-lg;
+  background: $body-bg;
+  color: $body-color;
+  text-decoration: none !important;
+  transition:
+    transform $_anim-standard $_easing-standard,
+    box-shadow $_anim-standard $_easing-standard,
+    border-color $_anim-standard $_easing-standard;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-3px);
+    border-color: $mc-accent;
+    box-shadow: $_shadow-md;
+  }
+}
+
+.home-card-thumb {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: $_radius-md;
+  background: body-mix(92%);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.home-card-title {
+  margin: 0.65rem 0 0.35rem;
+  font-family: $font-family-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $body-color;
+
+  .home-card:hover &,
+  .home-card:focus-visible & {
+    color: $mc-accent-link;
+  }
+
+  > p {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+}
+
+.home-card-description {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba($body-color, 0.75);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  > p {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+}
+
+@media (max-width: $_breakpoint-md) {
+  .home-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===========================
+// SELECTED PUBLICATIONS
+// ===========================
+.home-pubs {
+  list-style: none;
+  margin: $_space-lg 0 $_space-md;
+  padding: 0;
+  counter-reset: none;
+
+  > li {
+    padding: 0.85rem 0;
+    border-top: 1px solid rgba($mc-accent, 0.2);
+
+    &:last-child {
+      border-bottom: 1px solid rgba($mc-accent, 0.2);
+    }
+  }
+}
+
+.home-pub-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.home-pub-mark {
+  @include pill-chip;
+  cursor: default;
+}
+
+.home-pub-year {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: rgba($body-color, 0.6);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.home-pub-title {
+  display: block;
+  font-family: $font-family-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: $body-color;
+
+  &:hover,
+  &:focus-visible {
+    color: $mc-accent-link;
+  }
+}
+
+.home-pub-venue {
+  display: block;
+  margin-top: 0.15rem;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: rgba($body-color, 0.7);
+}
+
+// ===========================
+// AT-A-GLANCE FACTS
+// ===========================
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.5rem;
+  margin: $_space-lg 0 0;
+  padding-top: $_space-md;
+  border-top: 1px solid rgba($mc-accent, 0.2);
+
+  > p {
+    display: contents;
+  }
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: $font-family-serif;
+  font-size: 0.9rem;
+  color: rgba($body-color, 0.75);
+
+  iconify-icon {
+    color: $mc-accent;
+    flex-shrink: 0;
+  }
+}
+
+// ===========================
+// TECHNICAL STACK ROWS
+// ===========================
+.stack {
+  margin: $_space-lg 0 0;
+}
+
+// The label and its chips are siblings in a single paragraph, so the label is
+// taken out of the flow and the row is indented by its width. A flex label
+// would let wrapped chips fall back to the row's left edge, under the label.
+.stack-row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.5rem;
+  padding: 0.75rem 0;
+  padding-left: 11rem;
+
+  + .stack-row {
+    border-top: 1px solid rgba($mc-accent, 0.18);
+  }
+
+  > p {
+    display: contents;
+  }
+}
+
+.stack-label {
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: $font-family-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $mc-accent;
+
+  iconify-icon {
+    font-size: 1.1em;
+    flex-shrink: 0;
+  }
+}
+
+.chip {
+  @include pill-chip;
+  cursor: default;
+}
+
+// On narrow screens the label takes its own line and the chips wrap below it.
+@media (max-width: $_breakpoint-md) {
+  .stack-row {
+    padding-left: 0;
+  }
+
+  .stack-label {
+    position: static;
+    flex: 0 0 100%;
+  }
+}
+
+// ===========================
+// FAQ TOGGLES
+// ===========================
+.faq {
+  margin: $_space-lg 0 0;
+
+  details {
+    border-bottom: 1px solid rgba($mc-accent, 0.25);
+
+    &:first-of-type {
+      border-top: 1px solid rgba($mc-accent, 0.25);
+    }
+
+    > summary {
+      display: flex;
+      align-items: baseline;
+      gap: 0.55rem;
+      padding: 0.85rem 0;
+      cursor: pointer;
+      list-style: none;
+      font-family: $font-family-serif;
+      font-weight: 700;
+      color: $body-color;
+      transition: color $_anim-fast $_easing-standard;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      &::before {
+        content: "\25B8";
+        color: $mc-accent;
+        flex-shrink: 0;
+        transition: transform $_anim-fast $_easing-standard;
+      }
+
+      &:hover {
+        color: $mc-accent-link;
+      }
+
+      // `summary` is not covered by the theme's focus-visible rule for links
+      // and buttons, so it repeats the same treatment here.
+      &:focus-visible {
+        outline: 2px solid $body-color;
+        outline-offset: 2px;
+      }
+    }
+
+    &[open] > summary {
+      color: $mc-accent-link;
+
+      &::before {
+        transform: rotate(90deg);
+      }
+    }
+
+    > p {
+      margin: 0 0 0.85rem 1.15rem;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+  }
+}
+
+// ===========================
+// "VIEW ALL" LINKS
+// ===========================
+.mc-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: $font-family-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $mc-accent-link;
+
+  iconify-icon {
+    transition: transform $_anim-fast $_easing-standard;
+  }
+
+  &:hover iconify-icon,
+  &:focus-visible iconify-icon {
+    transform: translateX(3px);
+  }
+}
