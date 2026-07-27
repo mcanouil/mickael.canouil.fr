@@ -14,7 +14,26 @@ format:
       body-width: 1000px
 ```
 
-The extension also contributes a `project.website` block (favicon, navbar logo, navigation defaults), so no path references to `_extensions/mickaelcanouilfr/...` need appear in the site config.
+The extension also contributes a `project.website` block (navbar logo, navigation defaults, Open Graph and Twitter card defaults), so no path references to `_extensions/mickaelcanouilfr/...` need appear in the site config.
+
+## Social metadata
+
+`filters/social-metadata.lua` emits the head tags Quarto has no configuration key for: `og:type`, `og:url`, the `theme-color` pair, and the SVG icon, Apple touch icon, and manifest links.
+Quarto keeps the `website` block out of the metadata handed to Lua filters, so the project repeats `site-url` under `extensions.mickaelcanouilfr` alongside the icon paths.
+
+```yaml
+extensions:
+  mickaelcanouilfr:
+    site-url: https://mickael.canouil.fr
+    icon: assets/images/icon.svg
+    apple-touch-icon: assets/images/apple-touch-icon.png
+    manifest: site.webmanifest
+    theme-color:
+      light: "#fafafa"
+      dark: "#161616"
+```
+
+The filter is a copy of the one in [`quarto-atelier`](https://github.com/mcanouil/quarto-atelier), with the extension name changed and pages under `posts/` typed as `article` rather than `website`.
 
 ## brand.yml support
 
@@ -52,7 +71,9 @@ _extensions/mickaelcanouilfr/
 │   ├── _publications.scss        publications listing
 │   └── _carousel.scss            featured carousel
 ├── filters/
-│   └── current-year.lua          [current-year] span replacement
+│   ├── current-year.lua          [current-year] span replacement
+│   ├── social-metadata.lua       og:type, og:url, icon and manifest links
+│   └── _modules/                 string, logging, metadata helpers
 └── assets/
     ├── images/                   logo variants (light, dark, gold, ink)
     └── scripts/                  client-side JS hooks

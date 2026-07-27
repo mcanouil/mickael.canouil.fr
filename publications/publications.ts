@@ -275,8 +275,13 @@ function buildQmd(flagged: number, middle: number): string {
     "---",
     `title: 'Publications (${flagged} + ${middle})'`,
     "title-block-banner: true",
-    "image: /assets/images/social-profile.png",
-    "image-alt: Mickaël CANOUIL",
+    "description: 'Peer-reviewed publications by Mickaël CANOUIL in genetics, " +
+    "multi-omics, and diabetes research, listed newest first with DOIs and citations.'",
+    // Without an explicit image, Quarto's preview-image discovery picks the
+    // first image it finds in the rendered listing instead of the site card.
+    "image: /assets/images/og-image.png",
+    "image-alt: 'Social preview card for mickael.canouil.fr: a gold MC " +
+    "monogram above the Mickaël CANOUIL wordmark, over a near-black background.'",
     "date-format: 'MMMM,<br>YYYY'",
     "body-classes: publications-page",
     "toc: true",

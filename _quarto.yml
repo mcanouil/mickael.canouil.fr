@@ -7,15 +7,25 @@ project:
     - "**/*.qmd"
   pre-render:
     - publications/publications.ts
+  # Quarto copies only these globs, plus files it finds behind an `href` or a
+  # `src` in the rendered HTML. The manifest names its icons in JSON, which is
+  # not scanned, so they are listed here.
+  # The leading slash anchors a glob to the project root: a bare `favicon.ico`
+  # also matches the copies `renv` keeps under `renv/library/.../httpgd/www`,
+  # and publishes the whole tree that leads to them.
   resources:
     - _headers
+    - /favicon.ico
+    - /site.webmanifest
+    - /assets/images/icon-*.png
 
 website:
   title: "Mickaël CANOUIL"
   description: "A data science blog and portfolio by Mickaël CANOUIL"
-  image: /assets/images/social-profile.png
-  image-alt: "Profile picture of Mickaël CANOUIL"
-  site-url: https://mickael.canouil.fr
+  image: /assets/images/og-image.png
+  image-alt: "Social preview card: a gold MC monogram above the Mickaël CANOUIL wordmark in gold script and small capitals, over a near-black background, with the line 'Biostatistician, Quarto wizard, and cinephile.' beneath a thin gold rule."
+  favicon: favicon.ico
+  site-url: &site-url https://mickael.canouil.fr
   repo-url: https://github.com/mcanouil/mickael.canouil.fr
   page-footer:
     left: |
@@ -80,3 +90,16 @@ extensions:
     output-directory: ./typst-render
     dpi: 300
     format: png
+  # Quarto keeps the `website` block out of the metadata it hands to Lua
+  # filters, so `social-metadata.lua` cannot read `website.site-url` to build
+  # `og:url`. The anchor above republishes the same scalar here, without a
+  # second copy of the string. The remaining keys are the head links Quarto
+  # has no configuration for; `website.favicon` still emits the `.ico` one.
+  mickaelcanouilfr:
+    site-url: *site-url
+    icon: assets/images/icon.svg
+    apple-touch-icon: assets/images/apple-touch-icon.png
+    manifest: site.webmanifest
+    theme-color:
+      light: "#fafafa"
+      dark: "#161616"
