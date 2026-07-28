@@ -7,7 +7,9 @@ description: |
   extended Wilkinson search, and `breaks-width()`, `breaks-pretty()`,
   `breaks-extended()`, and `breaks-quantile()` let you place them yourself. Axis ticks
   are themed through a single `element-tick`, which is the breaking change of
-  the release.
+  the release. The documentation fills its gaps too, with a new wrangling
+  guide, a section on tick theming, and complete argument tables on every
+  scale page.
 date: "2026-07-28"
 categories:
   - typst
@@ -31,6 +33,8 @@ image-alt: |
 engine: markdown
 metadata-files:
   - ../_typst-gribouille.yml
+bibliography:
+  - references.bib
 ---
 
 Two weeks after 0.5.0, here is [Gribouille](https://github.com/mcanouil/gribouille) 0.6.0.
@@ -57,6 +61,7 @@ The one thing to watch when you upgrade is the tick theming: `tick-length` and `
 - [`left-join()`](https://m.canouil.dev/gribouille/reference/helpers/left-join.html) and the other four joins combine two datasets on their shared key columns; `bind-rows()` and `bind-cols()` stack or glue them.
 - `select()`, `rename()`, `relocate()`, `drop-na()`, `distinct()`, and `slice-max()`/`slice-min()` handle the column and row work that a bare `.filter()` states awkwardly.
 - The verbs are **experimental**, and the [Wrangling data](https://m.canouil.dev/gribouille/guides/wrangle.html) guide says when native Typst is enough on its own.
+- The documentation fills its gaps: the new guide above, a "Ticks and their labels" section in the [theming guide](https://m.canouil.dev/gribouille/guides/theming.html), and every `scale-*` page listing the keys its `..args` accepts, `oob` included.
 - Automatic continuous breaks come from the extended Wilkinson search, and [`breaks-width()`](https://m.canouil.dev/gribouille/reference/scales/breaks-width.html), [`breaks-pretty()`](https://m.canouil.dev/gribouille/reference/scales/breaks-pretty.html), [`breaks-extended()`](https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html), and [`breaks-quantile()`](https://m.canouil.dev/gribouille/reference/scales/breaks-quantile.html) build the `breaks:` closure for you.
 - {{< iconify octicon:alert-16 title="Breaking change" label="Breaking change" >}} **Breaking:** tick marks are themed through the `axis-ticks` family with the new [`element-tick(colour:, stroke:, length:)`](https://m.canouil.dev/gribouille/reference/themes/element-tick.html); `tick-length` and `tick-labels` are removed.
 - {{< iconify octicon:alert-16 title="Breaking change" label="Breaking change" >}} **Breaking:** the internal summary-dispatch kernel gives up the `summarise` name to the new verb; `stat-summary(fun:)` is unchanged.
@@ -246,10 +251,8 @@ The [Wrangling data](https://m.canouil.dev/gribouille/guides/wrangle.html) guide
 
 Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range.
 It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for.
-0.6.0 replaces it with the extended Wilkinson search[^wilkinson], which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target.
+0.6.0 replaces it with the extended Wilkinson search [@talbot_extension_2010], which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target.
 There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.
-
-[^wilkinson]: Talbot, J., Lin, S., and Hanrahan, P. (2010). An Extension of Wilkinson's Algorithm for Positioning Tick Labels on Axes. IEEE Transactions on Visualization and Computer Graphics, 16(6), 1036-1043.
 
 The same search is available as [`breaks-extended(n:)`](https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html) when you want a different tick count.
 It is one of four helpers that build a closure for the `breaks:` and `minor-breaks:` arguments of a continuous scale.
@@ -354,11 +357,34 @@ The one you are most likely to notice is vertical alignment of labels.
 Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds.
 A label carrying a descender, `Chinstrap` next to `Adelie`, no longer sits a little higher than its neighbours.
 
-On the documentation side, every `scale-*` reference page lists the keys its `..args` accepts, with type, accepted values, and default, including `oob`, which was not documented anywhere before.
-The theming guide gains a "Ticks and their labels" section, and the [Wrangling data](https://m.canouil.dev/gribouille/guides/wrangle.html) guide is new.
-The navbar GitHub icon became a widget with the live star and fork counts and a project menu.
+## Filling the documentation gaps
 
-One change to the site is worth a line of its own.
+A good share of this release was writing down what was already there.
+
+The reference pages had a real hole in them.
+A `scale-*` constructor takes `..args`, and the page described a few of those keys in prose, which left the rest to be found by reading the source.
+Every `scale-*` page now lists each key it accepts, with its type, its accepted values, and its default.
+That includes `oob`, the out-of-range handling, which no page documented at all.
+
+Cross-references are links again.
+A reference that closed a parenthetical printed as a bare `@geom-line` instead of a link, and a link sometimes ran into the word or the comma before it.
+
+Two guides changed.
+The [Wrangling data](https://m.canouil.dev/gribouille/guides/wrangle.html) guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end.
+It also lists the tasks that need no verb at all, because `filter`, `map`, and `sorted` already do them.
+The [theming guide](https://m.canouil.dev/gribouille/guides/theming.html) gains a "Ticks and their labels" section covering `element-tick`, ratio lengths, minor marks, and hiding labels per side.
+
+The site itself got a pass for legibility.
+Footer links were painted the page colour in light mode, which made them invisible, and the rule above the footer was 8% black on dark paper, which came to much the same thing.
+The copy button on a one-line code block hung past its bottom border.
+The navbar is dark in both colour schemes now, with scheme-aware scrollbars, a skip link, and a visible focus outline, and the tabset panel border no longer vanishes into the dark background.
+On a narrow screen, opening a navbar menu overlays the page instead of pushing the other items down, and the colour-scheme toggle and the search button sit together at the right edge with the brand centred.
+
+The GitHub icon in the navbar is a widget now.
+It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring.
+It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.
+
+One change is worth a line of its own.
 The stable documentation is now rendered wholly from the release tag, instead of taking its pages from `main` against a pinned source.
 Each site documents the API it ships with, which is the point.
 The trade-off is that a documentation fix reaches the stable site at the next release rather than immediately.
