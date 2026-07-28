@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Gribouille 0.6.0 adds an experimental set of data wrangling verbs, so grouped aggregation, reshaping, and joining happen in the document instead of in a script you run beforehand. Automatic axis breaks now come from the extended Wilkinson search, and breaks-width(), breaks-pretty(), breaks-extended(), and breaks-quantile() let you place them yourself. Axis ticks are themed through a single element-tick, which is the breaking change of the release.">
+
+<title>Gribouille 0.6.0: Wrangling Data and Breaks That Land on Round Numbers – Mickaël CANOUIL</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c86c67f2eb2b6c9ea83445e77d77b87f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f771398aef2be3c9b28d40a927732b28.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-c86c67f2eb2b6c9ea83445e77d77b87f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-3c53965240314a495007c10e344a9518.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-7752adb25f71fd41803f9adff05f998f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-3c53965240314a495007c10e344a9518.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
+<script>document.addEventListener("DOMContentLoaded",function(){
+  var DEFAULT_COLLAPSE=null;
+  document.querySelectorAll("pre.cw-auto").forEach(function(pre){
+    var fn=pre.closest("[data-filename]");
+    if(!fn)return;
+    var name=fn.getAttribute("data-filename");
+    if(!name)return;
+    var scaffold=pre.closest(".code-copy-outer-scaffold")||pre.closest(".sourceCode");
+    if(!scaffold)return;
+    var w=document.createElement("div");
+    w.className="code-with-filename code-window-auto";
+    var tb=document.createElement("div");
+    tb.className="code-with-filename-file";
+    var tp=document.createElement("pre");
+    var ts=document.createElement("strong");
+    ts.textContent=name;
+    tp.appendChild(ts);tb.appendChild(tp);
+    scaffold.parentNode.insertBefore(w,scaffold);
+    w.appendChild(tb);w.appendChild(scaffold);
+    pre.classList.remove("cw-auto");
+  });
+  function findMarkerSource(el){
+    return el.querySelector('pre[class*="cw-style-"],pre[class*="cw-collapse-"],pre[data-code-window-lines-label]')
+      ||el.querySelector('[class*="cw-style-"],[class*="cw-collapse-"],[data-code-window-lines-label]');
+  }
+  document.querySelectorAll(".code-with-filename").forEach(function(el){
+    var marker=findMarkerSource(el);
+    var styleApplied=/\bcode-window-(macos|windows|default)\b/.test(el.className);
+    if(!styleApplied){
+      var sm=marker&&marker.className.match(/cw-style-(\w+)/);
+      if(sm){el.classList.add("code-window-"+sm[1]);marker.classList.remove(sm[0]);}
+      else{el.classList.add("code-window-macos");}
+    }
+    var collapse=null;
+    if(marker){
+      var cm=marker.className.match(/cw-collapse-(open|closed)/);
+      if(cm){collapse=cm[1];marker.classList.remove(cm[0]);}
+    }
+    if(collapse===null&&DEFAULT_COLLAPSE){collapse=DEFAULT_COLLAPSE;}
+    if(marker&&marker.hasAttribute("data-code-window-lines-label")){
+      var spec=marker.getAttribute("data-code-window-lines-label");
+      marker.removeAttribute("data-code-window-lines-label");
+      var titleBar=el.querySelector(".code-with-filename-file");
+      if(titleBar&&!titleBar.querySelector(".code-with-filename-lines")){
+        var chip=document.createElement("span");
+        chip.className="code-with-filename-lines";
+        chip.textContent="L"+spec;
+        titleBar.appendChild(chip);
+      }
+    }
+    if(collapse&&!el.classList.contains("code-window-collapsible")){
+      var titleBar=el.querySelector(".code-with-filename-file");
+      if(titleBar){
+        var details=document.createElement("details");
+        details.className=el.className+" code-window-collapsible";
+        if(collapse==="open"){details.open=true;}
+        var summaryEl=document.createElement("summary");
+        summaryEl.className="code-with-filename-file";
+        while(titleBar.firstChild){summaryEl.appendChild(titleBar.firstChild);}
+        titleBar.parentNode.removeChild(titleBar);
+        details.appendChild(summaryEl);
+        while(el.firstChild){details.appendChild(el.firstChild);}
+        el.parentNode.replaceChild(details,el);
+      }
+    }
+  });
+});</script>
+<script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="../../assets/images/icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
+
+
+<meta property="og:title" content="Gribouille 0.6.0: Wrangling Data and Breaks That Land on Round Numbers - mickael.canouil.fr">
+<meta property="og:description" content="Gribouille 0.6.0 adds an experimental set of data wrangling verbs, so grouped aggregation, reshaping, and joining happen in the document instead of in a script you run beforehand. Automatic axis breaks now come from the extended Wilkinson search, and breaks-width(), breaks-pretty(), breaks-extended(), and breaks-quantile() let you place them yourself. Axis ticks are themed through a single element-tick, which is the breaking change of the release.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/featured.png">
+<meta property="og:site_name" content="Mickaël CANOUIL">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:alt" content="Featured card for the Gribouille 0.6.0 release on a cream paper background.
+On the left, the Gribouille wordmark sits above the tagline &quot;Create elegant
+graphics with the Grammar of Graphics for Typst.&quot;, a small orange &quot;v0.6.0
+release&quot; pill, and the URL m.canouil.dev/gribouille. On the right, a slightly
+rotated bordered card frames three panels, one per change in the release.
+Across the top row, a five-row table of class and highway values becomes a
+three-row table of class, mean highway, and joined kind, with &quot;summarise()&quot;
+and &quot;left-join()&quot; over an arrow between them. Bottom left, a line chart of
+unemployment whose y-axis ticks sit at the quartiles of the series, 7,497 to
+15,352, so the gridlines are unevenly spaced. Bottom right, a penguin scatter
+with long tick marks on the x-axis, half-length ones on the y-axis, and a
+duplicated y-axis on the right carrying marks but no labels.
+">
+<meta name="twitter:title" content="Gribouille 0.6.0: Wrangling Data and Breaks That Land on Round Numbers – Mickaël CANOUIL">
+<meta name="twitter:description" content="Gribouille 0.6.0 adds an experimental set of data wrangling verbs, so grouped aggregation, reshaping, and joining happen in the document instead of in a script you run beforehand. Automatic axis breaks now come from the extended Wilkinson search, and breaks-width(), breaks-pretty(), breaks-extended(), and breaks-quantile() let you place them yourself. Axis ticks are themed through a single element-tick, which is the breaking change of the release.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/featured.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="1260">
+<meta name="twitter:image-width" content="2400">
+<meta name="twitter:image:alt" content="Featured card for the Gribouille 0.6.0 release on a cream paper background.
+On the left, the Gribouille wordmark sits above the tagline &quot;Create elegant
+graphics with the Grammar of Graphics for Typst.&quot;, a small orange &quot;v0.6.0
+release&quot; pill, and the URL m.canouil.dev/gribouille. On the right, a slightly
+rotated bordered card frames three panels, one per change in the release.
+Across the top row, a five-row table of class and highway values becomes a
+three-row table of class, mean highway, and joined kind, with &quot;summarise()&quot;
+and &quot;left-join()&quot; over an arrow between them. Bottom left, a line chart of
+unemployment whose y-axis ticks sit at the quartiles of the series, 7,497 to
+15,352, so the gridlines are unevenly spaced. Bottom right, a penguin scatter
+with long tick marks on the x-axis, half-length ones on the y-axis, and a
+duplicated y-axis on the right carrying marks but no labels.
+">
+<link rel="canonical" href="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo light-content">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mickaël CANOUIL</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/index.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks/index.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications/index.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://bsky.app/profile/mickael.canouil.fr" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:bluesky" aria-label="BlueSky" title="BlueSky"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.linkedin.com/in/mickaelcanouil" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:linkedin" aria-label="LinkedIn" title="LinkedIn"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://fosstodon.org/@MickaelCanouil" rel="noopener noreferrer me" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:mastodon" aria-label="Mastodon" title="Mastodon"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/mcanouil" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:mark-github-16" aria-label="GitHub" title="GitHub"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/sponsors/mcanouil?o=esb" rel="noopener noreferrer" target="_blank"> 
+<span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="GitHub Sponsor" title="GitHub Sponsor"></iconify-icon></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Gribouille 0.6.0: Wrangling Data and Breaks That Land on Round Numbers</h1>
+                  <div>
+        <div class="description">
+          <p>Gribouille 0.6.0 adds an experimental set of data wrangling verbs, so grouped aggregation, reshaping, and joining happen in the document instead of in a script you run beforehand. Automatic axis breaks now come from the extended Wilkinson search, and <code>breaks-width()</code>, <code>breaks-pretty()</code>, <code>breaks-extended()</code>, and <code>breaks-quantile()</code> let you place them yourself. Axis ticks are themed through a single <code>element-tick</code>, which is the breaking change of the release.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">grammar-of-graphics</div>
+                <div class="quarto-category">gribouille</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><!--
+  @license MIT
+  @copyright 2026 Mickaël Canouil
+  @author Mickaël Canouil
+  -->
+  <a href="https://mickael.canouil.fr">Mickaël CANOUIL</a><span class="quarto-title-author-degree">, Ph.D.</span> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Tuesday, the 28th of July, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link active" data-scroll-target="#breaking-changes"><span class="header-section-number">1</span> <iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> Breaking changes</a></li>
+  <li><a href="#wrangling-data" id="toc-wrangling-data" class="nav-link" data-scroll-target="#wrangling-data"><span class="header-section-number">2</span> Wrangling data</a></li>
+  <li><a href="#breaks-that-land-on-round-numbers" id="toc-breaks-that-land-on-round-numbers" class="nav-link" data-scroll-target="#breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</a></li>
+  <li><a href="#ticks-in-one-element" id="toc-ticks-in-one-element" class="nav-link" data-scroll-target="#ticks-in-one-element"><span class="header-section-number">4</span> Ticks, in one element</a></li>
+  <li><a href="#under-the-hood" id="toc-under-the-hood" class="nav-link" data-scroll-target="#under-the-hood"><span class="header-section-number">5</span> Under the hood</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up"><span class="header-section-number">6</span> Wrap-up</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-28-gribouille-0-6/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+<a href="#quarto-document-content" class="visually-hidden-focusable skip-link">Skip to main content</a>
+
+
+
+
+
+<p>Two weeks after 0.5.0, here is <a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0. This one is about the data before the plot and the numbers along the axis. A set of wrangling verbs brings grouped aggregation, reshaping, and joining to the row-store data model, so the preparation stays in the document. Automatic breaks now come from the extended Wilkinson search, which puts ticks on rounder numbers closer to the data, and four <code>breaks-*</code> helpers let you place them yourself. The one thing to watch when you upgrade is the tick theming: <code>tick-length</code> and <code>tick-labels</code> are gone, replaced by a single <code>element-tick</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Featured card for the Gribouille 0.6.0 release on a cream paper
+background. On the left, the Gribouille wordmark sits above the tagline
+&quot;Create elegant graphics with the Grammar of Graphics for Typst.&quot;, a
+small orange &quot;v0.6.0 release&quot; pill, and the URL
+m.canouil.dev/gribouille. On the right, a slightly rotated bordered card
+frames three panels, one per change in the release. Across the top row,
+a five-row table of class and highway values becomes a three-row table
+of class, mean highway, and joined kind, with &quot;summarise()&quot; and
+&quot;left-join()&quot; over an arrow between them. Bottom left, a line chart of
+unemployment whose y-axis ticks sit at the quartiles of the series,
+7,497 to 15,352, so the gridlines are unevenly spaced. Bottom right, a
+penguin scatter with long tick marks on the x-axis, half-length ones on
+the y-axis, and a duplicated y-axis on the right carrying marks but no
+labels.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>At a glance
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0 on Typst Universe: <code>#import "@preview/gribouille:0.6.0": *</code>.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/count.html"><code>count()</code></a> aggregate a dataset per group, one output row per group.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-longer.html"><code>pivot-longer()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-wider.html"><code>pivot-wider()</code></a> melt columns into a name/value pair and spread them back.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/left-join.html"><code>left-join()</code></a> and the other four joins combine two datasets on their shared key columns; <code>bind-rows()</code> and <code>bind-cols()</code> stack or glue them.</li>
+<li><code>select()</code>, <code>rename()</code>, <code>relocate()</code>, <code>drop-na()</code>, <code>distinct()</code>, and <code>slice-max()</code>/<code>slice-min()</code> handle the column and row work that a bare <code>.filter()</code> states awkwardly.</li>
+<li>The verbs are <strong>experimental</strong>, and the <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide says when native Typst is enough on its own.</li>
+<li>Automatic continuous breaks come from the extended Wilkinson search, and <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-width.html"><code>breaks-width()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-pretty.html"><code>breaks-pretty()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended()</code></a>, and <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-quantile.html"><code>breaks-quantile()</code></a> build the <code>breaks:</code> closure for you.</li>
+<li><iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> tick marks are themed through the <code>axis-ticks</code> family with the new <a href="https://m.canouil.dev/gribouille/reference/themes/element-tick.html"><code>element-tick(colour:, stroke:, length:)</code></a>; <code>tick-length</code> and <code>tick-labels</code> are removed.</li>
+<li><iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> the internal summary-dispatch kernel gives up the <code>summarise</code> name to the new verb; <code>stat-summary(fun:)</code> is unchanged.</li>
+</ul>
+</div>
+</div>
+<p>Every figure in this post is a real, freshly compiled plot.</p>
+<section id="breaking-changes" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="breaking-changes"><span class="header-section-number">1</span> <iconify-icon role="img" inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> Breaking changes</h2>
+<p>Two names change, and only one of them is likely to be in your documents.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Migrate these names
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Tick marks are one theme record now. <code>element-tick(colour:, stroke:, length:)</code> carries the mark length, so <code>tick-length</code> and its per-axis and per-side variants are removed: write <code>axis-ticks: element-tick(length: 0.2cm)</code> instead. <code>tick-labels</code> is removed too, because tick labels live in <code>axis-text</code>, so hide them per side with <code>axis-text-y-right: element-blank()</code>. To drop the marks and the space they reserve, <code>axis-ticks: element-blank()</code> is the one switch.</li>
+<li><code>summarise</code> is the wrangling verb described below. The summary-dispatch kernel that used to carry that name is internal now. If you passed a summary by name or by closure to <code>stat-summary(fun:)</code> or <code>stat-summary-bin(fun:)</code>, nothing changes.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="wrangling-data" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="wrangling-data"><span class="header-section-number">2</span> Wrangling data</h2>
+<p>A Gribouille dataset is a row-store, an array of dictionaries with one dictionary per row. That is a plain Typst array, so a good part of the preparation is already a one-liner: <code>data.filter(...)</code> keeps rows, <code>data.map(...)</code> derives a column, <code>data.sorted(key: ...)</code> orders them. What Typst leaves open is grouped aggregation, reshaping, and joining, and that is what the new verbs do. They all take a row-store and return a row-store, so the result goes straight into <code>#plot</code> with nothing in between.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>These verbs are experimental
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Their interfaces can change without notice while the design settles, and they may end up in a dedicated Typst data-wrangling package rather than in Gribouille. The plotting API and the native array methods are not affected.</p>
+</div>
+</div>
+<p><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> collapses each group to one row. The grouping is per call, through <code>by:</code>, so there is no grouped state to remember to undo. Each aggregation is a closure that receives the group’s rows and returns one cell, so anything you can compute over the rows is fair game.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">by-class</span> <span class="op">=</span> summarise<span class="op">(</span></span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  mpg<span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>  mean-hwy<span class="op">:</span> rows <span class="op">=&gt;</span> rows<span class="op">.</span>map<span class="op">(</span>row <span class="op">=&gt;</span> row<span class="op">.</span>hwy<span class="op">).</span>sum<span class="op">()</span> / rows<span class="op">.</span>len<span class="op">(),</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a>  n<span class="op">:</span> rows <span class="op">=&gt;</span> rows<span class="op">.</span>len<span class="op">(),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-5" class="code-annotation-target"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a>  by<span class="op">:</span> <span class="st">"class"</span><span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a><span class="op">).</span>sorted<span class="op">(</span>key<span class="op">:</span> row <span class="op">=&gt;</span> row<span class="op">.</span>mean-hwy<span class="op">)</span></span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> by-class<span class="op">,</span></span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"class"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"mean-hwy"</span><span class="op">),</span></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>    geom-col<span class="op">(</span>fill<span class="op">:</span> okabe-ito<span class="op">.</span>at<span class="op">(</span><span class="dv">4</span><span class="op">)),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-13" class="code-annotation-target"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>    geom-text<span class="op">(</span>mapping<span class="op">:</span> aes<span class="op">(</span>label<span class="op">:</span> <span class="st">"n"</span><span class="op">),</span> anchor<span class="op">:</span> <span class="st">"south"</span><span class="op">,</span> size<span class="op">:</span> <span class="fl">8pt</span><span class="op">),</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> scale-discrete<span class="op">(</span>limits<span class="op">:</span> by-class<span class="op">.</span>map<span class="op">(</span>row <span class="op">=&gt;</span> row<span class="op">.</span>class<span class="op">)),</span></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Fuel Economy by Vehicle Class"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Vehicle Class"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Mean Highway mpg"</span><span class="op">,</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-1-26"><a href="#annotated-cell-1-26" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Every named argument is an aggregation: a closure over the group’s rows returning a single cell. A mean, a count, or a ratio of two columns all fit the same shape.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="2"><code>by:</code> takes one column name or an array of them; without it the whole dataset collapses to a single row.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6,16" data-code-annotation="3">The output is an ordinary row-store, so <code>.sorted()</code> orders it, and feeding that order back as the discrete <code>limits</code> keeps the bars sorted.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="13" data-code-annotation="4"><code>n</code> is one of the aggregated columns, so it can be mapped like any other.</span>
+</dd>
+</dl>
+</div>
+<div class="typst-render-error">
+<p><strong>[typst-render] Compilation failed for 'typst-block-1'.</strong></p>
+</div>
+</div>
+<p>When the aggregation is just a tally, <a href="https://m.canouil.dev/gribouille/reference/helpers/count.html"><code>count()</code></a> is the short form: it groups by the columns you name, adds an <code>n</code> column, and <code>sort: true</code> orders the groups from most to least frequent.</p>
+<p>Two columns that measure the same thing are usually easier to plot once melted into one value column with a label column beside it. <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-longer.html"><code>pivot-longer()</code></a> does that, and <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-wider.html"><code>pivot-wider()</code></a> spreads them back.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">long</span> <span class="op">=</span> pivot-longer<span class="op">(</span></span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  mpg<span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span><span class="st">"cty"</span><span class="op">,</span> <span class="st">"hwy"</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-4" class="code-annotation-target"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  names-to<span class="op">:</span> <span class="st">"metric"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>  values-to<span class="op">:</span> <span class="st">"mpg"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-2-8"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> long<span class="op">,</span></span>
+<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"metric"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"mpg"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"metric"</span><span class="op">),</span></span>
+<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span>geom-boxplot<span class="op">(),),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-12" class="code-annotation-target"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>  facet<span class="op">:</span> facet-wrap<span class="op">(</span><span class="st">"cyl"</span><span class="op">),</span></span>
+<span id="annotated-cell-2-13"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span>fill<span class="op">:</span> scale-okabe-ito<span class="op">()),</span></span>
+<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"City Against Highway, by Cylinder Count"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-16"><a href="#annotated-cell-2-16" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Metric"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-17"><a href="#annotated-cell-2-17" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Miles per Gallon"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-18"><a href="#annotated-cell-2-18" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Metric"</span><span class="op">,</span></span>
+<span id="annotated-cell-2-19"><a href="#annotated-cell-2-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-2-20"><a href="#annotated-cell-2-20" aria-hidden="true" tabindex="-1"></a>  guides<span class="op">:</span> guides<span class="op">(</span>fill<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-2-21"><a href="#annotated-cell-2-21" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-2-22"><a href="#annotated-cell-2-22" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-2-23"><a href="#annotated-cell-2-23" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-2-24"><a href="#annotated-cell-2-24" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">The columns to melt. Each row of <code>mpg</code> becomes two rows here, one per measurement.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="4" data-code-annotation="2"><code>names-to</code> names the column holding the old column names, <code>values-to</code> the one holding their values.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="12" data-code-annotation="3">The columns that were not melted, <code>cyl</code> among them, are carried through, so they can still facet or colour the plot.</span>
+</dd>
+</dl>
+</div>
+<div class="typst-render-error">
+<p><strong>[typst-render] Compilation failed for 'typst-block-2'.</strong></p>
+</div>
+</div>
+<p>Enriching a dataset with a lookup table is a join, not a dictionary read per row. Build the lookup as its own small row-store and <a href="https://m.canouil.dev/gribouille/reference/helpers/left-join.html"><code>left-join()</code></a> it on the shared key.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-3" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-3-1"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">by-class</span> <span class="op">=</span> summarise<span class="op">(</span></span>
+<span id="annotated-cell-3-2"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a>  mpg<span class="op">,</span></span>
+<span id="annotated-cell-3-3"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a>  mean-hwy<span class="op">:</span> rows <span class="op">=&gt;</span> rows<span class="op">.</span>map<span class="op">(</span>row <span class="op">=&gt;</span> row<span class="op">.</span>hwy<span class="op">).</span>sum<span class="op">()</span> / rows<span class="op">.</span>len<span class="op">(),</span></span>
+<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a>  by<span class="op">:</span> <span class="st">"class"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a><span class="op">).</span>sorted<span class="op">(</span>key<span class="op">:</span> row <span class="op">=&gt;</span> row<span class="op">.</span>mean-hwy<span class="op">)</span></span>
+<span id="annotated-cell-3-6"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-7" class="code-annotation-target"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">kind</span> <span class="op">=</span> <span class="op">(</span></span>
+<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"compact"</span><span class="op">,</span> kind: <span class="st">"Car"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-9"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"subcompact"</span><span class="op">,</span> kind: <span class="st">"Car"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"midsize"</span><span class="op">,</span> kind: <span class="st">"Car"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-11"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"2seater"</span><span class="op">,</span> kind: <span class="st">"Car"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-12"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"minivan"</span><span class="op">,</span> kind: <span class="st">"Van"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-13"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"suv"</span><span class="op">,</span> kind: <span class="st">"SUV"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-14"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>class: <span class="st">"pickup"</span><span class="op">,</span> kind: <span class="st">"Truck"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-3-16"><a href="#annotated-cell-3-16" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-17" class="code-annotation-target"><a href="#annotated-cell-3-17" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">enriched</span> <span class="op">=</span> left-join<span class="op">(</span>by-class<span class="op">,</span> kind<span class="op">,</span> by<span class="op">:</span> <span class="st">"class"</span><span class="op">)</span></span>
+<span id="annotated-cell-3-18"><a href="#annotated-cell-3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-3-19"><a href="#annotated-cell-3-19" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-3-20"><a href="#annotated-cell-3-20" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> enriched<span class="op">,</span></span>
+<span id="annotated-cell-3-21"><a href="#annotated-cell-3-21" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"class"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"mean-hwy"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"kind"</span><span class="op">),</span></span>
+<span id="annotated-cell-3-22"><a href="#annotated-cell-3-22" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span>geom-col<span class="op">(),),</span></span>
+<span id="annotated-cell-3-23"><a href="#annotated-cell-3-23" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-3-24"><a href="#annotated-cell-3-24" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> scale-discrete<span class="op">(</span>limits<span class="op">:</span> enriched<span class="op">.</span>map<span class="op">(</span>row <span class="op">=&gt;</span> row<span class="op">.</span>class<span class="op">)),</span></span>
+<span id="annotated-cell-3-25"><a href="#annotated-cell-3-25" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-okabe-ito<span class="op">(),</span></span>
+<span id="annotated-cell-3-26"><a href="#annotated-cell-3-26" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-3-27"><a href="#annotated-cell-3-27" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-3-28"><a href="#annotated-cell-3-28" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Economy by Class and by Kind"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-29"><a href="#annotated-cell-3-29" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Vehicle Class"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-30"><a href="#annotated-cell-3-30" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Mean Highway mpg"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-31"><a href="#annotated-cell-3-31" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Kind"</span><span class="op">,</span></span>
+<span id="annotated-cell-3-32"><a href="#annotated-cell-3-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-3-33"><a href="#annotated-cell-3-33" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-3-34"><a href="#annotated-cell-3-34" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-3-35"><a href="#annotated-cell-3-35" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-3-36"><a href="#annotated-cell-3-36" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="7" data-code-annotation="1">The lookup is a row-store like any other, written inline here, read from a CSV just as well.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="17" data-code-annotation="2">Every row of the left dataset is kept and gains the lookup’s extra columns. <code>inner-join</code> keeps only the matched rows, <code>full-join</code> keeps both sides, and <code>semi-join</code>/<code>anti-join</code> filter the left dataset without adding columns.</span>
+</dd>
+</dl>
+</div>
+<div class="typst-render-error">
+<p><strong>[typst-render] Compilation failed for 'typst-block-3'.</strong></p>
+</div>
+</div>
+<div class="highlight">
+<p><strong>Every verb takes a row-store and returns a row-store:</strong> the result of a summarise, a pivot, or a join goes straight into <code>#plot</code> with no adapter in between.</p>
+</div>
+<p>One more thing before the plot, for real files. A CSV arrives as strings, and missing values are spelled in as many ways as there are people producing the files. <a href="https://m.canouil.dev/gribouille/reference/core/as-numeric.html"><code>as-numeric()</code></a> now takes an <code>na:</code> list of sentinel values, blanking them before it parses, so a placeholder does not survive as a number.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="typst"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">raw</span> <span class="op">=</span> csv<span class="op">(</span><span class="st">"vehicles.csv"</span><span class="op">,</span> row-type<span class="op">:</span> dictionary<span class="op">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">clean</span> <span class="op">=</span> drop-na<span class="op">(</span>as-numeric<span class="op">(</span>raw<span class="op">,</span> <span class="st">"hwy"</span><span class="op">,</span> na<span class="op">:</span> <span class="op">(</span><span class="st">"NA"</span><span class="op">,</span> <span class="st">"-99"</span><span class="op">)),</span> <span class="st">"hwy"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide walks the whole path, from coercion to the plot, and it also says which tasks need no verb at all.</p>
+</section>
+<section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> economics<span class="op">,</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"date"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"unemploy"</span><span class="op">),</span></span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>    geom-line<span class="op">(</span>colour<span class="op">:</span> okabe-ito<span class="op">.</span>at<span class="op">(</span><span class="dv">5</span><span class="op">),</span> linewidth<span class="op">:</span> <span class="fl">1.5pt</span><span class="op">),</span></span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>    geom-point<span class="op">(</span>size<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> fill<span class="op">:</span> okabe-ito<span class="op">.</span>at<span class="op">(</span><span class="dv">5</span><span class="op">),</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">),</span></span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> scale-date<span class="op">(</span>date-format<span class="op">:</span> <span class="st">"[year]-[month repr:numerical]"</span><span class="op">),</span></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-continuous<span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-11" class="code-annotation-target"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>      breaks<span class="op">:</span> breaks-quantile<span class="op">(),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-12" class="code-annotation-target"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>      minor-breaks<span class="op">:</span> breaks-width<span class="op">(</span><span class="dv">500</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-5-13" class="code-annotation-target"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>      labels<span class="op">:</span> format-comma<span class="op">(</span>digits<span class="op">:</span> <span class="dv">0</span><span class="op">),</span></span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">),</span></span>
+<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"Ticks Where the Data Sits"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Date"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-19"><a href="#annotated-cell-5-19" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Unemployed (thousands)"</span><span class="op">,</span></span>
+<span id="annotated-cell-5-20"><a href="#annotated-cell-5-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-5-21"><a href="#annotated-cell-5-21" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(),</span></span>
+<span id="annotated-cell-5-22"><a href="#annotated-cell-5-22" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-5-23"><a href="#annotated-cell-5-23" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-5-24"><a href="#annotated-cell-5-24" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="11" data-code-annotation="1"><code>breaks-quantile(probs:)</code> puts the ticks at sample quantiles, the quartiles by default, so the axis reports where the mass of the data sits instead of drawing a regular grid.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="12" data-code-annotation="2"><code>minor-breaks:</code> takes the same closures. <code>breaks-width(width, offset:)</code> places a line every <code>width</code>, anchored on <code>offset</code>, so the positions stay on round multiples however the range moves.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="3">The tick labels are formatted by <code>format-comma()</code>, unrelated to where the ticks sit. <code>breaks-pretty(n:)</code> is the fourth helper, for round positions at a target count.</span>
+</dd>
+</dl>
+</div>
+<div class="typst-render-error">
+<p><strong>[typst-render] Compilation failed for 'typst-block-4'.</strong></p>
+</div>
+</div>
+<p>A closure and an explicit array of breaks are not treated the same way, and the difference matters. An explicit array widens the axis so every requested tick stays visible, while closure breaks are clipped to the trained domain, since the closure has seen the data and cannot ask for anything outside it.</p>
+<p>A related fix landed with them. A scale trained on whole numbers only, such as years or counts, now keeps whole automatic breaks, so a narrow range like 2020 to 2023 no longer labels half-steps.</p>
+</section>
+<section id="ticks-in-one-element" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="ticks-in-one-element"><span class="header-section-number">4</span> Ticks, in one element</h2>
+<p>Tick marks used to be described in two places: their colour and stroke in <code>axis-ticks</code>, their length in a separate <code>tick-length</code> with its own per-axis and per-side variants. They are one record now. <a href="https://m.canouil.dev/gribouille/reference/themes/element-tick.html"><code>element-tick(colour:, stroke:, length:)</code></a> carries all three, on <code>axis-ticks</code> and on its per-axis, per-side, and minor variants.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-6" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><a href="#annotated-cell-6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
+<span id="annotated-cell-6-2"><a href="#annotated-cell-6-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">,</span></span>
+<span id="annotated-cell-6-3"><a href="#annotated-cell-6-3" aria-hidden="true" tabindex="-1"></a>  mapping<span class="op">:</span> aes<span class="op">(</span>x<span class="op">:</span> <span class="st">"flipper-len"</span><span class="op">,</span> y<span class="op">:</span> <span class="st">"body-mass"</span><span class="op">,</span> fill<span class="op">:</span> <span class="st">"species"</span><span class="op">),</span></span>
+<span id="annotated-cell-6-4"><a href="#annotated-cell-6-4" aria-hidden="true" tabindex="-1"></a>  layers<span class="op">:</span> <span class="op">(</span>geom-point<span class="op">(</span>size<span class="op">:</span> <span class="fl">2pt</span><span class="op">,</span> alpha<span class="op">:</span> <span class="fl">0.8</span><span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">),),</span></span>
+<span id="annotated-cell-6-5"><a href="#annotated-cell-6-5" aria-hidden="true" tabindex="-1"></a>  scales<span class="op">:</span> scales<span class="op">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-6" class="code-annotation-target"><a href="#annotated-cell-6-6" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> scale-continuous<span class="op">(</span>secondary<span class="op">:</span> dup-axis<span class="op">()),</span></span>
+<span id="annotated-cell-6-7"><a href="#annotated-cell-6-7" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> scale-okabe-ito<span class="op">(),</span></span>
+<span id="annotated-cell-6-8"><a href="#annotated-cell-6-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-6-9"><a href="#annotated-cell-6-9" aria-hidden="true" tabindex="-1"></a>  labels<span class="op">:</span> labels<span class="op">(</span></span>
+<span id="annotated-cell-6-10"><a href="#annotated-cell-6-10" aria-hidden="true" tabindex="-1"></a>    title<span class="op">:</span> <span class="st">"One Record per Tick Mark"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-11"><a href="#annotated-cell-6-11" aria-hidden="true" tabindex="-1"></a>    x<span class="op">:</span> <span class="st">"Flipper Length (mm)"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-12"><a href="#annotated-cell-6-12" aria-hidden="true" tabindex="-1"></a>    y<span class="op">:</span> <span class="st">"Body Mass (g)"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-13"><a href="#annotated-cell-6-13" aria-hidden="true" tabindex="-1"></a>    fill<span class="op">:</span> <span class="st">"Species"</span><span class="op">,</span></span>
+<span id="annotated-cell-6-14"><a href="#annotated-cell-6-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-6-15"><a href="#annotated-cell-6-15" aria-hidden="true" tabindex="-1"></a>  theme<span class="op">:</span> theme-minimal<span class="op">(</span></span>
+<span id="annotated-cell-6-16"><a href="#annotated-cell-6-16" aria-hidden="true" tabindex="-1"></a>    axis-line<span class="op">:</span> element-line<span class="op">(</span>stroke<span class="op">:</span> <span class="fl">0.5pt</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-17" class="code-annotation-target"><a href="#annotated-cell-6-17" aria-hidden="true" tabindex="-1"></a>    axis-ticks<span class="op">:</span> element-tick<span class="op">(</span>length<span class="op">:</span> <span class="fl">0.25cm</span><span class="op">,</span> stroke<span class="op">:</span> <span class="fl">0.8pt</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-6-18" class="code-annotation-target"><a href="#annotated-cell-6-18" aria-hidden="true" tabindex="-1"></a>    axis-ticks-y<span class="op">:</span> element-tick<span class="op">(</span>length<span class="op">:</span> <span class="fl">50%</span><span class="op">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-6-19" class="code-annotation-target"><a href="#annotated-cell-6-19" aria-hidden="true" tabindex="-1"></a>    axis-text-y-right<span class="op">:</span> element-blank<span class="op">(),</span></span>
+<span id="annotated-cell-6-20"><a href="#annotated-cell-6-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="annotated-cell-6-21"><a href="#annotated-cell-6-21" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">12cm</span><span class="op">,</span></span>
+<span id="annotated-cell-6-22"><a href="#annotated-cell-6-22" aria-hidden="true" tabindex="-1"></a>  height<span class="op">:</span> <span class="fl">7cm</span><span class="op">,</span></span>
+<span id="annotated-cell-6-23"><a href="#annotated-cell-6-23" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="6" data-code-annotation="1"><code>dup-axis()</code> repeats the axis on the opposite side, and its <code>breaks:</code> and <code>labels:</code> are honoured now; the secondary axis used to draw the primary ones whatever you asked for.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="17" data-code-annotation="2">Length, colour, and stroke sit in the same record, set once on <code>axis-ticks</code> for every side.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="18" data-code-annotation="3">A ratio scales the length inherited from the parent surface, exactly as <code>size</code> and <code>stroke</code> do elsewhere, so the y marks come out half as long without naming an absolute value.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="19" data-code-annotation="4">Tick labels live in <code>axis-text</code>, so hiding them per side is the usual <code>element-blank()</code>, and the width they reserved goes back to the panel.</span>
+</dd>
+</dl>
+</div>
+<div class="typst-render-error">
+<p><strong>[typst-render] Compilation failed for 'typst-block-5'.</strong></p>
+</div>
+</div>
+<p>Minor marks follow the same record through <code>axis-ticks-minor</code>. The sub-decade ticks that <a href="https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html"><code>guide-axis-logticks()</code></a> adds on a log axis used to be hardcoded at half length in the major stroke; they are themable now, and they inherit the major record, so the default look is unchanged.</p>
+<div class="highlight">
+<p><strong>One record, one switch:</strong> <code>element-tick</code> holds the colour, the stroke, and the length, and <code>axis-ticks: element-blank()</code> turns the marks off without reserving any depth.</p>
+</div>
+</section>
+<section id="under-the-hood" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">5</span> Under the hood</h2>
+<p>The usual share of fixes rides along.</p>
+<p>The one you are most likely to notice is vertical alignment of labels. Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>On the documentation side, every <code>scale-*</code> reference page lists the keys its <code>..args</code> accepts, with type, accepted values, and default, including <code>oob</code>, which was not documented anywhere before. The theming guide gains a “Ticks and their labels” section, and the <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new. The navbar GitHub icon became a widget with the live star and fork counts and a project menu.</p>
+<p>One change to the site is worth a line of its own. The stable documentation is now rendered wholly from the release tag, instead of taking its pages from <code>main</code> against a pinned source. Each site documents the API it ships with, which is the point. The trade-off is that a documentation fix reaches the stable site at the next release rather than immediately.</p>
+</section>
+<section id="wrap-up" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">6</span> Wrap-up</h2>
+<div class="highlight">
+<p><strong>Prepare the data in the document, and let the axis pick better numbers.</strong></p>
+</div>
+<p>Next on the list is more geoms and more worked examples. If you run into something unexpected, the issue tracker is the right place for it.</p>
+<ul>
+<li>Gribouille
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/gribouille" class="uri">https://github.com/mcanouil/gribouille</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/gribouille" class="uri">https://m.canouil.dev/gribouille</a>.</li>
+<li>Typst Universe: <a href="https://typst.app/universe/package/gribouille" class="uri">https://typst.app/universe/package/gribouille</a>.</li>
+</ul></li>
+<li>Typst Render
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/quarto-typst-render" class="uri">https://github.com/mcanouil/quarto-typst-render</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/quarto-typst-render" class="uri">https://m.canouil.dev/quarto-typst-render</a>.</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>A note on contributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Gribouille is an unfunded spare-time project, and the API is still settling. Bug reports and ideas are very welcome on the issue tracker. Pull requests are not being accepted for now, for the reasons set out in the <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">launch post</a>. Thanks in advance for your patience.</p>
+</div>
+</div>
+
+
+</section>
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Talbot, J., Lin, S., and Hanrahan, P. (2010). An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes. IEEE Transactions on Visualization and Computer Graphics, 16(6), 1036-1043.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {Gribouille 0.6.0: {Wrangling} {Data} and {Breaks} {That}
+    {Land} on {Round} {Numbers}},
+  date = {2026-07-28},
+  url = {https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/},
+  langid = {en-GB}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-07-28). Gribouille 0.6.0: Wrangling Data and Breaks
+That Land on Round Numbers. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/">https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/</a>
+</div></div></section></div></main> <!-- /main -->
+<script id="mc-base64" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  window.mcDecodeB64 = function (b64) {
+    try {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    } catch {
+      return "";
+    }
+  };
+</script>
+<script id="mc-email" type="text/javascript">
+  /**
+   * Restore the `mailto:` links that `filters/email-obfuscation.lua` encoded,
+   * so the address never appears in the served HTML. Decoding happens on the
+   * first interaction as well as on load, so a link works even if this runs
+   * late.
+   *
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  (function () {
+    const restore = (link) => {
+      const payload = link.getAttribute("data-mc-email");
+      if (!payload) return;
+      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
+      if (!address) return;
+      link.setAttribute("href", "mailto:" + address);
+      link.removeAttribute("data-mc-email");
+      link.classList.add("mc-email--ready");
+    };
+
+    const restoreAll = () => {
+      window.document.querySelectorAll("a.mc-email[data-mc-email]").forEach(restore);
+    };
+
+    window.document.addEventListener("DOMContentLoaded", restoreAll);
+    if (window.document.readyState !== "loading") restoreAll();
+  })();
+</script>
+<script id="publications-bibtex-clipboard" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    const chips = document.querySelectorAll(".pub-chip[data-bibtex]");
+    if (chips.length === 0) return;
+
+    chips.forEach((btn) => {
+      btn.setAttribute("aria-live", "polite");
+      const original = btn.textContent;
+      let pending = false;
+      btn.addEventListener("click", async () => {
+        if (pending) return;
+        pending = true;
+        const text = window.mcDecodeB64(btn.getAttribute("data-bibtex") || "");
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copied";
+        } catch {
+          btn.classList.add("pub-chip--copied");
+          btn.textContent = "Copy failed";
+        }
+        setTimeout(() => {
+          btn.classList.remove("pub-chip--copied");
+          btn.textContent = original;
+          pending = false;
+        }, 1500);
+      });
+    });
+  });
+</script>
+<script id="year-toc" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    const configs = [
+      { bodyClass: "publications-page", headerSelector: "h2.pub-year[id]", yearSelector: ".pub-year-num", idPrefix: "pub-year-" },
+      { bodyClass: "talks-page", headerSelector: "section.talks-section[id]", yearSelector: ".talks-year", idPrefix: "talks-" },
+    ];
+    const config = configs.find((c) => document.body.classList.contains(c.bodyClass));
+    if (!config) return;
+
+    const headers = Array.from(document.querySelectorAll(config.headerSelector));
+    if (headers.length === 0) return;
+
+    const sidebar = document.getElementById("quarto-margin-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.remove("zindex-bottom");
+
+    const tocTitle = document.createElement("h2");
+    tocTitle.id = "toc-title";
+    tocTitle.textContent = "Years";
+
+    const list = document.createElement("ul");
+
+    const anchors = new Map();
+    headers.forEach((h) => {
+      const id = h.id;
+      const year = h.querySelector(config.yearSelector)?.textContent?.trim() || id.replace(config.idPrefix, "");
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.id = `toc-${id}`;
+      a.className = "nav-link";
+      a.setAttribute("data-scroll-target", `#${id}`);
+      a.textContent = year;
+      li.appendChild(a);
+      list.appendChild(li);
+      anchors.set(id, a);
+    });
+
+    const nav = document.createElement("nav");
+    nav.id = "TOC";
+    nav.setAttribute("role", "doc-toc");
+    nav.className = "toc-active";
+    nav.appendChild(tocTitle);
+    nav.appendChild(list);
+
+    const tocActions = sidebar.querySelector(".toc-actions");
+    if (tocActions) {
+      nav.appendChild(tocActions);
+    }
+    sidebar.insertBefore(nav, sidebar.firstChild);
+
+    let activeId = null;
+    const setActive = (targetId) => {
+      if (activeId === targetId) return;
+      anchors.get(activeId)?.classList.remove("active");
+      anchors.get(targetId)?.classList.add("active");
+      activeId = targetId;
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible.length > 0) {
+            setActive(visible[0].target.id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      );
+      headers.forEach((h) => observer.observe(h));
+    }
+
+    if (headers.length > 0) {
+      setActive(headers[0].id);
+    }
+  });
+</script>
+<script id="ordinal-dates" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    const SELECTOR = [
+      ".date",
+      ".date-modified",
+      ".listing-date",
+      ".listing-file-modified",
+      ".blog-date",
+      ".project-date",
+      ".talks-date",
+      ".pub-date",
+    ].join(", ");
+    const PATTERN = /(\d+)(st|nd|rd|th)\b/g;
+
+    function wrapTextNode(node) {
+      const text = node.nodeValue;
+      const fragment = document.createDocumentFragment();
+      let cursor = 0;
+      let match;
+      PATTERN.lastIndex = 0;
+      while ((match = PATTERN.exec(text)) !== null) {
+        const [full, digits, suffix] = match;
+        const start = match.index;
+        if (start > cursor) {
+          fragment.appendChild(document.createTextNode(text.slice(cursor, start)));
+        }
+        fragment.appendChild(document.createTextNode(digits));
+        const sup = document.createElement("sup");
+        sup.className = "ordinal-suffix";
+        sup.textContent = suffix;
+        fragment.appendChild(sup);
+        cursor = start + full.length;
+      }
+      if (cursor === 0) return;
+      if (cursor < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(cursor)));
+      }
+      node.parentNode.replaceChild(fragment, node);
+    }
+
+    const elements = document.querySelectorAll(SELECTOR);
+    if (elements.length === 0) return;
+    elements.forEach(function (el) {
+      if (el.dataset.ordinalDates === "wrapped") return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          if (node.parentNode && node.parentNode.classList && node.parentNode.classList.contains("ordinal-suffix")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const targets = [];
+      let current = walker.nextNode();
+      while (current) {
+        targets.push(current);
+        current = walker.nextNode();
+      }
+      targets.forEach(wrapTextNode);
+      el.dataset.ordinalDates = "wrapped";
+    });
+  });
+</script>
+<script id="navbar-tooltips" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof window.tippy !== "function") return;
+
+    const config = {
+      theme: "mc",
+      placement: "bottom",
+      arrow: false,
+      delay: [100, 0],
+      offset: [0, 6],
+      allowHTML: false,
+      appendTo: function () { return document.body; },
+    };
+
+    function bind(el, content) {
+      if (!el || !content || el.dataset.tippyBound === "1") return;
+      el.removeAttribute("title");
+      window.tippy(el, Object.assign({ content: content }, config));
+      el.dataset.tippyBound = "1";
+    }
+
+    document.querySelectorAll(".navbar a.nav-link, a.about-link").forEach(function (link) {
+      const icon = link.querySelector("iconify-icon[aria-label], iconify-icon[title]");
+      if (!icon) return;
+      const titleFirst = link.classList.contains("about-link");
+      const label = titleFirst
+        ? (icon.getAttribute("title") || icon.getAttribute("aria-label"))
+        : (icon.getAttribute("aria-label") || icon.getAttribute("title"));
+      icon.removeAttribute("title");
+      bind(link, label);
+    });
+
+    document.querySelectorAll("a.quarto-color-scheme-toggle").forEach(function (toggle) {
+      bind(toggle, toggle.getAttribute("title") || toggle.getAttribute("aria-label"));
+    });
+
+    document.querySelectorAll("a.navbar-brand-logo").forEach(function (logo) {
+      bind(logo, "Home");
+    });
+
+    const searchEl = document.getElementById("quarto-search");
+    if (searchEl) {
+      // autocomplete.js renders the search button asynchronously, so it may not
+      // exist yet. Bind now if it does, otherwise watch until it appears.
+      const bindSearch = function () {
+        const button = searchEl.querySelector(".aa-DetachedSearchButton");
+        if (!button) return false;
+        const label = button.getAttribute("title") || searchEl.getAttribute("title");
+        // The wrapper carries its own title, which the browser would show as a
+        // native tooltip on top of the tippy one.
+        searchEl.removeAttribute("title");
+        // The title is the button's only accessible name and bind() strips it,
+        // so move it to aria-label first. a11y-fixes.html runs on
+        // DOMContentLoaded, too early to see this asynchronously rendered button.
+        if (label && !button.hasAttribute("aria-label")) {
+          button.setAttribute("aria-label", label);
+        }
+        bind(button, label);
+        return true;
+      };
+
+      if (!bindSearch()) {
+        const observer = new MutationObserver(function () {
+          if (bindSearch()) observer.disconnect();
+        });
+        observer.observe(searchEl, { childList: true, subtree: true });
+      }
+    }
+
+    const aboutImages = document.querySelectorAll("img.about-image");
+    if (aboutImages.length > 0) {
+      const titleEl = document.querySelector("header#title-block-header h1.title, h1.title");
+      const titleText = (titleEl && titleEl.textContent.trim()) || "";
+      aboutImages.forEach(function (img) {
+        bind(img, titleText || img.getAttribute("alt") || "Profile picture");
+      });
+    }
+  });
+</script>
+<script id="title-block-header-empty-clean" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('header#title-block-header div, header#title-block-header p').forEach(function (el) {
+      if (!el.textContent.trim()) {
+        el.style.display = "none";
+      }
+    });
+  });
+</script>
+<script id="a11y-fixes" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Logo link: Quarto emits <a class="navbar-brand-logo"> with an inner <img alt>
+    // but axe sees no accessible name when the img is hidden by CSS.
+    document.querySelectorAll("a.navbar-brand-logo:not([aria-label])").forEach((a) => {
+      a.setAttribute("aria-label", "Mickaël CANOUIL — home");
+    });
+
+    // Color scheme toggle: Quarto adds title= but no aria-label.
+    document.querySelectorAll("a.quarto-color-scheme-toggle:not([aria-label])").forEach((a) => {
+      a.setAttribute("aria-label", a.getAttribute("title") || "Toggle colour scheme");
+    });
+
+    // Navbar search input: Quarto's inline button has no visible label.
+    const searchInput = document.querySelector(
+      ".aa-Input, input.aa-Input, input[placeholder='Search'], input[type='search']"
+    );
+    if (searchInput && !searchInput.getAttribute("aria-label")) {
+      searchInput.setAttribute("aria-label", "Search the site");
+    }
+
+    // CSL bibliography appendix: Quarto emits role="listitem" without role="list"
+    // parent. Promote each listitem itself to a list (it already wraps its own
+    // content); avoids adding role="list" to a parent that also contains
+    // unrelated children (axe rejects buttons inside role="list").
+    document.querySelectorAll('[role="listitem"]').forEach((el) => {
+      el.removeAttribute("role");
+    });
+
+    // Disambiguate duplicate banner landmarks. The Quarto title-block header
+    // (page-level) is also a <header>, which axe flags as a duplicate banner
+    // role alongside the site navbar. Strip the implicit banner role from the
+    // title-block via role="presentation" (header element disallows region).
+    const siteHeader = document.getElementById("quarto-header");
+    if (siteHeader && !siteHeader.getAttribute("aria-label")) {
+      siteHeader.setAttribute("aria-label", "Site banner");
+    }
+    const titleHeader = document.querySelector("header#title-block-header, header.quarto-title-block");
+    if (titleHeader) {
+      titleHeader.setAttribute("role", "presentation");
+    }
+    const navbarPrimary = document.querySelector(".navbar");
+    if (navbarPrimary && !navbarPrimary.getAttribute("aria-label")) {
+      navbarPrimary.setAttribute("aria-label", "Primary");
+    }
+    const tocNav = document.querySelector("#TOC, nav#TOC, .sidebar-toc nav");
+    if (tocNav && !tocNav.getAttribute("aria-label")) {
+      tocNav.setAttribute("aria-label", "On this page");
+    }
+
+    // Listing category sidebar: Quarto emits <h5>Categories</h5> after page <h1>,
+    // breaking the heading order. Re-tag to <h2> so the document outline stays
+    // monotonic, and put the sidebar block in a labelled landmark.
+    document.querySelectorAll("h5.quarto-listing-category-title").forEach((h5) => {
+      const h2 = document.createElement("h2");
+      for (const attr of h5.attributes) h2.setAttribute(attr.name, attr.value);
+      h2.innerHTML = h5.innerHTML;
+      h5.replaceWith(h2);
+    });
+
+    // Wrap orphan listing-category, listing-category-title, margin-header, and
+    // title-banner in labelled landmarks so axe's region rule passes. Skip if
+    // already inside another landmark (axe rejects nested top-level complementary).
+    const insideLandmark = (el) =>
+      el && el.closest('main, [role="main"], aside, [role="complementary"], nav, [role="navigation"], section[aria-label], section[aria-labelledby]');
+    const labelOnce = (el, role, label) => {
+      if (!el || el.getAttribute("role") || insideLandmark(el.parentElement)) return;
+      el.setAttribute("role", role);
+      if (!el.getAttribute("aria-label")) el.setAttribute("aria-label", label);
+    };
+
+    // Group the listing categories title and list as one complementary landmark.
+    // Use <div role="complementary"> instead of <aside>: Quarto's quarto.js treats
+    // any <aside> as a margin-column conflict element and collapses the entire
+    // margin-sidebar into a navbar toggle when it intersects.
+    document.querySelectorAll(".quarto-listing-category-title").forEach((title) => {
+      const next = title.nextElementSibling;
+      if (next && next.classList.contains("quarto-listing-category") && !insideLandmark(title.parentElement)) {
+        const wrap = document.createElement("div");
+        wrap.setAttribute("role", "complementary");
+        wrap.setAttribute("aria-label", "Listing filters");
+        title.parentNode.insertBefore(wrap, title);
+        wrap.appendChild(title);
+        wrap.appendChild(next);
+      }
+    });
+    // Skip the mobile sidebar-toggle clone; it duplicates the desktop sidebar
+    // and would create non-unique landmarks.
+    const inToggleClone = (el) => el && el.closest(".quarto-sidebar-toggle-contents, .quarto-sidebar-toggle");
+
+    document.querySelectorAll(".quarto-listing-category").forEach((el) => {
+      if (inToggleClone(el)) return;
+      labelOnce(el, "complementary", "Listing filters");
+    });
+    document.querySelectorAll(".quarto-margin-header").forEach((el) => {
+      if (inToggleClone(el)) return;
+      if (el.querySelector('aside[aria-label="Listing filters"], .quarto-listing-category')) return;
+      labelOnce(el, "complementary", "Page metadata");
+    });
+    document.querySelectorAll(".quarto-title-banner").forEach((el) => labelOnce(el, "region", "Page header"));
+    document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
+
+    // Quarto's sidebar-toggle clones the labelled landmarks into a mobile-only
+    // container after our handlers run. Suffix the cloned landmarks' labels so
+    // axe sees them as unique from the desktop originals.
+    const dedupeCloneLandmarks = () => {
+      document
+        .querySelectorAll('.quarto-sidebar-toggle-contents [role="complementary"], .quarto-sidebar-toggle-contents [role="region"], .quarto-sidebar-toggle-contents aside')
+        .forEach((el) => {
+          const label = el.getAttribute("aria-label");
+          if (label && !/\(mobile\)$/.test(label)) {
+            el.setAttribute("aria-label", `${label} (mobile)`);
+          }
+        });
+    };
+    dedupeCloneLandmarks();
+    setTimeout(dedupeCloneLandmarks, 50);
+    setTimeout(dedupeCloneLandmarks, 250);
+  });
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/mickael\.canouil\.fr");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "mcanouil/gribouille";
+    script.dataset.repoId = "R_kgDOSGUuww";
+    script.dataset.category = "Announcements";
+    script.dataset.categoryId = "DIC_kwDOSGUuw84C7KIV";
+    script.dataset.mapping = "og:title";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Powered by <a href="https://quarto.org" target="_blank" rel="noopener noreferrer"><iconify-icon role="img" inline="" icon="simple-icons:quarto" aria-label="Quarto Logo" title="Quarto Logo"></iconify-icon> Quarto</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+<p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="Heart" title="Heart"></iconify-icon> Sponsor</a>.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-28-gribouille-0-6/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
+</div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>
