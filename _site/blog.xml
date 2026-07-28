@@ -15,8 +15,1454 @@
 <title>Mickaël CANOUIL</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.11.0</generator>
-<lastBuildDate>Fri, 24 Jul 2026 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.11.1</generator>
+<lastBuildDate>Tue, 28 Jul 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Gribouille 0.6.0: Wrangling Data and Breaks That Land on Round Numbers</title>
+  <link>https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/</link>
+  <description><![CDATA[ 
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+Skip to main content
+
+
+
+
+
+<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0 is about the data before the plot, the numbers along the axis, and documentation. A set of wrangling verbs brings grouped aggregation, reshaping, and joining to the row-store data model, so the preparation stays in the document. Automatic breaks now come from the extended Wilkinson search, which puts ticks on rounder numbers closer to the data, and four <code>breaks-*</code> helpers let you place them yourself. The one thing to watch when you upgrade is the tick theming: <code>tick-length</code> and <code>tick-labels</code> are gone, replaced by a single <code>element-tick</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Featured card for the Gribouille 0.6.0 release on a cream paper
+background. On the left, the Gribouille wordmark sits above the tagline
+&quot;Create elegant graphics with the Grammar of Graphics for Typst.&quot;, a
+small orange &quot;v0.6.0 release&quot; pill, and the URL
+m.canouil.dev/gribouille. On the right, a slightly rotated bordered card
+frames three panels, one per change in the release. Across the top row,
+a five-row table of class and highway values becomes a three-row table
+of class, mean highway, and joined kind, with &quot;summarise()&quot; and
+&quot;left-join()&quot; over an arrow between them. Bottom left, a line chart of
+unemployment whose y-axis ticks sit at the quartiles of the series,
+7,497 to 15,352, so the gridlines are unevenly spaced. Bottom right, a
+penguin scatter with long tick marks on the x-axis, half-length ones on
+the y-axis, and a duplicated y-axis on the right carrying marks but no
+labels.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>At a glance
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0 on Typst Universe: <code>#import "@preview/gribouille:0.6.0": *</code>.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/count.html"><code>count()</code></a> aggregate a dataset per group, one output row per group.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-longer.html"><code>pivot-longer()</code></a> and <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-wider.html"><code>pivot-wider()</code></a> melt columns into a name/value pair and spread them back.</li>
+<li><a href="https://m.canouil.dev/gribouille/reference/helpers/left-join.html"><code>left-join()</code></a> and the other four joins combine two datasets on their shared key columns; <code>bind-rows()</code> and <code>bind-cols()</code> stack or glue them.</li>
+<li><code>select()</code>, <code>rename()</code>, <code>relocate()</code>, <code>drop-na()</code>, <code>distinct()</code>, and <code>slice-max()</code>/<code>slice-min()</code> handle the column and row work that a bare <code>.filter()</code> states awkwardly.</li>
+<li>The verbs are <strong>experimental</strong>, and the <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide says when native Typst is enough on its own.</li>
+<li>The documentation fills its gaps: the new guide above, a “Ticks and their labels” section in the <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a>, and every <code>scale-*</code> page listing the keys its <code>..args</code> accepts, <code>oob</code> included.</li>
+<li>Automatic continuous breaks come from the extended Wilkinson search, and <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-width.html"><code>breaks-width()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-pretty.html"><code>breaks-pretty()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended()</code></a>, and <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-quantile.html"><code>breaks-quantile()</code></a> build the <code>breaks:</code> closure for you.</li>
+<li><iconify-icon inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> tick marks are themed through the <code>axis-ticks</code> family with the new <a href="https://m.canouil.dev/gribouille/reference/themes/element-tick.html"><code>element-tick(colour:, stroke:, length:)</code></a>; <code>tick-length</code> and <code>tick-labels</code> are removed.</li>
+<li><iconify-icon inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> <strong>Breaking:</strong> the internal summary-dispatch kernel gives up the <code>summarise</code> name to the new verb; <code>stat-summary(fun:)</code> is unchanged.</li>
+</ul>
+</div>
+</div>
+<p>Every figure in this post is a real, freshly compiled plot.</p>
+<section id="breaking-changes" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="breaking-changes"><span class="header-section-number">1</span> <iconify-icon inline="" icon="octicon:alert-16" aria-label="Breaking change" title="Breaking change"></iconify-icon> Breaking changes</h2>
+<p>Two names change, and only one of them is likely to be in your documents.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Migrate these names
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Tick marks are one theme record now. <code>element-tick(colour:, stroke:, length:)</code> carries the mark length, so <code>tick-length</code> and its per-axis and per-side variants are removed: write <code>axis-ticks: element-tick(length: 0.2cm)</code> instead. <code>tick-labels</code> is removed too, because tick labels live in <code>axis-text</code>, so hide them per side with <code>axis-text-y-right: element-blank()</code>. To drop the marks and the space they reserve, <code>axis-ticks: element-blank()</code> is the one switch.</li>
+<li><code>summarise</code> is the wrangling verb described below. The summary-dispatch kernel that used to carry that name is internal now. If you passed a summary by name or by closure to <code>stat-summary(fun:)</code> or <code>stat-summary-bin(fun:)</code>, nothing changes.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="wrangling-data" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="wrangling-data"><span class="header-section-number">2</span> Wrangling data</h2>
+<p>A Gribouille dataset is a row-store, an array of dictionaries with one dictionary per row. That is a plain Typst array, so a good part of the preparation is already a one-liner: <code>data.filter(...)</code> keeps rows, <code>data.map(...)</code> derives a column, <code>data.sorted(key: ...)</code> orders them. What Typst leaves open is grouped aggregation, reshaping, and joining, and that is what the new verbs do. They all take a row-store and return a row-store, so the result goes straight into <code>#plot</code> with nothing in between.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>These verbs are experimental
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Their interfaces can change without notice while the design settles, and they may end up in a dedicated Typst data-wrangling package rather than in Gribouille. The plotting API and the native array methods are not affected.</p>
+</div>
+</div>
+<p><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> collapses each group to one row. The grouping is per call, through <code>by:</code>, so there is no grouped state to remember to undo[^If you are a <code>dplyr</code> user, you know what I am talking about.]. Each aggregation is a closure that receives the group’s rows and returns one cell, so anything you can compute over the rows is fair game.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">by-class</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> summarise<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-1-2">  mpg<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target">  mean-hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> rows <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> rows<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>map<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">).</span>sum<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()</span> / rows<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>len<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-1-4">  n<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> rows <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> rows<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>len<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-5" class="code-annotation-target">  by<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-6" class="code-annotation-target"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">).</span>sorted<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>key<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>mean-hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-1-7"></span>
+<span id="annotated-cell-1-8"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-1-9">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> by-class<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-10">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mean-hwy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-1-11">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-1-12">    geom-col<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-13" class="code-annotation-target">    geom-text<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"n"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> anchor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"south"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-1-14">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-1-15">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-1-16">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>limits<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> by-class<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>map<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>class<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<span id="annotated-cell-1-17">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-1-18">  labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-1-19">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fuel Economy by Vehicle Class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-20">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Vehicle Class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-21">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Mean Highway mpg"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-22">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-1-23">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-1-24">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-25">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-1-26"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Every named argument is an aggregation: a closure over the group’s rows returning a single cell. A mean, a count, or a ratio of two columns all fit the same shape.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="2"><code>by:</code> takes one column name or an array of them; without it the whole dataset collapses to a single row.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="6,16" data-code-annotation="3">The output is an ordinary row-store, so <code>.sorted()</code> orders it, and feeding that order back as the discrete <code>limits</code> keeps the bars sorted.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="13" data-code-annotation="4"><code>n</code> is one of the aggregated columns, so it can be mapped like any other.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/summarise-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Bar chart of the mean highway fuel economy of each vehicle class, sorted from pickup at about 17 miles per gallon up to compact at about 30, with the number of vehicles in the class printed above each bar."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/summarise-light.svg" class="img-fluid hero-art" alt="Bar chart of the mean highway fuel economy of each vehicle class, sorted from pickup at about 17 miles per gallon up to compact at about 30, with the number of vehicles in the class printed above each bar."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/summarise-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Bar chart of the mean highway fuel economy of each vehicle class, sorted from pickup at about 17 miles per gallon up to compact at about 30, with the number of vehicles in the class printed above each bar."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/summarise-dark.svg" class="img-fluid hero-art" alt="Bar chart of the mean highway fuel economy of each vehicle class, sorted from pickup at about 17 miles per gallon up to compact at about 30, with the number of vehicles in the class printed above each bar."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>When the aggregation is just a tally, <a href="https://m.canouil.dev/gribouille/reference/helpers/count.html"><code>count()</code></a> is the short form: it groups by the columns you name, adds an <code>n</code> column, and <code>sort: true</code> orders the groups from most to least frequent.</p>
+<p>Two columns that measure the same thing are usually easier to plot once melted into one value column with a label column beside it. <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-longer.html"><code>pivot-longer()</code></a> does that, and <a href="https://m.canouil.dev/gribouille/reference/helpers/pivot-wider.html"><code>pivot-wider()</code></a> spreads them back.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-2-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">long</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pivot-longer<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-2-2">  mpg<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-3" class="code-annotation-target">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cty"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"hwy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-4" class="code-annotation-target">  names-to<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"metric"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-5">  values-to<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mpg"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-6"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-2-7"></span>
+<span id="annotated-cell-2-8"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-2-9">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> long<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-10">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"metric"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mpg"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"metric"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-2-11">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-boxplot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-12" class="code-annotation-target">  facet<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> facet-wrap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cyl"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-2-13">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()),</span></span>
+<span id="annotated-cell-2-14">  labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-2-15">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"City Against Highway, by Cylinder Count"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-16">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Metric"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-17">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Miles per Gallon"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-18">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Metric"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-19">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-2-20">  guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> guides<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-2-21">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-2-22">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-23">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-24"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="1">The columns to melt. Each row of <code>mpg</code> becomes two rows here, one per measurement.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="4" data-code-annotation="2"><code>names-to</code> names the column holding the old column names, <code>values-to</code> the one holding their values.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="12" data-code-annotation="3">The columns that were not melted, <code>cyl</code> among them, are carried through, so they can still facet or colour the plot.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/pivot-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Box plots of miles per gallon for city and highway economy, faceted into one panel per cylinder count; the highway box sits above the city box in every panel, and both drop as the number of cylinders grows."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/pivot-light.svg" class="img-fluid hero-art" alt="Box plots of miles per gallon for city and highway economy, faceted into one panel per cylinder count; the highway box sits above the city box in every panel, and both drop as the number of cylinders grows."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/pivot-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Box plots of miles per gallon for city and highway economy, faceted into one panel per cylinder count; the highway box sits above the city box in every panel, and both drop as the number of cylinders grows."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/pivot-dark.svg" class="img-fluid hero-art" alt="Box plots of miles per gallon for city and highway economy, faceted into one panel per cylinder count; the highway box sits above the city box in every panel, and both drop as the number of cylinders grows."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>Enriching a dataset with a lookup table is a join, not a dictionary read per row. Build the lookup as its own small row-store and <a href="https://m.canouil.dev/gribouille/reference/helpers/left-join.html"><code>left-join()</code></a> it on the shared key.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-3" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-3-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">by-class</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> summarise<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-2">  mpg<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-3">  mean-hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> rows <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> rows<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>map<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">).</span>sum<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()</span> / rows<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>len<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-3-4">  by<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-5"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">).</span>sorted<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>key<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>mean-hwy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-3-6"></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-7" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">kind</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-8">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"compact"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Car"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-9">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"subcompact"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Car"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-10">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"midsize"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Car"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-11">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2seater"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Car"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-12">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"minivan"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Van"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-13">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"suv"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SUV"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-14">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>class: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pickup"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Truck"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-15"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-3-16"></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-17" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">enriched</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> left-join<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>by-class<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> kind<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> by<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-3-18"></span>
+<span id="annotated-cell-3-19"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-20">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> enriched<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-21">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mean-hwy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"kind"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-22">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-col<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),),</span></span>
+<span id="annotated-cell-3-23">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-24">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-discrete<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>limits<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> enriched<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>map<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>row <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=&gt;</span> row<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>class<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span></span>
+<span id="annotated-cell-3-25">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-3-26">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-27">  labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-3-28">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Economy by Class and by Kind"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-29">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Vehicle Class"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-30">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Mean Highway mpg"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-31">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Kind"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-32">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-3-33">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-3-34">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-35">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-3-36"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="7" data-code-annotation="1">The lookup is a row-store like any other, written inline here, read from a CSV just as well.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="17" data-code-annotation="2">Every row of the left dataset is kept and gains the lookup’s extra columns. <code>inner-join</code> keeps only the matched rows, <code>full-join</code> keeps both sides, and <code>semi-join</code>/<code>anti-join</code> filter the left dataset without adding columns.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/join-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The same bar chart of mean highway economy per vehicle class, sorted ascending, with the bars coloured by a joined vehicle kind: the pickup and SUV classes sit at the low end, the minivan in the middle, and the car classes at the high end."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/join-light.svg" class="img-fluid hero-art" alt="The same bar chart of mean highway economy per vehicle class, sorted ascending, with the bars coloured by a joined vehicle kind: the pickup and SUV classes sit at the low end, the minivan in the middle, and the car classes at the high end."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/join-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="The same bar chart of mean highway economy per vehicle class, sorted ascending, with the bars coloured by a joined vehicle kind: the pickup and SUV classes sit at the low end, the minivan in the middle, and the car classes at the high end."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/join-dark.svg" class="img-fluid hero-art" alt="The same bar chart of mean highway economy per vehicle class, sorted ascending, with the bars coloured by a joined vehicle kind: the pickup and SUV classes sit at the low end, the minivan in the middle, and the car classes at the high end."></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="highlight">
+<p><strong>Every verb takes a row-store and returns a row-store:</strong> the result of a summarise, a pivot, or a join goes straight into <code>#plot</code> with no adapter in between.</p>
+</div>
+<p>One more thing before the plot, for real files. A CSV arrives as strings, and missing values are spelled in as many ways as there are people producing the files. <a href="https://m.canouil.dev/gribouille/reference/core/as-numeric.html"><code>as-numeric()</code></a> now takes an <code>na:</code> list of sentinel values, blanking them before it parses, so a placeholder does not survive as a number.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb1-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">raw</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> csv<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"vehicles.csv"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> row-type<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> dictionary<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb1-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">clean</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> drop-na<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>as-numeric<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>raw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"hwy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> na<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"NA"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"-99"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)),</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"hwy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span></code></pre></div></div>
+<p>The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide walks the whole path, from coercion to the plot, and it also says which tasks need no verb at all.</p>
+</section>
+<section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>, which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-5-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> economics<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"date"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"unemploy"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-4">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-5-5">    geom-line<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>colour<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-6">    geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-7">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-8">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-5-9">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-date<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>date-format<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"[year]-[month repr:numerical]"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-10">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-continuous<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-11" class="code-annotation-target">      breaks<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> breaks-quantile<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-12" class="code-annotation-target">      minor-breaks<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> breaks-width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">500</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-5-13" class="code-annotation-target">      labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> format-comma<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>digits<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-14">    <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-15">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-16">  labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-5-17">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Ticks Where the Data Sits"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-18">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Date"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-19">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Unemployed (thousands)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-20">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-5-21">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-5-22">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-23">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-5-24"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="11" data-code-annotation="1"><code>breaks-quantile(probs:)</code> puts the ticks at sample quantiles, the quartiles by default, so the axis reports where the mass of the data sits instead of drawing a regular grid.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="12" data-code-annotation="2"><code>minor-breaks:</code> takes the same closures. <code>breaks-width(width, offset:)</code> places a line every <code>width</code>, anchored on <code>offset</code>, so the positions stay on round multiples however the range moves.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="3">The tick labels are formatted by <code>format-comma()</code>, unrelated to where the ticks sit. <code>breaks-pretty(n:)</code> is the fourth helper, for round positions at a target count.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/breaks-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Line chart with a marker per month of the number of unemployed people in the United States from January 2008 to December 2009, rising from about 7,500 thousand to over 15,000 thousand, with y-axis ticks at the quartiles of the series and minor gridlines every 500."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/breaks-light.svg" class="img-fluid hero-art" alt="Line chart with a marker per month of the number of unemployed people in the United States from January 2008 to December 2009, rising from about 7,500 thousand to over 15,000 thousand, with y-axis ticks at the quartiles of the series and minor gridlines every 500."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/breaks-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Line chart with a marker per month of the number of unemployed people in the United States from January 2008 to December 2009, rising from about 7,500 thousand to over 15,000 thousand, with y-axis ticks at the quartiles of the series and minor gridlines every 500."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/breaks-dark.svg" class="img-fluid hero-art" alt="Line chart with a marker per month of the number of unemployed people in the United States from January 2008 to December 2009, rising from about 7,500 thousand to over 15,000 thousand, with y-axis ticks at the quartiles of the series and minor gridlines every 500."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>A closure and an explicit array of breaks are not treated the same way, and the difference matters. An explicit array widens the axis so every requested tick stays visible, while closure breaks are clipped to the trained domain, since the closure has seen the data and cannot ask for anything outside it.</p>
+<p>A related fix landed with them. A scale trained on whole numbers only, such as years or counts, now keeps whole automatic breaks, so a narrow range like 2020 to 2023 no longer labels half-steps.</p>
+</section>
+<section id="ticks-in-one-element" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="ticks-in-one-element"><span class="header-section-number">4</span> Ticks, in one element</h2>
+<p>Tick marks used to be described in two places: their colour and stroke in <code>axis-ticks</code>, their length in a separate <code>tick-length</code> with its own per-axis and per-side variants. They are one record now. <a href="https://m.canouil.dev/gribouille/reference/themes/element-tick.html"><code>element-tick(colour:, stroke:, length:)</code></a> carries all three, on <code>axis-ticks</code> and on its per-axis, per-side, and minor variants.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-6" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span>plot<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-6-2">  data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> penguins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-3">  mapping<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> aes<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"flipper-len"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"body-mass"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-6-4">  layers<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>geom-point<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),),</span></span>
+<span id="annotated-cell-6-5">  scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scales<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-6-6" class="code-annotation-target">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-continuous<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>secondary<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> dup-axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()),</span></span>
+<span id="annotated-cell-6-7">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> scale-okabe-ito<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-6-8">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-6-9">  labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> labels<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-6-10">    title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"One Record per Tick Mark"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-11">    x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Flipper Length (mm)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-12">    y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Body Mass (g)"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-13">    fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Species"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-14">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-6-15">  theme<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> theme-minimal<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-6-16">    axis-line<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-line<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-6-17" class="code-annotation-target">    axis-ticks<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-tick<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8pt</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-6-18" class="code-annotation-target">    axis-ticks-y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-tick<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-6" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-6-19" class="code-annotation-target">    axis-text-y-right<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> element-blank<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(),</span></span>
+<span id="annotated-cell-6-20">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="annotated-cell-6-21">  width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-22">  height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7cm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-6-23"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-6" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="6" data-code-annotation="1"><code>dup-axis()</code> repeats the axis on the opposite side, and its <code>breaks:</code> and <code>labels:</code> are honoured now; the secondary axis used to draw the primary ones whatever you asked for.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="17" data-code-annotation="2">Length, colour, and stroke sit in the same record, set once on <code>axis-ticks</code> for every side.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="18" data-code-annotation="3">A ratio scales the length inherited from the parent surface, exactly as <code>size</code> and <code>stroke</code> do elsewhere, so the y marks come out half as long without naming an absolute value.</span>
+</dd>
+<dt data-target-cell="annotated-cell-6" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-6" data-code-lines="19" data-code-annotation="4">Tick labels live in <code>axis-text</code>, so hiding them per side is the usual <code>element-blank()</code>, and the width they reserved goes back to the panel.</span>
+</dd>
+</dl>
+</div>
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/ticks-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="Scatter plot of penguin body mass against flipper length with long tick marks on the x-axis, half-length ticks on the y-axis, and a duplicated y-axis on the right carrying its marks but no labels."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/ticks-light.svg" class="img-fluid hero-art" alt="Scatter plot of penguin body mass against flipper length with long tick marks on the x-axis, half-length ticks on the y-axis, and a duplicated y-axis on the right carrying its marks but no labels."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-07-28-gribouille-0-6/./assets/typst-render/ticks-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="Scatter plot of penguin body mass against flipper length with long tick marks on the x-axis, half-length ticks on the y-axis, and a duplicated y-axis on the right carrying its marks but no labels."><img src="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/assets/typst-render/ticks-dark.svg" class="img-fluid hero-art" alt="Scatter plot of penguin body mass against flipper length with long tick marks on the x-axis, half-length ticks on the y-axis, and a duplicated y-axis on the right carrying its marks but no labels."></a></p>
+</div>
+</div>
+</div>
+</div>
+<p>Minor marks follow the same record through <code>axis-ticks-minor</code>. The sub-decade ticks that <a href="https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html"><code>guide-axis-logticks()</code></a> adds on a log axis used to be hardcoded at half length in the major stroke; they are themable now, and they inherit the major record, so the default look is unchanged.</p>
+<div class="highlight">
+<p><strong>One record, one switch:</strong> <code>element-tick</code> holds the colour, the stroke, and the length, and <code>axis-ticks: element-blank()</code> turns the marks off without reserving any depth.</p>
+</div>
+</section>
+<section id="under-the-hood" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">5</span> Under the hood</h2>
+<p>The usual share of fixes rides along.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+</section>
+<section id="filling-the-documentation-gaps" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
+<p>A good share of this release was writing down what was already there.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
+<p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
+<p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
+</section>
+<section id="wrap-up" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">7</span> Wrap-up</h2>
+<div class="highlight">
+<p><strong>Prepare the data in the document, and let the axis pick better numbers.</strong></p>
+</div>
+<p>Next on the list is more geoms and more worked examples. If you run into something unexpected, the issue tracker is the right place for it.</p>
+<ul>
+<li>Gribouille
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/gribouille" class="uri">https://github.com/mcanouil/gribouille</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/gribouille" class="uri">https://m.canouil.dev/gribouille</a>.</li>
+<li>Typst Universe: <a href="https://typst.app/universe/package/gribouille" class="uri">https://typst.app/universe/package/gribouille</a>.</li>
+</ul></li>
+<li>Typst Render
+<ul>
+<li>Repository: <a href="https://github.com/mcanouil/quarto-typst-render" class="uri">https://github.com/mcanouil/quarto-typst-render</a>.</li>
+<li>Documentation: <a href="https://m.canouil.dev/quarto-typst-render" class="uri">https://m.canouil.dev/quarto-typst-render</a>.</li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>A note on contributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Gribouille is an unfunded spare-time project, and the API is still settling. Bug reports and ideas are very welcome on the issue tracker. Pull requests are not being accepted for now, for the reasons set out in the <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">launch post</a>. Thanks in advance for your patience.</p>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {Gribouille 0.6.0: {Wrangling} {Data} and {Breaks} {That}
+    {Land} on {Round} {Numbers}},
+  date = {2026-07-28},
+  url = {https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2026-07-28). Gribouille 0.6.0: Wrangling Data and Breaks
+That Land on Round Numbers. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/">https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/</a>
+</div></div></section></div> ]]></description>
+  <category>typst</category>
+  <category>quarto</category>
+  <category>grammar-of-graphics</category>
+  <category>gribouille</category>
+  <guid>https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/</guid>
+  <pubDate>Tue, 28 Jul 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-07-28-gribouille-0-6/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Stop Duplicating Your Quarto Source</title>
   <link>https://mickael.canouil.fr/posts/2026-07-24-quarto-stop-duplicating/</link>
@@ -581,15 +2027,15 @@ font-style: inherit;">|</span></span>
 <p>Here are the three outputs, rendered from that one file.</p>
 <p>The HTML handout, with the headings at their written levels and no slide break in sight.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The PDF, through Typst, with the same heading levels as the HTML.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The deck, with the promoted headings and the repeated heading on the continuation slide.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo-slides.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo-slides.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open them full size: <a href="assets/output/demo.html" target="_blank" rel="noopener noreferrer">HTML</a>, <a href="assets/output/demo.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="assets/output/demo-slides.html" target="_blank" rel="noopener noreferrer">Reveal.js</a>.</p>
 <div class="highlight">
@@ -28641,7 +30087,7 @@ font-style: inherit;">](https://github.com/mcanouil/quarto-extensions-updater)</
 <a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Quarto CLI does not natively track installation sources as of version 1.8.24. See <a href="https://github.com/quarto-dev/quarto-cli/issues/11468">quarto-dev/quarto-cli#11468</a>.↩︎</p></li>
+<li id="fn1"><p>Quarto CLI does not natively track installation sources as of version 1.8.24. See <a href="https://github.com/quarto-dev/quarto-cli/issues/11468"><span><span title="GitHub">quarto-dev/quarto-cli#11468</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" title="GitHub" aria-label="GitHub platform">GitHub</span></span></a>.↩︎</p></li>
 </ol>
 </section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
   author = {CANOUIL, Mickaël},
@@ -29042,8 +30488,8 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 
 <ol>
 <li id="fn1"><p>Whilst Pandoc’s div syntax doesn’t require matching numbers of colons for opening and closing divs (see <a href="https://pandoc.org/MANUAL.html#extension-fenced_divs">Pandoc Manual: Extension fenced_divs</a>), using four colons for opening and three for closing provides clear visual distinction and enables better editor support.↩︎</p></li>
-<li id="fn2"><p>The Quarto extension disables Copilot by default in its configuration (see <a href="https://github.com/quarto-dev/quarto/issues/621">quarto-dev/quarto#621</a> and <a href="https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962">package.json</a>). This explicit enablement is required if you want to use Copilot in your Quarto workflow.↩︎</p></li>
-<li id="fn3"><p>See <a href="https://github.com/quarto-dev/quarto/issues/670">quarto-dev/quarto#670</a> for discussion about native div folding support.↩︎</p></li>
+<li id="fn2"><p>The Quarto extension disables Copilot by default in its configuration (see <a href="https://github.com/quarto-dev/quarto/issues/621"><span><span title="GitHub">quarto-dev/quarto#621</span><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span></a> and <a href="https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962">package.json</a>). This explicit enablement is required if you want to use Copilot in your Quarto workflow.↩︎</p></li>
+<li id="fn3"><p>See <a href="https://github.com/quarto-dev/quarto/issues/670"><span><span title="GitHub">quarto-dev/quarto#670</span><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span></a> for discussion about native div folding support.↩︎</p></li>
 </ol>
 </section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
   author = {CANOUIL, Mickaël},
@@ -30609,364 +32055,6 @@ Building Maintainable and Robust Extensions.
   <guid>https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/</guid>
   <pubDate>Thu, 06 Nov 2025 00:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/featured.png" medium="image" type="image/png" height="81" width="144"/>
-</item>
-<item>
-  <title>Quarto Wizard 1.0.0: Democratising Quarto Extension Management</title>
-  <link>https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/</link>
-  <description><![CDATA[ 
-
-<!--
-@license MIT
-@copyright 2026 Mickaël Canouil
-@author Mickaël Canouil
--->
-Skip to main content
-
-
-
-
-
-<div class="thanks">
-<p>Thank you to the Quarto team for featuring this article on <a href="https://quarto.org/docs/blog/posts/2025-10-20-quarto-wizard-1-0-0/">quarto.org</a>, where it was originally published.</p>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene." width="600"></a></p>
-</figure>
-</div>
-<p>I’m absolutely thrilled to announce <strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 1.0.0</strong>, a groundbreaking extension for Visual Studio Code and Positron that transforms how you interact with the <iconify-icon inline="" icon="simple-icons:quarto" style="color:#74aadb;" aria-label="Quarto icon" title="Quarto icon"></iconify-icon> Quarto ecosystem. If you’ve ever found yourself wrestling with command-line extension management or struggling to discover the perfect template for your project, this tool is about to become your new best friend.</p>
-<div class="highlight">
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 1.0.0</strong> is now available!</p>
-</div>
-<p>Install it today from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>:</p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ul>
-<li><p>Via VS Code or Positron Extensions view:</p>
-<ul>
-<li>Search for “Quarto Wizard”.</li>
-<li>Click “Install”.</li>
-</ul>
-<p><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/extensions-marketplace-dark.png" title="Extensions View: Marketplace" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center" data-group="quarto-wizard-dark" alt="Visual Studio Code Extensions Marketplace showing Quarto Wizard search
-results with install button.
-" width="500"> <img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/extensions-marketplace-light.png" title="Extensions View: Marketplace" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center" data-group="quarto-wizard-light" alt="Visual Studio Code Extensions Marketplace showing Quarto Wizard search
-results with install button.
-" width="500"></p></li>
-</ul>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ul>
-<li><p>Via the command line:</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true" href="">Visual Studio Code</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false" href="">Positron</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" aria-labelledby="tabset-1-1-tab">
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Terminal</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="Terminal" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">code</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--install-extension</span> mcanouil.quarto-wizard</span></code></pre></div></div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Be sure to execute the command <em>Shell Command: Install ‘code’ command in PATH</em> from Visual Studio Code’s Command Palette (<span class="visually-hidden"></span>) if you haven’t done so already.</p>
-</div>
-</div>
-</div>
-<div id="tabset-1-2" class="tab-pane" aria-labelledby="tabset-1-2-tab">
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Terminal</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="Terminal" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">positron</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">--install-extension</span> mcanouil.quarto-wizard</span></code></pre></div></div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Be sure to execute the command <em>Shell Command: Install ‘positron’ command in PATH</em> from Positron’s Command Palette (<span class="visually-hidden"></span>) if you haven’t done so already.</p>
-</div>
-</div>
-</div>
-</div>
-</div></li>
-</ul>
-</div>
-</div>
-</div>
-<p>Quarto has revolutionised scientific and technical publishing by enabling reproducible documents that seamlessly blend code, narrative text, and visualisation. However, one persistent friction point has been managing the rich and ever-growing ecosystem of extensions and templates—until now.</p>
-<section id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206d6574612071756172746f2d77697a617264203e7d7d-quarto-wizard-your-gui-for-quarto-extensions" class="level2">
-<h2 class="anchored" data-anchor-id="b58fc729-690b-4000-b19f-365a4093b2ff7b7b3c206d6574612071756172746f2d77697a617264203e7d7d-quarto-wizard-your-gui-for-quarto-extensions"><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard: Your GUI for Quarto extensions</h2>
-<p>I designed <strong>Quarto Wizard</strong> to address a fundamental challenge I’ve observed in the community: whilst Quarto’s command-line interface is powerful, many users prefer visual interfaces for discovering, installing, and managing extensions.</p>
-<div class="highlight">
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard</strong> makes it simple to <strong>discover</strong>, <strong>install</strong>, and <strong>manage</strong> Quarto extensions and templates directly in your IDE.</p>
-</div>
-<section id="seamless-ide-integration" class="level3">
-<h3 class="anchored" data-anchor-id="seamless-ide-integration">Seamless IDE integration</h3>
-<p><strong>Quarto Wizard integrates beautifully with both the VS Code and Positron ecosystems</strong>, appearing as a dedicated icon in the Activity Bar alongside your other development tools. This provides instant access to extension management without disrupting your coding flow, whether you’re in Microsoft’s VS Code or Posit’s new Positron IDE.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-activity-bar-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-activity-bar-dark.png" title="Quarto Wizard Explorer View (Dark)" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard Extensions Installed panel in Visual Studio Code showing
-no extensions installed message with green Install Extensions button.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-activity-bar-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-activity-bar-light.png" title="Quarto Wizard Explorer View (Light)" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard Extensions Installed panel in Visual Studio Code showing
-no extensions installed message with green Install Extensions button.
-" width="500"></a></p>
-</figure>
-</div>
-<p>The solution is <strong>multi-modal installation</strong>: you can now install extensions through multiple pathways that suit your workflow: from the command line, through the web directory, or via the <strong>Quarto Wizard</strong> GUI in your IDE.</p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row quarto-layout-valign-center">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ol type="1">
-<li>Open the Command Palette (<span class="visually-hidden"></span>).</li>
-<li>Type <code>Quarto Wizard: Install Extensions</code> and select it.</li>
-<li>Browse the list of available Quarto extensions.</li>
-<li>Select the Quarto extension(s) you want to install.</li>
-<li>Answer the prompts to confirm the installation.</li>
-</ol>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-install-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-install-dark.png" title="Quarto Wizard: Install Extensions (Dark)" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard extension selection dialog showing list of available
-extensions with checkboxes including LIVE, HIGHLIGHT TEXT, GITHUB, and
-other Quarto extensions.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-install-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-install-light.png" title="Quarto Wizard: Install Extensions (Light)" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard extension selection dialog showing list of available
-extensions with checkboxes including LIVE, HIGHLIGHT TEXT, GITHUB, and
-other Quarto extensions.
-" width="500"></a></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="intelligent-extension-management" class="level3">
-<h3 class="anchored" data-anchor-id="intelligent-extension-management">Intelligent extension management</h3>
-<p>The <strong>“Recently Installed Extensions”</strong> feature helps track your workflow and easily reproduce project setups across different environments. This is invaluable for researchers collaborating across multiple machines or teaching workshops where consistent setups are essential, regardless of whether team members use VS Code or Positron.</p>
-<p>What makes this particularly powerful is that <strong>Quarto Wizard</strong> tracks which extensions were installed through its interface by adding <code>source</code> metadata to the <code>_extensions.yml</code> file, enabling seamless updates and removals.<sup>1</sup> This source tracking transforms extension maintenance from manual archaeology into an effortless workflow. The extension maintains detailed metadata about installed extensions, enabling batch operations and dependency tracking. The Explorer View provides a comprehensive overview of all installed extensions with visual indicators for updates and management options.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-update-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-update-dark.png" title="Quarto Wizard: Explorer View Update (Dark)" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard Extensions Installed panel showing expanded iconify
-extension details with update button and version information.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-update-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-update-light.png" title="Quarto Wizard: Explorer View Update (Light)" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard Extensions Installed panel showing expanded iconify
-extension details with update button and version information.
-" width="500"></a></p>
-</figure>
-</div>
-</section>
-<section id="template-workflow-simplified" class="level3">
-<h3 class="anchored" data-anchor-id="template-workflow-simplified">Template workflow simplified</h3>
-<p>Beyond extension management, I’ve designed <strong>Quarto Wizard</strong> to ease the process of discovering and using document templates. Once you’ve selected a template, <strong>Quarto Wizard</strong> lets you customise and save the document. The file is not created until you confirm, allowing you to adjust the filename and location.</p>
-<div class="quarto-layout-panel" data-layout-ncol="2">
-<div class="quarto-layout-row quarto-layout-valign-center">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ol type="1">
-<li>Open the Command Palette (<span class="visually-hidden"></span>).</li>
-<li>Type <code>Quarto Wizard: Use Template</code> and select it.</li>
-<li>Browse the list of available Quarto templates.</li>
-<li>Select the Quarto template(s) you want to use.</li>
-<li>Answer the prompts to confirm the selection.</li>
-</ol>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-template-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-template-dark.png" title="Quarto Wizard: Use Template (Dark)" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Visual Studio Code showing Quarto Wizard with installed extensions list
-and document editor displaying invoice template with YAML frontmatter.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/vscode-template-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/vscode-template-light.png" title="Quarto Wizard: Use Template (Light)" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Visual Studio Code showing Quarto Wizard with installed extensions list
-and document editor displaying invoice template with YAML frontmatter.
-" width="500"></a></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="powered-by-a-comprehensive-extension-directory" class="level2">
-<h2 class="anchored" data-anchor-id="powered-by-a-comprehensive-extension-directory">Powered by a comprehensive extension directory</h2>
-<div class="highlight">
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard</strong> transforms tedious extension hunting into <strong>one-click shopping for 250+ powerful document enhancements</strong>.</p>
-</div>
-<section id="a-curated-catalogue-of-250-extensions" class="level3">
-<h3 class="anchored" data-anchor-id="a-curated-catalogue-of-250-extensions">A curated catalogue of 250+ extensions</h3>
-<p>At the heart of <strong>Quarto Wizard</strong> lies the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions directory (m.canouil.dev/quarto-extensions/)</a>, a comprehensive listing I maintain that catalogues extensions from across the entire Quarto ecosystem.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-home-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-home-dark.png" title="Mickaël CANOUIL's Quarto Extensions directory" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website displaying grid of extension cards including
-webr, Reveal.js Clean theme, and Hikmah Academic templates.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-home-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-home-light.png" title="Mickaël CANOUIL's Quarto Extensions directory" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website displaying grid of extension cards including
-webr, Reveal.js Clean theme, and Hikmah Academic templates.
-" width="500"></a></p>
-</figure>
-</div>
-<p>To date, it includes over 250 extensions contributed by the community, covering a vast array of functionalities from citation management to interactive visualisations. This directory powers <strong>Quarto Wizard</strong>’s discovery features, providing rich metadata about each extension including descriptions, licensing, version tags, and GitHub stars. The directory is continuously updated through GitHub’s API, ensuring you always have access to the latest extensions from the community.</p>
-</section>
-<section id="one-click-installation-from-the-web" class="level3">
-<h3 class="anchored" data-anchor-id="one-click-installation-from-the-web">One-click installation from the web</h3>
-<p>What’s particularly exciting is that you can install extensions or use templates <strong>directly from the website itself</strong>. Each extension listed at <a href="https://m.canouil.dev/quarto-extensions/">m.canouil.dev/quarto-extensions/</a> includes multiple installation options: traditional command-line via terminal, or one-click installation through <strong>Quarto Wizard</strong> in VS Code, Positron, or VSCodium. Simply browse the directory, find the extension you need, and choose your preferred installation method. The website generates the appropriate commands or launches your IDE directly. This flexibility means teams with mixed technical backgrounds can all access the same powerful extensions.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-modal-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-modal-dark.png" title="Mickaël CANOUIL's Quarto Extensions install modal" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website with Install Options popup showing manual
-terminal command and Quarto Wizard installation options for Visual
-Studio Code, Positron, and VSCodium.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-modal-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-modal-light.png" title="Mickaël CANOUIL's Quarto Extensions install modal" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website with Install Options popup showing manual
-terminal command and Quarto Wizard installation options for Visual
-Studio Code, Positron, and VSCodium.
-" width="500"></a></p>
-</figure>
-</div>
-<p>For example, you might want to add the <a href="https://github.com/mcanouil/quarto-iconify"><strong>Iconify</strong></a> extension to access over 200,000 open source vector icons in your documents, or the <a href="https://github.com/mcanouil/quarto-animate"><strong>Animate</strong></a> extension to bring your presentations to life with CSS animations. Perhaps the <a href="https://github.com/mcanouil/quarto-spotlight"><strong>Spotlight</strong></a> extension for Reveal.js catches your eye for creating dramatic Reveal.js presentations that highlight your mouse position. All of these extensions (and hundreds more) are just a click away.</p>
-</section>
-<section id="template-discovery-made-easy" class="level3">
-<h3 class="anchored" data-anchor-id="template-discovery-made-easy">Template discovery made easy</h3>
-<p>Additionally, the Quarto Extensions directory excels at <strong>template discovery and deployment</strong> which is enhanced with powerful filtering options: you can sort by recently updated, filter by popularity, browse by categories (<em>i.e.</em>, Shortcodes, Filters, Formats, Projects, Reveal.js Plugins), or search for specific functionality. Each extension clearly indicates whether it’s a template with <strong>“Use”</strong> buttons alongside <strong>“Install”</strong> options.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-template-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-template-dark.png" title="Mickaël CANOUIL's Quarto Extensions list view filtered by formats" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website in list view showing Template extensions with
-install and use buttons.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/quarto-extensions-template-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/assets/media/quarto-extensions-template-light.png" title="Mickaël CANOUIL's Quarto Extensions list view filtered by formats" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="Quarto Extensions website in list view showing Template extensions with
-install and use buttons.
-" width="500"></a></p>
-</figure>
-</div>
-<p>Whether you’re crafting an academic paper using journal-specific formats, creating professional invoices with my <a href="https://github.com/mcanouil/quarto-invoice"><strong>Invoice</strong></a> extension template, or building stunning presentations with themed templates like my <a href="https://github.com/mcanouil/quarto-revealjs-coeos"><strong>Reveal.js Coeos</strong></a> extension, browsing available templates becomes as simple as scrolling through a curated gallery.</p>
-<p>This directory creates a seamless experience: instead of manually searching GitHub repositories or memorising command-line syntax, you can browse hundreds of extensions with detailed information at your fingertips. This transforms extension discovery from a treasure hunt into a curated shopping experience.</p>
-</section>
-</section>
-<section id="addressing-real-workflow-friction" class="level2">
-<h2 class="anchored" data-anchor-id="addressing-real-workflow-friction">Addressing real workflow friction</h2>
-<p>I designed <strong>Quarto Wizard</strong> and the extension directory at <a href="https://m.canouil.dev/quarto-extensions/">m.canouil.dev/quarto-extensions</a> to directly tackle several persistent Quarto pain points I’ve encountered:</p>
-<ul>
-<li><p><strong>Discovery challenges</strong>: Finding relevant extensions in the growing ecosystem becomes intuitive through the visual browser interface powered by the comprehensive extensions directory.</p></li>
-<li><p><strong>Command-line intimidation</strong>: Users who prefer graphical interfaces no longer need to memorise terminal commands.</p></li>
-<li><p><strong>Document setup complexity</strong>: Template-based document initialisation eliminates manual YAML configuration.</p></li>
-<li><p><strong>Extension maintenance</strong>: Updates, removals, and dependency management become point-and-click operations rather than command-line archaeology.</p></li>
-<li><p><strong>Source tracking</strong>: <strong>Quarto Wizard</strong> automatically adds source metadata to installed extensions, enabling future updates and proper version management.</p></li>
-<li><p><strong>Stable installations</strong>: <strong>Quarto Wizard</strong> installs extensions from GitHub releases/tags by default instead of the potentially unstable default branch, ensuring more reliable installations and more replicable environments.</p></li>
-</ul>
-</section>
-<section id="perfect-for-diverse-use-cases" class="level2">
-<h2 class="anchored" data-anchor-id="perfect-for-diverse-use-cases">Perfect for diverse use cases</h2>
-<p>The extension shines across multiple scenarios:</p>
-<ul>
-<li><p><strong>Academic researchers</strong> can quickly install citation management tools, bibliography extensions like <a href="https://github.com/pandoc-ext/multibib"><strong>Multibib</strong></a> or <a href="https://github.com/pandoc-ext/section-bibliographies"><strong>Section Bibliographies</strong></a>, and journal-specific formatting, whether they’re using VS Code or Positron for their analysis work.</p></li>
-<li><p><strong>Data scientists</strong> gain easy access to computational extensions like <a href="https://github.com/coatless/quarto-webr"><strong>WebR</strong></a>, visualisation tools, and interactive notebook capabilities. This is particularly powerful in Positron, which is designed specifically for data science workflows.</p></li>
-<li><p><strong>Technical writers</strong> can browse and install extensions for enhanced typography with for example the <a href="https://github.com/mcanouil/quarto-highlight-text"><strong>Highlight Text</strong></a> extension for multi-format text highlighting, code highlighting, and advanced formatting options of their Reveal.js presentations with <a href="https://github.com/EmilHvitfeldt/quarto-revealjs-editable"><strong>Reveal.js Editable</strong></a> extension in their preferred IDE.</p></li>
-<li><p><strong>Workshop instructors</strong> can ensure all participants have consistent extension setups through guided installation processes, regardless of whether attendees prefer VS Code or Positron.</p></li>
-</ul>
-</section>
-<section id="future-ready-architecture" class="level2">
-<h2 class="anchored" data-anchor-id="future-ready-architecture">Future-ready architecture</h2>
-<p>I’ve built <strong>Quarto Wizard</strong> on robust foundations that ensure long-term reliability. The extension integrates with GitHub’s API through the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions directory</a> for real-time metadata, includes attestation verification for security, and maintains full compatibility with both VS Code and Positron environments.</p>
-<p>The modular architecture allows for future enhancements whilst maintaining backwards compatibility. As the Quarto ecosystem continues expanding and as Positron evolves alongside VS Code, <strong>Quarto Wizard</strong> will support new extension types and project management workflows in both environments.</p>
-</section>
-<section id="getting-started-today" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started-today">Getting started today</h2>
-<p>Begin your <strong>Quarto Wizard</strong> journey by installing the extension from the VS Code marketplace, the Open VSX Registry, or directly through your IDE’s Extensions view. Once installed, the <strong>Quarto Wizard</strong> icon appears in your Activity Bar, providing immediate access to extension management and project tools.</p>
-<p>You have multiple paths to explore Quarto extensions:</p>
-<ol type="1">
-<li><strong>Through Quarto Wizard</strong>: Click the <strong>Quarto Wizard</strong> icon in your IDE’s Activity Bar and browse the integrated catalogue.</li>
-<li><strong>Via the web directory</strong>: Visit <a href="https://m.canouil.dev/quarto-extensions/">m.canouil.dev/quarto-extensions</a> where you can browse all extensions and install them directly from the website. Each extension offers installation buttons for <strong>Quarto Wizard</strong>, VS Code, Positron, VSCodium, or traditional terminal commands.</li>
-<li><strong>Traditional command-line</strong>: Use the familiar <code>quarto add</code> commands if you prefer.</li>
-</ol>
-<div class="highlight">
-<p>Ready to transform your <strong>Quarto workflow</strong>?<br>
-Install <strong>Quarto Wizard</strong> today and discover how <strong>effortless extension management</strong> can be. Your future self will thank you for making <strong>document creation</strong> this <strong>intuitive</strong> and <strong>powerful</strong>.</p>
-</div>
-<p>Try installing your first extension: perhaps <a href="https://github.com/mcanouil/quarto-iconify"><strong>Iconify</strong></a> extension for comprehensive icon support or <a href="https://github.com/mcanouil/quarto-github"><strong>GitHub</strong></a> for seamless GitHub linking. Whether you click “Install” on the website, use <strong>Quarto Wizard</strong>’s interface, or type commands in the terminal, the choice is yours. The difference in experience compared to traditional command-line installation is immediately apparent, especially when browsing the visual catalogue with its filtering options, popularity indicators, and rich metadata.</p>
-<p>I believe <strong>Quarto Wizard</strong> represents a significant step forward in making Quarto’s powerful publishing capabilities accessible to users regardless of their comfort level with command-line tools or their choice of IDE. By providing intuitive visual interfaces for complex operations, <strong>Quarto Wizard</strong> democratises access to the rich Quarto ecosystem whilst maintaining the flexibility and power that makes Quarto exceptional.</p>
-<p>The future of reproducible publishing is here, and it’s more accessible than ever in whichever modern development environment you prefer.</p>
-
-
-</section>
-
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Quarto CLI does not natively track installation sources as of version 1.8.24 (<a href="https://github.com/quarto-dev/quarto-cli/issues/11468">quarto-dev/quarto-cli#11468</a>).↩︎</p></li>
-</ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
-  author = {CANOUIL, Mickaël},
-  title = {Quarto {Wizard} 1.0.0: {Democratising} {Quarto} {Extension}
-    {Management}},
-  date = {2025-10-20},
-  url = {https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/},
-  langid = {en-GB}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2025" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2025-10-20). Quarto Wizard 1.0.0: Democratising Quarto
-Extension Management. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/">https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/</a>
-</div></div></section></div> ]]></description>
-  <category>quarto</category>
-  <category>vscode</category>
-  <category>positron</category>
-  <category>extensions</category>
-  <category>productivity</category>
-  <category>quarto-wizard</category>
-  <guid>https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/</guid>
-  <pubDate>Mon, 20 Oct 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2025-10-20-quarto-wizard-1-0-0/featured.png" medium="image" type="image/png" height="96" width="144"/>
 </item>
 </channel>
 </rss>
