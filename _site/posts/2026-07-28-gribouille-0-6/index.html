@@ -62,27 +62,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -176,6 +156,7 @@ div.csl-indent {
   });
 });</script>
 <script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<link href="../../site_libs/quarto-contrib/quarto-gitlink-1.0.0/gitlink.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -473,7 +454,7 @@ duplicated y-axis on the right carrying marks but no labels.
 <span class="menu-text"><iconify-icon role="img" inline="" icon="fa7-brands:mastodon" aria-label="Mastodon" title="Mastodon"></iconify-icon></span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://github.com/mcanouil" rel="noopener noreferrer" target="_blank"> 
+    <a class="nav-link" href="@mcanouilGitHub" rel="noopener noreferrer" target="_blank"> 
 <span class="menu-text"><iconify-icon role="img" inline="" icon="octicon:mark-github-16" aria-label="GitHub" title="GitHub"></iconify-icon></span></a>
   </li>  
   <li class="nav-item">
@@ -565,7 +546,7 @@ duplicated y-axis on the right carrying marks but no labels.
 
 
 
-<p>Two weeks after 0.5.0, here is <a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0. This one is about the data before the plot and the numbers along the axis. A set of wrangling verbs brings grouped aggregation, reshaping, and joining to the row-store data model, so the preparation stays in the document. Automatic breaks now come from the extended Wilkinson search, which puts ticks on rounder numbers closer to the data, and four <code>breaks-*</code> helpers let you place them yourself. The one thing to watch when you upgrade is the tick theming: <code>tick-length</code> and <code>tick-labels</code> are gone, replaced by a single <code>element-tick</code>.</p>
+<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> 0.6.0 is about the data before the plot, the numbers along the axis, and documentation. A set of wrangling verbs brings grouped aggregation, reshaping, and joining to the row-store data model, so the preparation stays in the document. Automatic breaks now come from the extended Wilkinson search, which puts ticks on rounder numbers closer to the data, and four <code>breaks-*</code> helpers let you place them yourself. The one thing to watch when you upgrade is the tick theming: <code>tick-length</code> and <code>tick-labels</code> are gone, replaced by a single <code>element-tick</code>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Featured card for the Gribouille 0.6.0 release on a cream paper
@@ -646,7 +627,7 @@ labels.
 <p>Their interfaces can change without notice while the design settles, and they may end up in a dedicated Typst data-wrangling package rather than in Gribouille. The plotting API and the native array methods are not affected.</p>
 </div>
 </div>
-<p><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> collapses each group to one row. The grouping is per call, through <code>by:</code>, so there is no grouped state to remember to undo. Each aggregation is a closure that receives the group’s rows and returns one cell, so anything you can compute over the rows is fair game.</p>
+<p><a href="https://m.canouil.dev/gribouille/reference/helpers/summarise.html"><code>summarise()</code></a> collapses each group to one row. The grouping is per call, through <code>by:</code>, so there is no grouped state to remember to undo[^If you are a <code>dplyr</code> user, you know what I am talking about.]. Each aggregation is a closure that receives the group’s rows and returns one cell, so anything you can compute over the rows is fair game.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-1" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">by-class</span> <span class="op">=</span> summarise<span class="op">(</span></span>
 <span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a>  mpg<span class="op">,</span></span>
@@ -809,7 +790,7 @@ labels.
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span class="citation" data-cites="talbot_extension_2010">(<a href="#ref-talbot_extension_2010" role="doc-biblioref">Talbot et al., 2010</a>)</span>, which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>, which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
@@ -918,17 +899,15 @@ labels.
 <section id="under-the-hood" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">5</span> Under the hood</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels. Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them. A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
-<p>The site itself got a pass for legibility. Footer links were painted the page colour in light mode, which made them invisible, and the rule above the footer was 8% black on dark paper, which came to much the same thing. The copy button on a one-line code block hung past its bottom border. The navbar is dark in both colour schemes now, with scheme-aware scrollbars, a skip link, and a visible focus outline, and the tabset panel border no longer vanishes into the dark background. On a narrow screen, opening a navbar menu overlays the page instead of pushing the other items down, and the colour-scheme toggle and the search button sit together at the right edge with the brand centred.</p>
-<p>The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
-<p>One change is worth a line of its own. The stable documentation is now rendered wholly from the release tag, instead of taking its pages from <code>main</code> against a pinned source. Each site documents the API it ships with, which is the point. The trade-off is that a documentation fix reaches the stable site at the next release rather than immediately.</p>
+<p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
 <h2 data-number="7" class="anchored" data-anchor-id="wrap-up"><span class="header-section-number">7</span> Wrap-up</h2>
@@ -964,14 +943,9 @@ labels.
 </div>
 
 
-
 </section>
 
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-talbot_extension_2010" class="csl-entry" role="listitem">
-Talbot, J., Lin, S., &amp; Hanrahan, P. (2010). An <span>Extension</span> of <span>Wilkinson</span>’s <span>Algorithm</span> for <span>Positioning</span> <span>Tick</span> <span>Labels</span> on <span>Axes</span>. <em>IEEE Transactions on Visualization and Computer Graphics</em>, <em>16</em>(6), 1036–1043. <a href="https://doi.org/10.1109/TVCG.2010.130">https://doi.org/10.1109/TVCG.2010.130</a>
-</div>
-</div></section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
   author = {CANOUIL, Mickaël},
   title = {Gribouille 0.6.0: {Wrangling} {Data} and {Breaks} {That}
     {Land} on {Round} {Numbers}},
