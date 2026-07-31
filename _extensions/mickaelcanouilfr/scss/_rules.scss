@@ -609,6 +609,20 @@ img.about-image {
 // NAVIGATION & HEADER
 // ===========================
 
+// Nav links, the theme toggle, and the overlay search button are three separate
+// Quarto components with three different box models (2.5rem / inline / ~28px)
+// and ad-hoc margins.  Pin them to one control box so heights and gaps match.
+$_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
+$_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
+$_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
+$_navbar-control-gap: $_space-xs; // boundary between every pair of navbar controls
+// The magnifier is the one glyph on the bar that does not fill its own box: it
+// draws in 20 units of a 24-unit viewBox, where the theme toggle and the
+// iconify icons paint edge to edge.  Scaling its box by 24/20 is what puts the
+// ink at the icon size rather than the box, and leaves half the difference as
+// slack on either side of the ink, which the search button's padding gives back.
+$_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
+
 // Main navbar styling
 // Background colour is controlled by $navbar-bg (set via brand.yml + metadata).
 // Only custom border and layout overrides remain here.
@@ -630,6 +644,14 @@ img.about-image {
     border-width: 1px 0 0;
   }
 
+  // Quarto reorders the container's children with `order`, so which control
+  // ends up next to which is not the DOM order.  Carrying the boundary spacing
+  // on the container rather than on each control's margin makes every pair pick
+  // up the same gap whatever the order resolves to.
+  .navbar-container {
+    column-gap: $_navbar-control-gap;
+  }
+
   // Collapsed (mobile) menu: lay the icon links out in a compact horizontal
   // row instead of a full-width vertical stack, so each link hugs its icon
   // and the underline and tooltip anchor to the icon rather than the bar.
@@ -637,46 +659,15 @@ img.about-image {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem;
+    gap: $_navbar-control-gap;
     width: auto;
 
     .nav-link {
       width: auto;
-      padding-inline: 0.6rem;
+      padding-inline: $_navbar-control-padding-x;
     }
   }
-}
 
-// Collapsed navbar: Quarto orders the bar as toggler, brand, tools, search and
-// pins the brand's inline margins to 0 !important, so with the search margin
-// cut back to the control gap below, `justify-content: space-between` spreads
-// all four controls across the bar.  Give the brand the auto margins instead:
-// the free space lands either side of it, leaving the toggler left, the brand
-// centred, and the theme toggle and search grouped right.
-// !important is required to beat Quarto's own !important margins.
-@media (max-width: $_breakpoint-lg) {
-  .navbar.navbar-expand-lg .navbar-container>.navbar-brand-container {
-    margin-inline: auto !important;
-  }
-}
-
-// ===========================
-// NAVBAR CONTROL SIZING
-// ===========================
-// Nav links, the theme toggle, and the overlay search button are three separate
-// Quarto components with three different box models (2.5rem / inline / ~28px)
-// and ad-hoc margins.  Pin them to one control box so heights and gaps match.
-$_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
-$_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
-$_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
-$_navbar-control-gap: 0.4rem; // boundary between navbar-right controls
-// The magnifier is the one glyph on the bar that does not fill its own box: it
-// draws in 20 units of a 24-unit viewBox, where the theme toggle and the
-// iconify icons paint edge to edge.  Scaling its box by 24/20 is what puts the
-// ink at the icon size rather than the box.
-$_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
-
-.navbar {
   // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
   // height of its own and sits on a different baseline to the nav links.
   .quarto-navbar-tools {
@@ -695,21 +686,23 @@ $_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
 
   // Overlay search renders a detached <button>; Quarto pins it to a 40px box
   // with a 26px icon, both larger than every other navbar control, and gives it
-  // an `auto` left margin when collapsed.  Replace that margin with the control
-  // gap so the search keeps a small space from the theme toggle at every width.
+  // an `auto` left margin when collapsed and a 0.25rem one when expanded.  Drop
+  // both: the container's column-gap is what spaces the search at every width.
   #quarto-search.type-overlay {
-    margin-left: $_navbar-control-gap;
+    margin-left: 0;
 
     .aa-Autocomplete {
       width: auto;
     }
 
+    // The icon box is wider than its ink, so the padding gives that slack back
+    // and the magnifier's ink, not its box, sits on the control rhythm.
     .aa-DetachedSearchButton {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       height: $_navbar-control-height;
-      padding-inline: $_navbar-control-padding-x;
+      padding-inline: $_navbar-control-padding-x - ($_navbar-search-icon-size - $_navbar-control-icon-size) * 0.5;
     }
 
     // The glyph sits in a block wrapper whose height is a line box, so it is
@@ -732,6 +725,19 @@ $_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
       width: $_navbar-search-icon-size;
       height: $_navbar-search-icon-size;
     }
+  }
+}
+
+// Collapsed navbar: Quarto orders the bar as toggler, brand, tools, search and
+// pins the brand's inline margins to 0 !important, so with the search's `auto`
+// margin dropped below, `justify-content: space-between` spreads all four
+// controls across the bar.  Give the brand the auto margins instead:
+// the free space lands either side of it, leaving the toggler left, the brand
+// centred, and the theme toggle and search grouped right.
+// !important is required to beat Quarto's own !important margins.
+@media (max-width: $_breakpoint-lg) {
+  .navbar.navbar-expand-lg .navbar-container>.navbar-brand-container {
+    margin-inline: auto !important;
   }
 }
 
