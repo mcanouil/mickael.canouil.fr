@@ -670,6 +670,11 @@ $_navbar-control-height: 2.5rem; // .nav-link: 1.5em line + 2 * 0.5rem padding
 $_navbar-control-padding-x: 0.6rem; // .navbar-expand-lg .navbar-nav .nav-link
 $_navbar-control-icon-size: 1rem; // .bi::before and the iconify nav icons
 $_navbar-control-gap: 0.4rem; // boundary between navbar-right controls
+// The magnifier is the one glyph on the bar that does not fill its own box: it
+// draws in 20 units of a 24-unit viewBox, where the theme toggle and the
+// iconify icons paint edge to edge.  Scaling its box by 24/20 is what puts the
+// ink at the icon size rather than the box.
+$_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
 
 .navbar {
   // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
@@ -707,12 +712,25 @@ $_navbar-control-gap: 0.4rem; // boundary between navbar-right controls
       padding-inline: $_navbar-control-padding-x;
     }
 
+    // The glyph sits in a block wrapper whose height is a line box, so it is
+    // taller than the icon and splits the leftover unevenly around it, dropping
+    // the glyph off the button's centre.  Collapse the wrapper onto the icon.
+    .aa-DetachedSearchButtonIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: auto;
+      line-height: 1;
+    }
+
     // `.aa-Autocomplete` is in the selector to match the specificity of
-    // Quarto's own 26px rule, which would otherwise win.
+    // Quarto's own 26px rule, which would otherwise win.  `display: block`
+    // drops the inline baseline gap under the glyph.
     .aa-Autocomplete .aa-DetachedSearchButtonIcon svg,
     .aa-Autocomplete svg.aa-SubmitIcon {
-      width: $_navbar-control-icon-size;
-      height: $_navbar-control-icon-size;
+      display: block;
+      width: $_navbar-search-icon-size;
+      height: $_navbar-search-icon-size;
     }
   }
 }
