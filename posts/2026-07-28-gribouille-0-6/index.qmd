@@ -250,7 +250,8 @@ The [Wrangling data](https://m.canouil.dev/gribouille/guides/wrangle.html) guide
 
 Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range.
 It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for.
-0.6.0 replaces it with the extended Wilkinson search [@talbot_extension_2010], which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target.
+0.6.0 replaces it with the extended Wilkinson search [@talbot_extension_2010].
+It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target.
 There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.
 
 The same search is available as [`breaks-extended(n:)`](https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html) when you want a different tick count.
@@ -293,7 +294,8 @@ The closure is called with the values the scale trained on, once per panel, and 
 3. The tick labels are formatted by `format-comma()`, unrelated to where the ticks sit. `breaks-pretty(n:)` is the fourth helper, for round positions at a target count.
 
 A closure and an explicit array of breaks are not treated the same way, and the difference matters.
-An explicit array widens the axis so every requested tick stays visible, while closure breaks are clipped to the trained domain, since the closure has seen the data and cannot ask for anything outside it.
+An explicit array widens the axis so every requested tick stays visible.
+Closure breaks are clipped to the trained domain instead, since the closure has seen the data and cannot ask for anything outside it.
 
 A related fix landed with them.
 A scale trained on whole numbers only, such as years or counts, now keeps whole automatic breaks, so a narrow range like 2020 to 2023 no longer labels half-steps.
@@ -340,7 +342,8 @@ They are one record now.
 4. Tick labels live in `axis-text`, so hiding them per side is the usual `element-blank()`, and the width they reserved goes back to the panel.
 
 Minor marks follow the same record through `axis-ticks-minor`.
-The sub-decade ticks that [`guide-axis-logticks()`](https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html) adds on a log axis used to be hardcoded at half length in the major stroke; they are themable now, and they inherit the major record, so the default look is unchanged.
+The sub-decade ticks that [`guide-axis-logticks()`](https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html) adds on a log axis used to be hardcoded at half length in the major stroke.
+They are themable now, and they inherit the major record, so the default look is unchanged.
 
 ::: {.highlight}
 
@@ -348,7 +351,7 @@ The sub-decade ticks that [`guide-axis-logticks()`](https://m.canouil.dev/gribou
 
 :::
 
-## Under the hood
+## Label Alignment Fix
 
 The usual share of fixes rides along.
 

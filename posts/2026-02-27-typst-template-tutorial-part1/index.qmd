@@ -90,7 +90,7 @@ And when multiple team members contribute to documents, stylistic drift is inevi
 
 ::: {.highlight}
 
-**Reproducible branding** through code eliminates manual styling errors and ensures every document reflects your organisation's identity automatically.
+**Reproducible branding** through code eliminates manual styling errors, so every document reflects your organisation's identity.
 
 :::
 
@@ -98,12 +98,12 @@ This is where programmatic document styling becomes valuable.
 
 Typst offers a modern, programmable alternative to LaTeX for PDF generation.
 Its syntax is cleaner, compilation is faster, and its scripting capabilities make complex layouts achievable without the arcane incantations that LaTeX often requires.
-When paired with Quarto's publishing ecosystem, Typst becomes a powerful foundation for branded document production.
+When paired with Quarto's publishing ecosystem, Typst becomes a foundation for branded document production.
 
 ## Prior Art: Getting Started with Typst and Quarto
 
 Before covering advanced techniques, a few excellent foundational resources deserve a mention.
-David Keyes wrote a comprehensive introduction to using Typst with Quarto at [R for the Rest of Us](https://rfortherestofus.com/2025/11/quarto-typst-pdf).
+David Keyes wrote an introduction to using Typst with Quarto at [R for the Rest of Us](https://rfortherestofus.com/2025/11/quarto-typst-pdf).
 If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.
 
 This tutorial builds upon that foundation.
@@ -355,7 +355,7 @@ Next, let us add colour support with predefined semantic colours:
 }
 ```
 
-1. Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from `_brand.yml` (Quarto's brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see @nte-brand-lua).
+1. Here, colours are hard-coded for simplicity. In a production extension you could retrieve them from `_brand.yml` (Quarto's brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see @nte-brand-lua).
 
 Now users can specify `colour: "success"` and get a green badge.
 The `mode` parameter selects light or dark colour palettes.
@@ -407,7 +407,7 @@ The Lua filter checks if a span has the `badge` class, extracts its content and 
 The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings.
 Typst syntax distinguishes strings (`"hello"`), numbers (`42`), and keywords (`none`, `true`); passing the wrong form produces a syntax error.
 The `wrapper.lua` module includes a minimal `typst_value` helper that handles these common cases: string pass-through for Typst keywords (`"none"`, `"true"`, `"false"`), passing Lua numbers as bare values (so `42` becomes `42` in Typst, not `"42"`), and wrapping everything else in quotes.
-[Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) replaces this with a more robust implementation that also handles actual Lua booleans, `nil`, and Typst measurement units like `1em` or `2.5pt`.
+[Part 2](/posts/2026-03-05-typst-template-tutorial-part2/) replaces this with an implementation that also handles actual Lua booleans, `nil`, and Typst measurement units like `1em` or `2.5pt`.
 
 This handler also does not escape Typst special characters in `content`.
 Badge labels containing `[`, `]`, or `#` would produce broken Typst syntax because Typst interprets those characters as markup inside `[...]` content blocks.
@@ -465,7 +465,7 @@ Quarto also exposes a `quarto.brand` Lua module that lets filters query `_brand.
 - `quarto.brand.has_mode(mode)`: returns `true` if the document has a brand definition for the given mode (`"light"` or `"dark"`).
 - `quarto.brand.get_color(mode, name)`: returns a brand colour by name in the output format (_e.g._, `quarto.brand.get_color("light", "primary")`).
 - `quarto.brand.get_color_css(mode, name)`: returns the colour in CSS format.
-- `quarto.brand.get_typography(mode, name)`: returns a table of typography options (family, size, weight, etc.) for the given element.
+- `quarto.brand.get_typography(mode, name)`: returns a table of typography options such as family, size, and weight for the given element.
 - `quarto.brand.get_logo(mode, name)`: returns logo resource paths and alt text.
 
 This approach is useful when you need brand values _inside_ the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code.
@@ -497,7 +497,7 @@ This panel contains **rich content** including:
 
 Pandoc parses this into a Div element with:
 
-- **`div.content`**: An array of block elements (paragraphs, lists, etc.).
+- **`div.content`**: An array of block elements, such as paragraphs and lists.
 - **`div.classes`**: A list of classes (["panel"]).
 - **`div.attributes`**: A table of key-value pairs.
 
@@ -697,7 +697,7 @@ The `breakable: false` default prevents panels from splitting across pages, avoi
 
 ### The Panel Wrapper: Injecting the Colour Scheme
 
-Unlike badges, where the Lua handler passes `effective-brand-mode` directly to `simple-badge`, panels need a richer colour dictionary.
+Unlike badges, where the Lua filter passes `effective-brand-mode` directly to `simple-badge`, panels need a richer colour dictionary.
 The `render-panel` function accepts a `colours` parameter that the Lua filter cannot populate at parse time.
 A wrapper function in `typst-show.typ` bridges this gap:
 
@@ -712,9 +712,9 @@ A wrapper function in `typst-show.typ` bridges this gap:
 ```
 
 1. Injects the full colour dictionary resolved from `effective-brand-mode` at render time.
-2. Forwards all other named arguments (`title`, `style`, etc.) unchanged.
+2. Forwards all other named arguments, such as `title` and `style`, unchanged.
 
-The Lua handler generates `#my-panel(style: "info")[...]`, and at render time `my-panel` resolves the colour scheme before delegating to `render-panel`.
+The Lua filter generates `#my-panel(style: "info")[...]`, and at render time `my-panel` resolves the colour scheme before delegating to `render-panel`.
 
 ::: {.highlight}
 

@@ -62,7 +62,7 @@ Until now, producing a figure inside a Typst document meant taking a detour thro
 You would leave Typst to call out to `ggplot2`, [`matplotlib`](https://matplotlib.org), or [`plotnine`](https://plotnine.org), save a PNG or SVG, and import it back.
 That works, but it splits the toolchain in two: one font system on the page, another inside the figure; one colour palette in the report, another in the chart; one render pass that knows about the layout, another that does not.
 
-`cetz` already gives Typst a robust low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing.
+`cetz` already gives Typst a low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing.
 That is exactly the gap Gribouille fills.
 
 ::: {.highlight}
@@ -72,7 +72,8 @@ That is exactly the gap Gribouille fills.
 :::
 
 The pay-off is a single toolchain.
-Give a plot an `alt:` description and Gribouille wraps the result in a Typst `figure` element with `kind: "gribouille-plot"`, so you can attach show rules, captions, or cross-references in one place; with or without it, every plot shares the document's fonts, palette, and geometry.
+Give a plot an `alt:` description and Gribouille wraps the result in a Typst `figure` element with `kind: "gribouille-plot"`, so you can attach show rules, captions, or cross-references in one place.
+Every plot shares the document's fonts, palette, and geometry, whether or not you add that description.
 The YAML front-matter of this very post wires its `background:` and `foreground:` to the site's light and dark colours, and every figure below reacts automatically when you toggle the theme.
 Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.
 
@@ -532,7 +533,7 @@ A rendered plot is ordinary Typst content, so the base [`grid`](https://typst.ap
 
 ## Drive Gribouille from any computation
 
-`Typst Render` 0.13.1 adds a small but powerful helper called `typst_define()`, available from both R and Python.
+`Typst Render` 0.13.1 adds a small helper called `typst_define()`, available from both R and Python.
 It lets a code cell hand any value to every `{typst}` block in the document under a single Typst dictionary named `typst_define`.
 A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.
 

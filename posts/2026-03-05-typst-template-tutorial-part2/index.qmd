@@ -62,7 +62,7 @@ Read [Part 1](/posts/2026-02-27-typst-template-tutorial-part1/) first for the fo
 - **Handler factories**: eliminate boilerplate by generating handlers with a closure-captured configuration flag.
 - **Configuration system**: let users extend the extension with their own class-to-function mappings via document metadata.
 - **Type-safe value conversion**: `typst_value` maps Lua types to correct Typst syntax (strings, numbers, keywords, units).
-- **WCAG-compliant badges**: iterative contrast adjustment ensures accessible colour combinations.
+- **WCAG-compliant badges**: iterative contrast adjustment produces accessible colour combinations.
 - **Shortcodes**: explicit syntax for components without a natural markdown representation.
 
 ::: {style="text-align: center;"}
@@ -95,7 +95,7 @@ This tutorial builds on those foundations with advanced patterns for production-
 Part 1 used `filter.lua` as the filter filename in its conceptual examples.
 Part 2 uses `typst-markdown.lua`, which is the production filename used in the downloadable extension.
 The role is identical: it is the Pandoc filter entrypoint that loads shared modules and registers the `Div` and `Span` handlers.
-When building your own extension, you can choose any descriptive name; just ensure it matches the filename declared under `filters:` in `_extension.yml`.
+When building your own extension, you can choose any descriptive name, as long as it matches the filename declared under `filters:` in `_extension.yml`.
 
 :::
 
@@ -283,7 +283,7 @@ for _, class in ipairs(span.classes) do -- <1>
 end
 ```
 
-1. Spans can carry multiple classes (e.g., `[text]{.badge .highlight}`); `span.classes` preserves declaration order (left to right as written in the markdown), so iterating finds the first mapped class and `return` exits immediately, ensuring only one handler fires per span.
+1. Spans can carry multiple classes, for example `[text]{.badge .highlight}`. `span.classes` preserves declaration order, left to right as written in the markdown, so iterating finds the first mapped class. `return` exits immediately, so only one handler fires per span.
 2. Span content is flattened to plain text; inline elements cannot preserve nested structure the way block divs can.
 3. Build the attribute string from any key-value pairs on the span (e.g., `colour="success"` becomes `colour: "success"`).
 4. If attributes are present, generate `#wrapper(attr: value)[content]`; otherwise use the shorter `#wrapper[content]` form.
@@ -293,7 +293,7 @@ end
 
 When building a new component, consider:
 
-- **No handler (default)**: Simple wrapper around content; just add a mapping in document YAML.
+- **No handler (default)**: Simple wrapper around content; add a mapping in document YAML.
 - **`create_wrapped_handler(true)`**: Wraps content and extracts title from first heading (e.g., panels with titles).
 - **`create_wrapped_handler(false)`**: Wraps content without title extraction (e.g., simple content wrappers).
 - **Custom handler**: Complex data extraction from nested elements (e.g., quote cards with author attribution).
@@ -356,7 +356,8 @@ extensions:
 1. User mappings live under the `extensions.typst-markdown` namespace.
 2. Simple format: class name maps directly to a Typst function name.
 3. Detailed format: allows setting `arguments: true` to always generate a parameter list.
-Both `function:` and `wrapper:` are accepted as the key name in the detailed format and are true aliases; `wrapper:` matches the internal Lua variable name, whilst `function:` is more descriptive in a YAML context, so `function:` is preferred.
+Both `function:` and `wrapper:` are accepted as the key name in the detailed format, and are true aliases.
+`wrapper:` matches the internal Lua variable name, whilst `function:` is more descriptive in a YAML context, so `function:` is preferred.
 Use either the simple or detailed format for each class; they are not combined: a class entry is either a bare string or an object, not both.
 
 ::: {.callout-important}
@@ -386,7 +387,7 @@ Comparing both implementations is useful for understanding which parts are patte
 ### Loading User Configuration
 
 The configuration module parses user settings from metadata.
-Two helpers keep the logic simple and robust:
+Two helpers keep the logic simple:
 
 - `meta_get(...)` reads metadata maps safely, whether keys are plain strings or Pandoc metadata objects.
 - `parse_mapping(...)` normalises both supported user formats into one internal shape (`{wrapper=..., arguments=...}`).
@@ -428,7 +429,7 @@ end
 ```
 
 1. Simple string mapping: `my-callout: my-custom-callout`.
-2. Detailed mapping: both `function` and `wrapper` are accepted as the key name, normalised to `wrapper` internally; `arguments = arg_value and ... or false` is the Lua ternary idiom (`condition and x or y`) since Lua has no `?:` operator, and the value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.
+2. Detailed mapping: both `function` and `wrapper` are accepted as the key name, normalised to `wrapper` internally. `arguments = arg_value and ... or false` is the Lua ternary idiom (`condition and x or y`) since Lua has no `?:` operator. The value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.
 3. Fallback: Pandoc may wrap a plain string in a metadata object; `stringify` unwraps it.
 
 ### Merging Configurations

@@ -40,7 +40,8 @@ metadata-files:
 [Gribouille](https://github.com/mcanouil/gribouille) shipped its [first version](../2026-05-20-gribouille-grammar-of-graphics-for-typst/index.qmd) a fortnight ago.
 This is the first feature update: 0.2.0 landed first, and 0.2.1 followed shortly after with `align-panels` and two more fixes, so this post covers the 0.2 update as a whole.
 It has two faces.
-On the surface, [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) learned to number, nest, title, share a legend across panels, and line those panels up across the grid, `facet-grid()` got free scales, and labels and guides became easier to control.
+On the surface, [`compose()`](https://m.canouil.dev/gribouille/reference/core/compose.html) learned to number, nest, title, share a legend across panels, and line those panels up across the grid.
+`facet-grid()` got free scales, and labels and guides became easier to control.
 Underneath, most of the time went into the internals, turning a long list of panics into clear errors and correct output.
 
 Every figure in this post is a real, freshly compiled plot.
@@ -119,7 +120,8 @@ A per-depth `tag-levels` array then continues the numbering down the tree, givin
 :::
 
 The 0.2.1 release adds one more control and tidies the tags.
-By default each panel keeps its own margins, so when one panel carries wide axis labels and another narrow ones, their plot areas start at different offsets and never quite line up.
+By default each panel keeps its own margins.
+When one panel carries wide axis labels and another panel carries narrow ones, their plot areas start at different offsets and never quite line up.
 `align-panels: true` shares the margins grid-wise, left and right per column, top and bottom per row, so the data areas align across the grid the way `patchwork` and `cowplot` do.
 The panel tags also reserve their own band now, sitting above each panel instead of overlapping the data.
 
@@ -256,7 +258,8 @@ The list above is the visible part.
 The larger share of this release is a pass over the internals, and it is the kind of work that does not show up in a screenshot.
 
 A whole class of inputs that used to crash the compile now behaves.
-A `geom-col()` on a continuous axis with a single distinct value, an empty `values` array in a `scale-*-manual()`, a non-positive `bins`, a sparse contour grid, or `width: auto` on an unbounded page: each of these used to panic, and each now either draws or reports a clear, actionable error.
+A `geom-col()` on a continuous axis with a single distinct value, an empty `values` array in a `scale-*-manual()`, a non-positive `bins`, a sparse contour grid, or `width: auto` on an unbounded page: each of these used to panic.
+Each now either draws or reports a clear, actionable error.
 
 ::: {.highlight}
 
@@ -268,7 +271,8 @@ A second group is about getting the right answer rather than not crashing.
 
 - `after-scale` and `stage` channels now train on the marker's source column, so grouped geoms such as [`geom-smooth()`](https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html), and [`geom-errorbar()`](https://m.canouil.dev/gribouille/reference/geoms/geom-errorbar.html) or [`geom-rug()`](https://m.canouil.dev/gribouille/reference/geoms/geom-rug.html), resolve a mapped colour instead of panicking.
 - [`coord-cartesian(xlim:, ylim:)`](https://m.canouil.dev/gribouille/reference/coord/coord-cartesian.html) zooms the axes instead of being ignored, and [`coord-flip(reverse: true)`](https://m.canouil.dev/gribouille/reference/coord/coord-flip.html) keeps a `log10` or `sqrt` transform.
-- A column mapped to both a positional and a grouping aesthetic, for example `aes(x: "species", fill: "species")`, now resolves the grouping across aggregating stats instead of drawing every mark in the ink colour with an empty guide.
+- A column mapped to both a positional and a grouping aesthetic, for example `aes(x: "species", fill: "species")`, now resolves the grouping across aggregating stats.
+Previously it drew every mark in the ink colour with an empty guide.
 - Number formatters round correctly, so `0.9999995` no longer renders as `0.1`, and continuous scales honour an explicit `breaks`.
 - [`geom-segment()`](https://m.canouil.dev/gribouille/reference/geoms/geom-segment.html), [`geom-curve()`](https://m.canouil.dev/gribouille/reference/geoms/geom-curve.html), [`geom-ribbon()`](https://m.canouil.dev/gribouille/reference/geoms/geom-ribbon.html), and [`geom-area()`](https://m.canouil.dev/gribouille/reference/geoms/geom-area.html) draw on a discrete scale instead of silently rendering nothing (0.2.1).
 

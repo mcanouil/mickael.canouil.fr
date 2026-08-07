@@ -87,7 +87,7 @@ There is no single right way to achieve branded outputs in R and Python.
 The [`brand.yml`](https://posit-dev.github.io/brand-yml/) project provides dedicated [R](https://posit-dev.github.io/brand-yml/pkg/r/) and [Python](https://posit-dev.github.io/brand-yml/pkg/py/) packages that read a `_brand.yml` file directly and are the recommended starting point for most projects.
 At the time of writing, however, the `brand.yml` packages do not support font registration for graphics devices.
 You could also write your own wrappers, hard-code a shared palette, or use any other strategy that suits your workflow.
-This post demonstrates one particular approach: reading the resolved brand data from `QUARTO_EXECUTE_INFO` at render time, making it independent of external packages and portable across languages, with full font registration support.
+This post demonstrates one particular approach: reading the resolved brand configuration from `QUARTO_EXECUTE_INFO` at render time, making it independent of external packages and portable across languages, with full font registration support.
 
 :::
 
@@ -96,7 +96,7 @@ This post demonstrates one particular approach: reading the resolved brand data 
 When Quarto renders a document, it sets the `QUARTO_EXECUTE_INFO` environment variable for every code cell.
 This variable points to a JSON file containing document metadata, format settings, and, crucially, the resolved brand configuration.
 
-The brand data lives at `format.render.brand` in the JSON, with separate entries for each colour mode (`light`, `dark`).
+The brand configuration lives at `format.render.brand` in the JSON, with separate entries for each colour mode (`light`, `dark`).
 Reading it requires only a JSON parser.
 
 ::: {.panel-tabset group="language"}
@@ -164,7 +164,7 @@ print(json.dumps(info["format"]["render"]["brand"], indent=2))
 
 ## Brand Data Structure
 
-The brand object under `format.render.brand` contains one entry per colour mode.
+The brand configuration under `format.render.brand` contains one entry per colour mode.
 Each mode holds a `data` object with colour and typography definitions.
 
 ```{.json}
@@ -359,7 +359,8 @@ def configure_brand_fonts() -> None:
 ## SVG Font Rendering
 
 When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly.
-An SVG file referenced via an `<img>` tag is treated as an isolated document by the browser: it cannot access the page's stylesheets or `@import` rules, so any `@font-face` declarations inside the SVG that reference external URLs are silently ignored.
+An SVG file referenced via an `<img>` tag is treated as an isolated document by the browser.
+It cannot access the page's stylesheets or `@import` rules, so any `@font-face` declarations inside the SVG that reference external URLs are silently ignored.
 Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.
 
 The companion repository includes an `inline-svglite.lua` Lua filter that replaces `<img>` references with raw SVG content automatically.
@@ -369,7 +370,7 @@ See the [companion repository](https://github.com/mcanouil/demo-quarto-brand-ren
 
 ## Branded Figures
 
-The `theme_brand()` function extracts colours and fonts from the brand data and builds a complete `ggplot2` or plotnine theme.
+The `theme_brand()` function extracts colours and fonts from the brand configuration and builds a complete `ggplot2` or plotnine theme.
 The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor.
 In R, the latest `ggplot2` supports `ink`, `paper`, and `accent` parameters directly in `theme_minimal()`; in Python, each theme element is styled individually.
 
@@ -645,7 +646,7 @@ def gt_brand(data, brand_mode: str = "light") -> GT:
 
 ## Light and Dark Mode
 
-Quarto supports light and dark colour modes, and the brand data includes separate colour definitions for each.
+Quarto supports light and dark colour modes, and the brand configuration includes separate colour definitions for each.
 The helper functions accept a `brand_mode` parameter to select which variant to use.
 
 For figures, Quarto's `renderings` cell option generates both variants from a single code cell.
@@ -687,7 +688,7 @@ The full workflow boils down to four steps:
 4. Use `renderings: [light, dark]` on figure cells and `.light-content`/`.dark-content` divs on tables so the reader's theme preference is respected automatically.
 
 That is the entire pattern.
-Every helper reads from the same `QUARTO_EXECUTE_INFO` source, so switching to a different brand configuration is just a matter of changing your `_brand.yml` file; no code changes are needed.
+Every helper reads from the same `QUARTO_EXECUTE_INFO` source, so switching to a different brand configuration is a matter of changing your `_brand.yml` file; no code changes are needed.
 
 ## Conclusion
 
