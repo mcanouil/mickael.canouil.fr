@@ -84,9 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-25f3d5f6080a1edec9881e46bd49ff46.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3eaea302994036fec77a3919495d4f04.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-70060e4394e3e00794d00073ec4e9086.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-3eaea302994036fec77a3919495d4f04.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-63ced7a67e2786f2dfc1158220657c84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-f8a6942225c26825e01e9559b7bc0083.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-63ced7a67e2786f2dfc1158220657c84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
@@ -1312,27 +1312,50 @@ Markers, and a Finer Grid. <em>Mickael.canouil.fr</em>. <a href="https://mickael
 <script id="mc-email" type="text/javascript">
   /**
    * Restore the `mailto:` links that `filters/email-obfuscation.lua` encoded,
-   * so the address never appears in the served HTML. Decoding happens on the
-   * first interaction as well as on load, so a link works even if this runs
-   * late.
+   * so the address never appears in the served HTML.
+   *
+   * Two encodings are handled. Links from the document body carry the payload
+   * in `data-mc-email`, written by the filter. Links of the `about` block carry
+   * it in the href itself, as `#mc-email-<base64>`: Quarto builds that block
+   * from document metadata before the Lua pipeline runs, so no filter can reach
+   * it and no attribute other than `href` survives.
    *
    * @license MIT
    * @copyright 2026 Mickaël Canouil
    * @author Mickaël Canouil
    */
   (function () {
+    const HREF_MARKER = "#mc-email-";
+
+    const apply = (link, payload) => {
+      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
+      if (!address) return false;
+      link.setAttribute("href", "mailto:" + address);
+      link.classList.add("mc-email--ready");
+      return true;
+    };
+
+    // The attribute is the only copy of the address, so it is dropped only once
+    // it has been used. Discarding it on a failed decode would leave the link
+    // permanently dead rather than merely unrestored.
     const restore = (link) => {
       const payload = link.getAttribute("data-mc-email");
       if (!payload) return;
-      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
-      if (!address) return;
-      link.setAttribute("href", "mailto:" + address);
-      link.removeAttribute("data-mc-email");
-      link.classList.add("mc-email--ready");
+      if (apply(link, payload)) link.removeAttribute("data-mc-email");
+    };
+
+    // Quarto rewrites a same-page href to a site-relative one, so the marker is
+    // matched anywhere in the value rather than at the start.
+    const restoreFromHref = (link) => {
+      const href = link.getAttribute("href") || "";
+      const start = href.indexOf(HREF_MARKER);
+      if (start === -1) return;
+      apply(link, href.slice(start + HREF_MARKER.length));
     };
 
     const restoreAll = () => {
       window.document.querySelectorAll("a.mc-email[data-mc-email]").forEach(restore);
+      window.document.querySelectorAll('a[href*="' + HREF_MARKER + '"]').forEach(restoreFromHref);
     };
 
     window.document.addEventListener("DOMContentLoaded", restoreAll);
@@ -1456,6 +1479,173 @@ Markers, and a Finer Grid. <em>Mickael.canouil.fr</em>. <a href="https://mickael
     if (headers.length > 0) {
       setActive(headers[0].id);
     }
+  });
+</script>
+<script id="section-rail" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!document.body.classList.contains("home-page")) return;
+
+    const sections = Array.from(document.querySelectorAll(".about-body section.level2[id]"));
+    if (sections.length === 0) return;
+
+    const list = document.createElement("ul");
+    const anchors = new Map();
+
+    sections.forEach((section) => {
+      const heading = section.querySelector("h2");
+      if (!heading) return;
+
+      const icon = heading.querySelector("iconify-icon");
+      const label = Array.from(heading.childNodes)
+        .filter((node) => node !== icon)
+        .map((node) => node.textContent)
+        .join("")
+        .trim();
+      if (label === "") return;
+
+      const link = document.createElement("a");
+      link.className = "mc-section-rail__link";
+      link.setAttribute("href", `#${section.id}`);
+
+      // Built fresh rather than cloned, so the rail carries only the icon name
+      // and never inherits whatever accessibility attributes a heading icon
+      // happens to have; the whole mark is hidden and the label names the link.
+      const mark = document.createElement("span");
+      mark.className = "mc-section-rail__mark";
+      mark.setAttribute("aria-hidden", "true");
+      const iconName = icon?.getAttribute("icon");
+      if (iconName) {
+        const railIcon = document.createElement("iconify-icon");
+        railIcon.setAttribute("icon", iconName);
+        mark.appendChild(railIcon);
+      }
+      link.appendChild(mark);
+
+      const text = document.createElement("span");
+      text.className = "mc-section-rail__label";
+      text.textContent = label;
+      link.appendChild(text);
+
+      const item = document.createElement("li");
+      item.appendChild(link);
+      list.appendChild(item);
+      anchors.set(section.id, link);
+    });
+
+    if (anchors.size === 0) return;
+
+    const nav = document.createElement("nav");
+    nav.id = "mc-section-rail";
+    nav.className = "mc-section-rail";
+    nav.setAttribute("aria-label", "Page sections");
+    nav.appendChild(list);
+
+    // Placed before `main` so the tab order matches what the reader sees: the
+    // rail is painted at the top right, and appending to `body` would put it
+    // behind the whole page and the footer. It is `position: fixed`, so where
+    // it sits in the DOM does not move it.
+    const main = document.querySelector("main");
+    if (main && main.parentNode) {
+      main.parentNode.insertBefore(nav, main);
+    } else {
+      document.body.appendChild(nav);
+    }
+
+    // Bring the active link into view on whichever axis the list happens to
+    // scroll: sideways in the bottom dock, and downwards in the vertical rail
+    // on a window too short for even the smallest height tier. Scrolling the
+    // list itself rather than calling `scrollIntoView` keeps the page where the
+    // reader left it, and the jump is deliberately instant: the rail retargets
+    // on every section scrolled past, and animating each one reads as fidgeting.
+    // Offsets are measured against the nav, so the list's own offset comes off.
+    const revealActive = (link) => {
+      if (list.scrollWidth > list.clientWidth + 1) {
+        list.scrollLeft =
+          link.offsetLeft - list.offsetLeft + link.offsetWidth / 2 - list.clientWidth / 2;
+      }
+      if (list.scrollHeight > list.clientHeight + 1) {
+        list.scrollTop =
+          link.offsetTop - list.offsetTop + link.offsetHeight / 2 - list.clientHeight / 2;
+      }
+    };
+
+    let activeId = null;
+    const setActive = (targetId) => {
+      if (activeId === targetId) return;
+      const previous = anchors.get(activeId);
+      if (previous) {
+        previous.classList.remove("active");
+        previous.removeAttribute("aria-current");
+      }
+      const current = anchors.get(targetId);
+      if (current) {
+        current.classList.add("active");
+        current.setAttribute("aria-current", "true");
+        revealActive(current);
+      }
+      activeId = targetId;
+    };
+
+    const tracked = sections.filter((section) => anchors.has(section.id));
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible.length > 0) {
+            setActive(visible[0].target.id);
+          }
+        },
+        { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      );
+      tracked.forEach((section) => observer.observe(section));
+
+      // The footer is not fixed, so it scrolls up under the rail at the end of
+      // the page, and shares its ink background. Retreat while it is in view.
+      const footer = document.querySelector("footer.footer");
+      if (footer) {
+        // Hiding the rail while it holds focus would drop the reader back to
+        // the top of the tab order, so the tuck waits for focus to leave. The
+        // observer only fires on a crossing, so that deferred tuck has to be
+        // re-applied on the way out; `focusout` is the only other trigger.
+        let footerVisible = false;
+        const syncTuck = () => {
+          if (footerVisible && nav.contains(document.activeElement)) return;
+          nav.classList.toggle("mc-section-rail--tucked", footerVisible);
+          // `visibility` only flips once the transition ends, so for 300ms the
+          // fading rail is still tabbable and focus landing on it is dropped
+          // when it finally hides. `inert` withdraws it at once.
+          nav.inert = footerVisible;
+        };
+
+        const footerObserver = new IntersectionObserver(
+          (entries) => {
+            footerVisible = entries[entries.length - 1].isIntersecting;
+            syncTuck();
+          },
+          { threshold: 0 },
+        );
+        footerObserver.observe(footer);
+
+        nav.addEventListener("focusout", (event) => {
+          if (!nav.contains(event.relatedTarget)) syncTuck();
+        });
+      }
+    }
+
+    // Seed from the fragment when the reader arrives on a deep link, so the
+    // rail does not announce the first section while they are somewhere else.
+    // Compared raw: the ids are Pandoc slugs, and `decodeURIComponent` throws
+    // on a malformed escape such as `#100%`, which would abort the whole setup.
+    const landed = window.location.hash.slice(1);
+    setActive(anchors.has(landed) ? landed : tracked[0].id);
   });
 </script>
 <script id="ordinal-dates" type="text/javascript">
