@@ -611,14 +611,14 @@ logo appears in the top right.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>There is no single right way to achieve branded outputs in R and Python. The <a href="https://posit-dev.github.io/brand-yml/"><code>brand.yml</code></a> project provides dedicated <a href="https://posit-dev.github.io/brand-yml/pkg/r/">R</a> and <a href="https://posit-dev.github.io/brand-yml/pkg/py/">Python</a> packages that read a <code>_brand.yml</code> file directly and are the recommended starting point for most projects. At the time of writing, however, the <code>brand.yml</code> packages do not support font registration for graphics devices. You could also write your own wrappers, hard-code a shared palette, or use any other strategy that suits your workflow. This post demonstrates one particular approach: reading the resolved brand data from <code>QUARTO_EXECUTE_INFO</code> at render time, making it independent of external packages and portable across languages, with full font registration support.</p>
+<p>There is no single right way to achieve branded outputs in R and Python. The <a href="https://posit-dev.github.io/brand-yml/"><code>brand.yml</code></a> project provides dedicated <a href="https://posit-dev.github.io/brand-yml/pkg/r/">R</a> and <a href="https://posit-dev.github.io/brand-yml/pkg/py/">Python</a> packages that read a <code>_brand.yml</code> file directly and are the recommended starting point for most projects. At the time of writing, however, the <code>brand.yml</code> packages do not support font registration for graphics devices. You could also write your own wrappers, hard-code a shared palette, or use any other strategy that suits your workflow. This post demonstrates one particular approach: reading the resolved brand configuration from <code>QUARTO_EXECUTE_INFO</code> at render time, making it independent of external packages and portable across languages, with full font registration support.</p>
 </div>
 </div>
 </section>
 <section id="the-quarto_execute_info-approach" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-quarto_execute_info-approach"><span class="header-section-number">2</span> The <code>QUARTO_EXECUTE_INFO</code> Approach</h2>
 <p>When Quarto renders a document, it sets the <code>QUARTO_EXECUTE_INFO</code> environment variable for every code cell. This variable points to a JSON file containing document metadata, format settings, and, crucially, the resolved brand configuration.</p>
-<p>The brand data lives at <code>format.render.brand</code> in the JSON, with separate entries for each colour mode (<code>light</code>, <code>dark</code>). Reading it requires only a JSON parser.</p>
+<p>The brand configuration lives at <code>format.render.brand</code> in the JSON, with separate entries for each colour mode (<code>light</code>, <code>dark</code>). Reading it requires only a JSON parser.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
@@ -694,7 +694,7 @@ logo appears in the top right.
 </section>
 <section id="brand-data-structure" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="brand-data-structure"><span class="header-section-number">3</span> Brand Data Structure</h2>
-<p>The brand object under <code>format.render.brand</code> contains one entry per colour mode. Each mode holds a <code>data</code> object with colour and typography definitions.</p>
+<p>The brand configuration under <code>format.render.brand</code> contains one entry per colour mode. Each mode holds a <code>data</code> object with colour and typography definitions.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="json"><pre class="sourceCode json cw-auto code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"light"</span><span class="fu">:</span> <span class="fu">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"data"</span><span class="fu">:</span> <span class="fu">{</span></span>
@@ -907,14 +907,14 @@ Figure&nbsp;2: Python workflow for branded figures and tables.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser: it cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
+<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser. It cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
 <p>The companion repository includes an <code>inline-svglite.lua</code> Lua filter that replaces <code>&lt;img&gt;</code> references with raw SVG content automatically. See the <a href="https://github.com/mcanouil/demo-quarto-brand-renderings">companion repository</a> for the full implementation.</p>
 </div>
 </div>
 </section>
 <section id="branded-figures" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="branded-figures"><span class="header-section-number">6</span> Branded Figures</h2>
-<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand data and builds a complete <code>ggplot2</code> or plotnine theme. The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor. In R, the latest <code>ggplot2</code> supports <code>ink</code>, <code>paper</code>, and <code>accent</code> parameters directly in <code>theme_minimal()</code>; in Python, each theme element is styled individually.</p>
+<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand configuration and builds a complete <code>ggplot2</code> or plotnine theme. The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor. In R, the latest <code>ggplot2</code> supports <code>ink</code>, <code>paper</code>, and <code>accent</code> parameters directly in <code>theme_minimal()</code>; in Python, each theme element is styled individually.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href=""><iconify-icon role="img" inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href=""><iconify-icon role="img" inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
@@ -1234,7 +1234,7 @@ Note
 </section>
 <section id="light-and-dark-mode" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="light-and-dark-mode"><span class="header-section-number">8</span> Light and Dark Mode</h2>
-<p>Quarto supports light and dark colour modes, and the brand data includes separate colour definitions for each. The helper functions accept a <code>brand_mode</code> parameter to select which variant to use.</p>
+<p>Quarto supports light and dark colour modes, and the brand configuration includes separate colour definitions for each. The helper functions accept a <code>brand_mode</code> parameter to select which variant to use.</p>
 <p>For figures, Quarto’s <code>renderings</code> cell option generates both variants from a single code cell.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="default"><pre class="sourceCode default cw-auto code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>#| renderings: [light, dark]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The code loops over both modes and prints each plot. Quarto then displays the correct one based on the reader’s selected theme.</p>
@@ -1269,7 +1269,7 @@ Note
 <li>Pass your data through <code>gt_brand(data, brand_mode = ...)</code> for every <code>gt</code> or <code>great_tables</code> table.</li>
 <li>Use <code>renderings: [light, dark]</code> on figure cells and <code>.light-content</code>/<code>.dark-content</code> divs on tables so the reader’s theme preference is respected automatically.</li>
 </ol>
-<p>That is the entire pattern. Every helper reads from the same <code>QUARTO_EXECUTE_INFO</code> source, so switching to a different brand configuration is just a matter of changing your <code>_brand.yml</code> file; no code changes are needed.</p>
+<p>That is the entire pattern. Every helper reads from the same <code>QUARTO_EXECUTE_INFO</code> source, so switching to a different brand configuration is a matter of changing your <code>_brand.yml</code> file; no code changes are needed.</p>
 </section>
 <section id="conclusion" class="level2" data-number="10">
 <h2 data-number="10" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">10</span> Conclusion</h2>

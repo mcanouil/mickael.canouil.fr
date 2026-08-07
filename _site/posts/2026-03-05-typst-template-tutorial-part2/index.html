@@ -624,7 +624,7 @@ snippets and gradient orbs in blue and teal.
 <li><strong>Handler factories</strong>: eliminate boilerplate by generating handlers with a closure-captured configuration flag.</li>
 <li><strong>Configuration system</strong>: let users extend the extension with their own class-to-function mappings via document metadata.</li>
 <li><strong>Type-safe value conversion</strong>: <code>typst_value</code> maps Lua types to correct Typst syntax (strings, numbers, keywords, units).</li>
-<li><strong>WCAG-compliant badges</strong>: iterative contrast adjustment ensures accessible colour combinations.</li>
+<li><strong>WCAG-compliant badges</strong>: iterative contrast adjustment produces accessible colour combinations.</li>
 <li><strong>Shortcodes</strong>: explicit syntax for components without a natural markdown representation.</li>
 </ul>
 <div style="text-align: center;">
@@ -652,7 +652,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Part 1 used <code>filter.lua</code> as the filter filename in its conceptual examples. Part 2 uses <code>typst-markdown.lua</code>, which is the production filename used in the downloadable extension. The role is identical: it is the Pandoc filter entrypoint that loads shared modules and registers the <code>Div</code> and <code>Span</code> handlers. When building your own extension, you can choose any descriptive name; just ensure it matches the filename declared under <code>filters:</code> in <code>_extension.yml</code>.</p>
+<p>Part 1 used <code>filter.lua</code> as the filter filename in its conceptual examples. Part 2 uses <code>typst-markdown.lua</code>, which is the production filename used in the downloadable extension. The role is identical: it is the Pandoc filter entrypoint that loads shared modules and registers the <code>Div</code> and <code>Span</code> handlers. When building your own extension, you can choose any descriptive name, as long as it matches the filename declared under <code>filters:</code> in <code>_extension.yml</code>.</p>
 </div>
 </div>
 <p>To keep the article and downloadable zip perfectly aligned, source-backed code blocks below show the full file content from the assets bundle. Each section highlights the exact functions to focus on, so you can scan purposefully instead of reading every line top-to-bottom.</p>
@@ -697,7 +697,7 @@ Note
 <span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">No title extraction; every new wrapped component repeats this same structure.</span>
 </dd>
 </dl>
-<p>The only thing that varies is the <code>extract_title</code> flag. A factory function captures that variation in a <a href="https://www.lua.org/pil/6.1.html">closure</a>, eliminating the repetition entirely. A closure is a function that remembers variables from the scope where it was created. When <code>create_wrapped_handler(true)</code> returns a new function, that function carries <code>should_extract_title = true</code> inside it, so every call to the returned handler automatically uses the correct flag without it needing to be passed again. This is necessary because the filter loop (shown below in “Using Factories”) calls each handler as <code>DIV_FACTORY_HANDLERS[class](div, class_config)</code>, passing only the div element and the class config; the flag is never passed. By baking the flag into the closure at declaration time, each entry in <code>DIV_FACTORY_HANDLERS</code> becomes a self-contained handler with no extra parameters to manage.</p>
+<p>The only thing that varies is the <code>extract_title</code> flag. A factory function captures that variation in a <a href="https://www.lua.org/pil/6.1.html">closure</a>, eliminating the repetition entirely. A closure is a function that remembers variables from the scope where it was created. When <code>create_wrapped_handler(true)</code> returns a new function, that function carries <code>should_extract_title = true</code> inside it. Every call to the returned handler then uses the correct flag automatically, without passing it again. This is necessary because the filter loop (shown below in “Using Factories”) calls each handler as <code>DIV_FACTORY_HANDLERS[class](div, class_config)</code>, passing only the div element and the class config. The flag itself is never passed. By baking the flag into the closure at declaration time, each entry in <code>DIV_FACTORY_HANDLERS</code> becomes a self-contained handler with no extra parameters to manage.</p>
 <section id="the-factory-pattern" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="the-factory-pattern"><span class="header-section-number">2.1</span> The Factory Pattern</h3>
 <p>In this file, focus on <code>create_wrapped_handler</code> and how it forwards to <code>build_wrapped_content</code>; the rest are shared helpers used by multiple components.</p>
@@ -870,7 +870,7 @@ Note
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="1" data-code-annotation="1">Spans can carry multiple classes (e.g., <code>[text]{.badge .highlight}</code>); <code>span.classes</code> preserves declaration order (left to right as written in the markdown), so iterating finds the first mapped class and <code>return</code> exits immediately, ensuring only one handler fires per span.</span>
+<span data-code-cell="annotated-cell-5" data-code-lines="1" data-code-annotation="1">Spans can carry multiple classes, for example <code>[text]{.badge .highlight}</code>. <code>span.classes</code> preserves declaration order, left to right as written in the markdown, so iterating finds the first mapped class. <code>return</code> exits immediately, so only one handler fires per span.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
 <dd>
@@ -894,7 +894,7 @@ Note
 <h3 data-number="2.4" class="anchored" data-anchor-id="choosing-your-approach"><span class="header-section-number">2.4</span> Choosing Your Approach</h3>
 <p>When building a new component, consider:</p>
 <ul>
-<li><strong>No handler (default)</strong>: Simple wrapper around content; just add a mapping in document YAML.</li>
+<li><strong>No handler (default)</strong>: Simple wrapper around content; add a mapping in document YAML.</li>
 <li><strong><code>create_wrapped_handler(true)</code></strong>: Wraps content and extracts title from first heading (e.g., panels with titles).</li>
 <li><strong><code>create_wrapped_handler(false)</code></strong>: Wraps content without title extraction (e.g., simple content wrappers).</li>
 <li><strong>Custom handler</strong>: Complex data extraction from nested elements (e.g., quote cards with author attribution).</li>
@@ -904,7 +904,7 @@ Note
 </section>
 <section id="sec-config" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="sec-config"><span class="header-section-number">3</span> The Configuration System</h2>
-<p>A key design goal for reusable extensions is extensibility. Users should be able to add their own components or override built-in ones without modifying the extension’s source code. The <a href="https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua">configuration system</a> enables this through metadata-driven element mappings.</p>
+<p>A key design goal for reusable extensions is extensibility. Users can add their own components or override built-in ones without modifying the extension’s source code. The <a href="https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua">configuration system</a> enables this through metadata-driven element mappings.</p>
 <section id="built-in-mappings" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="built-in-mappings"><span class="header-section-number">3.1</span> Built-in Mappings</h3>
 <p>The extension defines default mappings for all its components. <code>get_builtin_mappings()</code> is the canonical baseline before any user metadata overrides are merged.</p>
@@ -973,7 +973,7 @@ Note
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="7" data-code-annotation="3">Detailed format: allows setting <code>arguments: true</code> to always generate a parameter list. Both <code>function:</code> and <code>wrapper:</code> are accepted as the key name in the detailed format and are true aliases; <code>wrapper:</code> matches the internal Lua variable name, whilst <code>function:</code> is more descriptive in a YAML context, so <code>function:</code> is preferred. Use either the simple or detailed format for each class; they are not combined: a class entry is either a bare string or an object, not both.</span>
+<span data-code-cell="annotated-cell-7" data-code-lines="7" data-code-annotation="3">Detailed format: allows setting <code>arguments: true</code> to always generate a parameter list. Both <code>function:</code> and <code>wrapper:</code> are accepted as the key name in the detailed format, and are true aliases. <code>wrapper:</code> matches the internal Lua variable name, whilst <code>function:</code> is more descriptive in a YAML context, so <code>function:</code> is preferred. Use either the simple or detailed format for each class; they are not combined: a class entry is either a bare string or an object, not both.</span>
 </dd>
 </dl>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -1016,7 +1016,7 @@ Note
 </section>
 <section id="loading-user-configuration" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="loading-user-configuration"><span class="header-section-number">3.3</span> Loading User Configuration</h3>
-<p>The configuration module parses user settings from metadata. Two helpers keep the logic simple and robust:</p>
+<p>The configuration module parses user settings from metadata. Two helpers keep the logic simple:</p>
 <ul>
 <li><code>meta_get(...)</code> reads metadata maps safely, whether keys are plain strings or Pandoc metadata objects.</li>
 <li><code>parse_mapping(...)</code> normalises both supported user formats into one internal shape (<code>{wrapper=..., arguments=...}</code>).</li>
@@ -1066,7 +1066,7 @@ Note
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="17" data-code-annotation="2">Detailed mapping: both <code>function</code> and <code>wrapper</code> are accepted as the key name, normalised to <code>wrapper</code> internally; <code>arguments = arg_value and ... or false</code> is the Lua ternary idiom (<code>condition and x or y</code>) since Lua has no <code>?:</code> operator, and the value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="17" data-code-annotation="2">Detailed mapping: both <code>function</code> and <code>wrapper</code> are accepted as the key name, normalised to <code>wrapper</code> internally. <code>arguments = arg_value and ... or false</code> is the Lua ternary idiom (<code>condition and x or y</code>) since Lua has no <code>?:</code> operator. The value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
 <dd>

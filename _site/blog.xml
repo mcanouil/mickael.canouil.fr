@@ -948,7 +948,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>, which scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -1163,7 +1163,7 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 </div>
-<p>A closure and an explicit array of breaks are not treated the same way, and the difference matters. An explicit array widens the axis so every requested tick stays visible, while closure breaks are clipped to the trained domain, since the closure has seen the data and cannot ask for anything outside it.</p>
+<p>A closure and an explicit array of breaks are not treated the same way, and the difference matters. An explicit array widens the axis so every requested tick stays visible. Closure breaks are clipped to the trained domain instead, since the closure has seen the data and cannot ask for anything outside it.</p>
 <p>A related fix landed with them. A scale trained on whole numbers only, such as years or counts, now keeps whole automatic breaks, so a narrow range like 2020 to 2023 no longer labels half-steps.</p>
 </section>
 <section id="ticks-in-one-element" class="level2" data-number="4">
@@ -1389,20 +1389,20 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 </div>
-<p>Minor marks follow the same record through <code>axis-ticks-minor</code>. The sub-decade ticks that <a href="https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html"><code>guide-axis-logticks()</code></a> adds on a log axis used to be hardcoded at half length in the major stroke; they are themable now, and they inherit the major record, so the default look is unchanged.</p>
+<p>Minor marks follow the same record through <code>axis-ticks-minor</code>. The sub-decade ticks that <a href="https://m.canouil.dev/gribouille/reference/guides/guide-axis-logticks.html"><code>guide-axis-logticks()</code></a> adds on a log axis used to be hardcoded at half length in the major stroke. They are themable now, and they inherit the major record, so the default look is unchanged.</p>
 <div class="highlight">
 <p><strong>One record, one switch:</strong> <code>element-tick</code> holds the colour, the stroke, and the length, and <code>axis-ticks: element-blank()</code> turns the marks off without reserving any depth.</p>
 </div>
 </section>
-<section id="under-the-hood" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">5</span> Under the hood</h2>
+<section id="label-alignment-fix" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -1639,7 +1639,7 @@ font-style: inherit;"> prism</span></span></code></pre></div></div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="markdown" style="background: #f1f3f5;"><pre class="sourceCode markdown cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb7-1">::: {revealjs:style="font-size: 2em;" html:style="font-size: 1.2rem;"}</span>
 <span id="cb7-2">Same paragraph, two sizes.</span>
 <span id="cb7-3">:::</span></code></pre></div></div>
-<p>It works on divs, spans, code blocks, and headings. The format name is matched exactly against the Quarto target format, which includes custom formats. Under a custom <code>mcanouil-typst</code> format, only <code>mcanouil-typst:</code> matches, not <code>typst:</code>, and the built-in PDF format is targeted with <code>pdf:</code>, since that is the format name Quarto requests, not the writer it happens to use underneath.</p>
+<p>It works on divs, spans, code blocks, and headings. The format name is matched exactly against the Quarto target format, which includes custom formats. Under a custom <code>mcanouil-typst</code> format, only <code>mcanouil-typst:</code> matches, not <code>typst:</code>. The built-in PDF format is targeted with <code>pdf:</code>, since that is the format name Quarto requests, not the writer it happens to use underneath.</p>
 <p>Two prefixes save repetition. <code>slide:</code> covers every HTML slide format, and <code>default:</code> provides a fallback used only when nothing more specific matched.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="markdown" style="background: #f1f3f5;"><pre class="sourceCode markdown cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb8-1">::: {default:style="color: gray;" html:style="color: crimson;"}</span>
 <span id="cb8-2">Crimson in HTML, gray everywhere else.</span>
@@ -2027,15 +2027,15 @@ font-style: inherit;">|</span></span>
 <p>Here are the three outputs, rendered from that one file.</p>
 <p>The HTML handout, with the headings at their written levels and no slide break in sight.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The PDF, through Typst, with the same heading levels as the HTML.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The deck, with the promoted headings and the repeated heading on the continuation slide.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo-slides.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo-slides.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open them full size: <a href="assets/output/demo.html" target="_blank" rel="noopener noreferrer">HTML</a>, <a href="assets/output/demo.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="assets/output/demo-slides.html" target="_blank" rel="noopener noreferrer">Reveal.js</a>.</p>
 <div class="highlight">
@@ -5555,13 +5555,13 @@ font-style: inherit;">/plugin</span> marketplace add mcanouil/gribouille</span>
 background-color: null;
 font-style: inherit;">/plugin</span> install gribouille@gribouille</span></code></pre></div></div>
 </section>
-<section id="under-the-hood" class="level2" data-number="12">
-<h2 data-number="12" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">12</span> Under the hood</h2>
+<section id="stricter-errors-and-rendering-fixes" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="stricter-errors-and-rendering-fixes"><span class="header-section-number">12</span> Stricter Errors and Rendering Fixes</h2>
 <p>As always, a good share of the release is fixes rather than features.</p>
 <div class="highlight">
 <p><strong>Errors fail loudly now:</strong> an unknown aesthetic, theme key, stat, or column stops with a clear message instead of a misleading plot.</p>
 </div>
-<p>The biggest is stricter validation. An unknown <code>aes()</code> channel, such as the US spelling <code>color</code>, now fails with the list of valid channels instead of drawing an empty plot. <code>theme()</code> rejects a misspelled element key, an unknown <code>stat</code> or scale <code>transform</code> fails with a clear message rather than rendering as identity, and mapping an aesthetic to a missing column names the column and lists the ones that exist.</p>
+<p>The biggest is stricter validation. An unknown <code>aes()</code> aesthetic, such as the US spelling <code>color</code>, now fails with the list of valid aesthetics instead of drawing an empty plot. <code>theme()</code> rejects a misspelled element key, an unknown <code>stat</code> or scale <code>transform</code> fails with a clear message rather than rendering as identity, and mapping an aesthetic to a missing column names the column and lists the ones that exist.</p>
 <p>Two rendering fixes are worth calling out. Abutting opaque fills, such as tiles, hexes, and stacked bars, are now stroked with their own fill colour, which removes the hairline seams that antialiasing used to bleed through between them. And <code>stat-quantile</code> drops its cubic pair enumeration for an exact <code>O(n^2 log n)</code> search, so <code>geom-quantile</code> scales to thousands of rows.</p>
 <p>Facets and compositions also gain spacing control. <code>facet-wrap</code> and <code>facet-grid</code> take a <code>gutter</code> argument, and a new <code>theme(panel-spacing:)</code> default sets the gap for both axes at once (a length, or a <code>(x:, y:)</code> dictionary); <code>compose</code>’s <code>gutter</code> now accepts the same dictionary form.</p>
 </section>
@@ -6095,7 +6095,7 @@ Skip to main content
 
 
 
-<p>My recent posts have all been about Quarto and Typst. This one is different: it is about R (<em>yet, still a bit about Quarto too</em>). My day job is to conduct statistical analysis of omics data, and most of it is spent writing R code through packages, Shiny apps, scripts, things used by everyone from data scientists to clinicians who never open a terminal. This post is about the package shape I settled on in my most recent projects, where the analysis logic, the interactive app, and the report all need to share the same code.</p>
+<p>My recent posts have all been about Quarto and Typst. This one is different: it is about R (<em>yet, still a bit about Quarto too</em>). My day job is to conduct statistical analysis of omics data, and most of it is spent writing R code through packages, Shiny apps, and scripts. These are used by everyone from data scientists to clinicians who never open a terminal. This post is about the package shape I settled on in my most recent projects, where the analysis logic, the interactive app, and the report all need to share the same code.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-07-01-r-package-shiny-quarto/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Dark card on a navy background. Bold white text reads &quot;R Package
@@ -7042,7 +7042,7 @@ Figure&nbsp;2: Data flows in one direction through shared reactive state. Module
 </figcaption>
 </figure>
 </div>
-<p>Inside <code>mod_analysis</code>, the call is simply:</p>
+<p>Inside <code>mod_analysis</code>, the call is:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>R/mod_analysis.R</strong></pre>
@@ -8015,7 +8015,7 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 </section>
 <section id="filter-pin-and-auto-bounds" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filter-pin-and-auto-bounds"><span class="header-section-number">6</span> Filter, pin, and auto bounds</h2>
-<p>A few smaller changes make everyday plotting shorter. The bundled datasets are plain row-store arrays now, so you can <code>filter</code> and <code>map</code> them in place before they reach <code>plot()</code>. Any aesthetic can be pinned as a constant straight on a geom. And a scale <code>limit</code> or <code>expand</code> accepts <code>auto</code> on one side, keeping the trained value for the other.</p>
+<p>A few smaller changes make everyday plotting shorter. The bundled datasets are plain row-store arrays now, so you can <code>filter</code> and <code>map</code> them in place before they reach <code>plot()</code>. Any aesthetic can be pinned as a constant straight on a geom. And a scale <code>limits</code> or <code>expand</code> accepts <code>auto</code> on one side, keeping the trained value for the other.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -11064,8 +11064,8 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
 <p>The full, unedited source is in the repository under <a href="https://github.com/mcanouil/gribouille/tree/main/.github/star-history"><code>.github/star-history/</code></a>.</p>
 </section>
-<section id="under-the-hood" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">8</span> Under the hood</h2>
+<section id="theme-position-and-scale-fixes" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="theme-position-and-scale-fixes"><span class="header-section-number">8</span> Theme, Position, and Scale Fixes</h2>
 <p>As with every release, a good share of the work is fixes rather than features.</p>
 <p>The theme cascade is the largest of them. Setting the base <code>line</code> or <code>rect</code> stroke in <code>theme()</code> now reaches every line and rect surface: the panel grid, axis lines, ticks, and legend marks. Setting the base <code>text</code> size cascades to every text surface in the same way. On top of that, <code>element-line</code>, <code>element-rect</code>, and <code>element-text</code> accept a ratio such as <code>80%</code> to scale a single surface against its parent, while an absolute length still pins one outright.</p>
 <p>A second group lines up marks and positions.</p>
@@ -11075,7 +11075,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </ul>
 <p>A third group cleans up scales and presets.</p>
 <ul>
-<li>Explicit continuous <code>breaks</code> expand the axis range so the requested ticks stay visible, unless a side is pinned by an explicit <code>limit</code>.</li>
+<li>Explicit continuous <code>breaks</code> expand the axis range so the requested ticks stay visible, unless a side is pinned by explicit <code>limits</code>.</li>
 <li><code>theme-grey()</code> now matches ggplot2’s <code>theme_grey()</code>, with white gridlines and no axis lines.</li>
 </ul>
 <div class="highlight">
@@ -12157,7 +12157,7 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="annotations-can-overflow" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="annotations-can-overflow"><span class="header-section-number">5</span> Annotations can overflow</h2>
 <p><code>annotate()</code> gains a <code>clip</code> argument. The default is <code>true</code>, which preserves the existing behaviour: marks outside the panel are clipped. Set <code>clip: false</code> and the mark is drawn even if it sits past the axis limits.</p>
-<p>This is useful for corner insets, labels anchored outside the data range, or decorations that belong in the margin. A paired fix ensures that an <code>annotate(clip: false)</code> placed outside the scale <code>limits</code> actually draws. Before 0.3.0, the out-of-range pre-pass silently dropped it.</p>
+<p>This is useful for corner insets, labels anchored outside the data range, or decorations that belong in the margin. A paired fix means an <code>annotate(clip: false)</code> placed outside the scale <code>limits</code> now draws correctly. Before 0.3.0, the out-of-range pre-pass silently dropped it.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-6" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-6-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -12303,8 +12303,8 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 </dd>
 </dl>
 </section>
-<section id="under-the-hood" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">6</span> Under the hood</h2>
+<section id="legend-and-scale-fixes" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="legend-and-scale-fixes"><span class="header-section-number">6</span> Legend and Scale Fixes</h2>
 <p>As with 0.2, a large share of the release is fixes rather than features. Legend layout was the main focus.</p>
 <ul>
 <li>Horizontal legends with centred or right <code>align</code> now centre or right-justify the key graphic under the title, instead of leaving it pinned to the left while the title moved.</li>
@@ -12476,7 +12476,7 @@ Figure&nbsp;1: Monthly contributions to <code>quarto-dev/quarto-cli</code> from 
 </div>
 </div>
 </div>
-<p>The defaults are also less surprising. Format options live under a single <code>format:</code> key, so an HTML and a PDF variant of the same document sit side by side instead of fighting each other. Even the format names are more intuitive: <code>html</code>, <code>pdf</code>, <code>revealjs</code>, <code>website</code>, and <code>book</code> are easier to remember than the R Markdown equivalents (<em>also way less typing</em>), and they are consistent across formats, so I do not have to remember that <code>html_document</code> is for HTML but <code>pdf_document</code> is for PDF. A project/directory-level <code>_metadata.yml</code> sets shared options once, and conditional content with <code>{.content-visible when-format="html"}</code> reads far more clearly than the output checks I used to scatter through R Markdown code cells. None of this is magic, it is just less surprising, and after years of small surprises that matters.</p>
+<p>The defaults are also less surprising. Format options live under a single <code>format:</code> key, so an HTML and a PDF variant of the same document sit side by side instead of fighting each other. Even the format names are more intuitive: <code>html</code>, <code>pdf</code>, <code>revealjs</code>, <code>website</code>, and <code>book</code> are easier to remember than the R Markdown equivalents (<em>also way less typing</em>). They are consistent across formats too, so I do not have to remember that <code>html_document</code> is for HTML but <code>pdf_document</code> is for PDF. A project/directory-level <code>_metadata.yml</code> sets shared options once, and conditional content with <code>{.content-visible when-format="html"}</code> reads far more clearly than the output checks I used to scatter through R Markdown code cells. None of this is magic, it is less surprising, and after years of small surprises that matters.</p>
 <p>Multi-language support is also native in Quarto. I move between R and Python in the same workflow, even if not yet in the same document (<em>I have strong hopes for <strong>Quarto 2</strong> ongoing developments</em>).</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -12491,7 +12491,7 @@ Note
 <p>R and Python still live in separate documents within a project, not in one shared session. For my work that boundary has never been a real problem. When both languages were needed, I relied on <code>reticulate</code> to call Python from R.</p>
 </div>
 </div>
-<p>The look and feel out of the box is, in my opinion, simply better, especially for HTML. And because R is no longer mandatory, writing notes or plain prose is a first-class use case, not an afterthought. That is also what makes Quarto easy to recommend: I have helped colleagues and clients move from R and <code>bookdown</code>, without asking them to change how they think.</p>
+<p>The look and feel by default is, in my opinion, better, especially for HTML. And because R is no longer mandatory, writing notes or plain prose is a first-class use case, not an afterthought. That is also what makes Quarto easy to recommend: I have helped colleagues and clients move from R and <code>bookdown</code>, without asking them to change how they think.</p>
 </section>
 <section id="building-my-own" class="level2">
 <h2 class="anchored" data-anchor-id="building-my-own">Building My Own</h2>
@@ -12520,12 +12520,12 @@ Note
 <section id="then-came-typst" class="level2">
 <h2 class="anchored" data-anchor-id="then-came-typst">Then Came Typst</h2>
 <p>Building all of this kept pulling me toward one format in particular, and that format is Typst. It has become my most recent rabbit hole, both standalone with <code>typst compile</code> and through Quarto’s native <code>typst</code> output. For PDF it is a genuine step up from LaTeX: compilation is fast, the programming model is readable, and layout control is far more direct. I no longer dread a page that needs precise placement.</p>
-<p>Out of that work came <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">Gribouille</a>, a grammar of graphics written in pure Typst, so I can draw a plot where the document is compiled rather than importing a rendered image. The chart above (Figure&nbsp;1), the one tracing my time on <code>quarto-cli</code>, is one of its outputs. The non-obvious lesson, for me, was how little I missed LaTeX once the small frictions were gone. The other was that Typst’s documentation is remarkably easy to search: the model is consistent enough that the right page turns up before I have finished typing the query. My tutorials on building Typst templates for Quarto (<a href="../../posts/2026-02-27-typst-template-tutorial-part1/index.html">Part 1</a> and <a href="../../posts/2026-03-05-typst-template-tutorial-part2/index.html">Part 2</a>) document those experiments, from <a href="../../posts/2026-01-19-typst-document-dispatcher/index.html">document dispatching</a> to <a href="../../posts/2026-06-03-gribouille-0-2/index.html">the Gribouille releases</a>, and most recently <a href="../../posts/2026-05-28-typst-linkedin-carousels/index.html">building LinkedIn carousels with Typst</a>, which showed that the same source-to-output loop works for social content as well as technical documents.</p>
+<p>Out of that work came <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">Gribouille</a>, a grammar of graphics written in pure Typst, so I can draw a plot where the document is compiled rather than importing a rendered image. The chart above (Figure&nbsp;1), the one tracing my time on <code>quarto-cli</code>, is one of its outputs. The non-obvious lesson, for me, was how little I missed LaTeX once the small frictions were gone. The other was that Typst’s documentation is remarkably easy to search: the model is consistent enough that the right page turns up before I have finished typing the query. My tutorials on building Typst templates for Quarto (<a href="../../posts/2026-02-27-typst-template-tutorial-part1/index.html">Part 1</a> and <a href="../../posts/2026-03-05-typst-template-tutorial-part2/index.html">Part 2</a>) document those experiments, from <a href="../../posts/2026-01-19-typst-document-dispatcher/index.html">document dispatching</a> to <a href="../../posts/2026-06-03-gribouille-0-2/index.html">the Gribouille releases</a>. Most recently, <a href="../../posts/2026-05-28-typst-linkedin-carousels/index.html">building LinkedIn carousels with Typst</a> showed that the same source-to-output loop works for social content as well as technical documents.</p>
 </section>
 <section id="four-years-on" class="level2">
 <h2 class="anchored" data-anchor-id="four-years-on">Four Years On</h2>
 <p>Quarto stuck for a plain reason: it stopped getting in my way. What began as answering other people’s questions turned into building my own tools, and then into a new way to make PDFs altogether. Four years on, that is still why I open it every day.</p>
-<p>There is also something coming I’m excited about, namely Quarto 2, a ground-up rewrite in Rust: faster compilation, a tree-sitter parser with real error messages, and a collaborative editor built on Automerge. I cannot wait, even though backwards compatibility is one of the main goals, some breaking changes are likely to occur in favour of a better experience, and I am sure it will be worth it.</p>
+<p>There is also something coming I’m excited about, namely Quarto 2, a ground-up rewrite in Rust: faster compilation, a tree-sitter parser with real error messages, and a collaborative editor built on Automerge. I cannot wait. Backwards compatibility is one of the main goals, but some breaking changes are likely to happen in favour of a better experience. I am sure it will be worth it.</p>
 <p>Happy publishing!</p>
 
 
@@ -12589,7 +12589,7 @@ clouds with short callout labels.
 </div>
 <section id="introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> shipped its <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">first version</a> a fortnight ago. This is the first feature update: 0.2.0 landed first, and 0.2.1 followed shortly after with <code>align-panels</code> and two more fixes, so this post covers the 0.2 update as a whole. It has two faces. On the surface, <a href="https://m.canouil.dev/gribouille/reference/core/compose.html"><code>compose()</code></a> learned to number, nest, title, share a legend across panels, and line those panels up across the grid, <code>facet-grid()</code> got free scales, and labels and guides became easier to control. Underneath, most of the time went into the internals, turning a long list of panics into clear errors and correct output.</p>
+<p><a href="https://github.com/mcanouil/gribouille">Gribouille</a> shipped its <a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html">first version</a> a fortnight ago. This is the first feature update: 0.2.0 landed first, and 0.2.1 followed shortly after with <code>align-panels</code> and two more fixes, so this post covers the 0.2 update as a whole. It has two faces. On the surface, <a href="https://m.canouil.dev/gribouille/reference/core/compose.html"><code>compose()</code></a> learned to number, nest, title, share a legend across panels, and line those panels up across the grid. <code>facet-grid()</code> got free scales, and labels and guides became easier to control. Underneath, most of the time went into the internals, turning a long list of panics into clear errors and correct output.</p>
 <p>Every figure in this post is a real, freshly compiled plot.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -12875,7 +12875,7 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <p>A <code>compose()</code> call also accepts <code>defer: true</code>, so it can become a panel inside another <code>compose()</code>. A per-depth <code>tag-levels</code> array then continues the numbering down the tree, giving tags such as <code>B.1</code> and <code>B.2</code>.</p>
 </div>
 </div>
-<p>The 0.2.1 release adds one more control and tidies the tags. By default each panel keeps its own margins, so when one panel carries wide axis labels and another narrow ones, their plot areas start at different offsets and never quite line up. <code>align-panels: true</code> shares the margins grid-wise, left and right per column, top and bottom per row, so the data areas align across the grid the way <code>patchwork</code> and <code>cowplot</code> do. The panel tags also reserve their own band now, sitting above each panel instead of overlapping the data.</p>
+<p>The 0.2.1 release adds one more control and tidies the tags. By default each panel keeps its own margins. When one panel carries wide axis labels and another panel carries narrow ones, their plot areas start at different offsets and never quite line up. <code>align-panels: true</code> shares the margins grid-wise, left and right per column, top and bottom per row, so the data areas align across the grid the way <code>patchwork</code> and <code>cowplot</code> do. The panel tags also reserve their own band now, sitting above each panel instead of overlapping the data.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-2" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-2-1"><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -13502,7 +13502,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <section id="the-heavy-lifting-was-underneath" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="the-heavy-lifting-was-underneath"><span class="header-section-number">6</span> The heavy lifting was underneath</h2>
 <p>The list above is the visible part. The larger share of this release is a pass over the internals, and it is the kind of work that does not show up in a screenshot.</p>
-<p>A whole class of inputs that used to crash the compile now behaves. A <code>geom-col()</code> on a continuous axis with a single distinct value, an empty <code>values</code> array in a <code>scale-*-manual()</code>, a non-positive <code>bins</code>, a sparse contour grid, or <code>width: auto</code> on an unbounded page: each of these used to panic, and each now either draws or reports a clear, actionable error.</p>
+<p>A whole class of inputs that used to crash the compile now behaves. A <code>geom-col()</code> on a continuous axis with a single distinct value, an empty <code>values</code> array in a <code>scale-*-manual()</code>, a non-positive <code>bins</code>, a sparse contour grid, or <code>width: auto</code> on an unbounded page: each of these used to panic. Each now either draws or reports a clear, actionable error.</p>
 <div class="highlight">
 <p><strong>Most of the 0.2 work is invisible:</strong> the figures look the same, but far fewer inputs make the compiler give up.</p>
 </div>
@@ -13510,7 +13510,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <ul>
 <li><code>after-scale</code> and <code>stage</code> channels now train on the marker’s source column, so grouped geoms such as <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-smooth.html"><code>geom-smooth()</code></a>, and <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-errorbar.html"><code>geom-errorbar()</code></a> or <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-rug.html"><code>geom-rug()</code></a>, resolve a mapped colour instead of panicking.</li>
 <li><a href="https://m.canouil.dev/gribouille/reference/coord/coord-cartesian.html"><code>coord-cartesian(xlim:, ylim:)</code></a> zooms the axes instead of being ignored, and <a href="https://m.canouil.dev/gribouille/reference/coord/coord-flip.html"><code>coord-flip(reverse: true)</code></a> keeps a <code>log10</code> or <code>sqrt</code> transform.</li>
-<li>A column mapped to both a positional and a grouping aesthetic, for example <code>aes(x: "species", fill: "species")</code>, now resolves the grouping across aggregating stats instead of drawing every mark in the ink colour with an empty guide.</li>
+<li>A column mapped to both a positional and a grouping aesthetic, for example <code>aes(x: "species", fill: "species")</code>, now resolves the grouping across aggregating stats. Previously it drew every mark in the ink colour with an empty guide.</li>
 <li>Number formatters round correctly, so <code>0.9999995</code> no longer renders as <code>0.1</code>, and continuous scales honour an explicit <code>breaks</code>.</li>
 <li><a href="https://m.canouil.dev/gribouille/reference/geoms/geom-segment.html"><code>geom-segment()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-curve.html"><code>geom-curve()</code></a>, <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-ribbon.html"><code>geom-ribbon()</code></a>, and <a href="https://m.canouil.dev/gribouille/reference/geoms/geom-area.html"><code>geom-area()</code></a> draw on a discrete scale instead of silently rendering nothing (0.2.1).</li>
 </ul>
@@ -17572,14 +17572,14 @@ logo appears in the top right.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>There is no single right way to achieve branded outputs in R and Python. The <a href="https://posit-dev.github.io/brand-yml/"><code>brand.yml</code></a> project provides dedicated <a href="https://posit-dev.github.io/brand-yml/pkg/r/">R</a> and <a href="https://posit-dev.github.io/brand-yml/pkg/py/">Python</a> packages that read a <code>_brand.yml</code> file directly and are the recommended starting point for most projects. At the time of writing, however, the <code>brand.yml</code> packages do not support font registration for graphics devices. You could also write your own wrappers, hard-code a shared palette, or use any other strategy that suits your workflow. This post demonstrates one particular approach: reading the resolved brand data from <code>QUARTO_EXECUTE_INFO</code> at render time, making it independent of external packages and portable across languages, with full font registration support.</p>
+<p>There is no single right way to achieve branded outputs in R and Python. The <a href="https://posit-dev.github.io/brand-yml/"><code>brand.yml</code></a> project provides dedicated <a href="https://posit-dev.github.io/brand-yml/pkg/r/">R</a> and <a href="https://posit-dev.github.io/brand-yml/pkg/py/">Python</a> packages that read a <code>_brand.yml</code> file directly and are the recommended starting point for most projects. At the time of writing, however, the <code>brand.yml</code> packages do not support font registration for graphics devices. You could also write your own wrappers, hard-code a shared palette, or use any other strategy that suits your workflow. This post demonstrates one particular approach: reading the resolved brand configuration from <code>QUARTO_EXECUTE_INFO</code> at render time, making it independent of external packages and portable across languages, with full font registration support.</p>
 </div>
 </div>
 </section>
 <section id="the-quarto_execute_info-approach" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="the-quarto_execute_info-approach"><span class="header-section-number">2</span> The <code>QUARTO_EXECUTE_INFO</code> Approach</h2>
 <p>When Quarto renders a document, it sets the <code>QUARTO_EXECUTE_INFO</code> environment variable for every code cell. This variable points to a JSON file containing document metadata, format settings, and, crucially, the resolved brand configuration.</p>
-<p>The brand data lives at <code>format.render.brand</code> in the JSON, with separate entries for each colour mode (<code>light</code>, <code>dark</code>). Reading it requires only a JSON parser.</p>
+<p>The brand configuration lives at <code>format.render.brand</code> in the JSON, with separate entries for each colour mode (<code>light</code>, <code>dark</code>). Reading it requires only a JSON parser.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
 <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" aria-controls="tabset-1-1" aria-selected="true" href=""><iconify-icon inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" aria-controls="tabset-1-2" aria-selected="false" href=""><iconify-icon inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
@@ -17745,7 +17745,7 @@ font-style: inherit;">2</span>))</span></code></pre></div></div>
 </section>
 <section id="brand-data-structure" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="brand-data-structure"><span class="header-section-number">3</span> Brand Data Structure</h2>
-<p>The brand object under <code>format.render.brand</code> contains one entry per colour mode. Each mode holds a <code>data</code> object with colour and typography definitions.</p>
+<p>The brand configuration under <code>format.render.brand</code> contains one entry per colour mode. Each mode holds a <code>data</code> object with colour and typography definitions.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="json" style="background: #f1f3f5;"><pre class="sourceCode json cw-auto code-with-copy"><code class="sourceCode json"><span id="cb3-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">{</span></span>
@@ -18339,14 +18339,14 @@ font-style: inherit;">=</span> pyfonts.load_google_font(family)</span>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser: it cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
+<p>When generating figures as SVG, the SVG files must be inlined directly into the HTML page for fonts to render correctly. An SVG file referenced via an <code>&lt;img&gt;</code> tag is treated as an isolated document by the browser. It cannot access the page’s stylesheets or <code>@import</code> rules, so any <code>@font-face</code> declarations inside the SVG that reference external URLs are silently ignored. Inlining the SVG into the page DOM removes this boundary, allowing the browser to resolve font imports just like any other CSS resource.</p>
 <p>The companion repository includes an <code>inline-svglite.lua</code> Lua filter that replaces <code>&lt;img&gt;</code> references with raw SVG content automatically. See the <a href="https://github.com/mcanouil/demo-quarto-brand-renderings">companion repository</a> for the full implementation.</p>
 </div>
 </div>
 </section>
 <section id="branded-figures" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="branded-figures"><span class="header-section-number">6</span> Branded Figures</h2>
-<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand data and builds a complete <code>ggplot2</code> or plotnine theme. The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor. In R, the latest <code>ggplot2</code> supports <code>ink</code>, <code>paper</code>, and <code>accent</code> parameters directly in <code>theme_minimal()</code>; in Python, each theme element is styled individually.</p>
+<p>The <code>theme_brand()</code> function extracts colours and fonts from the brand configuration and builds a complete <code>ggplot2</code> or plotnine theme. The idea is straightforward: pull out the ink (foreground), paper (background), and palette colours, then pass them to the theme constructor. In R, the latest <code>ggplot2</code> supports <code>ink</code>, <code>paper</code>, and <code>accent</code> parameters directly in <code>theme_minimal()</code>; in Python, each theme element is styled individually.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset" data-group="language">
 <ul class="nav nav-tabs"><li class="nav-item"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" aria-controls="tabset-6-1" aria-selected="true" href=""><iconify-icon inline="" icon="fa7-brands:r-project" aria-label="Icon r-project from fa7-brands Iconify.design set." title="Icon r-project from fa7-brands Iconify.design set."></iconify-icon> R</a></li><li class="nav-item"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" aria-controls="tabset-6-2" aria-selected="false" href=""><iconify-icon inline="" icon="fa7-brands:python" aria-label="Icon python from fa7-brands Iconify.design set." title="Icon python from fa7-brands Iconify.design set."></iconify-icon> Python</a></li></ul>
 <div class="tab-content" data-group="language">
@@ -19416,7 +19416,7 @@ font-style: inherit;">=</span>loc.column_labels(),</span>
 </section>
 <section id="light-and-dark-mode" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="light-and-dark-mode"><span class="header-section-number">8</span> Light and Dark Mode</h2>
-<p>Quarto supports light and dark colour modes, and the brand data includes separate colour definitions for each. The helper functions accept a <code>brand_mode</code> parameter to select which variant to use.</p>
+<p>Quarto supports light and dark colour modes, and the brand configuration includes separate colour definitions for each. The helper functions accept a <code>brand_mode</code> parameter to select which variant to use.</p>
 <p>For figures, Quarto’s <code>renderings</code> cell option generates both variants from a single code cell.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="default" style="background: #f1f3f5;"><pre class="sourceCode default cw-auto code-with-copy"><code class="sourceCode default"><span id="cb8-1">#| renderings: [light, dark]</span></code></pre></div></div>
 <p>The code loops over both modes and prints each plot. Quarto then displays the correct one based on the reader’s selected theme.</p>
@@ -19455,7 +19455,7 @@ font-style: inherit;">`brand_mode = "dark"`</span>.</span>
 <li>Pass your data through <code>gt_brand(data, brand_mode = ...)</code> for every <code>gt</code> or <code>great_tables</code> table.</li>
 <li>Use <code>renderings: [light, dark]</code> on figure cells and <code>.light-content</code>/<code>.dark-content</code> divs on tables so the reader’s theme preference is respected automatically.</li>
 </ol>
-<p>That is the entire pattern. Every helper reads from the same <code>QUARTO_EXECUTE_INFO</code> source, so switching to a different brand configuration is just a matter of changing your <code>_brand.yml</code> file; no code changes are needed.</p>
+<p>That is the entire pattern. Every helper reads from the same <code>QUARTO_EXECUTE_INFO</code> source, so switching to a different brand configuration is a matter of changing your <code>_brand.yml</code> file; no code changes are needed.</p>
 </section>
 <section id="conclusion" class="level2" data-number="10">
 <h2 data-number="10" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">10</span> Conclusion</h2>
@@ -19552,7 +19552,7 @@ snippets and gradient orbs in blue and teal.
 <li><strong>Handler factories</strong>: eliminate boilerplate by generating handlers with a closure-captured configuration flag.</li>
 <li><strong>Configuration system</strong>: let users extend the extension with their own class-to-function mappings via document metadata.</li>
 <li><strong>Type-safe value conversion</strong>: <code>typst_value</code> maps Lua types to correct Typst syntax (strings, numbers, keywords, units).</li>
-<li><strong>WCAG-compliant badges</strong>: iterative contrast adjustment ensures accessible colour combinations.</li>
+<li><strong>WCAG-compliant badges</strong>: iterative contrast adjustment produces accessible colour combinations.</li>
 <li><strong>Shortcodes</strong>: explicit syntax for components without a natural markdown representation.</li>
 </ul>
 <div style="text-align: center;">
@@ -19580,7 +19580,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Part 1 used <code>filter.lua</code> as the filter filename in its conceptual examples. Part 2 uses <code>typst-markdown.lua</code>, which is the production filename used in the downloadable extension. The role is identical: it is the Pandoc filter entrypoint that loads shared modules and registers the <code>Div</code> and <code>Span</code> handlers. When building your own extension, you can choose any descriptive name; just ensure it matches the filename declared under <code>filters:</code> in <code>_extension.yml</code>.</p>
+<p>Part 1 used <code>filter.lua</code> as the filter filename in its conceptual examples. Part 2 uses <code>typst-markdown.lua</code>, which is the production filename used in the downloadable extension. The role is identical: it is the Pandoc filter entrypoint that loads shared modules and registers the <code>Div</code> and <code>Span</code> handlers. When building your own extension, you can choose any descriptive name, as long as it matches the filename declared under <code>filters:</code> in <code>_extension.yml</code>.</p>
 </div>
 </div>
 <p>To keep the article and downloadable zip perfectly aligned, source-backed code blocks below show the full file content from the assets bundle. Each section highlights the exact functions to focus on, so you can scan purposefully instead of reading every line top-to-bottom.</p>
@@ -19724,7 +19724,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 <span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">No title extraction; every new wrapped component repeats this same structure.</span>
 </dd>
 </dl>
-<p>The only thing that varies is the <code>extract_title</code> flag. A factory function captures that variation in a <a href="https://www.lua.org/pil/6.1.html">closure</a>, eliminating the repetition entirely. A closure is a function that remembers variables from the scope where it was created. When <code>create_wrapped_handler(true)</code> returns a new function, that function carries <code>should_extract_title = true</code> inside it, so every call to the returned handler automatically uses the correct flag without it needing to be passed again. This is necessary because the filter loop (shown below in “Using Factories”) calls each handler as <code>DIV_FACTORY_HANDLERS[class](div, class_config)</code>, passing only the div element and the class config; the flag is never passed. By baking the flag into the closure at declaration time, each entry in <code>DIV_FACTORY_HANDLERS</code> becomes a self-contained handler with no extra parameters to manage.</p>
+<p>The only thing that varies is the <code>extract_title</code> flag. A factory function captures that variation in a <a href="https://www.lua.org/pil/6.1.html">closure</a>, eliminating the repetition entirely. A closure is a function that remembers variables from the scope where it was created. When <code>create_wrapped_handler(true)</code> returns a new function, that function carries <code>should_extract_title = true</code> inside it. Every call to the returned handler then uses the correct flag automatically, without passing it again. This is necessary because the filter loop (shown below in “Using Factories”) calls each handler as <code>DIV_FACTORY_HANDLERS[class](div, class_config)</code>, passing only the div element and the class config. The flag itself is never passed. By baking the flag into the closure at declaration time, each entry in <code>DIV_FACTORY_HANDLERS</code> becomes a self-contained handler with no extra parameters to manage.</p>
 <section id="the-factory-pattern" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="the-factory-pattern"><span class="header-section-number">2.1</span> The Factory Pattern</h3>
 <p>In this file, focus on <code>create_wrapped_handler</code> and how it forwards to <code>build_wrapped_content</code>; the rest are shared helpers used by multiple components.</p>
@@ -20955,7 +20955,7 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="1" data-code-annotation="1">Spans can carry multiple classes (e.g., <code>[text]{.badge .highlight}</code>); <code>span.classes</code> preserves declaration order (left to right as written in the markdown), so iterating finds the first mapped class and <code>return</code> exits immediately, ensuring only one handler fires per span.</span>
+<span data-code-cell="annotated-cell-5" data-code-lines="1" data-code-annotation="1">Spans can carry multiple classes, for example <code>[text]{.badge .highlight}</code>. <code>span.classes</code> preserves declaration order, left to right as written in the markdown, so iterating finds the first mapped class. <code>return</code> exits immediately, so only one handler fires per span.</span>
 </dd>
 <dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
 <dd>
@@ -20979,7 +20979,7 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 <h3 data-number="2.4" class="anchored" data-anchor-id="choosing-your-approach"><span class="header-section-number">2.4</span> Choosing Your Approach</h3>
 <p>When building a new component, consider:</p>
 <ul>
-<li><strong>No handler (default)</strong>: Simple wrapper around content; just add a mapping in document YAML.</li>
+<li><strong>No handler (default)</strong>: Simple wrapper around content; add a mapping in document YAML.</li>
 <li><strong><code>create_wrapped_handler(true)</code></strong>: Wraps content and extracts title from first heading (e.g., panels with titles).</li>
 <li><strong><code>create_wrapped_handler(false)</code></strong>: Wraps content without title extraction (e.g., simple content wrappers).</li>
 <li><strong>Custom handler</strong>: Complex data extraction from nested elements (e.g., quote cards with author attribution).</li>
@@ -20989,7 +20989,7 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 </section>
 <section id="sec-config" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="sec-config"><span class="header-section-number">3</span> The Configuration System</h2>
-<p>A key design goal for reusable extensions is extensibility. Users should be able to add their own components or override built-in ones without modifying the extension’s source code. The <a href="https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua">configuration system</a> enables this through metadata-driven element mappings.</p>
+<p>A key design goal for reusable extensions is extensibility. Users can add their own components or override built-in ones without modifying the extension’s source code. The <a href="https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua">configuration system</a> enables this through metadata-driven element mappings.</p>
 <section id="built-in-mappings" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="built-in-mappings"><span class="header-section-number">3.1</span> Built-in Mappings</h3>
 <p>The extension defines default mappings for all its components. <code>get_builtin_mappings()</code> is the canonical baseline before any user metadata overrides are merged.</p>
@@ -21287,7 +21287,7 @@ font-style: inherit;">---</span></span><div class="code-annotation-gutter-bg"></
 </dd>
 <dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-7" data-code-lines="7" data-code-annotation="3">Detailed format: allows setting <code>arguments: true</code> to always generate a parameter list. Both <code>function:</code> and <code>wrapper:</code> are accepted as the key name in the detailed format and are true aliases; <code>wrapper:</code> matches the internal Lua variable name, whilst <code>function:</code> is more descriptive in a YAML context, so <code>function:</code> is preferred. Use either the simple or detailed format for each class; they are not combined: a class entry is either a bare string or an object, not both.</span>
+<span data-code-cell="annotated-cell-7" data-code-lines="7" data-code-annotation="3">Detailed format: allows setting <code>arguments: true</code> to always generate a parameter list. Both <code>function:</code> and <code>wrapper:</code> are accepted as the key name in the detailed format, and are true aliases. <code>wrapper:</code> matches the internal Lua variable name, whilst <code>function:</code> is more descriptive in a YAML context, so <code>function:</code> is preferred. Use either the simple or detailed format for each class; they are not combined: a class entry is either a bare string or an object, not both.</span>
 </dd>
 </dl>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -21347,7 +21347,7 @@ Note
 </section>
 <section id="loading-user-configuration" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="loading-user-configuration"><span class="header-section-number">3.3</span> Loading User Configuration</h3>
-<p>The configuration module parses user settings from metadata. Two helpers keep the logic simple and robust:</p>
+<p>The configuration module parses user settings from metadata. Two helpers keep the logic simple:</p>
 <ul>
 <li><code>meta_get(...)</code> reads metadata maps safely, whether keys are plain strings or Pandoc metadata objects.</li>
 <li><code>parse_mapping(...)</code> normalises both supported user formats into one internal shape (<code>{wrapper=..., arguments=...}</code>).</li>
@@ -21786,7 +21786,7 @@ font-style: inherit;">end</span></span><div class="code-annotation-gutter-bg"></
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="17" data-code-annotation="2">Detailed mapping: both <code>function</code> and <code>wrapper</code> are accepted as the key name, normalised to <code>wrapper</code> internally; <code>arguments = arg_value and ... or false</code> is the Lua ternary idiom (<code>condition and x or y</code>) since Lua has no <code>?:</code> operator, and the value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="17" data-code-annotation="2">Detailed mapping: both <code>function</code> and <code>wrapper</code> are accepted as the key name, normalised to <code>wrapper</code> internally. <code>arguments = arg_value and ... or false</code> is the Lua ternary idiom (<code>condition and x or y</code>) since Lua has no <code>?:</code> operator. The value is stringified before comparison because Pandoc delivers YAML booleans as metadata strings, not Lua booleans.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
 <dd>
@@ -25184,17 +25184,17 @@ snippets and gradient orbs in blue and teal.
 </div>
 <section id="why-pdf-branding-matters" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="why-pdf-branding-matters"><span class="header-section-number">1</span> Why PDF Branding Matters</h2>
-<p>In professional environments, document presentation is not merely aesthetic; it is a reflection of organisational identity and credibility. Whether you are producing academic papers, corporate reports, client proposals, or technical documentation, consistent branding transforms disparate documents into a cohesive portfolio that reinforces trust and recognition.</p>
-<p>Yet achieving this consistency manually is fraught with challenges. Copy-pasting styles between documents introduces errors. Updating a colour scheme across dozens of files becomes a maintenance nightmare. And when multiple team members contribute to documents, stylistic drift is inevitable.</p>
+<p>In professional environments, document presentation is more than aesthetic. It reflects organisational identity and credibility. You might produce academic papers, corporate reports, client proposals, or technical documentation. Consistent branding turns these different documents into one recognisable, trustworthy portfolio.</p>
+<p>Yet keeping this consistency by hand is difficult. Copy-pasting styles between documents introduces errors. Updating a colour scheme across dozens of files becomes a maintenance nightmare. And when multiple team members contribute to documents, stylistic drift is inevitable.</p>
 <div class="highlight">
-<p><strong>Reproducible branding</strong> through code eliminates manual styling errors and ensures every document reflects your organisation’s identity automatically.</p>
+<p><strong>Reproducible branding</strong> through code eliminates manual styling errors, so every document reflects your organisation’s identity.</p>
 </div>
 <p>This is where programmatic document styling becomes valuable.</p>
-<p>Typst offers a modern, programmable alternative to LaTeX for PDF generation. Its syntax is cleaner, compilation is faster, and its scripting capabilities make complex layouts achievable without the arcane incantations that LaTeX often requires. When paired with Quarto’s publishing ecosystem, Typst becomes a powerful foundation for branded document production.</p>
+<p>Typst offers a modern, programmable alternative to LaTeX for PDF generation. Its syntax is cleaner, compilation is faster, and its scripting capabilities make complex layouts achievable without the arcane incantations that LaTeX often requires. When paired with Quarto’s publishing ecosystem, Typst becomes a foundation for branded document production.</p>
 </section>
 <section id="prior-art-getting-started-with-typst-and-quarto" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="prior-art-getting-started-with-typst-and-quarto"><span class="header-section-number">2</span> Prior Art: Getting Started with Typst and Quarto</h2>
-<p>Before diving into advanced techniques, it is worth acknowledging excellent foundational resources recently published. David Keyes wrote a comprehensive introduction to using Typst with Quarto at <a href="https://rfortherestofus.com/2025/11/quarto-typst-pdf">R for the Rest of Us</a>. If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.</p>
+<p>Before covering advanced techniques, a few excellent foundational resources deserve a mention. David Keyes wrote an introduction to using Typst with Quarto at <a href="https://rfortherestofus.com/2025/11/quarto-typst-pdf">R for the Rest of Us</a>. If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.</p>
 <p>This tutorial builds upon that foundation. Where David’s post shows how to use Typst templates with Quarto, this tutorial explores how to <em>build</em> sophisticated templates that pair Lua filters with Typst rendering functions. What does this mean in practice? It means creating reusable components like badges, panels, and quote cards that authors can invoke with simple markdown syntax instead of writing Typst code directly.</p>
 <p>In this tutorial, you will learn the architectural patterns that enable rich, interactive components whilst maintaining clean, extensible code.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -25207,7 +25207,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This is <strong>Part 1</strong> of a two-part series. This part covers the foundational concepts; <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.</p>
+<p>This is <strong>Part 1</strong> of a two-part series. This part covers the foundational concepts. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.</p>
 <p>The examples here are generic, but the <a href="https://github.com/mcanouil/quarto-mcanouil">‘mcanouil’ Quarto extension</a> demonstrates these patterns in a production context.</p>
 </div>
 </div>
@@ -25222,7 +25222,7 @@ background-color: null;
 font-style: inherit;">Completed</span><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">]</span>{.badge colour="success"} and ready for review.</span></code></pre></div></div>
-<p>This should produce a styled badge in the PDF output. But here is the challenge: Typst templates alone cannot intercept and transform markdown elements. Typst receives content <em>after</em> Quarto and Pandoc have processed it. Without a Lua filter, Pandoc’s default Typst writer simply drops the <code>.badge</code> class and outputs the text content with no styling; your Typst template never sees the class at all.</p>
+<p>This should produce a styled badge in the PDF output. But here is the challenge: Typst templates alone cannot intercept and transform markdown elements. Typst receives content <em>after</em> Quarto and Pandoc have processed it. Without a Lua filter, Pandoc’s default Typst writer drops the <code>.badge</code> class and outputs plain text with no styling. Your Typst template never sees the class at all.</p>
 <p>The solution requires two layers working in concert:</p>
 <ol type="1">
 <li><strong>Lua filters</strong> that intercept markdown elements during Pandoc processing and generate Typst code.</li>
@@ -25415,7 +25415,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 </section>
 <section id="extension-structure-overview" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="extension-structure-overview"><span class="header-section-number">5</span> Extension Structure Overview</h2>
-<p>Before diving into component implementation, let us establish the minimal file organisation needed for a Typst extension.</p>
+<p>Before covering component implementation, let us set out the minimal file organisation needed for a Typst extension.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="txt" style="background: #f1f3f5;"><pre class="sourceCode txt cw-auto code-with-copy"><code class="sourceCode default"><span id="cb2-1">_extensions/my-extension/</span>
 <span id="cb2-2">├── _extension.yml       # Extension manifest</span>
 <span id="cb2-3">├── template.typ         # Main Typst template</span>
@@ -26099,7 +26099,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from <code>_brand.yml</code> (Quarto’s brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see Note&nbsp;1).</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity. In a production extension you could retrieve them from <code>_brand.yml</code> (Quarto’s brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see Note&nbsp;1).</span>
 </dd>
 </dl>
 <p>Now users can specify <code>colour: "success"</code> and get a green badge. The <code>mode</code> parameter selects light or dark colour palettes.</p>
@@ -26308,7 +26308,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings. Typst syntax distinguishes strings (<code>"hello"</code>), numbers (<code>42</code>), and keywords (<code>none</code>, <code>true</code>); passing the wrong form produces a syntax error. The <code>wrapper.lua</code> module includes a minimal <code>typst_value</code> helper that handles these common cases: string pass-through for Typst keywords (<code>"none"</code>, <code>"true"</code>, <code>"false"</code>), passing Lua numbers as bare values (so <code>42</code> becomes <code>42</code> in Typst, not <code>"42"</code>), and wrapping everything else in quotes. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> replaces this with a more robust implementation that also handles actual Lua booleans, <code>nil</code>, and Typst measurement units like <code>1em</code> or <code>2.5pt</code>.</p>
+<p>The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings. Typst syntax distinguishes strings (<code>"hello"</code>), numbers (<code>42</code>), and keywords (<code>none</code>, <code>true</code>); passing the wrong form produces a syntax error. The <code>wrapper.lua</code> module includes a minimal <code>typst_value</code> helper that handles these common cases: string pass-through for Typst keywords (<code>"none"</code>, <code>"true"</code>, <code>"false"</code>), passing Lua numbers as bare values (so <code>42</code> becomes <code>42</code> in Typst, not <code>"42"</code>), and wrapping everything else in quotes. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> replaces this with an implementation that also handles actual Lua booleans, <code>nil</code>, and Typst measurement units like <code>1em</code> or <code>2.5pt</code>.</p>
 <p>This handler also does not escape Typst special characters in <code>content</code>. Badge labels containing <code>[</code>, <code>]</code>, or <code>#</code> would produce broken Typst syntax because Typst interprets those characters as markup inside <code>[...]</code> content blocks. For typical short labels like <code>"Completed"</code> or <code>"v1.2.0"</code> this is not an issue, but a production implementation would <em>escape</em> those characters before inserting content into the generated code: replacing <code>]</code> with <code>\]</code>, <code>[</code> with <code>\[</code>, and <code>#</code> with <code>\#</code> so Typst does not treat them as markup.</p>
 </div>
 </div>
@@ -26378,7 +26378,7 @@ Note&nbsp;1: Quarto Brand Lua API
 <li><code>quarto.brand.has_mode(mode)</code>: returns <code>true</code> if the document has a brand definition for the given mode (<code>"light"</code> or <code>"dark"</code>).</li>
 <li><code>quarto.brand.get_color(mode, name)</code>: returns a brand colour by name in the output format (<em>e.g.</em>, <code>quarto.brand.get_color("light", "primary")</code>).</li>
 <li><code>quarto.brand.get_color_css(mode, name)</code>: returns the colour in CSS format.</li>
-<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options (family, size, weight, etc.) for the given element.</li>
+<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options such as family, size, and weight for the given element.</li>
 <li><code>quarto.brand.get_logo(mode, name)</code>: returns logo resource paths and alt text.</li>
 </ul>
 <p>This approach is useful when you need brand values <em>inside</em> the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code. In this tutorial, we pass the mode to Typst instead, keeping colour logic in a single layer.</p>
@@ -26408,7 +26408,7 @@ font-style: inherit;">- </span>And more.</span>
 <span id="cb5-7">:::</span></code></pre></div></div>
 <p>Pandoc parses this into a Div element with:</p>
 <ul>
-<li><strong><code>div.content</code></strong>: An array of block elements (paragraphs, lists, etc.).</li>
+<li><strong><code>div.content</code></strong>: An array of block elements, such as paragraphs and lists.</li>
 <li><strong><code>div.classes</code></strong>: A list of classes ([“panel”]).</li>
 <li><strong><code>div.attributes</code></strong>: A table of key-value pairs.</li>
 </ul>
@@ -27406,7 +27406,7 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 </section>
 <section id="the-panel-wrapper-injecting-the-colour-scheme" class="level3" data-number="7.6">
 <h3 data-number="7.6" class="anchored" data-anchor-id="the-panel-wrapper-injecting-the-colour-scheme"><span class="header-section-number">7.6</span> The Panel Wrapper: Injecting the Colour Scheme</h3>
-<p>Unlike badges, where the Lua handler passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
+<p>Unlike badges, where the Lua filter passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>_extensions/my-extension/typst-show.typ</strong></pre>
@@ -27459,10 +27459,10 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 </dd>
 <dt data-target-cell="annotated-cell-20" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-20" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments (<code>title</code>, <code>style</code>, etc.) unchanged.</span>
+<span data-code-cell="annotated-cell-20" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments, such as <code>title</code> and <code>style</code>, unchanged.</span>
 </dd>
 </dl>
-<p>The Lua handler generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
+<p>The Lua filter generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
 <div class="highlight">
 <p>For badges, passing <code>mode</code> directly to the Typst function is sufficient. For panels, a <strong>wrapper function</strong> injects a full colour dictionary that depends on runtime context. Choose the simpler approach when it works; use a wrapper when the rendering function needs derived values the Lua filter cannot provide.</p>
 </div>
@@ -28612,7 +28612,7 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <ul>
 <li>Uses the user-provided value if present.</li>
 <li>Falls back to “report” if not specified.</li>
-<li>Ensures the dispatcher always receives a valid string.</li>
+<li>Always gives the dispatcher a valid string.</li>
 </ul>
 </section>
 </section>
@@ -28772,8 +28772,8 @@ font-style: inherit;">$document-dispatcher.typ()$</span></span></code></pre></di
 <p>The loading order matters:</p>
 <ol type="1">
 <li><strong><code>definitions.typ</code></strong> must come first; it provides Quarto features like callouts.</li>
-<li><strong>Document type templates</strong> define the rendering functions (<code>render-report</code>, etc.).</li>
-<li><strong>Dispatcher</strong> comes last because it references the document type functions.</li>
+<li><strong>Document type templates</strong> define the rendering functions (<code>render-report</code>, <code>render-letter</code>, <code>render-cv</code>).</li>
+<li><strong>Dispatcher</strong> comes last because it references the rendering functions.</li>
 </ol>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -29194,14 +29194,14 @@ Skip to main content
 <p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene." width="600"></a></p>
 </figure>
 </div>
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is here with a major architectural overhaul and powerful new features for managing your Quarto extensions.</p>
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is here with a major architectural overhaul and new features for managing your Quarto extensions.</p>
 <div class="highlight">
 <p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is now available!</p>
 <p>Upgrade today from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
 </div>
 <section id="from-1.0.0-to-2.0.0" class="level2">
 <h2 class="anchored" data-anchor-id="from-1.0.0-to-2.0.0">From 1.0.0 to 2.0.0</h2>
-<p>Version 1.0.0 was not around for long. As I worked on improving Quarto Wizard and enabling features beyond what the Quarto CLI offers, what started as small enhancements quickly grew into a major internal refactoring. The result is a more powerful and self-contained extension.</p>
+<p>Version 1.0.0 was not around for long. As I worked on improving Quarto Wizard and enabling features beyond what the Quarto CLI offers, what started as small enhancements quickly grew into a major internal refactoring. The result is a more self-contained extension.</p>
 <div class="highlight">
 <p>No more Quarto CLI dependency.</p>
 </div>
@@ -29352,7 +29352,7 @@ Note
 </section>
 <section id="documentation-website" class="level2">
 <h2 class="anchored" data-anchor-id="documentation-website">Documentation Website</h2>
-<p>A new comprehensive documentation website is now available at <a href="https://m.canouil.dev/quarto-wizard">m.canouil.dev/quarto-wizard</a>, featuring:</p>
+<p>A new documentation website is now available at <a href="https://m.canouil.dev/quarto-wizard">m.canouil.dev/quarto-wizard</a>, featuring:</p>
 <ul>
 <li>User guide with step-by-step instructions.</li>
 <li>Command and configuration reference.</li>
@@ -29372,7 +29372,7 @@ Note
 <section id="whats-next" class="level2">
 <h2 class="anchored" data-anchor-id="whats-next">What’s Next</h2>
 <p>This major refactoring introduced <code>@quarto-wizard/core</code><sup>1</sup>, a platform-agnostic package for extension management.</p>
-<p>Next on the roadmap: a new version of the <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater GitHub Action</a> that will leverage this core package, bringing the same native installation capabilities to your CI/CD workflows.</p>
+<p>Next on the roadmap: a new version of the <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater GitHub Action</a> that will use this core package, bringing the same native installation capabilities to your CI/CD workflows.</p>
 
 
 </section>
@@ -30488,8 +30488,8 @@ font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></di
 
 <ol>
 <li id="fn1"><p>Whilst Pandoc’s div syntax doesn’t require matching numbers of colons for opening and closing divs (see <a href="https://pandoc.org/MANUAL.html#extension-fenced_divs">Pandoc Manual: Extension fenced_divs</a>), using four colons for opening and three for closing provides clear visual distinction and enables better editor support.↩︎</p></li>
-<li id="fn2"><p>The Quarto extension disables Copilot by default in its configuration (see <a href="https://github.com/quarto-dev/quarto/issues/621"><span><span title="GitHub">quarto-dev/quarto#621</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a> and <a href="https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962">package.json</a>). This explicit enablement is required if you want to use Copilot in your Quarto workflow.↩︎</p></li>
-<li id="fn3"><p>See <a href="https://github.com/quarto-dev/quarto/issues/670"><span><span title="GitHub">quarto-dev/quarto#670</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a> for discussion about native div folding support.↩︎</p></li>
+<li id="fn2"><p>The Quarto extension disables Copilot by default in its configuration (see <a href="https://github.com/quarto-dev/quarto/issues/621"><span><span title="GitHub">quarto-dev/quarto#621</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> and <a href="https://github.com/quarto-dev/quarto/blob/eac7ac2f4676908b05e746e085c1cbf23d000563/apps/vscode/package.json#L960-L962">package.json</a>). This explicit enablement is required if you want to use Copilot in your Quarto workflow.↩︎</p></li>
+<li id="fn3"><p>See <a href="https://github.com/quarto-dev/quarto/issues/670"><span><span title="GitHub">quarto-dev/quarto#670</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> for discussion about native div folding support.↩︎</p></li>
 </ol>
 </section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
   author = {CANOUIL, Mickaël},
