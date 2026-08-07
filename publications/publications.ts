@@ -273,7 +273,7 @@ function processEntry(rawCsl: string[], rawFields: RawFields): {
 function buildQmd(flagged: number, middle: number): string {
   return [
     "---",
-    `title: 'Publications (${flagged} + ${middle})'`,
+    `title: '{{< iconify octicon:beaker-24 aria-hidden=true >}} Publications (${flagged} + ${middle})'`,
     "title-block-banner: true",
     "description: 'Peer-reviewed publications by Mickaël CANOUIL in genetics, " +
     "multi-omics, and diabetes research, listed newest first with DOIs and citations.'",
