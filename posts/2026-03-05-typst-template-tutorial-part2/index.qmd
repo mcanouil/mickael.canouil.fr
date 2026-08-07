@@ -134,8 +134,10 @@ local DIV_HANDLERS = {
 The only thing that varies is the `extract_title` flag.
 A factory function captures that variation in a [closure](https://www.lua.org/pil/6.1.html), eliminating the repetition entirely.
 A closure is a function that remembers variables from the scope where it was created.
-When `create_wrapped_handler(true)` returns a new function, that function carries `should_extract_title = true` inside it, so every call to the returned handler automatically uses the correct flag without it needing to be passed again.
-This is necessary because the filter loop (shown below in "Using Factories") calls each handler as `DIV_FACTORY_HANDLERS[class](div, class_config)`, passing only the div element and the class config; the flag is never passed.
+When `create_wrapped_handler(true)` returns a new function, that function carries `should_extract_title = true` inside it.
+Every call to the returned handler then uses the correct flag automatically, without passing it again.
+This is necessary because the filter loop (shown below in "Using Factories") calls each handler as `DIV_FACTORY_HANDLERS[class](div, class_config)`, passing only the div element and the class config.
+The flag itself is never passed.
 By baking the flag into the closure at declaration time, each entry in `DIV_FACTORY_HANDLERS` becomes a self-contained handler with no extra parameters to manage.
 
 ### The Factory Pattern
@@ -300,7 +302,7 @@ When building a new component, consider:
 ## The Configuration System {#sec-config}
 
 A key design goal for reusable extensions is extensibility.
-Users should be able to add their own components or override built-in ones without modifying the extension's source code.
+Users can add their own components or override built-in ones without modifying the extension's source code.
 The [configuration system](https://github.com/mcanouil/quarto-mcanouil/blob/main/_extensions/mcanouil/typst/_modules/config.lua) enables this through metadata-driven element mappings.
 
 ### Built-in Mappings
