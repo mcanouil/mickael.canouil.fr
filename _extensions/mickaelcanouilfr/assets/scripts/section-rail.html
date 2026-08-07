@@ -128,16 +128,32 @@
       // the page, and shares its ink background. Retreat while it is in view.
       const footer = document.querySelector("footer.footer");
       if (footer) {
+        // Hiding the rail while it holds focus would drop the reader back to
+        // the top of the tab order, so the tuck waits for focus to leave. The
+        // observer only fires on a crossing, so that deferred tuck has to be
+        // re-applied on the way out; `focusout` is the only other trigger.
+        let footerVisible = false;
+        const syncTuck = () => {
+          if (footerVisible && nav.contains(document.activeElement)) return;
+          nav.classList.toggle("mc-section-rail--tucked", footerVisible);
+          // `visibility` only flips once the transition ends, so for 300ms the
+          // fading rail is still tabbable and focus landing on it is dropped
+          // when it finally hides. `inert` withdraws it at once.
+          nav.inert = footerVisible;
+        };
+
         const footerObserver = new IntersectionObserver(
-          ([entry]) => {
-            // Hiding the rail while it holds focus would drop the reader back
-            // to the top of the tab order, so stay put until focus leaves.
-            if (entry.isIntersecting && nav.contains(document.activeElement)) return;
-            nav.classList.toggle("mc-section-rail--tucked", entry.isIntersecting);
+          (entries) => {
+            footerVisible = entries[entries.length - 1].isIntersecting;
+            syncTuck();
           },
           { threshold: 0 },
         );
         footerObserver.observe(footer);
+
+        nav.addEventListener("focusout", (event) => {
+          if (!nav.contains(event.relatedTarget)) syncTuck();
+        });
       }
     }
 
