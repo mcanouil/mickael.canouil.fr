@@ -1,27 +1,50 @@
 <script id="mc-email" type="text/javascript">
   /**
    * Restore the `mailto:` links that `filters/email-obfuscation.lua` encoded,
-   * so the address never appears in the served HTML. Decoding happens on the
-   * first interaction as well as on load, so a link works even if this runs
-   * late.
+   * so the address never appears in the served HTML.
+   *
+   * Two encodings are handled. Links from the document body carry the payload
+   * in `data-mc-email`, written by the filter. Links of the `about` block carry
+   * it in the href itself, as `#mc-email-<base64>`: Quarto builds that block
+   * from document metadata before the Lua pipeline runs, so no filter can reach
+   * it and no attribute other than `href` survives.
    *
    * @license MIT
    * @copyright 2026 Mickaël Canouil
    * @author Mickaël Canouil
    */
   (function () {
+    const HREF_MARKER = "#mc-email-";
+
+    const apply = (link, payload) => {
+      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
+      if (!address) return false;
+      link.setAttribute("href", "mailto:" + address);
+      link.classList.add("mc-email--ready");
+      return true;
+    };
+
+    // The attribute is the only copy of the address, so it is dropped only once
+    // it has been used. Discarding it on a failed decode would leave the link
+    // permanently dead rather than merely unrestored.
     const restore = (link) => {
       const payload = link.getAttribute("data-mc-email");
       if (!payload) return;
-      const address = window.mcDecodeB64 ? window.mcDecodeB64(payload) : "";
-      if (!address) return;
-      link.setAttribute("href", "mailto:" + address);
-      link.removeAttribute("data-mc-email");
-      link.classList.add("mc-email--ready");
+      if (apply(link, payload)) link.removeAttribute("data-mc-email");
+    };
+
+    // Quarto rewrites a same-page href to a site-relative one, so the marker is
+    // matched anywhere in the value rather than at the start.
+    const restoreFromHref = (link) => {
+      const href = link.getAttribute("href") || "";
+      const start = href.indexOf(HREF_MARKER);
+      if (start === -1) return;
+      apply(link, href.slice(start + HREF_MARKER.length));
     };
 
     const restoreAll = () => {
       window.document.querySelectorAll("a.mc-email[data-mc-email]").forEach(restore);
+      window.document.querySelectorAll('a[href*="' + HREF_MARKER + '"]').forEach(restoreFromHref);
     };
 
     window.document.addEventListener("DOMContentLoaded", restoreAll);

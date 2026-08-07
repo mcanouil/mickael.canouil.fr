@@ -21,8 +21,10 @@
 -- JavaScript can still retype it.
 --
 -- This does not reach the links of the `about` block: Quarto builds those from
--- document metadata in its template, not in the document AST. Point them at a
--- section anchor rather than at `mailto:`.
+-- document metadata before the Lua pipeline runs, so they are absent from both
+-- the AST and `Meta` by the time any filter sees the document. Write those
+-- hrefs as `#mc-email-<base64>` instead; `assets/scripts/email.html` restores
+-- them from the href.
 
 local BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 

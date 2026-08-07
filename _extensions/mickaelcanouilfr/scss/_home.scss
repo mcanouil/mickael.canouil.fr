@@ -467,3 +467,295 @@
     transform: translateX(3px);
   }
 }
+
+// ===========================
+// IN-PAGE ANCHOR OFFSET
+// ===========================
+// `header#quarto-header` is fixed, so an anchor jump from the section rail
+// would otherwise park its target underneath it.
+// 5rem matches the offset `.talks-section` already uses.
+.about-body section.level2 {
+  scroll-margin-top: 5rem;
+}
+
+// ===========================
+// SECTION RAIL
+// ===========================
+// Floating in-page navigation for the long home page, built at runtime by
+// `assets/scripts/section-rail.html` from the `##` sections of `.about-body`.
+// Collapsed to an icon column pinned to the right edge; the labels expand
+// leftwards on hover or keyboard focus so the centred body never shifts.
+// Below `$_breakpoint-lg` the same markup becomes a horizontal bottom dock.
+
+// Quarto reserves this band for `header#quarto-header.fixed-top` through
+// `body.nav-fixed { padding-top: 64px }` in its own stylesheet.
+$_navbar-height: 64px;
+
+.mc-section-rail {
+  // Anchored to the band between navbar and viewport bottom rather than
+  // centred on the viewport, so a short window can never push the rail up
+  // behind the fixed header.
+  position: fixed;
+  top: calc(#{$_navbar-height} + #{$_space-md});
+  right: $_space-md;
+  bottom: $_space-md;
+  z-index: 1020;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: min(18rem, 22vw);
+  // The nav box is wider than the collapsed rail, so it must not swallow
+  // clicks aimed at the page underneath; the list itself takes them back.
+  pointer-events: none;
+  transition:
+    opacity $_anim-standard $_easing-standard,
+    transform $_anim-standard $_easing-standard,
+    visibility $_anim-standard $_easing-standard;
+
+  // Set by the footer observer in `section-rail.html`. `visibility` also
+  // takes the links out of the tab order while the rail is off screen.
+  &.mc-section-rail--tucked {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(120%);
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $_space-xs;
+    max-height: 100%;
+    margin: 0;
+    padding: $_space-sm;
+    // The height tiers below keep the list inside the band; this overflow is
+    // only a fallback for viewports shorter than any tier anticipates, so its
+    // scrollbar chrome stays hidden.
+    overflow-y: auto;
+    scrollbar-width: none;
+    list-style: none;
+    // Ink surface with gold accents, the same palette the title banner uses
+    // in both colour schemes, so the rail reads as site chrome rather than
+    // as page content.
+    border: 1px solid rgba(#ffffff, 0.12);
+    border-radius: $_radius-lg;
+    background: rgba($mc-ink, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: $_shadow-sm;
+    pointer-events: auto;
+    transition: box-shadow $_anim-standard $_easing-standard;
+
+    // Declared last: anything after a nested rule is emitted as a second
+    // `.mc-section-rail ul` block with this one wedged in between.
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  li {
+    width: 100%;
+    margin: 0;
+  }
+
+  &:hover ul,
+  &:focus-within ul {
+    box-shadow: $_shadow-md;
+  }
+
+  &:hover .mc-section-rail__label,
+  &:focus-within .mc-section-rail__label {
+    max-width: 12rem;
+    padding-inline-end: $_space-sm;
+    opacity: 1;
+  }
+}
+
+.mc-section-rail__link {
+  // Reversed so the label grows to the left of the icon column, which stays
+  // put whatever the expanded width.
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.2rem;
+  border-radius: $_radius-md;
+  color: rgba(#ffffff, 0.72);
+  text-decoration: none;
+  outline-offset: 2px;
+  transition:
+    color $_anim-fast $_easing-standard,
+    background-color $_anim-fast $_easing-standard;
+
+  &:hover,
+  &:focus-visible {
+    color: lighten($mc-accent, 12%);
+    background: rgba($mc-accent, 0.18);
+    text-decoration: none;
+  }
+
+  // Same gold as the hover state: `$mc-accent` on the 26% tint over ink only
+  // reaches 3:1, short of AA for a 0.82rem label. The heavier tint is what
+  // separates the current section from a hovered one.
+  &.active {
+    color: lighten($mc-accent, 12%);
+    background: rgba($mc-accent, 0.26);
+  }
+}
+
+.mc-section-rail__mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.05rem;
+
+  // Fallback bullet for a section whose heading carries no icon.
+  &:empty::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: $_radius-full;
+    background: currentColor;
+  }
+}
+
+.mc-section-rail__label {
+  max-width: 0;
+  overflow: hidden;
+  font-family: $font-family-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    max-width $_anim-standard $_easing-standard,
+    padding $_anim-standard $_easing-standard,
+    opacity $_anim-fast $_easing-standard;
+}
+
+// Eleven sections stack to about 435px. Rather than scroll, the rail tightens
+// as vertical room runs out: about 330px at the first tier, about 260px at the
+// second. These must stay ahead of the dock block below, which matches at any
+// height and has to win on small screens.
+@media (max-height: 560px) {
+  .mc-section-rail ul {
+    gap: 0.1rem;
+    padding: 0.35rem;
+  }
+
+  .mc-section-rail__link {
+    padding: 0.15rem;
+  }
+
+  .mc-section-rail__mark {
+    width: 1.4rem;
+    height: 1.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 430px) {
+  .mc-section-rail ul {
+    gap: 0.05rem;
+  }
+
+  .mc-section-rail__link {
+    padding: 0.1rem;
+  }
+
+  .mc-section-rail__mark {
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.8rem;
+  }
+}
+
+// Below this width a right-edge rail would sit on top of the body, so the same
+// markup docks along the bottom edge instead: a horizontal strip that swipes
+// sideways, with the label shown on the active chip only. `#quarto-back-to-top`
+// sits at `bottom: 80px`, clear of the dock.
+@media (max-width: $_breakpoint-lg) {
+  .mc-section-rail {
+    inset: auto 0 0 0;
+    align-items: stretch;
+    max-width: none;
+
+    // The dock retargets its label and its scroll position on every section
+    // the reader passes, so it stays deliberately still: no slide-out, no
+    // scroll snapping, and no width animation on the label below. Only the
+    // tap and active colour changes are allowed to move.
+    &.mc-section-rail--tucked {
+      transform: none;
+    }
+
+    ul {
+      flex-direction: row;
+      align-items: center;
+      gap: $_space-xs;
+      width: 100%;
+      max-height: none;
+      padding: $_space-xs $_space-sm;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-width: 1px 0 0;
+      border-radius: 0;
+    }
+
+    li {
+      width: auto;
+
+      // Auto margins centre the row while the chips fit and collapse to zero
+      // once they overflow. `justify-content: center` would instead push the
+      // leading chips past the scroll origin, out of reach.
+      &:first-child {
+        margin-inline-start: auto;
+      }
+
+      &:last-child {
+        margin-inline-end: auto;
+      }
+    }
+
+    // The desktop rail reveals every label on hover; the dock shows only the
+    // active one, so the hover rules are cancelled here at equal specificity.
+    &:hover .mc-section-rail__label,
+    &:focus-within .mc-section-rail__label {
+      max-width: 0;
+      padding-inline-end: 0;
+      opacity: 0;
+    }
+  }
+
+  .mc-section-rail__link {
+    // Icon first, label after, and a target that clears the 44px guideline.
+    flex-direction: row;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    justify-content: center;
+    padding: 0.25rem 0.35rem;
+  }
+
+  .mc-section-rail__label {
+    transition: none;
+  }
+
+  .mc-section-rail__link.active .mc-section-rail__label {
+    max-width: 12rem;
+    padding-inline-start: $_space-xs;
+    padding-inline-end: 0;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mc-section-rail,
+  .mc-section-rail ul,
+  .mc-section-rail__link,
+  .mc-section-rail__label {
+    transition: none;
+  }
+}

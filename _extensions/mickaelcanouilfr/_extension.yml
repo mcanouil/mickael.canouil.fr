@@ -22,6 +22,7 @@ contributes:
         - assets/scripts/email.html
         - assets/scripts/publications-clipboard.html
         - assets/scripts/year-toc.html
+        - assets/scripts/section-rail.html
         - assets/scripts/ordinal-dates.html
         - assets/scripts/navbar-tooltips.html
         - assets/scripts/title-block-header.html
@@ -31,8 +32,9 @@ contributes:
       filters:
         - filters/current-year.lua
         - filters/social-metadata.lua
-        # Runs late: the `about` block's links are built by Quarto's own
-        # filters, so an earlier stage would not see them.
+        # Runs late so it also catches the links other filters generate. It
+        # still cannot reach the `about` block, which Quarto builds before the
+        # Lua pipeline; those hrefs carry their own encoded payload.
         - at: post-quarto
           path: filters/email-obfuscation.lua
       lang: en-GB
