@@ -73,14 +73,22 @@
       document.body.appendChild(nav);
     }
 
-    // In the bottom dock the list scrolls sideways, so the active chip is
-    // brought to the middle. Setting `scrollLeft` rather than calling
-    // `scrollIntoView` keeps the page itself where the reader left it, and the
-    // jump is deliberately instant: the dock retargets on every section the
-    // reader scrolls past, and a smooth scroll each time reads as fidgeting.
-    const centreInDock = (link) => {
-      if (list.scrollWidth <= list.clientWidth + 1) return;
-      list.scrollLeft = link.offsetLeft + link.offsetWidth / 2 - list.clientWidth / 2;
+    // Bring the active link into view on whichever axis the list happens to
+    // scroll: sideways in the bottom dock, and downwards in the vertical rail
+    // on a window too short for even the smallest height tier. Scrolling the
+    // list itself rather than calling `scrollIntoView` keeps the page where the
+    // reader left it, and the jump is deliberately instant: the rail retargets
+    // on every section scrolled past, and animating each one reads as fidgeting.
+    // Offsets are measured against the nav, so the list's own offset comes off.
+    const revealActive = (link) => {
+      if (list.scrollWidth > list.clientWidth + 1) {
+        list.scrollLeft =
+          link.offsetLeft - list.offsetLeft + link.offsetWidth / 2 - list.clientWidth / 2;
+      }
+      if (list.scrollHeight > list.clientHeight + 1) {
+        list.scrollTop =
+          link.offsetTop - list.offsetTop + link.offsetHeight / 2 - list.clientHeight / 2;
+      }
     };
 
     let activeId = null;
@@ -95,7 +103,7 @@
       if (current) {
         current.classList.add("active");
         current.setAttribute("aria-current", "true");
-        centreInDock(current);
+        revealActive(current);
       }
       activeId = targetId;
     };
@@ -122,6 +130,9 @@
       if (footer) {
         const footerObserver = new IntersectionObserver(
           ([entry]) => {
+            // Hiding the rail while it holds focus would drop the reader back
+            // to the top of the tab order, so stay put until focus leaves.
+            if (entry.isIntersecting && nav.contains(document.activeElement)) return;
             nav.classList.toggle("mc-section-rail--tucked", entry.isIntersecting);
           },
           { threshold: 0 },
@@ -132,7 +143,9 @@
 
     // Seed from the fragment when the reader arrives on a deep link, so the
     // rail does not announce the first section while they are somewhere else.
-    const landed = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+    // Compared raw: the ids are Pandoc slugs, and `decodeURIComponent` throws
+    // on a malformed escape such as `#100%`, which would abort the whole setup.
+    const landed = window.location.hash.slice(1);
     setActive(anchors.has(landed) ? landed : tracked[0].id);
   });
 </script>

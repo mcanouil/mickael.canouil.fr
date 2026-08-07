@@ -24,9 +24,9 @@
       return true;
     };
 
-    // The payload is dropped only once it has been decoded: `base64.html` may
-    // not have run yet, and discarding it early would leave the link dead with
-    // nothing left to retry from.
+    // The attribute is the only copy of the address, so it is dropped only once
+    // it has been used. Discarding it on a failed decode would leave the link
+    // permanently dead rather than merely unrestored.
     const restore = (link) => {
       const payload = link.getAttribute("data-mc-email");
       if (!payload) return;
