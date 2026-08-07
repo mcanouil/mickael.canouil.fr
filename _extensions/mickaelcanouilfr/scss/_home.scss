@@ -488,15 +488,23 @@
 // Below `$_breakpoint-lg` the same markup becomes a horizontal bottom dock.
 
 // Quarto reserves this band for `header#quarto-header.fixed-top` through
-// `body.nav-fixed { padding-top: 64px }` in its own stylesheet.
+// `body.nav-fixed { padding-top: 64px }` in its own stylesheet, and sets
+// `nav-fixed` only on a site that has a navbar. `mcanouil.github.io` renders
+// this same composition without one, so the offset is carried as a custom
+// property rather than as a `body.nav-fixed .mc-section-rail` rule: that
+// selector would outrank the bottom dock below and pin its top edge too.
 $_navbar-height: 64px;
 
+body.nav-fixed {
+  --mc-rail-top: calc(#{$_navbar-height} + #{$_space-md});
+}
+
 .mc-section-rail {
-  // Anchored to the band between navbar and viewport bottom rather than
-  // centred on the viewport, so a short window can never push the rail up
-  // behind the fixed header.
+  // Anchored to the band between the header and the viewport bottom rather
+  // than centred on the viewport, so a short window can never push the rail
+  // up behind the fixed header. The fallback covers a page with no navbar.
   position: fixed;
-  top: calc(#{$_navbar-height} + #{$_space-md});
+  top: var(--mc-rail-top, #{$_space-md});
   right: $_space-md;
   bottom: $_space-md;
   z-index: 1020;
