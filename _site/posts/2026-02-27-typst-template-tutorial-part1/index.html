@@ -615,17 +615,17 @@ snippets and gradient orbs in blue and teal.
 </div>
 <section id="why-pdf-branding-matters" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="why-pdf-branding-matters"><span class="header-section-number">1</span> Why PDF Branding Matters</h2>
-<p>In professional environments, document presentation is not merely aesthetic; it is a reflection of organisational identity and credibility. Whether you are producing academic papers, corporate reports, client proposals, or technical documentation, consistent branding transforms disparate documents into a cohesive portfolio that reinforces trust and recognition.</p>
-<p>Yet achieving this consistency manually is fraught with challenges. Copy-pasting styles between documents introduces errors. Updating a colour scheme across dozens of files becomes a maintenance nightmare. And when multiple team members contribute to documents, stylistic drift is inevitable.</p>
+<p>In professional environments, document presentation is more than aesthetic. It reflects organisational identity and credibility. You might produce academic papers, corporate reports, client proposals, or technical documentation. Consistent branding turns these different documents into one recognisable, trustworthy portfolio.</p>
+<p>Yet keeping this consistency by hand is difficult. Copy-pasting styles between documents introduces errors. Updating a colour scheme across dozens of files becomes a maintenance nightmare. And when multiple team members contribute to documents, stylistic drift is inevitable.</p>
 <div class="highlight">
-<p><strong>Reproducible branding</strong> through code eliminates manual styling errors and ensures every document reflects your organisation’s identity automatically.</p>
+<p><strong>Reproducible branding</strong> through code eliminates manual styling errors, so every document reflects your organisation’s identity.</p>
 </div>
 <p>This is where programmatic document styling becomes valuable.</p>
-<p>Typst offers a modern, programmable alternative to LaTeX for PDF generation. Its syntax is cleaner, compilation is faster, and its scripting capabilities make complex layouts achievable without the arcane incantations that LaTeX often requires. When paired with Quarto’s publishing ecosystem, Typst becomes a powerful foundation for branded document production.</p>
+<p>Typst offers a modern, programmable alternative to LaTeX for PDF generation. Its syntax is cleaner, compilation is faster, and its scripting capabilities make complex layouts achievable without the arcane incantations that LaTeX often requires. When paired with Quarto’s publishing ecosystem, Typst becomes a foundation for branded document production.</p>
 </section>
 <section id="prior-art-getting-started-with-typst-and-quarto" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="prior-art-getting-started-with-typst-and-quarto"><span class="header-section-number">2</span> Prior Art: Getting Started with Typst and Quarto</h2>
-<p>Before diving into advanced techniques, it is worth acknowledging excellent foundational resources recently published. David Keyes wrote a comprehensive introduction to using Typst with Quarto at <a href="https://rfortherestofus.com/2025/11/quarto-typst-pdf">R for the Rest of Us</a>. If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.</p>
+<p>Before covering advanced techniques, a few excellent foundational resources deserve a mention. David Keyes wrote an introduction to using Typst with Quarto at <a href="https://rfortherestofus.com/2025/11/quarto-typst-pdf">R for the Rest of Us</a>. If you are new to Typst or want a gentler introduction, that post provides an excellent starting point.</p>
 <p>This tutorial builds upon that foundation. Where David’s post shows how to use Typst templates with Quarto, this tutorial explores how to <em>build</em> sophisticated templates that pair Lua filters with Typst rendering functions. What does this mean in practice? It means creating reusable components like badges, panels, and quote cards that authors can invoke with simple markdown syntax instead of writing Typst code directly.</p>
 <p>In this tutorial, you will learn the architectural patterns that enable rich, interactive components whilst maintaining clean, extensible code.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -638,7 +638,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This is <strong>Part 1</strong> of a two-part series. This part covers the foundational concepts; <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.</p>
+<p>This is <strong>Part 1</strong> of a two-part series. This part covers the foundational concepts. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> explores advanced patterns including handler factories, configuration systems, and WCAG-compliant styling.</p>
 <p>The examples here are generic, but the <a href="https://github.com/mcanouil/quarto-mcanouil">‘mcanouil’ Quarto extension</a> demonstrates these patterns in a production context.</p>
 </div>
 </div>
@@ -647,7 +647,7 @@ Note
 <h2 data-number="3" class="anchored" data-anchor-id="the-problem-bridging-markdown-and-typst"><span class="header-section-number">3</span> The Problem: Bridging Markdown and Typst</h2>
 <p>Consider a simple scenario: you want users to write badges in their Quarto documents using familiar markdown syntax, but have them render as styled components in Typst.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="markdown"><pre class="sourceCode markdown cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>The task is <span class="co">[</span><span class="ot">Completed</span><span class="co">]</span>{.badge colour="success"} and ready for review.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This should produce a styled badge in the PDF output. But here is the challenge: Typst templates alone cannot intercept and transform markdown elements. Typst receives content <em>after</em> Quarto and Pandoc have processed it. Without a Lua filter, Pandoc’s default Typst writer simply drops the <code>.badge</code> class and outputs the text content with no styling; your Typst template never sees the class at all.</p>
+<p>This should produce a styled badge in the PDF output. But here is the challenge: Typst templates alone cannot intercept and transform markdown elements. Typst receives content <em>after</em> Quarto and Pandoc have processed it. Without a Lua filter, Pandoc’s default Typst writer drops the <code>.badge</code> class and outputs plain text with no styling. Your Typst template never sees the class at all.</p>
 <p>The solution requires two layers working in concert:</p>
 <ol type="1">
 <li><strong>Lua filters</strong> that intercept markdown elements during Pandoc processing and generate Typst code.</li>
@@ -753,7 +753,7 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 </section>
 <section id="extension-structure-overview" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="extension-structure-overview"><span class="header-section-number">5</span> Extension Structure Overview</h2>
-<p>Before diving into component implementation, let us establish the minimal file organisation needed for a Typst extension.</p>
+<p>Before covering component implementation, let us set out the minimal file organisation needed for a Typst extension.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="txt"><pre class="sourceCode txt cw-auto code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>_extensions/my-extension/</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>├── _extension.yml       # Extension manifest</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>├── template.typ         # Main Typst template</span>
@@ -894,7 +894,7 @@ Figure&nbsp;1: The bridge between markdown and Typst.
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity; in a production extension you could retrieve them from <code>_brand.yml</code> (Quarto’s brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see <a href="#nte-brand-lua" class="quarto-xref">Note&nbsp;1</a>).</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="1" data-code-annotation="1">Here, colours are hard-coded for simplicity. In a production extension you could retrieve them from <code>_brand.yml</code> (Quarto’s brand configuration file that centralises colours, fonts, and logos for consistent styling) using the Quarto Brand Lua API (see <a href="#nte-brand-lua" class="quarto-xref">Note&nbsp;1</a>).</span>
 </dd>
 </dl>
 <p>Now users can specify <code>colour: "success"</code> and get a green badge. The <code>mode</code> parameter selects light or dark colour palettes.</p>
@@ -965,7 +965,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings. Typst syntax distinguishes strings (<code>"hello"</code>), numbers (<code>42</code>), and keywords (<code>none</code>, <code>true</code>); passing the wrong form produces a syntax error. The <code>wrapper.lua</code> module includes a minimal <code>typst_value</code> helper that handles these common cases: string pass-through for Typst keywords (<code>"none"</code>, <code>"true"</code>, <code>"false"</code>), passing Lua numbers as bare values (so <code>42</code> becomes <code>42</code> in Typst, not <code>"42"</code>), and wrapping everything else in quotes. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> replaces this with a more robust implementation that also handles actual Lua booleans, <code>nil</code>, and Typst measurement units like <code>1em</code> or <code>2.5pt</code>.</p>
+<p>The attribute value here is always a Lua string because Pandoc exposes HTML attributes as strings. Typst syntax distinguishes strings (<code>"hello"</code>), numbers (<code>42</code>), and keywords (<code>none</code>, <code>true</code>); passing the wrong form produces a syntax error. The <code>wrapper.lua</code> module includes a minimal <code>typst_value</code> helper that handles these common cases: string pass-through for Typst keywords (<code>"none"</code>, <code>"true"</code>, <code>"false"</code>), passing Lua numbers as bare values (so <code>42</code> becomes <code>42</code> in Typst, not <code>"42"</code>), and wrapping everything else in quotes. <a href="../../posts/2026-03-05-typst-template-tutorial-part2/">Part 2</a> replaces this with an implementation that also handles actual Lua booleans, <code>nil</code>, and Typst measurement units like <code>1em</code> or <code>2.5pt</code>.</p>
 <p>This handler also does not escape Typst special characters in <code>content</code>. Badge labels containing <code>[</code>, <code>]</code>, or <code>#</code> would produce broken Typst syntax because Typst interprets those characters as markup inside <code>[...]</code> content blocks. For typical short labels like <code>"Completed"</code> or <code>"v1.2.0"</code> this is not an issue, but a production implementation would <em>escape</em> those characters before inserting content into the generated code: replacing <code>]</code> with <code>\]</code>, <code>[</code> with <code>\[</code>, and <code>#</code> with <code>\#</code> so Typst does not treat them as markup.</p>
 </div>
 </div>
@@ -1024,7 +1024,7 @@ Note&nbsp;1: Quarto Brand Lua API
 <li><code>quarto.brand.has_mode(mode)</code>: returns <code>true</code> if the document has a brand definition for the given mode (<code>"light"</code> or <code>"dark"</code>).</li>
 <li><code>quarto.brand.get_color(mode, name)</code>: returns a brand colour by name in the output format (<em>e.g.</em>, <code>quarto.brand.get_color("light", "primary")</code>).</li>
 <li><code>quarto.brand.get_color_css(mode, name)</code>: returns the colour in CSS format.</li>
-<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options (family, size, weight, etc.) for the given element.</li>
+<li><code>quarto.brand.get_typography(mode, name)</code>: returns a table of typography options such as family, size, and weight for the given element.</li>
 <li><code>quarto.brand.get_logo(mode, name)</code>: returns logo resource paths and alt text.</li>
 </ul>
 <p>This approach is useful when you need brand values <em>inside</em> the Lua filter itself, for instance to compute contrast ratios or choose between different rendering strategies before emitting Typst code. In this tutorial, we pass the mode to Typst instead, keeping colour logic in a single layer.</p>
@@ -1048,7 +1048,7 @@ Note&nbsp;1: Quarto Brand Lua API
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Pandoc parses this into a Div element with:</p>
 <ul>
-<li><strong><code>div.content</code></strong>: An array of block elements (paragraphs, lists, etc.).</li>
+<li><strong><code>div.content</code></strong>: An array of block elements, such as paragraphs and lists.</li>
 <li><strong><code>div.classes</code></strong>: A list of classes ([“panel”]).</li>
 <li><strong><code>div.attributes</code></strong>: A table of key-value pairs.</li>
 </ul>
@@ -1283,7 +1283,7 @@ Note&nbsp;1: Quarto Brand Lua API
 </section>
 <section id="the-panel-wrapper-injecting-the-colour-scheme" class="level3" data-number="7.6">
 <h3 data-number="7.6" class="anchored" data-anchor-id="the-panel-wrapper-injecting-the-colour-scheme"><span class="header-section-number">7.6</span> The Panel Wrapper: Injecting the Colour Scheme</h3>
-<p>Unlike badges, where the Lua handler passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
+<p>Unlike badges, where the Lua filter passes <code>effective-brand-mode</code> directly to <code>simple-badge</code>, panels need a richer colour dictionary. The <code>render-panel</code> function accepts a <code>colours</code> parameter that the Lua filter cannot populate at parse time. A wrapper function in <code>typst-show.typ</code> bridges this gap:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>_extensions/my-extension/typst-show.typ</strong></pre>
@@ -1303,10 +1303,10 @@ Note&nbsp;1: Quarto Brand Lua API
 </dd>
 <dt data-target-cell="annotated-cell-20" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-20" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments (<code>title</code>, <code>style</code>, etc.) unchanged.</span>
+<span data-code-cell="annotated-cell-20" data-code-lines="5" data-code-annotation="2">Forwards all other named arguments, such as <code>title</code> and <code>style</code>, unchanged.</span>
 </dd>
 </dl>
-<p>The Lua handler generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
+<p>The Lua filter generates <code>#my-panel(style: "info")[...]</code>, and at render time <code>my-panel</code> resolves the colour scheme before delegating to <code>render-panel</code>.</p>
 <div class="highlight">
 <p>For badges, passing <code>mode</code> directly to the Typst function is sufficient. For panels, a <strong>wrapper function</strong> injects a full colour dictionary that depends on runtime context. Choose the simpler approach when it works; use a wrapper when the rendering function needs derived values the Lua filter cannot provide.</p>
 </div>

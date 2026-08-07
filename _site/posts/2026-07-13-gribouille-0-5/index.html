@@ -526,7 +526,7 @@ and a bump chart with filled points.
   <li><a href="#streamgraphs" id="toc-streamgraphs" class="nav-link" data-scroll-target="#streamgraphs"><span class="header-section-number">10.1</span> Streamgraphs</a></li>
   </ul></li>
   <li><a href="#agents-and-plugins" id="toc-agents-and-plugins" class="nav-link" data-scroll-target="#agents-and-plugins"><span class="header-section-number">11</span> Agents and plugins</a></li>
-  <li><a href="#under-the-hood" id="toc-under-the-hood" class="nav-link" data-scroll-target="#under-the-hood"><span class="header-section-number">12</span> Under the hood</a></li>
+  <li><a href="#stricter-errors-and-rendering-fixes" id="toc-stricter-errors-and-rendering-fixes" class="nav-link" data-scroll-target="#stricter-errors-and-rendering-fixes"><span class="header-section-number">12</span> Stricter Errors and Rendering Fixes</a></li>
   <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up"><span class="header-section-number">13</span> Wrap-up</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-07-13-gribouille-0-5/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -1221,13 +1221,13 @@ chart with filled points.
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/plugin</span> marketplace add mcanouil/gribouille</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/plugin</span> install gribouille@gribouille</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="under-the-hood" class="level2" data-number="12">
-<h2 data-number="12" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">12</span> Under the hood</h2>
+<section id="stricter-errors-and-rendering-fixes" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="stricter-errors-and-rendering-fixes"><span class="header-section-number">12</span> Stricter Errors and Rendering Fixes</h2>
 <p>As always, a good share of the release is fixes rather than features.</p>
 <div class="highlight">
 <p><strong>Errors fail loudly now:</strong> an unknown aesthetic, theme key, stat, or column stops with a clear message instead of a misleading plot.</p>
 </div>
-<p>The biggest is stricter validation. An unknown <code>aes()</code> channel, such as the US spelling <code>color</code>, now fails with the list of valid channels instead of drawing an empty plot. <code>theme()</code> rejects a misspelled element key, an unknown <code>stat</code> or scale <code>transform</code> fails with a clear message rather than rendering as identity, and mapping an aesthetic to a missing column names the column and lists the ones that exist.</p>
+<p>The biggest is stricter validation. An unknown <code>aes()</code> aesthetic, such as the US spelling <code>color</code>, now fails with the list of valid aesthetics instead of drawing an empty plot. <code>theme()</code> rejects a misspelled element key, an unknown <code>stat</code> or scale <code>transform</code> fails with a clear message rather than rendering as identity, and mapping an aesthetic to a missing column names the column and lists the ones that exist.</p>
 <p>Two rendering fixes are worth calling out. Abutting opaque fills, such as tiles, hexes, and stacked bars, are now stroked with their own fill colour, which removes the hairline seams that antialiasing used to bleed through between them. And <code>stat-quantile</code> drops its cubic pair enumeration for an exact <code>O(n^2 log n)</code> search, so <code>geom-quantile</code> scales to thousands of rows.</p>
 <p>Facets and compositions also gain spacing control. <code>facet-wrap</code> and <code>facet-grid</code> take a <code>gutter</code> argument, and a new <code>theme(panel-spacing:)</code> default sets the gap for both axes at once (a length, or a <code>(x:, y:)</code> dictionary); <code>compose</code>’s <code>gutter</code> now accepts the same dictionary form.</p>
 </section>

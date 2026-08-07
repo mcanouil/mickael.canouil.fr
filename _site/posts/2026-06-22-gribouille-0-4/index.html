@@ -519,7 +519,7 @@ long flat run to a final amber spike.
   <li><a href="#a-grid-cascade-and-minor-gridlines" id="toc-a-grid-cascade-and-minor-gridlines" class="nav-link" data-scroll-target="#a-grid-cascade-and-minor-gridlines"><span class="header-section-number">5</span> A grid cascade and minor gridlines</a></li>
   <li><a href="#filter-pin-and-auto-bounds" id="toc-filter-pin-and-auto-bounds" class="nav-link" data-scroll-target="#filter-pin-and-auto-bounds"><span class="header-section-number">6</span> Filter, pin, and auto bounds</a></li>
   <li><a href="#an-advanced-example-a-star-history-chart" id="toc-an-advanced-example-a-star-history-chart" class="nav-link" data-scroll-target="#an-advanced-example-a-star-history-chart"><span class="header-section-number">7</span> An advanced example: a star-history chart</a></li>
-  <li><a href="#under-the-hood" id="toc-under-the-hood" class="nav-link" data-scroll-target="#under-the-hood"><span class="header-section-number">8</span> Under the hood</a></li>
+  <li><a href="#theme-position-and-scale-fixes" id="toc-theme-position-and-scale-fixes" class="nav-link" data-scroll-target="#theme-position-and-scale-fixes"><span class="header-section-number">8</span> Theme, Position, and Scale Fixes</a></li>
   <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up"><span class="header-section-number">9</span> Wrap-up</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-06-22-gribouille-0-4/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -800,7 +800,7 @@ a final amber spike.
 </section>
 <section id="filter-pin-and-auto-bounds" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filter-pin-and-auto-bounds"><span class="header-section-number">6</span> Filter, pin, and auto bounds</h2>
-<p>A few smaller changes make everyday plotting shorter. The bundled datasets are plain row-store arrays now, so you can <code>filter</code> and <code>map</code> them in place before they reach <code>plot()</code>. Any aesthetic can be pinned as a constant straight on a geom. And a scale <code>limit</code> or <code>expand</code> accepts <code>auto</code> on one side, keeping the trained value for the other.</p>
+<p>A few smaller changes make everyday plotting shorter. The bundled datasets are plain row-store arrays now, so you can <code>filter</code> and <code>map</code> them in place before they reach <code>plot()</code>. Any aesthetic can be pinned as a constant straight on a geom. And a scale <code>limits</code> or <code>expand</code> accepts <code>auto</code> on one side, keeping the trained value for the other.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>plot<span class="op">(</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-2" class="code-annotation-target"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> penguins<span class="op">.</span>filter<span class="op">(</span>row <span class="op">=&gt;</span> row<span class="op">.</span>species <span class="op">==</span> <span class="st">"Gentoo"</span><span class="op">),</span></span>
@@ -1226,8 +1226,8 @@ a final amber spike.
 </div>
 <p>The full, unedited source is in the repository under <a href="https://github.com/mcanouil/gribouille/tree/main/.github/star-history"><code>.github/star-history/</code></a>.</p>
 </section>
-<section id="under-the-hood" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="under-the-hood"><span class="header-section-number">8</span> Under the hood</h2>
+<section id="theme-position-and-scale-fixes" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="theme-position-and-scale-fixes"><span class="header-section-number">8</span> Theme, Position, and Scale Fixes</h2>
 <p>As with every release, a good share of the work is fixes rather than features.</p>
 <p>The theme cascade is the largest of them. Setting the base <code>line</code> or <code>rect</code> stroke in <code>theme()</code> now reaches every line and rect surface: the panel grid, axis lines, ticks, and legend marks. Setting the base <code>text</code> size cascades to every text surface in the same way. On top of that, <code>element-line</code>, <code>element-rect</code>, and <code>element-text</code> accept a ratio such as <code>80%</code> to scale a single surface against its parent, while an absolute length still pins one outright.</p>
 <p>A second group lines up marks and positions.</p>
@@ -1237,7 +1237,7 @@ a final amber spike.
 </ul>
 <p>A third group cleans up scales and presets.</p>
 <ul>
-<li>Explicit continuous <code>breaks</code> expand the axis range so the requested ticks stay visible, unless a side is pinned by an explicit <code>limit</code>.</li>
+<li>Explicit continuous <code>breaks</code> expand the axis range so the requested ticks stay visible, unless a side is pinned by explicit <code>limits</code>.</li>
 <li><code>theme-grey()</code> now matches ggplot2’s <code>theme_grey()</code>, with white gridlines and no axis lines.</li>
 </ul>
 <div class="highlight">
