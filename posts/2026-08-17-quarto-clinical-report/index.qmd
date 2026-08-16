@@ -30,6 +30,7 @@ extensions:
     output-directory: ./assets/typst-render
     format: svg
     align: center
+    classes: hero-art
     cache: false
     background:
       light: "#fafafa"
@@ -37,8 +38,6 @@ extensions:
     foreground:
       light: "#111827"
       dark: "#f5f5f4"
-resources:
-  - assets/**
 ---
 
 A clinical study report is a long document with numbered tables, a signed approval page, and firm rules about what goes where.
@@ -65,7 +64,6 @@ The data are the public CDISC pilot study `CDISCPILOT01` shipped with `pharmaver
 
 ![The cover page of the Typst PDF.](assets/cover.png){
   fig-alt="Cover page of the clinical study report. A dark teal band across the top holds the Nordvale Therapeutics logo. Below it, the protocol number, the title Clinical Study Report, an amber rule, the study subtitle, and a two-column grid of fields: compound, study phase, indication, sponsor, report version, and report date. An amber-edged panel reads Draft, this document is a draft and is not for regulatory submission. A confidentiality panel and a disclaimer sit at the bottom."
-  fig-align="center"
   width="250px"
   .hero-art
 }
@@ -126,14 +124,14 @@ A document then asks for `clinical-typst` or `clinical-html`, and gets the spons
 #let box-fill = color.mix((bg, 90%), (fg, 10%))
 #let box-stroke = color.mix((fg, 20%), (bg, 80%)) + 0.5pt
 
-#let node(body, detail: none, stroke: box-stroke) = rect(
+#let node(body, detail: "", stroke: box-stroke) = rect(
   fill: box-fill, stroke: stroke, radius: 3pt,
   inset: (x: 9pt, y: 8pt), width: 100%, height: 100%,
 )[
   #align(center + horizon)[
     #stack(spacing: 4pt,
       text(size: 9pt, fill: fg)[#body],
-      ..if detail == none { () } else { (text(size: 7pt, fill: muted)[#detail],) },
+      text(size: 7pt, fill: muted)[#detail],
     )
   ]
 ]
@@ -144,22 +142,20 @@ A document then asks for `clinical-typst` or `clinical-html`, and gets the spons
   let row = (avail.height - 24pt) / 3
   grid(
     columns: (1fr, 30pt, 1.15fr, 30pt, 1fr),
-    rows: (row, 12pt, row, 12pt, row),
+    rows: (avail.height,),
     align: horizon,
-    grid.cell(rowspan: 5, stack(spacing: 12pt,
+    stack(spacing: 12pt,
       block(height: row)[#node(raw("sections/*.qmd"), detail: "the ICH E3 chapters")],
       block(height: row)[#node(raw("R/tlf.R"), detail: "one function per output")],
       block(height: row)[#node(raw("_brand.yml"), detail: "colours, fonts, logos")],
-    )),
-    grid.cell(rowspan: 5, arr),
-    grid.cell(rowspan: 5, node(
-      [Quarto], detail: "with the nordvale/clinical extension", stroke: teal + 1.2pt,
-    )),
-    grid.cell(rowspan: 5, arr),
-    grid.cell(rowspan: 5, stack(spacing: 12pt,
+    ),
+    arr,
+    node([Quarto], detail: "with the nordvale/clinical extension", stroke: teal + 1.2pt),
+    arr,
+    stack(spacing: 12pt,
       block(height: row * 1.5)[#node(raw("clinical-typst"), detail: "a branded PDF", stroke: amber + 1pt)],
       block(height: row * 1.5)[#node(raw("clinical-html"), detail: "a searchable site", stroke: teal + 1pt)],
-    )),
+    ),
   )
 })
 ```
@@ -167,10 +163,10 @@ A document then asks for `clinical-typst` or `clinical-html`, and gets the spons
 The two renderings are not a screenshot of each other.
 They are the same chapter, computed once, laid out twice.
 
-::: {layout-ncol="2" style="text-align:center;"}
-![The **Typst** PDF](assets/table.png){fig-alt="Page 15 of the PDF. A numbered heading reads 7 Primary and secondary endpoints, followed by Table 7.1 with a dark teal header row, a source note under it, and a Kaplan-Meier figure with a risk table." fig-align="center" .hero-art}
+::: {layout-ncol="2"}
+![The **Typst** PDF](assets/table.png){fig-alt="Page 15 of the PDF. A numbered heading reads 7 Primary and secondary endpoints, followed by Table 7.1 with a dark teal header row, a source note under it, and a Kaplan-Meier figure with a risk table." .hero-art}
 
-![The **HTML** site](assets/html-site.png){fig-alt="The same chapter on the HTML site. A left sidebar lists the chapters and appendices, and the main column shows Table 7.1 with the same teal header row and the same Kaplan-Meier figure." fig-align="center" .hero-art}
+![The **HTML** site](assets/html-site.png){fig-alt="The same chapter on the HTML site. A left sidebar lists the chapters and appendices, and the main column shows Table 7.1 with the same teal header row and the same Kaplan-Meier figure." .hero-art}
 :::
 
 ## The Typst Template
@@ -186,6 +182,7 @@ page(
   header: none,
   footer: none,
   numbering: none,
+  background: none,
 )[
   #block(width: 100%, height: 42mm, fill: primary, inset: (x: 20mm, y: 14mm))[   // <2>
     #if logo != none {
@@ -252,7 +249,6 @@ The template turns each approval into a signature block.
 
 ![The document control page, with the revision history, the approval block, and the draft watermark.](assets/document-control.png){
   fig-alt="Page one of the report body. A heading reads Document control, followed by a table of two revisions with a teal header row, then an Approval section with three signature blocks, each showing a name, a role, and ruled lines for signature and date. A faint diagonal DRAFT watermark crosses the page. The footer reads Page 1 of 49."
-  fig-align="center"
   width="250px"
   .hero-art
 }
@@ -265,7 +261,7 @@ The title of the table of contents comes from `quarto.language`, which is why th
 Everything else the template writes is English in the source: "Signature", "Date", "Draft", "Confidential", and "Page N of M".
 A key under `language` that Quarto does not ship passes validation and is merged over the defaults.
 It is then dropped before templates see it, so it reads back as an empty string, with no warning.
-I reported that as [quarto-cli#14772](https://github.com/quarto-dev/quarto-cli/issues/14772), and the fix proposed in [#14773](https://github.com/quarto-dev/quarto-cli/pull/14773) targets Quarto 1.11.
+I reported that as [quarto-dev/quarto-cli#14772](https://github.com/quarto-dev/quarto-cli/issues/14772), and the fix proposed in [quarto-dev/quarto-cli#14773](https://github.com/quarto-dev/quarto-cli/pull/14773) targets Quarto 1.11.
 
 :::
 
@@ -279,10 +275,8 @@ The running footer numbers the pages as X of Y, which Typst gives you with the f
 The watermark is one comparison, read once at the top of the template.
 
 ```typst
-#let is-draft = lower(status) == "draft"
+let is-draft = lower(status) == "draft"
 ```
-
-That flag then drives the notice on the cover and the background of every page.
 
 ::: {.highlight}
 
@@ -296,7 +290,6 @@ Two listings are wider than a portrait page, so the appendix wraps those two in 
 
 ![The one landscape page, holding the two widest listings.](assets/listing-landscape.png){
   fig-alt="A landscape page from the appendix. Listing A.4 lists serious treatment-emergent adverse events, with columns for subject, treatment, preferred term, system organ class, onset day, severity, relatedness, and outcome. Listing A.5 below it lists abnormal laboratory values meeting a liver-injury criterion. The DRAFT watermark sits behind the tables."
-  fig-align="center"
   width="450px"
   .hero-art
 }
@@ -397,10 +390,10 @@ That page is the only place the `number` and `section` fields are printed, and i
 
 ![The index of outputs, where the Quarto number of each output meets its ICH E3 number.](assets/index-of-outputs.png){
   fig-alt="A page headed A.2 Index of outputs. Each entry is a term such as Table 7.1 with a description under it reading, for example, Time to first dermatologic treatment-emergent adverse event. ICH E3 output Table 14.2.1, section 14.2. Intention-to-treat population."
-  fig-align="center"
   width="450px"
   .hero-art
 }
+
 Changing an output number is a one-line edit in one file, and every mention of it follows.
 
 ## Book or One Long Document
@@ -457,7 +450,7 @@ A table taller than the space left overflowed the page instead of continuing on 
 One show rule fixes it, and Typst then repeats the header rows on each page.
 
 ```typst
-#show figure.where(kind: "quarto-float-tbl"): set block(breakable: true)
+show figure.where(kind: "quarto-float-tbl"): set block(breakable: true)
 ```
 
 Plots stay unbreakable, so an image never parts from its caption.
