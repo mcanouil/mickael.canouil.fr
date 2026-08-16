@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
+<meta name="description" content="A complete Quarto project that turns public CDISC pilot data into a sponsor-style clinical study report, rendered to a branded Typst PDF and an HTML site from one source. This post walks through the format extension, the Typst template, the brand, the output index, and the checks.">
 
-<title>Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions – Mickaël CANOUIL</title>
+<title>A Clinical Study Report in Quarto, End to End – Mickaël CANOUIL</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -188,30 +188,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/">
-<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/svg+xml" href="../../assets/images/icon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/apple-touch-icon.png">
-<link rel="manifest" href="../../site.webmanifest">
 
 
-<meta property="og:title" content="Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions - mickael.canouil.fr">
-<meta property="og:description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/featured.png">
+<meta property="og:title" content="A Clinical Study Report in Quarto, End to End - mickael.canouil.fr">
+<meta property="og:description" content="A complete Quarto project that turns public CDISC pilot data into a sponsor-style clinical study report, rendered to a branded Typst PDF and an HTML site from one source. This post walks through the format extension, the Typst template, the brand, the output index, and the checks.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/featured.png">
 <meta property="og:site_name" content="Mickaël CANOUIL">
 <meta property="og:locale" content="en_GB">
-<meta property="og:image:height" content="1080">
-<meta property="og:image:width" content="1920">
-<meta property="og:image:alt" content="Quarto logo and Lua programming language logo separated by diagonal line with a gradient.">
-<meta name="twitter:title" content="Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions – Mickaël CANOUIL">
-<meta name="twitter:description" content="This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/featured.png">
+<meta property="og:image:height" content="806">
+<meta property="og:image:width" content="1536">
+<meta property="og:image:alt" content="Card titled &quot;A Clinical Study Report in Quarto&quot; in dark teal on an off-white
+background, under a teal band reading &quot;Quarto, Typst, pharmaverse&quot;.
+An amber rule sits under the title, above the line &quot;Public CDISC pilot data
+to a branded Typst PDF and an HTML site, from one source.&quot; and four grey
+chips labelled _brand.yml, Typst template, ICH E3 numbering, and double
+programming. A faint diagonal DRAFT watermark shows on the right.
+">
+<meta name="twitter:title" content="A Clinical Study Report in Quarto, End to End – Mickaël CANOUIL">
+<meta name="twitter:description" content="A complete Quarto project that turns public CDISC pilot data into a sponsor-style clinical study report, rendered to a branded Typst PDF and an HTML site from one source. This post walks through the format extension, the Typst template, the brand, the output index, and the checks.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/featured.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="1080">
-<meta name="twitter:image-width" content="1920">
-<meta name="twitter:image:alt" content="Quarto logo and Lua programming language logo separated by diagonal line with a gradient.">
-<link rel="canonical" href="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/">
+<meta name="twitter:image-height" content="806">
+<meta name="twitter:image-width" content="1536">
+<meta name="twitter:image:alt" content="Card titled &quot;A Clinical Study Report in Quarto&quot; in dark teal on an off-white
+background, under a teal band reading &quot;Quarto, Typst, pharmaverse&quot;.
+An amber rule sits under the title, above the line &quot;Public CDISC pilot data
+to a branded Typst PDF and an HTML site, from one source.&quot; and four grey
+chips labelled _brand.yml, Typst template, ICH E3 numbering, and double
+programming. A faint diagonal DRAFT watermark shows on the right.
+">
+<link rel="canonical" href="https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/">
 </head>
 
 <body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -449,18 +455,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Lua Best Practices for Quarto Extensions: Building Maintainable and Robust Extensions</h1>
+      <h1 class="title">A Clinical Study Report in Quarto, End to End</h1>
                   <div>
         <div class="description">
-          <p>This guide explores essential practices drawn from Quarto’s extensions and community standards, covering project structure, error handling, documentation, and release management to help transform your extensions into reliable, community-friendly tools that stand the test of time.</p>
+          <p>A complete Quarto project that turns public CDISC pilot data into a sponsor-style clinical study report, rendered to a branded Typst PDF and an HTML site from one source. This post walks through the format extension, the Typst template, the brand, the output index, and the checks.</p>
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">quarto</div>
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">clinical</div>
+                <div class="quarto-category">pharmaverse</div>
+                <div class="quarto-category">brand</div>
                 <div class="quarto-category">extensions</div>
-                <div class="quarto-category">productivity</div>
-                <div class="quarto-category">best practices</div>
-                <div class="quarto-category">lua</div>
               </div>
                   </div>
   </div>
@@ -483,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Thursday, the 6th of November, 2025</p>
+        <p class="date">Monday, the 17th of August, 2026</p>
       </div>
     </div>
     
@@ -499,36 +507,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-foundation-structure-and-organisation" id="toc-the-foundation-structure-and-organisation" class="nav-link active" data-scroll-target="#the-foundation-structure-and-organisation">The Foundation: Structure and Organisation</a>
-  <ul class="collapse">
-  <li><a href="#consistent-project-structure" id="toc-consistent-project-structure" class="nav-link" data-scroll-target="#consistent-project-structure">Consistent Project Structure</a></li>
-  <li><a href="#module-loading" id="toc-module-loading" class="nav-link" data-scroll-target="#module-loading">Module Loading</a></li>
-  </ul></li>
-  <li><a href="#configuration-and-validation" id="toc-configuration-and-validation" class="nav-link" data-scroll-target="#configuration-and-validation">Configuration and Validation</a>
-  <ul class="collapse">
-  <li><a href="#configuration-hierarchy" id="toc-configuration-hierarchy" class="nav-link" data-scroll-target="#configuration-hierarchy">Configuration Hierarchy</a></li>
-  <li><a href="#parameter-scoping-to-avoid-conflicts" id="toc-parameter-scoping-to-avoid-conflicts" class="nav-link" data-scroll-target="#parameter-scoping-to-avoid-conflicts">Parameter Scoping to Avoid Conflicts</a></li>
-  <li><a href="#input-validation" id="toc-input-validation" class="nav-link" data-scroll-target="#input-validation">Input Validation</a></li>
-  </ul></li>
-  <li><a href="#documentation-as-code" id="toc-documentation-as-code" class="nav-link" data-scroll-target="#documentation-as-code">Documentation as Code</a>
-  <ul class="collapse">
-  <li><a href="#luadoc-annotations" id="toc-luadoc-annotations" class="nav-link" data-scroll-target="#luadoc-annotations">LuaDoc Annotations</a></li>
-  <li><a href="#structured-code-organisation" id="toc-structured-code-organisation" class="nav-link" data-scroll-target="#structured-code-organisation">Structured Code Organisation</a></li>
-  </ul></li>
-  <li><a href="#error-handling-and-logging" id="toc-error-handling-and-logging" class="nav-link" data-scroll-target="#error-handling-and-logging">Error Handling and Logging</a>
-  <ul class="collapse">
-  <li><a href="#graceful-degradation" id="toc-graceful-degradation" class="nav-link" data-scroll-target="#graceful-degradation">Graceful Degradation</a></li>
-  <li><a href="#informative-logging" id="toc-informative-logging" class="nav-link" data-scroll-target="#informative-logging">Informative Logging</a></li>
-  </ul></li>
-  <li><a href="#distribution-and-maintenance" id="toc-distribution-and-maintenance" class="nav-link" data-scroll-target="#distribution-and-maintenance">Distribution and Maintenance</a>
-  <ul class="collapse">
-  <li><a href="#semantic-versioning" id="toc-semantic-versioning" class="nav-link" data-scroll-target="#semantic-versioning">Semantic Versioning</a></li>
-  <li><a href="#deprecation-handling" id="toc-deprecation-handling" class="nav-link" data-scroll-target="#deprecation-handling">Deprecation Handling</a></li>
-  </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
-  <li><a href="#resources-and-further-reading" id="toc-resources-and-further-reading" class="nav-link" data-scroll-target="#resources-and-further-reading">Resources and Further Reading</a></li>
+  <li><a href="#what-the-report-is" id="toc-what-the-report-is" class="nav-link active" data-scroll-target="#what-the-report-is">What the Report Is</a></li>
+  <li><a href="#one-source-two-formats" id="toc-one-source-two-formats" class="nav-link" data-scroll-target="#one-source-two-formats">One Source, Two Formats</a></li>
+  <li><a href="#the-typst-template" id="toc-the-typst-template" class="nav-link" data-scroll-target="#the-typst-template">The Typst Template</a></li>
+  <li><a href="#the-brand-reaches-the-figures" id="toc-the-brand-reaches-the-figures" class="nav-link" data-scroll-target="#the-brand-reaches-the-figures">The Brand Reaches the Figures</a></li>
+  <li><a href="#every-output-has-a-number" id="toc-every-output-has-a-number" class="nav-link" data-scroll-target="#every-output-has-a-number">Every Output Has a Number</a></li>
+  <li><a href="#book-or-one-long-document" id="toc-book-or-one-long-document" class="nav-link" data-scroll-target="#book-or-one-long-document">Book or One Long Document</a></li>
+  <li><a href="#checking-the-numbers" id="toc-checking-the-numbers" class="nav-link" data-scroll-target="#checking-the-numbers">Checking the Numbers</a></li>
+  <li><a href="#what-i-would-watch-out-for" id="toc-what-i-would-watch-out-for" class="nav-link" data-scroll-target="#what-i-would-watch-out-for">What I Would Watch Out For</a></li>
+  <li><a href="#render-it-yourself" id="toc-render-it-yourself" class="nav-link" data-scroll-target="#render-it-yourself">Render It Yourself</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-11-06-quarto-extensions-lua/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-08-17-quarto-clinical-report/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -544,392 +533,435 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<p>A clinical study report is a long document with numbered tables, a signed approval page, and firm rules about what goes where. I wanted to know how much of one Quarto can carry on its own. So I built one from public data, and put the whole project on GitHub.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Quarto logo and Lua programming language logo separated by diagonal line with a gradient." width="600"></a></p>
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Card titled &quot;A Clinical Study Report in Quarto&quot; in dark teal on an
+off-white background, under a teal band reading &quot;Quarto, Typst,
+pharmaverse&quot;. An amber rule sits under the title, above the line &quot;Public
+CDISC pilot data to a branded Typst PDF and an HTML site, from one
+source.&quot; and four grey chips labelled \_brand.yml, Typst template, ICH
+E3 numbering, and double programming. A faint diagonal DRAFT watermark
+shows on the right.
+" width="600"></a></p>
 </figure>
 </div>
-<p>Quarto extensions represent one of the most powerful aspects of the publishing platform, allowing developers to extend core functionality far beyond what’s possible with configuration alone. Through extensions, you can add custom shortcodes for embedding interactive content, create filters that transform document structure, develop entirely new output formats, and integrate third-party libraries seamlessly into the rendering pipeline.</p>
-<p>Whether you’re building a simple shortcode to embed tweets, creating a sophisticated filter for academic citations, or developing a complete custom format for journal submissions, Lua serves as the extensibility layer that makes it all possible. The flexibility is remarkable: extensions can process the document’s abstract syntax tree (AST), inject CSS and JavaScript dependencies, generate format-specific output, and even interact with external systems during rendering.</p>
-<div class="highlight">
-<p>With <strong>great power</strong> comes <strong>great responsibility</strong>.</p>
+<section id="what-the-report-is" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-report-is">What the Report Is</h2>
+<p><code>demo-quarto-clinical-report</code> is an abbreviated clinical study report, written in the section order of ICH E3<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. It has a synopsis, ethics, design, statistical methods, study patients, demographics, endpoints, safety, conclusions, and three appendices. The PDF is 50 pages, cover included, with 30 numbered tables, listings, and figures.</p>
+<p>Two things before anything else. Nordvale Therapeutics is a fictional sponsor, invented for the demo. The data are the public CDISC pilot study <code>CDISCPILOT01</code> shipped with <code>pharmaverseadam</code>, and the report is not a regulatory submission.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/cover.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="The cover page of the Typst PDF."><img src="assets/cover.png" class="hero-art img-fluid figure-img" alt="Cover page of the clinical study report. A dark teal band across the top holds the Nordvale Therapeutics logo. Below it, the protocol number, the title Clinical Study Report, an amber rule, the study subtitle, and a two-column grid of fields: compound, study phase, indication, sponsor, report version, and report date. An amber-edged panel reads Draft, this document is a draft and is not for regulatory submission. A confidentiality panel and a disclaimer sit at the bottom." width="250"></a></p>
+<figcaption>The cover page of the Typst PDF.</figcaption>
+</figure>
 </div>
-<p>As extensions become more complex and widely adopted, following established best practices becomes valuable for creating code that’s maintainable, reliable, and accessible to the broader community. Drawing from patterns established in Quarto’s extensions and emerging community standards, this guide explores the essential practices that help transform initial working extensions into well-crafted, robust solutions.</p>
+</section>
+<section id="one-source-two-formats" class="level2">
+<h2 class="anchored" data-anchor-id="one-source-two-formats">One Source, Two Formats</h2>
+<p>The project carries one extension, <code>_extensions/nordvale/clinical</code>, and that extension contributes two formats.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/nordvale/clinical/_extension.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="_extensions/nordvale/clinical/_extension.yml"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contributes</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">formats</span><span class="kw">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">common</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-4"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">toc</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">toc-depth</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="annotated-cell-1-6"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">number-sections</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">lang</span><span class="kw">:</span><span class="at"> en-GB</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-8" class="code-annotation-target"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">typst</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> typst-template.typ</span></span>
+<span id="annotated-cell-1-11"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> typst-show.typ</span></span>
+<span id="annotated-cell-1-12"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">filters</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">path</span><span class="kw">:</span><span class="at"> appendices.lua</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">at</span><span class="kw">:</span><span class="at"> post-quarto</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">papersize</span><span class="kw">:</span><span class="at"> a4</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">section-numbering</span><span class="kw">:</span><span class="at"> </span><span class="st">"1.1.1"</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-17" class="code-annotation-target"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">font-paths</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-18"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> _extensions/nordvale/clinical/fonts</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-19" class="code-annotation-target"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">html</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-20"><a href="#annotated-cell-1-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">theme</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-21"><a href="#annotated-cell-1-21" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> cosmo</span></span>
+<span id="annotated-cell-1-22"><a href="#annotated-cell-1-22" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> brand</span></span>
+<span id="annotated-cell-1-23"><a href="#annotated-cell-1-23" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> clinical.scss</span></span>
+<span id="annotated-cell-1-24"><a href="#annotated-cell-1-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">filters</span><span class="kw">:</span></span>
+<span id="annotated-cell-1-25"><a href="#annotated-cell-1-25" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> inline-svglite.lua</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">What both formats agree on, merged into each one.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="8" data-code-annotation="2">The two template partials that build the pages, and the filter that numbers the floats by chapter.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="3">The fonts travel with the extension, so the PDF does not depend on what is installed.</span>
+</dd>
+<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-1" data-code-lines="19" data-code-annotation="4">The theme, and the filter that inlines the figures.</span>
+</dd>
+</dl>
+<p>A document then asks for <code>clinical-typst</code> or <code>clinical-html</code>, and gets the sponsor identity with it.</p>
+<div id="fig-flow" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<div class="light-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-08-17-quarto-clinical-report/./assets/typst-render/index/fig-flow-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;1: One set of sections, one extension, two renderings."><img src="../../posts/2026-08-17-quarto-clinical-report/./assets/typst-render/index/fig-flow-light.svg" class="img-fluid hero-art figure-img" alt="Flow diagram. On the left, three stacked boxes: sections/*.qmd, R/tlf.R, and _brand.yml. An arrow points right to a taller box labelled Quarto with the nordvale/clinical extension. Another arrow points right to two stacked boxes: clinical-typst giving a PDF, and clinical-html giving a website."></a></p>
+</div>
+</div>
+<div class="dark-content">
+<div style="text-align: center;">
+<p><a href="../../posts/2026-08-17-quarto-clinical-report/./assets/typst-render/index/fig-flow-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figure&nbsp;1: One set of sections, one extension, two renderings."><img src="../../posts/2026-08-17-quarto-clinical-report/./assets/typst-render/index/fig-flow-dark.svg" class="img-fluid hero-art figure-img" alt="Flow diagram. On the left, three stacked boxes: sections/*.qmd, R/tlf.R, and _brand.yml. An arrow points right to a taller box labelled Quarto with the nordvale/clinical extension. Another arrow points right to two stacked boxes: clinical-typst giving a PDF, and clinical-html giving a website."></a></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: One set of sections, one extension, two renderings.
+</figcaption>
+</figure>
+</div>
+<p>The two renderings are not a screenshot of each other. They are the same chapter, computed once, laid out twice.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/table.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="The Typst PDF"><img src="assets/table.png" class="hero-art img-fluid figure-img" alt="Page 15 of the PDF. A numbered heading reads 7 Primary and secondary endpoints, followed by Table 7.1 with a dark teal header row, a source note under it, and a Kaplan-Meier figure with a risk table."></a></p>
+<figcaption>The <strong>Typst</strong> PDF</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/html-site.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The HTML site"><img src="assets/html-site.png" class="hero-art img-fluid figure-img" alt="The same chapter on the HTML site. A left sidebar lists the chapters and appendices, and the main column shows Table 7.1 with the same teal header row and the same Kaplan-Meier figure."></a></p>
+<figcaption>The <strong>HTML</strong> site</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-typst-template" class="level2">
+<h2 class="anchored" data-anchor-id="the-typst-template">The Typst Template</h2>
+<p><code>typst-template.typ</code> defines one function, <code>clinical()</code>, with the document metadata as its arguments. <code>typst-show.typ</code> is the piece that maps Quarto metadata onto that function, including the brand colours and the logo Quarto resolves from <code>_brand.yml</code>.</p>
+<p>The cover page is a page of its own, with the band reaching the paper edge.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/nordvale/clinical/typst-template.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="_extensions/nordvale/clinical/typst-template.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-2-1"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a>page(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-2" class="code-annotation-target"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a>  margin: (x: 0mm, y: 0mm),</span>
+<span id="annotated-cell-2-3"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a>  header: none,</span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  footer: none,</span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>  numbering: none,</span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>  background: none,</span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a>)[</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-8" class="code-annotation-target"><a href="#annotated-cell-2-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>block<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">42mm</span><span class="op">,</span> fill<span class="op">:</span> primary<span class="op">,</span> inset<span class="op">:</span> <span class="op">(</span>x: <span class="fl">20mm</span><span class="op">,</span> y: <span class="fl">14mm</span><span class="op">))[</span></span>
+<span id="annotated-cell-2-9"><a href="#annotated-cell-2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">#</span><span class="cf">if</span> logo <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
+<span id="annotated-cell-2-10"><a href="#annotated-cell-2-10" aria-hidden="true" tabindex="-1"></a>      logo</span>
+<span id="annotated-cell-2-11"><a href="#annotated-cell-2-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> else {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-2-12" class="code-annotation-target"><a href="#annotated-cell-2-12" aria-hidden="true" tabindex="-1"></a>      text(fill: paper, size: 20pt, weight: "semibold")[<span class="kw">#</span>sponsor]</span>
+<span id="annotated-cell-2-13"><a href="#annotated-cell-2-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-2-14"><a href="#annotated-cell-2-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">]</span></span>
+<span id="annotated-cell-2-15"><a href="#annotated-cell-2-15" aria-hidden="true" tabindex="-1"></a>]</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="2" data-code-annotation="1">No margin on this page, so a filled block can reach the edge of the paper.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="8" data-code-annotation="2">The band itself, coloured with the brand primary, with its own inset for the logo.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="12" data-code-annotation="3">A sponsor with no logo still gets a cover, with the name set in the same place.</span>
+</dd>
+</dl>
+<p>Then comes the document control page, which is the part a regulated document needs and a blog post rarely shows. It carries the revision history and the approval block, and both are written as metadata rather than as prose.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_metadata-csr.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="_metadata-csr.yml"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-1" class="code-annotation-target"><a href="#annotated-cell-3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">status</span><span class="kw">:</span><span class="at"> draft</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-3-2" class="code-annotation-target"><a href="#annotated-cell-3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">approvals</span><span class="kw">:</span></span>
+<span id="annotated-cell-3-3"><a href="#annotated-cell-3-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Study Statistician</span></span>
+<span id="annotated-cell-3-4"><a href="#annotated-cell-3-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">role</span><span class="kw">:</span><span class="at"> Biostatistics</span></span>
+<span id="annotated-cell-3-5"><a href="#annotated-cell-3-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Clinical Study Lead</span></span>
+<span id="annotated-cell-3-6"><a href="#annotated-cell-3-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">role</span><span class="kw">:</span><span class="at"> Clinical Development</span></span>
+<span id="annotated-cell-3-7"><a href="#annotated-cell-3-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Medical Monitor</span></span>
+<span id="annotated-cell-3-8"><a href="#annotated-cell-3-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">role</span><span class="kw">:</span><span class="at"> Clinical Safety and Pharmacovigilance</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-3-9" class="code-annotation-target"><a href="#annotated-cell-3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">revisions</span><span class="kw">:</span></span>
+<span id="annotated-cell-3-10"><a href="#annotated-cell-3-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"0.1"</span></span>
+<span id="annotated-cell-3-11"><a href="#annotated-cell-3-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">date</span><span class="kw">:</span><span class="at"> 2026-06-15</span></span>
+<span id="annotated-cell-3-12"><a href="#annotated-cell-3-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">summary</span><span class="kw">:</span><span class="at"> First draft for internal review.</span></span>
+<span id="annotated-cell-3-13"><a href="#annotated-cell-3-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"1.0"</span></span>
+<span id="annotated-cell-3-14"><a href="#annotated-cell-3-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">date</span><span class="kw">:</span><span class="at"> 2026-07-28</span></span>
+<span id="annotated-cell-3-15"><a href="#annotated-cell-3-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">summary</span><span class="kw">:</span><span class="at"> Statistical results added after database lock.</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="1" data-code-annotation="1">The one key that decides whether the document is a draft.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="2" data-code-annotation="2">One entry per approver, in the order they appear on the page.</span>
+</dd>
+<dt data-target-cell="annotated-cell-3" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-3" data-code-lines="9" data-code-annotation="3">The revision history, printed as a table above the signatures.</span>
+</dd>
+</dl>
+<p>The template turns each approval into a signature block.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/nordvale/clinical/typst-template.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-4" data-filename="_extensions/nordvale/clinical/typst-template.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">signature-block</span><span class="op">(</span>name<span class="op">,</span> role<span class="op">,</span> rule<span class="op">:</span> gray<span class="op">)</span> <span class="op">=</span> block<span class="op">(</span></span>
+<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span></span>
+<span id="annotated-cell-4-3"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a>  inset<span class="op">:</span> <span class="op">(</span>top: <span class="fl">10pt</span><span class="op">,</span> bottom: <span class="fl">6pt</span><span class="op">),</span></span>
+<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a><span class="op">)[</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-4-5" class="code-annotation-target"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>text<span class="op">(</span>size<span class="op">:</span> <span class="fl">10pt</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"semibold"</span><span class="op">)[</span><span class="kw">#</span>name<span class="op">]</span></span>
+<span id="annotated-cell-4-6"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>linebreak<span class="op">()</span></span>
+<span id="annotated-cell-4-7"><a href="#annotated-cell-4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>text<span class="op">(</span>size<span class="op">:</span> <span class="fl">9pt</span><span class="op">,</span> fill<span class="op">:</span> rule<span class="op">)[</span><span class="kw">#</span>role<span class="op">]</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-4-8" class="code-annotation-target"><a href="#annotated-cell-4-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>v<span class="op">(</span><span class="fl">26pt</span><span class="op">)</span></span>
+<span id="annotated-cell-4-9"><a href="#annotated-cell-4-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>grid<span class="op">(</span></span>
+<span id="annotated-cell-4-10"><a href="#annotated-cell-4-10" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">:</span> <span class="op">(</span><span class="fl">1fr</span><span class="op">,</span> <span class="fl">1fr</span><span class="op">),</span></span>
+<span id="annotated-cell-4-11"><a href="#annotated-cell-4-11" aria-hidden="true" tabindex="-1"></a>    column-gutter<span class="op">:</span> <span class="fl">12pt</span><span class="op">,</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-4-12" class="code-annotation-target"><a href="#annotated-cell-4-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="kw">#</span>line<span class="op">(</span>length<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> stroke<span class="op">:</span> <span class="fl">0.6pt</span> <span class="op">+</span> rule<span class="op">)</span> <span class="kw">#</span>text<span class="op">(</span>size<span class="op">:</span> <span class="fl">8pt</span><span class="op">,</span> fill<span class="op">:</span> rule<span class="op">)[</span>Signature<span class="op">]],</span></span>
+<span id="annotated-cell-4-13"><a href="#annotated-cell-4-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="kw">#</span>line<span class="op">(</span>length<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> stroke<span class="op">:</span> <span class="fl">0.6pt</span> <span class="op">+</span> rule<span class="op">)</span> <span class="kw">#</span>text<span class="op">(</span>size<span class="op">:</span> <span class="fl">8pt</span><span class="op">,</span> fill<span class="op">:</span> rule<span class="op">)[</span>Date<span class="op">]],</span></span>
+<span id="annotated-cell-4-14"><a href="#annotated-cell-4-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="annotated-cell-4-15"><a href="#annotated-cell-4-15" aria-hidden="true" tabindex="-1"></a><span class="op">]</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="5" data-code-annotation="1">The name and the role, taken from one entry of <code>approvals</code>.</span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="8" data-code-annotation="2">The gap a pen needs, which is the only reason this block exists.</span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="12" data-code-annotation="3">Two ruled lines, one for the signature and one for the date.</span>
+</dd>
+</dl>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/document-control.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="The document control page, with the revision history, the approval block, and the draft watermark."><img src="assets/document-control.png" class="hero-art img-fluid figure-img" alt="Page one of the report body. A heading reads Document control, followed by a table of two revisions with a teal header row, then an Approval section with three signature blocks, each showing a name, a role, and ruled lines for signature and date. A faint diagonal DRAFT watermark crosses the page. The footer reads Page 1 of 49." width="250"></a></p>
+<figcaption>The document control page, with the revision history, the approval block, and the draft watermark.</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+<span class="screen-reader-only">Note</span>The words the template writes itself
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This guide presents opinionated recommendations. Whilst these approaches have proven effective in practice, they represent one way of thinking about extension development rather than strict requirements. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is choosing patterns that work for your specific context and maintaining consistency within your projects.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> targets Quarto 1.11.</p>
 </div>
 </div>
-<p>The difference between a working solution and a polished extension lies not just in functionality, but in attention to structure, error handling, documentation, and user experience. Well-crafted extensions anticipate edge cases, provide helpful error messages, support multiple output formats gracefully, and maintain backward compatibility as they evolve. They follow consistent patterns that make them easier to understand, modify, and debug.</p>
-<section id="the-foundation-structure-and-organisation" class="level2">
-<h2 class="anchored" data-anchor-id="the-foundation-structure-and-organisation">The Foundation: Structure and Organisation</h2>
-<section id="consistent-project-structure" class="level3">
-<h3 class="anchored" data-anchor-id="consistent-project-structure">Consistent Project Structure</h3>
-<p>Every well-built Quarto extension benefits from a predictable structure. This consistency isn’t just aesthetic.<br>
-It reduces cognitive load for contributors and makes debugging substantially easier:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="txt"><pre class="sourceCode txt cw-auto code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my-extension/</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>├── README.md</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>├── example.qmd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>└── _extensions/</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    └── my-extension/</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        ├── _extension.yml</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        ├── my-extension.lua</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        └── _modules/          # Shared utilities (personal convention)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            ├── utils.lua</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>            └── validation.lua</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="typst"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>[Page <span class="kw">#</span>counter<span class="op">(</span>page<span class="op">).</span>display<span class="op">()</span> of <span class="kw">#</span>counter<span class="op">(</span>page<span class="op">).</span>final<span class="op">().</span>first<span class="op">()</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The watermark is one comparison, read once at the top of the template.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="typst"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>let is-draft = lower(status) == "draft"</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="highlight">
-<p>Use a dedicated <code>_modules/</code> directory for shared utility functions, following <strong>DRY</strong> principles whilst maintaining extension portability across different environments.</p>
+<p><strong>One key decides the whole document:</strong> <code>status: draft</code> puts the watermark on every page and the draft notice on the cover. Setting it to <code>final</code> removes both, and there is nothing else to edit.</p>
 </div>
-<p>The <code>_modules</code> directory shown here represents a personal organisational convention rather than a Quarto requirement. This approach involves creating a dedicated folder for shared utility modules within each extension. Rather than copying utility functions between extensions or writing everything in a single file, this modular architecture follows the DRY (Don’t Repeat Yourself) principle whilst maintaining portability. You might prefer a different structure (such as <code>lib/</code>, <code>utils/</code>, or keeping everything in the main file), but the key principle remains: consistent organisation makes maintenance easier.</p>
-</section>
-<section id="module-loading" class="level3">
-<h3 class="anchored" data-anchor-id="module-loading">Module Loading</h3>
-<p>When requiring modules in your extensions, consider using this robust path resolution pattern:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">--- Load required modules</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">utils</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="va">quarto</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>resolve_path<span class="op">(</span><span class="st">"_modules/utils.lua"</span><span class="op">):</span><span class="fu">gsub</span><span class="op">(</span><span class="st">"%.lua$"</span><span class="op">,</span> <span class="st">""</span><span class="op">))</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">validation</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="va">quarto</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>resolve_path<span class="op">(</span><span class="st">"_modules/validation.lua"</span><span class="op">):</span><span class="fu">gsub</span><span class="op">(</span><span class="st">"%.lua$"</span><span class="op">,</span> <span class="st">""</span><span class="op">))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>This pattern ensures modules load correctly regardless of the execution context and handles path resolution gracefully across different operating systems.<br>
-If you choose a different directory structure, simply adjust the path accordingly.</p>
-</section>
-</section>
-<section id="configuration-and-validation" class="level2">
-<h2 class="anchored" data-anchor-id="configuration-and-validation">Configuration and Validation</h2>
-<section id="configuration-hierarchy" class="level3">
-<h3 class="anchored" data-anchor-id="configuration-hierarchy">Configuration Hierarchy</h3>
-<p>Implementing a consistent configuration hierarchy can provide flexibility whilst maintaining predictable behaviour.<br>
-One effective pattern is: arguments, then metadata, then defaults:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Get configuration options with proper fallback hierarchy</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">args</span><span class="co"> table Command line arguments</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">meta</span><span class="co"> table Document metadata</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">defaults</span><span class="co"> table Default configuration</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> table Resolved configuration</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> get_options<span class="op">(</span><span class="va">args</span><span class="op">,</span> <span class="va">meta</span><span class="op">,</span> <span class="va">defaults</span><span class="op">)</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">options</span> <span class="op">=</span> <span class="op">{}</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Start with defaults</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">key</span><span class="op">,</span> <span class="va">value</span> <span class="kw">in</span> <span class="fu">pairs</span><span class="op">(</span><span class="va">defaults</span><span class="op">)</span> <span class="cf">do</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">value</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Override with metadata if present</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">meta</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="cf">then</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">meta</span><span class="op">[</span><span class="va">key</span><span class="op">])</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Override with arguments if present (highest priority)</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">args</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="cf">then</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">args</span><span class="op">[</span><span class="va">key</span><span class="op">])</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">options</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The last piece is orientation. Two listings are wider than a portrait page, so the appendix wraps those two in a <code>::: {.landscape}</code> div, and only those.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/listing-landscape.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="The one landscape page, holding the two widest listings."><img src="assets/listing-landscape.png" class="hero-art img-fluid figure-img" alt="A landscape page from the appendix. Listing A.4 lists serious treatment-emergent adverse events, with columns for subject, treatment, preferred term, system organ class, onset day, severity, relatedness, and outcome. Listing A.5 below it lists abnormal laboratory values meeting a liver-injury criterion. The DRAFT watermark sits behind the tables." width="450"></a></p>
+<figcaption>The one landscape page, holding the two widest listings.</figcaption>
+</figure>
 </div>
 </section>
-<section id="parameter-scoping-to-avoid-conflicts" class="level3">
-<h3 class="anchored" data-anchor-id="parameter-scoping-to-avoid-conflicts">Parameter Scoping to Avoid Conflicts</h3>
-<p>To prevent conflicts with Quarto CLI options and other extensions, consider scoping your extension’s configuration parameters under <code>extensions</code> and your extension’s name in the document metadata or in your project configuration (<em>i.e.</em>, <code>quarto.yml</code>).<br>
-This creates a clear namespace and prevents accidental collisions:</p>
+<section id="the-brand-reaches-the-figures" class="level2">
+<h2 class="anchored" data-anchor-id="the-brand-reaches-the-figures">The Brand Reaches the Figures</h2>
+<p><code>_brand.yml</code> holds nine named colours and three font families. The fonts are declared with <code>source: file</code>, and point at files bundled in the extension. The PDF then looks the same on my laptop and on a runner. Typst finds them through <code>font-paths</code>, and the HTML theme reads them from the brand.</p>
+<p>The page furniture is the easy half. Figures and tables are the other half, because <code>ggplot2</code> and <code>gt</code> know nothing about a Quarto brand.</p>
+<p>This project uses the approach I described in <a href="../../posts/2026-04-15-quarto-brand-figures-tables/">Branded Figures and Tables in R and Python with Quarto</a>, with its companion repository <a href="https://github.com/mcanouil/demo-quarto-brand-renderings">mcanouil/demo-quarto-brand-renderings</a> as the reference implementation. Read that post for the principle, and for the Python side. Only the names change here: <code>get_brand_info()</code> became <code>brand_raw()</code> and <code>brand()</code>, <code>theme_brand()</code> became <code>theme_nordvale()</code>, and <code>gt_brand()</code> became <code>gt_style_nordvale()</code>. <code>configure_brand_fonts()</code> kept its name.</p>
+<p>Quarto publishes the resolved brand in an environment variable at render time, so the helpers read it from there.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>document.qmd</strong></pre>
+<pre><strong>R/brand.R</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="document.qmd"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "My Document"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Recommended: Scoped under extensions namespace</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="an">extensions:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">  my-extension:</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: "modern"</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">    colour: "#ff0000"</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">    position: "top"</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Consider avoiding: Top-level parameters that might conflict</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="an">theme:</span><span class="co"> "modern"      # Could conflict with Quarto's theme system</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="an">colour:</span><span class="co"> "#ff0000"    # Could conflict with other extensions</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="an">position:</span><span class="co"> "top"      # Too generic, high chance of conflicts</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="highlight">
-<p>Always <strong>scope extension configuration</strong> under the <code>extensions</code> namespace to <strong>prevent conflicts</strong> with Quarto CLI options and other extensions in the ecosystem.</p>
-</div>
-<p>When accessing these scoped parameters in your Lua code:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="Lua"><pre class="sourceCode lua code-annotation-code code-with-copy code-annotated"><code class="sourceCode lua"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> get_extension_options<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
-<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extensions_config</span> <span class="op">=</span> <span class="va">meta</span><span class="op">.</span><span class="va">extensions</span></span>
-<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extensions_config</span> <span class="cf">then</span></span>
-<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
-<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-7" class="code-annotation-target"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">extension_config</span> <span class="op">=</span> <span class="va">extensions_config</span><span class="op">[</span><span class="cn">EXTENSION_NAME</span><span class="op">]</span></span>
-<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">extension_config</span> <span class="cf">then</span></span>
-<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{}</span></span>
-<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">options</span> <span class="op">=</span> <span class="op">{}</span></span>
-<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">key</span><span class="op">,</span> <span class="va">value</span> <span class="kw">in</span> <span class="fu">pairs</span><span class="op">(</span><span class="va">extension_config</span><span class="op">)</span> <span class="cf">do</span></span>
-<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">options</span><span class="op">[</span><span class="va">key</span><span class="op">]</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">value</span><span class="op">)</span></span>
-<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">options</span></span>
-<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-7" data-filename="R/brand.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-7-1"><a href="#annotated-cell-7-1" aria-hidden="true" tabindex="-1"></a>brand_raw <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-7-2" class="code-annotation-target"><a href="#annotated-cell-7-2" aria-hidden="true" tabindex="-1"></a>  execute_info <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"QUARTO_EXECUTE_INFO"</span>, <span class="at">unset =</span> <span class="st">""</span>)</span>
+<span id="annotated-cell-7-3"><a href="#annotated-cell-7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nzchar</span>(execute_info)) {</span>
+<span id="annotated-cell-7-4"><a href="#annotated-cell-7-4" aria-hidden="true" tabindex="-1"></a>    info <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(execute_info)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-7-5" class="code-annotation-target"><a href="#annotated-cell-7-5" aria-hidden="true" tabindex="-1"></a>    brand <span class="ot">&lt;-</span> info[[<span class="st">"format"</span>]][[<span class="st">"render"</span>]][[<span class="st">"brand"</span>]]</span>
+<span id="annotated-cell-7-6"><a href="#annotated-cell-7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(brand) <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(brand) <span class="sc">&gt;</span> <span class="dv">0</span>L) {</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-7-7" class="code-annotation-target"><a href="#annotated-cell-7-7" aria-hidden="true" tabindex="-1"></a>      mode <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"light"</span> <span class="sc">%in%</span> <span class="fu">names</span>(brand)) <span class="st">"light"</span> <span class="cf">else</span> <span class="fu">names</span>(brand)[[<span class="dv">1</span>L]]</span>
+<span id="annotated-cell-7-8"><a href="#annotated-cell-7-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(brand[[mode]][[<span class="st">"data"</span>]])</span>
+<span id="annotated-cell-7-9"><a href="#annotated-cell-7-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="annotated-cell-7-10"><a href="#annotated-cell-7-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-7" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-7-11" class="code-annotation-target"><a href="#annotated-cell-7-11" aria-hidden="true" tabindex="-1"></a>  yaml<span class="sc">::</span><span class="fu">read_yaml</span>(<span class="fu">brand_file</span>())</span>
+<span id="annotated-cell-7-12"><a href="#annotated-cell-7-12" aria-hidden="true" tabindex="-1"></a>}</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="7" data-code-annotation="1"><code>EXTENSION_NAME</code> should be a constant defined in your extension representing its name.</span>
+<span data-code-cell="annotated-cell-7" data-code-lines="2" data-code-annotation="1">Quarto sets this variable for every chunk it executes, and it holds the render context as JSON.</span>
+</dd>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="5" data-code-annotation="2">The brand Quarto resolved, after every <code>_brand.yml</code> in the project has been merged.</span>
+</dd>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="7" data-code-annotation="3">The report is printed, so the light mode is the one to take.</span>
+</dd>
+<dt data-target-cell="annotated-cell-7" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-7" data-code-lines="11" data-code-annotation="4">Outside a render there is no variable, so the helpers read the file and still work in a plain R session and in the tests.</span>
 </dd>
 </dl>
-<p>This approach helps ensure your extension plays nicely with Quarto’s built-in options and other extensions whilst providing clear documentation for users about which parameters belong to your extension.</p>
+<p>From there, <code>theme_nordvale()</code> styles the plots, <code>treatment_colours()</code> fixes one colour per treatment group, and <code>gt_style_nordvale()</code> styles the tables. That last one stays inside the subset of <code>gt</code> options Quarto can translate to Typst: fonts, colours, borders, and alignment.</p>
+<p>One HTML detail is worth the filter it took. The figures are drawn with <code>svglite</code>, and a standalone SVG file has to carry the fonts itself to display them. <code>inline-svglite.lua</code> puts the SVG content into the page instead of a link to the file. The page stylesheet then resolves the brand fonts, and the graphics device does not have to embed them.</p>
 </section>
-<section id="input-validation" class="level3">
-<h3 class="anchored" data-anchor-id="input-validation">Input Validation</h3>
-<p>Consider validating user inputs and providing helpful error messages:</p>
+<section id="every-output-has-a-number" class="level2">
+<h2 class="anchored" data-anchor-id="every-output-has-a-number">Every Output Has a Number</h2>
+<p>Quarto numbers a table by chapter, so the first table of chapter 7 is Table 7.1. ICH E3 numbers the same table 14.2.1, in the section for efficacy data. Both numbers are needed at once: a reader follows the cross-reference, a reviewer looks up the E3 number.</p>
+<p><code>R/tlf-index.R</code> is where every output number lives, and no other file in the project states one.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
+<pre><strong>R/tlf-index.R</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Validate and process a theme option</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">theme_input</span><span class="co"> string Theme name provided by user</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> string Valid theme name</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_theme_option<span class="op">(</span><span class="va">theme_input</span><span class="op">)</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">valid_themes</span> <span class="op">=</span> <span class="op">{</span><span class="st">"light"</span><span class="op">,</span> <span class="st">"dark"</span><span class="op">,</span> <span class="st">"modern"</span><span class="op">,</span> <span class="st">"classic"</span><span class="op">}</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"No theme specified, using default"</span><span class="op">)</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"light"</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Check if theme is in our list of valid themes</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="va">i</span> <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> <span class="op">#</span><span class="va">valid_themes</span> <span class="cf">do</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">valid_themes</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">==</span> <span class="va">theme_input</span> <span class="cf">then</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="va">theme_input</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Invalid theme: "</span> <span class="op">..</span> <span class="va">theme_input</span> <span class="op">..</span> <span class="st">". Valid options: light, dark, modern, classic"</span><span class="op">)</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="st">"light"</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-8" data-filename="R/tlf-index.R"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tlf_entry_spec</span>(</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-8-2" class="code-annotation-target"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key =</span> <span class="st">"tte"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-8-3" class="code-annotation-target"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ref =</span> <span class="st">"tbl-tte"</span>,</span>
+<span id="annotated-cell-8-4"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">kind =</span> <span class="st">"Table"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-8-5" class="code-annotation-target"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">number =</span> <span class="st">"14.2.1"</span>,</span>
+<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">section =</span> <span class="st">"14.2"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-8-7" class="code-annotation-target"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Time to first dermatologic treatment-emergent adverse event"</span>,</span>
+<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">subtitle =</span> <span class="st">"Intention-to-treat population"</span>,</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-8-9" class="code-annotation-target"><a href="#annotated-cell-8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">source_note =</span> <span class="st">"Medians and confidence intervals are Kaplan-Meier estimates. ..."</span></span>
+<span id="annotated-cell-8-10"><a href="#annotated-cell-8-10" aria-hidden="true" tabindex="-1"></a>)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-</section>
-<section id="documentation-as-code" class="level2">
-<h2 class="anchored" data-anchor-id="documentation-as-code">Documentation as Code</h2>
-<section id="luadoc-annotations" class="level3">
-<h3 class="anchored" data-anchor-id="luadoc-annotations">LuaDoc Annotations</h3>
-<p>Well-crafted extensions benefit from comprehensive <a href="https://keplerproject.github.io/luadoc/">LuaDoc</a> annotations.<br>
-These aren’t just comments. They enable IDE features, catch type errors early, and serve as living documentation:</p>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="2" data-code-annotation="1">The name the R code calls the output by. <code>tlf_entry()</code> stops with an error on a key it does not know, so a typo fails the render instead of printing an empty caption.</span>
+</dd>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="3" data-code-annotation="2">The cross-reference identifier, which is what Quarto numbers.</span>
+</dd>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="5" data-code-annotation="3">The ICH E3 number and the E3 section, which is what a reviewer looks for. Neither is printed next to the output itself; both are printed in the index of outputs, at the end of the listings appendix.</span>
+</dd>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="7" data-code-annotation="4">The title and the population, which <code>tlf_caption()</code> writes under the output.</span>
+</dd>
+<dt data-target-cell="annotated-cell-8" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-8" data-code-lines="9" data-code-annotation="5">The source note, which <code>tlf_output()</code> attaches to the table itself.</span>
+</dd>
+</dl>
+<p>A section then wraps the output in a cross-reference div and asks the index for the caption.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
+<pre><strong>sections/07-efficacy.qmd</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Processes a div element and adds custom styling</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">div</span><span class="co"> Div The Pandoc div element to process</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">options</span><span class="co"> table Configuration options</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@return</span><span class="co"> Div|Null Modified div or null if processing failed</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> process_div<span class="op">(</span><span class="va">div</span><span class="op">,</span> <span class="va">options</span><span class="op">)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Implementation here</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">---Configuration options for the extension</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@type</span><span class="co"> table</span><span class="kw">&lt;string</span><span class="ot">, any</span><span class="kw">&gt;</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">default_options</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="va">style</span> <span class="op">=</span> <span class="st">'default'</span><span class="op">,</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="va">position</span> <span class="op">=</span> <span class="st">'top'</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="sections/07-efficacy.qmd"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>::: {#tbl-tte}</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: tte</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tlf_output</span>(<span class="fu">tlf_tte_summary</span>(adtte), <span class="st">"tte"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="in">`{r} tlf_caption("tte")`</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>:::</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="highlight">
-<p>Comprehensive <strong>LuaDoc annotations</strong> with <code>@param</code>, <code>@return</code>, and <code>@type</code> enable IDE features, type checking, and serve as <strong>living documentation</strong> that evolves with your code.</p>
+<p>The div supplies the number, so no caption in the project states one. The appendix ties the two numbering schemes together. <code>tlf_catalogue()</code> prints the whole index as a definition list, where each term is a cross-reference. Quarto resolves its own number, and the description carries the ICH E3 number, the E3 section, and the population. That page is the only place the <code>number</code> and <code>section</code> fields are printed, and it is what makes them worth keeping in the index.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/index-of-outputs.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="The index of outputs, where the Quarto number of each output meets its ICH E3 number."><img src="assets/index-of-outputs.png" class="hero-art img-fluid figure-img" alt="A page headed A.2 Index of outputs. Each entry is a term such as Table 7.1 with a description under it reading, for example, Time to first dermatologic treatment-emergent adverse event. ICH E3 output Table 14.2.1, section 14.2. Intention-to-treat population." width="450"></a></p>
+<figcaption>The index of outputs, where the Quarto number of each output meets its ICH E3 number.</figcaption>
+</figure>
 </div>
-<p>Modern development environments like VS Code with the Lua Language Server extension use these annotations to provide intelligent autocomplete, type checking, and hover documentation.</p>
+<p>Changing an output number is a one-line edit in one file, and every mention of it follows.</p>
 </section>
-<section id="structured-code-organisation" class="level3">
-<h3 class="anchored" data-anchor-id="structured-code-organisation">Structured Code Organisation</h3>
-<p>Organising your code with clear section dividers and consistent ordering can improve maintainability:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">--[[</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">License header</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">]]</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension name constant</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">EXTENSION_NAME</span> <span class="op">=</span> <span class="st">"my-extension"</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">--- Load required modules</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Module loading here</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">--- Filter/Shortcode constants</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">DEFAULT_THEME</span> <span class="op">=</span> <span class="st">'light'</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">--- Filter/Shortcode variables</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">dependency_added</span> <span class="op">=</span> <span class="kw">false</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">--- Private helper functions</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">-- Internal functions here</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">--- Public API functions</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">-- Main extension logic here</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">--- Extension registration</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">-- Return statement here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>This structure makes it easier to navigate large extension files and understand the code’s organisation at a glance.</p>
+<section id="book-or-one-long-document" class="level2">
+<h2 class="anchored" data-anchor-id="book-or-one-long-document">Book or One Long Document</h2>
+<p>The same sections are rendered two ways, chosen with a Quarto profile. <code>_quarto-book.yml</code> builds a book with a sidebar and a search box. <code>_quarto-doc.yml</code> renders <code>csr.qmd</code>, which is nothing but includes, as one long document, alongside the companion statistical analysis plan.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="sh"><pre class="sourceCode sh cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render                 <span class="co"># the book, in _book/</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render <span class="at">--profile</span> doc   <span class="co"># the single document, in _doc/</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The study metadata that both share sits in <code>_metadata.yml</code>. The per-document keys do not, and that is deliberate. A shared <code>_metadata.yml</code> is always merged, and merging concatenates list values instead of replacing them. Put those keys in the shared file, and the approvals of the analysis plan join the approvals of the report. They live in <code>_metadata-csr.yml</code> instead, which the report loads, while <code>sap.qmd</code> sets its own.</p>
 </section>
+<section id="checking-the-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="checking-the-numbers">Checking the Numbers</h2>
+<p>A report of computed numbers needs something to check those numbers. The project has three test files, and the workflow runs them before it renders anything.</p>
+<p><code>test-invariants.R</code> checks the properties every table quietly relies on. The population flags nest as the methods chapter claims. A reason for discontinuation is present exactly for the subjects who did not complete. No subject is lost between the source data and the analysis datasets.</p>
+<p><code>test-independent-test.R</code> recomputes every headline number the prose states, from the source packages rather than from the derived datasets. If <code>R/00-adam.R</code> gets a filter wrong, the test disagrees instead of restating the mistake.</p>
+<p><code>test-double-programming.R</code> refits the models by a second route and compares the results with the strings the report prints. It catches a wrong estimate, a wrong reference group, or a transposed confidence interval, which no structural test can see.</p>
+<p>The reproducibility appendix carries the rest of the traceability. It holds the analysis results datasets <code>gtsummary</code> keeps behind each table, a define.xml-style metadata excerpt, and the empty table shells next to the locked table. It also holds the session information, and an <code>renv</code> lockfile snapshotted in explicit mode from <code>DESCRIPTION</code>.</p>
 </section>
-<section id="error-handling-and-logging" class="level2">
-<h2 class="anchored" data-anchor-id="error-handling-and-logging">Error Handling and Logging</h2>
-<section id="graceful-degradation" class="level3">
-<h3 class="anchored" data-anchor-id="graceful-degradation">Graceful Degradation</h3>
-<p>Robust extensions handle unexpected situations elegantly.<br>
-Consider checking for unsupported formats and returning <code>pandoc.Null()</code> rather than throwing errors:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Check format compatibility first</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html:js"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>For extensions that support multiple formats, provide appropriate implementations for each:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"html"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'html'</span><span class="op">,</span> <span class="va">html_output</span><span class="op">)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elseif</span> <span class="va">quarto</span><span class="op">.</span><span class="va">doc</span><span class="op">.</span>is_format<span class="op">(</span><span class="st">"latex"</span><span class="op">)</span> <span class="cf">then</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>RawInline<span class="op">(</span><span class="st">'latex'</span><span class="op">,</span> <span class="va">latex_output</span><span class="op">)</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">-- Unsupported format - fail gracefully</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Null<span class="op">()</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="highlight">
-<p><strong>Check format compatibility</strong> with <code>quarto.doc.is_format()</code> and return <code>pandoc.Null()</code> for unsupported formats <strong>rather than throwing errors</strong> that break the rendering process.</p>
-</div>
+<section id="what-i-would-watch-out-for" class="level2">
+<h2 class="anchored" data-anchor-id="what-i-would-watch-out-for">What I Would Watch Out For</h2>
+<p>Four things are worth knowing before you start. None of them are hard once you know where to look, and each one can cost an afternoon if you do not.</p>
+<p><strong>Floats numbered by chapter.</strong> Typst numbers figures from one counter, and Quarto zeroes that counter at each chapter. Typst is never told which chapter it is in, so every chapter opened with “Table 1”. <code>appendices.lua</code> reads the chapter from the heading counter and prefixes the float number with it. The same filter gives the appendices their letters.</p>
+<p><strong>Tables that do not break.</strong> Quarto wraps every cross-referenced float in a <code>figure</code>, and a <code>figure</code> block is not breakable. A table taller than the space left overflowed the page instead of continuing on the next one. One show rule fixes it, and Typst then repeats the header rows on each page.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="typst"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>show figure.where(kind: "quarto-float-tbl"): set block(breakable: true)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plots stay unbreakable, so an image never parts from its caption.</p>
+<p><strong>Counting before filtering.</strong> A few subjects in the pilot data have a last date known to be alive that precedes their first dose. The report discloses how many, and that count is taken from the unfiltered derivation on purpose. Taken after the filter, the count can report zero one day, and turn a disclosure into a false statement.</p>
+<p><strong>Defaults that are not neutral.</strong> <code>emmeans::contrast(method = "trt.vs.ctrl")</code> applies a Dunnett-style multiplicity adjustment by default. That adjustment widens the intervals beyond what the statistical methods chapter and the analysis plan describe. The secondary endpoint is descriptive here, so the call passes <code>adjust = "none"</code> and says so.</p>
 </section>
-<section id="informative-logging" class="level3">
-<h3 class="anchored" data-anchor-id="informative-logging">Informative Logging</h3>
-<p>Using Quarto’s logging facilities can provide helpful feedback.<br>
-The <code>quarto.log</code> module supports different log levels and can be activated with the <code>--trace</code> flag:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
+<section id="render-it-yourself" class="level2">
+<h2 class="anchored" data-anchor-id="render-it-yourself">Render It Yourself</h2>
+<p>You need Quarto 1.10.18 or later, for the <code>quarto.language</code> variables the Typst template reads, and R 4.4 or later.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="sh"><pre class="sourceCode sh cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'renv::restore()'</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The repository is at <a href="https://github.com/mcanouil/demo-quarto-clinical-report">mcanouil/demo-quarto-clinical-report</a>, and the rendered report is published at <a href="https://m.canouil.dev/demo-quarto-clinical-report/" class="uri">https://m.canouil.dev/demo-quarto-clinical-report/</a>. Here is the whole PDF, the one the workflow publishes on every push to <code>main</code>.</p>
+<div style="text-align: center;">
+<p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-10"><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- For debugging during development</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>output<span class="op">(</span><span class="st">"Processing element:"</span><span class="op">,</span> <span class="va">element</span><span class="op">)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- For user-facing warnings</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"Deprecated configuration detected. Please update your settings."</span><span class="op">)</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">-- For error conditions</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="st">"Required dependency not found. Extension cannot proceed."</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>When using shared utility modules, establishing consistent logging patterns can be helpful:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">---Log an error message with extension context</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">extension_name</span><span class="co"> string Name of the extension</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span><span class="an">@param</span><span class="co"> </span><span class="cv">message</span><span class="co"> string Error message to log</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> log_error<span class="op">(</span><span class="va">extension_name</span><span class="op">,</span> <span class="va">message</span><span class="op">)</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">local</span> <span class="va">full_message</span> <span class="op">=</span> <span class="st">"["</span> <span class="op">..</span> <span class="va">extension_name</span> <span class="op">..</span> <span class="st">"] "</span> <span class="op">..</span> <span class="va">message</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>error<span class="op">(</span><span class="va">full_message</span><span class="op">)</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="distribution-and-maintenance" class="level2">
-<h2 class="anchored" data-anchor-id="distribution-and-maintenance">Distribution and Maintenance</h2>
-<section id="semantic-versioning" class="level3">
-<h3 class="anchored" data-anchor-id="semantic-versioning">Semantic Versioning</h3>
-<p>Using semantic versioning for your extensions helps maintain backward compatibility:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>_extension.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="_extension.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> My Extension</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="fl">1.2.0</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quarto-required</span><span class="kw">:</span><span class="at"> </span><span class="st">"&gt;=1.2.0"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="deprecation-handling" class="level3">
-<h3 class="anchored" data-anchor-id="deprecation-handling">Deprecation Handling</h3>
-<p>When changing extension interfaces, providing deprecation warnings helps users transition smoothly:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>Lua</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="Lua"><pre class="sourceCode lua code-with-copy"><code class="sourceCode lua"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> handle_deprecated_config<span class="op">(</span><span class="va">meta</span><span class="op">)</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">]</span> <span class="cf">then</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">quarto</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warning<span class="op">(</span><span class="st">"'old-option' is deprecated. Use 'new-option' instead."</span><span class="op">)</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Still process the old option for compatibility</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>stringify<span class="op">(</span><span class="va">meta</span><span class="op">[</span><span class="st">'old-option'</span><span class="op">])</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">nil</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Building solid Quarto extensions is a journey of continuous improvement. Start with working code and gradually enhance structure, documentation, error handling, and user experience. The practices outlined in this guide represent one perspective on extension development, drawn from patterns observed in extensions and general software development principles.</p>
-<p>Remember that these are recommendations rather than rigid rules. Quarto’s flexibility means there are often multiple valid approaches to solving the same problem. The key is finding patterns that work for your specific context and maintaining consistency within your projects.</p>
-<p>Whether you’re enhancing a simple shortcode or expanding a complex multi-format filter, investing in clarity, documentation, and robust error handling pays dividends as your extension grows and finds new users. Good code is written for humans first, computers second.</p>
-<div class="highlight">
-<p><strong>Proper releases</strong> with semantic versioning enable tools like <strong>Quarto Wizard’s automatic update detection</strong> for seamless extension maintenance.</p>
-</div>
-<p>Finally, consider tagging and releasing your extensions using semantic versioning. Creating releases not only provides users with stable versions to reference but also enables powerful tooling like <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>’s update feature to automatically manage extension lifecycles. With proper releases, users can easily discover when updates are available, understand what’s changed through release notes, and confidently upgrade their extensions knowing they’re moving to a tested, stable version. This thoughtful approach to release management helps transform your extension from a working script into a reliable, maintainable tool that others can depend upon.</p>
-<p><em>Happy extending!</em></p>
-</section>
-<section id="resources-and-further-reading" class="level2">
-<h2 class="anchored" data-anchor-id="resources-and-further-reading">Resources and Further Reading</h2>
-<ul>
-<li><strong><a href="https://quarto.org/docs/extensions/creating.html">Creating Extensions</a></strong> - Official Quarto guide to building extensions.</li>
-<li><strong><a href="https://quarto.org/docs/extensions/lua.html">Lua Development</a></strong> - Getting started with Lua for Quarto extensions.</li>
-<li><strong><a href="https://pandoc.org/lua-filters.html">Writing Lua Filters</a></strong> - Pandoc’s official Lua filter documentation.</li>
-<li><strong><a href="https://keplerproject.github.io/luadoc/">LuaDoc</a></strong> - Documentation generation tool for Lua code.</li>
-<li><strong><a href="https://tylerneylon.com/a/learn-lua/">Learn Lua in 15 Minutes</a></strong> - Quick introduction to Lua syntax and concepts.</li>
-<li><strong><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></strong> - Tool for managing and updating Quarto extensions.</li>
-</ul>
+<p>Open it full size: <a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="https://m.canouil.dev/demo-quarto-clinical-report/" target="_blank" rel="noopener noreferrer">HTML book</a>.</p>
+<p>Take the template, keep the structure, and put your own sponsor on the cover.</p>
+<p>Happy publishing!</p>
 
 
 </section>
 
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>ICH E3, Structure and Content of Clinical Study Reports, see <a href="https://database.ich.org/sites/default/files/E3_Guideline.pdf" class="uri">https://database.ich.org/sites/default/files/E3_Guideline.pdf</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
   author = {CANOUIL, Mickaël},
-  title = {Lua {Best} {Practices} for {Quarto} {Extensions:} {Building}
-    {Maintainable} and {Robust} {Extensions}},
-  date = {2025-11-06},
-  url = {https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/},
+  title = {A {Clinical} {Study} {Report} in {Quarto,} {End} to {End}},
+  date = {2026-08-17},
+  url = {https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/},
   langid = {en-GB}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2025" class="csl-entry quarto-appendix-citeas" role="listitem">
-CANOUIL, M. (2025-11-06). Lua Best Practices for Quarto Extensions:
-Building Maintainable and Robust Extensions.
-<em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/">https://mickael.canouil.fr/posts/2025-11-06-quarto-extensions-lua/</a>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-08-17). A Clinical Study Report in Quarto, End to End.
+<em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/">https://mickael.canouil.fr/posts/2026-08-17-quarto-clinical-report/</a>
 </div></div></section></div></main> <!-- /main -->
 <script id="mc-base64" type="text/javascript">
   /**
@@ -2087,7 +2119,7 @@ Building Maintainable and Robust Extensions.
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon aria-hidden="true" inline="" icon="octicon:heart-fill-16"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2025-11-06-quarto-extensions-lua/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-08-17-quarto-clinical-report/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
 </div>
