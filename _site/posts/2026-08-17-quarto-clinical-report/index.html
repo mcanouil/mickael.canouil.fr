@@ -794,7 +794,7 @@ Figure&nbsp;1: One set of sections, one extension, two renderings.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" style="background-color: #c3c3c3;" title="GitHub">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" style="background-color: #c3c3c3;" title="GitHub">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -945,12 +945,28 @@ Figure&nbsp;1: One set of sections, one extension, two renderings.
 <section id="what-i-would-watch-out-for" class="level2">
 <h2 class="anchored" data-anchor-id="what-i-would-watch-out-for">What I Would Watch Out For</h2>
 <p>Four things are worth knowing before you start. None of them are hard once you know where to look, and each one can cost an afternoon if you do not.</p>
-<p><strong>Floats numbered by chapter.</strong> Typst numbers figures from one counter, and Quarto zeroes that counter at each chapter. Typst is never told which chapter it is in, so every chapter opened with “Table 1”. <code>appendices.lua</code> reads the chapter from the heading counter and prefixes the float number with it. The same filter gives the appendices their letters.</p>
-<p><strong>Tables that do not break.</strong> Quarto wraps every cross-referenced float in a <code>figure</code>, and a <code>figure</code> block is not breakable. A table taller than the space left overflowed the page instead of continuing on the next one. One show rule fixes it, and Typst then repeats the header rows on each page.</p>
+<dl>
+<dt>Floats numbered by chapter.</dt>
+<dd>
+Typst numbers figures from one counter, and Quarto zeroes that counter at each chapter. Typst is never told which chapter it is in, so every chapter opened with “Table 1”. <code>appendices.lua</code> reads the chapter from the heading counter and prefixes the float number with it. The same filter gives the appendices their letters.
+</dd>
+<dt>Tables that do not break.</dt>
+<dd>
+Quarto wraps every cross-referenced float in a <code>figure</code>, and a <code>figure</code> block is not breakable. A table taller than the space left overflowed the page instead of continuing on the next one. One show rule fixes it, and Typst then repeats the header rows on each page.
+</dd>
+</dl>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="typst"><pre class="sourceCode typst cw-auto code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>show figure.where(kind: "quarto-float-tbl"): set block(breakable: true)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Plots stay unbreakable, so an image never parts from its caption.</p>
-<p><strong>Counting before filtering.</strong> A few subjects in the pilot data have a last date known to be alive that precedes their first dose. The report discloses how many, and that count is taken from the unfiltered derivation on purpose. Taken after the filter, the count can report zero one day, and turn a disclosure into a false statement.</p>
-<p><strong>Defaults that are not neutral.</strong> <code>emmeans::contrast(method = "trt.vs.ctrl")</code> applies a Dunnett-style multiplicity adjustment by default. That adjustment widens the intervals beyond what the statistical methods chapter and the analysis plan describe. The secondary endpoint is descriptive here, so the call passes <code>adjust = "none"</code> and says so.</p>
+<dl>
+<dt>Counting before filtering.</dt>
+<dd>
+A few subjects in the pilot data have a last date known to be alive that precedes their first dose. The report discloses how many, and that count is taken from the unfiltered derivation on purpose. Taken after the filter, the count can report zero one day, and turn a disclosure into a false statement.
+</dd>
+<dt>Defaults that are not neutral.</dt>
+<dd>
+<code>emmeans::contrast(method = "trt.vs.ctrl")</code> applies a Dunnett-style multiplicity adjustment by default. That adjustment widens the intervals beyond what the statistical methods chapter and the analysis plan describe. The secondary endpoint is descriptive here, so the call passes <code>adjust = "none"</code> and says so.
+</dd>
+</dl>
 </section>
 <section id="render-it-yourself" class="level2">
 <h2 class="anchored" data-anchor-id="render-it-yourself">Render It Yourself</h2>
@@ -962,7 +978,7 @@ Figure&nbsp;1: One set of sections, one extension, two renderings.
 <p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-10"><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open it full size: <a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="https://m.canouil.dev/demo-quarto-clinical-report/" target="_blank" rel="noopener noreferrer">HTML book</a>.</p>
-<p>Take the template, keep the structure, and put your own sponsor on the cover.</p>
+<p>Hope this shows that Quarto can be used in such context while providing profesional outputs.</p>
 <p>Happy publishing!</p>
 
 
