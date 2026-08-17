@@ -357,7 +357,8 @@ Quarto numbers a table by where it falls in the document, so the first table of 
 A clinical study report is read by the ICH E3 output number instead, so that table is Table 14.2.1 wherever it sits.
 14.2.1 reads as section 14, the displays that follow the text, then 2 for efficacy data, then the first table of that group.
 Demographic displays sit under 14.1 and safety displays under 14.3, while the subject data listings sit under 16.2, where 16.2.7 is the adverse event listing.
-The guideline stops at the group, and the digits after it are the sponsor's own sequence, which is why the per-protocol version of 14.2.1 is 14.2.1.1.
+The guideline stops at the group, and the digits after it are the sponsor's own sequence.
+That is why the per-protocol version of 14.2.1 is 14.2.1.1.
 Tables and figures run as separate series, so a Table 14.2.1 and a Figure 14.2.1 both exist.
 
 The report prints the E3 number, in the caption and in every reference to it.
@@ -401,13 +402,15 @@ tlf_output(tlf_tte_summary(adtte), "tte")
 ````
 
 Getting that number onto the page took more than metadata.
-Quarto builds a float number from the chapter and a running count, and nothing in the document can set it: a custom cross-reference type names the prefix, not the number.
+Quarto builds a float number from the chapter and a running count, and nothing in the document can set it.
+A custom cross-reference type names the prefix, not the number.
 So the pre-render step writes the numbers to a file, and a filter applies them, differently in each format.
 In HTML the filter sets the number on the float, which Quarto then stringifies into the caption.
 In Typst it emits one show rule per label, because Typst numbers its own figures and ignores what the filter did to the float.
 
 An HTML book needs one more step.
-Quarto writes its cross-reference index before any extension filter runs, and a book fills every reference from that index after Pandoc, so a filter never reaches those numbers.
+Quarto writes its cross-reference index before any extension filter runs.
+A book then fills every reference from that index after Pandoc, so a filter never reaches those numbers.
 A post-render step renumbers them on the rendered pages instead.
 
 The appendix then lists every output.
@@ -423,14 +426,23 @@ Changing an output number is a one-line edit in one file, and every mention of i
 
 ## Book or One Long Document
 
-The same sections are rendered two ways, chosen with a Quarto profile.
-`_quarto-book.yml` builds a book with a sidebar and a search box.
-`_quarto-doc.yml` renders `csr.qmd`, which is nothing but includes, as one long document, alongside the companion statistical analysis plan.
+A format is not tied to one kind of project, and this one shows it.
+The same extension renders the same sections as a Quarto book and as a single long document, and a profile picks between them.
+`_quarto-book.yml` builds the book.
+`_quarto-doc.yml` renders `csr.qmd`, which is nothing but includes, alongside the companion statistical analysis plan.
 
 ```sh
 quarto render                 # the book, in _book/
 quarto render --profile doc   # the single document, in _doc/
 ```
+
+Both profiles produce a Typst PDF and an HTML output.
+The two PDFs come to the same 50 pages, so the choice shows in the HTML.
+I would take the book there.
+Each chapter becomes a page of its own, with a sidebar and a search box.
+A reviewer can then send a link straight to the section they ask about.
+The single document is one page carrying 50 pages of tables.
+The single document earns its place as the thing you hand over, and as proof that the format does not depend on the book.
 
 The study metadata that both share sits in `_metadata.yml`.
 The per-document keys do not, and that is deliberate.
