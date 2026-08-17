@@ -82,30 +82,42 @@ contributes:
       toc-depth: 3
       number-sections: true
       lang: en-GB
-    typst:                                     # <2>
+      crossref:                                # <2>
+        custom:
+          - kind: float
+            key: listing
+            reference-prefix: Listing
+            caption-location: top
+    typst:                                     # <3>
       template-partials:
         - typst-template.typ
         - typst-show.typ
       filters:
         - path: appendices.lua
           at: post-quarto
+        - path: tlf-numbers.lua                # <4>
+          at: post-quarto
       papersize: a4
       section-numbering: "1.1.1"
-      font-paths:                              # <3>
+      font-paths:                              # <5>
         - _extensions/nordvale/clinical/fonts
-    html:                                      # <4>
+    html:                                      # <6>
       theme:
         - cosmo
         - brand
         - clinical.scss
       filters:
         - inline-svglite.lua
+        - path: tlf-numbers.lua
+          at: post-quarto
 ```
 
 1. What both formats agree on, merged into each one.
-2. The two template partials that build the pages, and `appendices.lua`, which letters the appendix chapters and numbers the floats by chapter.
-3. The fonts travel with the extension, so the PDF does not depend on what is installed.
-4. The theme, and `inline-svglite.lua`, which inlines the figures the `svglite` device draws so the page stylesheet resolves the brand fonts for them, as described in [The Brand Reaches the Figures](#the-brand-reaches-the-figures).
+2. A category of its own for the subject data listings. They are tabular data, and Quarto reserves `lst` for code, which it left-aligns and captions above.
+3. The two template partials that build the pages, and `appendices.lua`, which letters the appendix chapters and numbers the floats by chapter.
+4. The filter that gives every output its ICH E3 number, in both formats. See [Every Output Has a Number](#every-output-has-a-number).
+5. The fonts travel with the extension, so the PDF does not depend on what is installed.
+6. The theme, and `inline-svglite.lua`, which inlines the figures the `svglite` device draws so the page stylesheet resolves the brand fonts for them, as described in [The Brand Reaches the Figures](#the-brand-reaches-the-figures).
 
 A document then asks for `clinical-typst` or `clinical-html`, and gets the sponsor identity with it.
 
@@ -164,9 +176,9 @@ The two renderings are not a screenshot of each other.
 They are the same chapter, computed once, laid out twice.
 
 ::: {layout-ncol="2"}
-![The **Typst** PDF](assets/table.png){fig-alt="Page 15 of the PDF. A numbered heading reads 7 Primary and secondary endpoints, followed by Table 7.1 with a dark teal header row, a source note under it, and a Kaplan-Meier figure with a risk table." .hero-art}
+![The **Typst** PDF](assets/table.png){fig-alt="Page 15 of the PDF. A numbered heading reads 7 Primary and secondary endpoints, followed by Table 14.2.1 with a dark teal header row, a source note under it, and a Kaplan-Meier figure with a risk table." .hero-art}
 
-![The **HTML** site](assets/html-site.png){fig-alt="The same chapter on the HTML site. A left sidebar lists the chapters and appendices, and the main column shows Table 7.1 with the same teal header row and the same Kaplan-Meier figure." .hero-art}
+![The **HTML** site](assets/html-site.png){fig-alt="The same chapter on the HTML site. A left sidebar lists the chapters and appendices, and the main column shows Table 14.2.1 with the same teal header row and the same Kaplan-Meier figure." .hero-art}
 :::
 
 ## The Typst Template
@@ -289,7 +301,7 @@ The last piece is orientation.
 Two listings are wider than a portrait page, so the appendix wraps those two in a `::: {.landscape}` div, and only those.
 
 ![The one landscape page, holding the two widest listings.](assets/listing-landscape.png){
-  fig-alt="A landscape page from the appendix. Listing A.4 lists serious treatment-emergent adverse events, with columns for subject, treatment, preferred term, system organ class, onset day, severity, relatedness, and outcome. Listing A.5 below it lists abnormal laboratory values meeting a liver-injury criterion. The DRAFT watermark sits behind the tables."
+  fig-alt="A landscape page from the appendix. Listing 16.2.7.1 lists serious treatment-emergent adverse events, with columns for subject, treatment, preferred term, system organ class, onset day, severity, relatedness, and outcome. Listing 16.2.8.1 below it lists abnormal laboratory values meeting a liver-injury criterion. The DRAFT watermark sits behind the tables."
   style="width:450px"
   .hero-art
 }
@@ -341,9 +353,15 @@ The page stylesheet then resolves the brand fonts, and the graphics device does 
 
 ## Every Output Has a Number
 
-Quarto numbers a table by chapter, so the first table of chapter 7 is Table 7.1.
-ICH E3 numbers the same table 14.2.1, in the section for efficacy data.
-Both numbers are needed at once: a reader follows the cross-reference, a reviewer looks up the E3 number.
+Quarto numbers a table by where it falls in the document, so the first table of chapter 7 would be Table 7.1.
+A clinical study report is read by the ICH E3 output number instead, so that table is Table 14.2.1 wherever it sits.
+14.2.1 reads as section 14, the displays that follow the text, then 2 for efficacy data, then the first table of that group.
+Demographic displays sit under 14.1 and safety displays under 14.3, while the subject data listings sit under 16.2, where 16.2.7 is the adverse event listing.
+The guideline stops at the group, and the digits after it are the sponsor's own sequence, which is why the per-protocol version of 14.2.1 is 14.2.1.1.
+Tables and figures run as separate series, so a Table 14.2.1 and a Figure 14.2.1 both exist.
+
+The report prints the E3 number, in the caption and in every reference to it.
+A reviewer asks for 14.3.1.2 and gets the same kind of output in any study from any sponsor.
 
 `R/tlf-index.R` is where every output number lives, and no other file in the project states one.
 
@@ -361,8 +379,8 @@ tlf_entry_spec(
 ```
 
 1. The name the R code calls the output by. `tlf_entry()` stops with an error on a key it does not know, so a typo fails the render instead of printing an empty caption.
-2. The cross-reference identifier, which is what Quarto numbers.
-3. The ICH E3 number and the E3 section, which is what a reviewer looks for. Neither is printed next to the output itself; both are printed in the index of outputs, at the end of the listings appendix.
+2. The cross-reference identifier, which every reference in the report points at.
+3. The ICH E3 number, which the report prints, and the E3 section it belongs to, which the index of outputs prints.
 4. The title and the population, which `tlf_caption()` writes under the output.
 5. The source note, which `tlf_output()` attaches to the table itself.
 
@@ -382,14 +400,21 @@ tlf_output(tlf_tte_summary(adtte), "tte")
 :::
 ````
 
-The div supplies the number, so no caption in the project states one.
-The appendix ties the two numbering schemes together.
-`tlf_catalogue()` prints the whole index as a definition list, where each term is a cross-reference.
-Quarto resolves its own number, and the description carries the ICH E3 number, the E3 section, and the population.
-That page is the only place the `number` and `section` fields are printed, and it is what makes them worth keeping in the index.
+Getting that number onto the page took more than metadata.
+Quarto builds a float number from the chapter and a running count, and nothing in the document can set it: a custom cross-reference type names the prefix, not the number.
+So the pre-render step writes the numbers to a file, and a filter applies them, differently in each format.
+In HTML the filter sets the number on the float, which Quarto then stringifies into the caption.
+In Typst it emits one show rule per label, because Typst numbers its own figures and ignores what the filter did to the float.
 
-![The index of outputs, where the Quarto number of each output meets its ICH E3 number.](assets/index-of-outputs.png){
-  fig-alt="A page headed A.2 Index of outputs. Each entry is a term such as Table 7.1 with a description under it reading, for example, Time to first dermatologic treatment-emergent adverse event. ICH E3 output Table 14.2.1, section 14.2. Intention-to-treat population."
+An HTML book needs one more step.
+Quarto writes its cross-reference index before any extension filter runs, and a book fills every reference from that index after Pandoc, so a filter never reaches those numbers.
+A post-render step renumbers them on the rendered pages instead.
+
+The appendix then lists every output.
+`tlf_catalogue()` prints the index as a definition list, where each term is a cross-reference that resolves to the ICH E3 number, and each description carries the E3 section and the population.
+
+![The index of outputs, at the end of the listings appendix.](assets/index-of-outputs.png){
+  fig-alt="A page headed A.2 Index of outputs. Each entry is a term such as Table 14.2.1 with a description under it reading, for example, Time to first dermatologic treatment-emergent adverse event. ICH E3 section 14.2. Intention-to-treat population."
   style="width:250px"
   .hero-art
 }
