@@ -1,10 +1,10 @@
---- Schema Validation Module
---- @module schema
+--- MC Platform Schema - Validator for gitlink platform configurations (platforms.yml)
+--- @module "platform-schema"
 --- @license MIT
 --- @copyright 2026 Mickaël Canouil
 --- @author Mickaël Canouil
 
-local schema_module = {}
+local platform_schema = {}
 
 -- ============================================================================
 -- CONSTANTS
@@ -298,13 +298,13 @@ end
 --- @param config table The platform configuration to validate
 --- @return ValidationResult
 --- @usage
----   local result = schema_module.validate_platform('github', config)
+---   local result = platform_schema.validate_platform('github', config)
 ---   if not result.valid then
 ---     for _, err in ipairs(result.errors) do
 ---       print('ERROR: ' .. err)
 ---     end
 ---   end
-function schema_module.validate_platform(platform_name, config)
+function platform_schema.validate_platform(platform_name, config)
   local result = create_validation_result()
 
   if not is_string(platform_name) or platform_name == '' then
@@ -337,8 +337,8 @@ end
 --- @param platforms table Table of platform configurations keyed by name
 --- @return table<string, ValidationResult> Validation results for each platform
 --- @usage
----   local results = schema_module.validate_all_platforms(platforms_config)
-function schema_module.validate_all_platforms(platforms)
+---   local results = platform_schema.validate_all_platforms(platforms_config)
+function platform_schema.validate_all_platforms(platforms)
   local results = {}
 
   if not is_table(platforms) then
@@ -348,7 +348,7 @@ function schema_module.validate_all_platforms(platforms)
   end
 
   for platform_name, config in pairs(platforms) do
-    results[platform_name] = schema_module.validate_platform(platform_name, config)
+    results[platform_name] = platform_schema.validate_platform(platform_name, config)
   end
 
   return results
@@ -358,9 +358,9 @@ end
 --- @param result ValidationResult The validation result to format
 --- @return string, string|nil Formatted message, and platform_name if provided
 --- @usage
----   local msg = schema_module.format_result(result)
+---   local msg = platform_schema.format_result(result)
 ---   print(msg)
-function schema_module.format_result(result)
+function platform_schema.format_result(result)
   local lines = {}
 
   if result.valid then
@@ -395,8 +395,8 @@ end
 --- @param result ValidationResult The validation result
 --- @return string Summary string
 --- @usage
----   local summary = schema_module.get_summary(result)
-function schema_module.get_summary(result)
+---   local summary = platform_schema.get_summary(result)
+function platform_schema.get_summary(result)
   return string.format(
     'Status: %s | Errors: %d | Warnings: %d',
     result.valid and 'PASSED' or 'FAILED',
@@ -409,4 +409,4 @@ end
 -- MODULE EXPORT
 -- ============================================================================
 
-return schema_module
+return platform_schema
