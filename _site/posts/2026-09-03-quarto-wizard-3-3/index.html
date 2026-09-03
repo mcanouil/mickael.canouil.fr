@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.">
+<meta name="description" content="Quarto Wizard 3.3 compiles the Typst block under your cursor and shows the image beside the editor. It also publishes the Lua validator of the extension schema vocabulary, so an extension can check its own options during a render.">
 
-<title>Quarto Q&amp;A: How to have labels and captions for an unknown number of tables? – Mickaël CANOUIL</title>
+<title>Quarto Wizard 3.3: Typst Preview and Schema Validation – Mickaël CANOUIL</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -187,8 +187,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<style>
+.quarto-wizard {
+   display: inline-block;
+   aspect-ratio: 1 / 1;
+   height: 1em;
+   margin-bottom: -0.15em;
+   mask-image: url('assets/media/quarto-wizard.svg');
+   mask-size: contain;
+   mask-repeat: no-repeat;
+   mask-position: center;
+   background-color: currentColor;
+   vertical-align: baseline;
+ }
+ </style>
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/">
+<meta property="og:url" content="https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/">
 <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="../../assets/images/icon.svg">
@@ -196,26 +210,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="manifest" href="../../site.webmanifest">
 
 
-<meta property="og:title" content="Quarto Q&amp;A: How to have labels and captions for an unknown number of tables? - mickael.canouil.fr">
-<meta property="og:description" content="A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.">
-<meta property="og:image" content="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/featured.png">
+<meta property="og:title" content="Quarto Wizard 3.3: Typst Preview and Schema Validation - mickael.canouil.fr">
+<meta property="og:description" content="Quarto Wizard 3.3 compiles the Typst block under your cursor and shows the image beside the editor. It also publishes the Lua validator of the extension schema vocabulary, so an extension can check its own options during a render.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/featured.png">
 <meta property="og:site_name" content="Mickaël CANOUIL">
 <meta property="og:locale" content="en_GB">
-<meta property="og:image:height" content="1512">
-<meta property="og:image:width" content="2688">
-<meta property="og:image:alt" content="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables.
-Tables are simply on top of each other after the item list.
+<meta property="og:image:height" content="1260">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:alt" content="A card titled Quarto Wizard 3.3, with the line &quot;Typst preview, beside the editor&quot; and the Typst wordmark under it.
+Beside the title, an editor window holds a Typst cell on the left and the preview panel on the right, where the cell compiles to a scatter plot of penguin flipper length against body mass.
 ">
-<meta name="twitter:title" content="Quarto Q&amp;A: How to have labels and captions for an unknown number of tables? – Mickaël CANOUIL">
-<meta name="twitter:description" content="A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using knitr and R.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/featured.png">
+<meta name="twitter:title" content="Quarto Wizard 3.3: Typst Preview and Schema Validation – Mickaël CANOUIL">
+<meta name="twitter:description" content="Quarto Wizard 3.3 compiles the Typst block under your cursor and shows the image beside the editor. It also publishes the Lua validator of the extension schema vocabulary, so an extension can check its own options during a render.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/featured.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="1512">
-<meta name="twitter:image-width" content="2688">
-<meta name="twitter:image:alt" content="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables.
-Tables are simply on top of each other after the item list.
+<meta name="twitter:image-height" content="1260">
+<meta name="twitter:image-width" content="2400">
+<meta name="twitter:image:alt" content="A card titled Quarto Wizard 3.3, with the line &quot;Typst preview, beside the editor&quot; and the Typst wordmark under it.
+Beside the title, an editor window holds a Typst cell on the left and the preview panel on the right, where the cell compiles to a scatter plot of penguin flipper length against body mass.
 ">
-<link rel="canonical" href="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/">
+<link rel="canonical" href="https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/">
 </head>
 
 <body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
@@ -454,17 +468,19 @@ Tables are simply on top of each other after the item list.
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Quarto Q&amp;A: How to have labels and captions for an unknown number of tables?</h1>
+      <h1 class="title">Quarto Wizard 3.3: Typst Preview and Schema Validation</h1>
                   <div>
         <div class="description">
-          <p>A small example of how to automatically have labels and captions for an unknown number of tables in Quarto, using <code>knitr</code> and R.</p>
+          <p>Quarto Wizard 3.3 compiles the Typst block under your cursor and shows the image beside the editor. It also publishes the Lua validator of the extension schema vocabulary, so an extension can check its own options during a render.</p>
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">quarto</div>
-                <div class="quarto-category">q&amp;a</div>
-                <div class="quarto-category">r</div>
-                <div class="quarto-category">knitr</div>
+                <div class="quarto-category">vscode</div>
+                <div class="quarto-category">positron</div>
+                <div class="quarto-category">extensions</div>
+                <div class="quarto-category">typst</div>
+                <div class="quarto-category">quarto-wizard</div>
               </div>
                   </div>
   </div>
@@ -487,7 +503,7 @@ Tables are simply on top of each other after the item list.
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">Sunday, the 5th of March, 2023</p>
+        <p class="date">Thursday, the 3rd of September, 2026</p>
       </div>
     </div>
     
@@ -503,12 +519,19 @@ Tables are simply on top of each other after the item list.
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-questionproblem" id="toc-the-questionproblem" class="nav-link active" data-scroll-target="#the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</a></li>
-  <li><a href="#the-answersolution" id="toc-the-answersolution" class="nav-link" data-scroll-target="#the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">3</span> References</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples"><span class="header-section-number">4</span> Examples</a></li>
+  <li><a href="#preview-a-typst-block" id="toc-preview-a-typst-block" class="nav-link active" data-scroll-target="#preview-a-typst-block">Preview a Typst Block</a>
+  <ul class="collapse">
+  <li><a href="#where-the-image-appears" id="toc-where-the-image-appears" class="nav-link" data-scroll-target="#where-the-image-appears">Where the Image Appears</a></li>
+  <li><a href="#three-kinds-of-block" id="toc-three-kinds-of-block" class="nav-link" data-scroll-target="#three-kinds-of-block">Three Kinds of Block</a></li>
+  <li><a href="#colours" id="toc-colours" class="nav-link" data-scroll-target="#colours">Colours</a></li>
+  <li><a href="#paths-and-the-compile-root" id="toc-paths-and-the-compile-root" class="nav-link" data-scroll-target="#paths-and-the-compile-root">Paths and the Compile Root</a></li>
+  <li><a href="#open-the-file-a-path-points-to" id="toc-open-the-file-a-path-points-to" class="nav-link" data-scroll-target="#open-the-file-a-path-points-to">Open the File a Path Points To</a></li>
+  <li><a href="#the-limits-of-the-preview" id="toc-the-limits-of-the-preview" class="nav-link" data-scroll-target="#the-limits-of-the-preview">The Limits of the Preview</a></li>
+  </ul></li>
+  <li><a href="#one-schema-two-validators" id="toc-one-schema-two-validators" class="nav-link" data-scroll-target="#one-schema-two-validators">One Schema, Two Validators</a></li>
+  <li><a href="#other-fixes" id="toc-other-fixes" class="nav-link" data-scroll-target="#other-fixes">Other Fixes</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-03-05-quarto-auto-table-crossref/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-09-03-quarto-wizard-3-3/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content" tabindex="-1">
@@ -524,109 +547,282 @@ Tables are simply on top of each other after the item list.
 
 
 
-<p>I decided to start small blog posts with answers/solutions to questions I have seen and answered on <a href="https://twitter.com/">Twitter</a>, <a href="https://joinmastodon.org/">Mastodon</a>, and <a href="https://quarto.org/">Quarto</a> GitHub <a href="https://github.com/quarto-dev/quarto-cli/issues">Issues</a> &amp; <a href="https://github.com/quarto-dev/quarto-cli/discussions">Discussions</a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-fluid quarto-figure quarto-figure-center figure-img" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="A card titled Quarto Wizard 3.3, with the line &quot;Typst preview, beside
+the editor&quot; and the Typst wordmark under it. Beside the title, an editor
+window holds a Typst cell on the left and the preview panel on the
+right, where the cell compiles to a scatter plot of penguin flipper
+length against body mass.
+" width="600"></a></p>
 </figure>
 </div>
-<section id="the-questionproblem" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="the-questionproblem"><span class="header-section-number">1</span> The Question/Problem</h2>
-<blockquote class="blockquote">
-<p>Suppose, in a #QuartoPub document, using #rStats I have a list of length G, each item in this list is a flextable - I need to use flextable as opposed to kable, to allow for output to docx. G is unknown apriori, but will be at least 1.</p>
-<p>Is there any way to create a sequence of tables with associated labels and captions that could be worked out dynamically/parsed? Manually, this can be done really easily (creating new labels etc) and knowing when to stop, but is there a way of automating this?</p>
-</blockquote>
-<p><em>Source: <a href="https://mastodon.ie/@DToher/109915736491084825" class="uri">https://mastodon.ie/@DToher/109915736491084825</a></em></p>
-</section>
-<section id="the-answersolution" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="the-answersolution"><span class="header-section-number">2</span> The Answer/Solution</h2>
-<p>The trick is, within a code cell with <code>output: asis</code>, to use <code>knitr::knit_child()</code> to create code cells with <code>label</code>, caption (<code>tbl-cap</code>), or whatever option you might want or need.</p>
-<div class="tabset-margin-container"></div><div class="cell panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Quarto Input</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Quarto Output</a></li></ul>
-<div class="cell tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="md"><pre class="sourceCode md cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ipkg <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"palmerpenguins"</span>, <span class="st">"gt"</span>, <span class="st">"dplyr"</span>)) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(ipkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(ipkg)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(ipkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>Below are tables of the first six rows of the Palmer penguins dataset by species:</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sprintf</span>(</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"- `%s` (@tbl-%s)"</span>,</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">levels</span>(penguins[[<span class="st">"species"</span>]]),</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">levels</span>(penguins[[<span class="st">"species"</span>]])</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ispecies <span class="cf">in</span> <span class="fu">levels</span>(penguins[[<span class="st">"species"</span>]])) {</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  tab <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(species <span class="sc">%in%</span> ispecies) <span class="sc">|&gt;</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>species) <span class="sc">|&gt;</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tab_header</span>(<span class="at">title =</span> ispecies)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, knitr<span class="sc">::</span><span class="fu">knit_child</span>(<span class="at">quiet =</span> <span class="cn">TRUE</span>, <span class="at">text =</span> <span class="fu">c</span>(</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">"```{r}"</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#| echo: false"</span>,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"#| tbl-cap: %s"</span>, ispecies),</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sprintf</span>(<span class="st">"#| label: tbl-%s"</span>, ispecies),</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tab"</span>,</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"```"</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  )))</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 3.3</strong> adds a preview for Typst blocks, and publishes the Lua validator that an extension can use to check its own options. This post shows both.</p>
+<div class="highlight">
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 3.3</strong> is available from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code Marketplace</a> and the <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
 </div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="featured.png" class="img-fluid" alt="Screenshot of an html rendered by Quarto. it starts with a sentence saying below are several tables by species of penguins, followed by an item list showing the species and their respective cross-reference to the tables. Tables are simply on top of each other after the item list."></a></p>
+<section id="preview-a-typst-block" class="level2">
+<h2 class="anchored" data-anchor-id="preview-a-typst-block">Preview a Typst Block</h2>
+<p>Writing Typst inside a Quarto document used to mean rendering the whole document to see one small block. Quarto Wizard 3.3 compiles the block under the cursor and shows the image beside the editor. It uses the Typst binary that ships inside Quarto, so there is nothing else to install.</p>
+<p>Put the cursor inside a Typst block, then run <strong>Quarto Wizard: Preview Typst Block</strong>, or select the code lens above the block. The cell below draws the penguins with <a href="https://m.canouil.dev/gribouille/">Gribouille</a>, and the image beside it is what the render produces.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-panel-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/typst-preview-panel-dark.webp" title="Typst Block Preview" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A Quarto document with a Typst cell on the left and the Quarto Wizard
+preview panel on the right, showing the scatter plot of penguin flipper
+length against body mass that the cell compiles to.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-panel-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/typst-preview-panel-light.webp" title="Typst Block Preview" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A Quarto document with a Typst cell on the left and the Quarto Wizard
+preview panel on the right, showing the scatter plot of penguin flipper
+length against body mass that the cell compiles to.
+" width="600"></a></p>
+</figure>
+</div>
+<p>The panel then follows the cursor, and it compiles again after each edit. Move the cursor to another block, of any of the three kinds, and the panel shows that one instead.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-loop-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/typst-preview-loop-dark.webp" title="Typst Block Preview" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The same document and preview panel, where the cursor visits a Typst
+cell, a raw block and a plain block in turn, and the compiled image
+follows every edit and every move.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-loop-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/typst-preview-loop-light.webp" title="Typst Block Preview" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The same document and preview panel, where the cursor visits a Typst
+cell, a raw block and a plain block in turn, and the compiled image
+follows every edit and every move.
+" width="600"></a></p>
+</figure>
+</div>
+<p>The panel writes a failure over the last good image of the same block. The preview therefore does not go empty while you type.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-error-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/typst-preview-error-dark.webp" title="A Failure in the Typst Preview" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The preview panel showing a compiler message about an invalid number
+suffix, with the last good image of the block still under it.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-error-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/typst-preview-error-light.webp" title="A Failure in the Typst Preview" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The preview panel showing a compiler message about an invalid number
+suffix, with the last good image of the block still under it.
+" width="600"></a></p>
+</figure>
+</div>
+<p>The full compiler output goes to the Quarto Wizard log.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
 </div>
 </div>
+<div class="callout-body-container callout-body">
+<p><code>quartoWizard.typstPreview.debounceMs</code> sets how long an edit waits before the preview follows it. Its default is 300 milliseconds. Set it to <code>0</code> to compile on every keystroke, and raise it when a block is slow to compile.</p>
 </div>
-</section>
-<section id="references" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="references"><span class="header-section-number">3</span> References</h2>
-<p>References:</p>
+</div>
+<section id="where-the-image-appears" class="level3">
+<h3 class="anchored" data-anchor-id="where-the-image-appears">Where the Image Appears</h3>
+<p><code>quartoWizard.typstPreview.surface</code> selects where the image is shown.</p>
 <ul>
-<li><a href="https://bookdown.org/yihui/rmarkdown-cookbook/child-document.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/child-document.html</a></li>
-<li><a href="https://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/knit-expand.html</a></li>
-<li><a href="https://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html" class="uri">https://bookdown.org/yihui/rmarkdown-cookbook/results-asis.html</a></li>
+<li><code>panel</code>, the default, shows the image beside the editor. The panel scrolls, so a tall image is never cut.</li>
+<li><code>hover</code> shows the image when the pointer rests on a block.</li>
+<li><code>off</code> shows no image, and offers no code lens.</li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-hover-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/typst-preview-hover-dark.webp" title="Typst Block Preview in a Hover" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A hover card over a Typst block, showing the compiled image of that
+block above the block itself.
+" width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-hover-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/typst-preview-hover-light.webp" title="Typst Block Preview in a Hover" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A hover card over a Typst block, showing the compiled image of that
+block above the block itself.
+" width="500"></a></p>
+</figure>
+</div>
+<p>A hover cannot scroll, so the image is scaled down to <code>quartoWizard.typstPreview.maxHeight</code>.</p>
 </section>
-<section id="examples" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="examples"><span class="header-section-number">4</span> Examples</h2>
+<section id="three-kinds-of-block" class="level3">
+<h3 class="anchored" data-anchor-id="three-kinds-of-block">Three Kinds of Block</h3>
+<p>Three fences are spelled almost the same way, and Quarto treats each one differently. The preview treats them differently too, and the code lens above each block says which kind it is.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Fence</th>
+<th>What Quarto does with it</th>
+<th>What the preview compiles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>```typst</code></td>
+<td>Highlights it, and never executes it.</td>
+<td>The body, under the preview’s own page setup and colours.</td>
+</tr>
+<tr class="even">
+<td><code>```{=typst}</code></td>
+<td>Passes it to the Typst output untouched.</td>
+<td>The body, under every raw block above it in the document.</td>
+</tr>
+<tr class="odd">
+<td><code>```{typst}</code></td>
+<td>Executes it through the <a href="https://m.canouil.dev/quarto-typst-render/">typst-render</a> extension.</td>
+<td>The body, under the options and the colours of that extension.</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>{typst}</code> cell needs <code>typst-render</code> installed in the project. Without it the preview says so and shows nothing. An image compiled with guessed options is not the image the render produces, which is worse than no image at all.</p>
+<p>Quarto Wizard installs it for you, in the folder you pick:</p>
+<p><a href="vscode://mcanouil.quarto-wizard/install?repo=mcanouil/quarto-typst-render" class="btn btn-primary btn-sm" role="button">Install in VS Code</a> <a href="positron://mcanouil.quarto-wizard/install?repo=mcanouil/quarto-typst-render" class="btn btn-primary btn-sm" role="button">Install in Positron</a></p>
+<p>The other two kinds need no extension.</p>
+</section>
+<section id="colours" class="level3">
+<h3 class="anchored" data-anchor-id="colours">Colours</h3>
+<p>A plain block and a raw block take their colours from <code>quartoWizard.typstPreview.foreground</code> and <code>quartoWizard.typstPreview.background</code>. Both accept three forms. <code>auto</code>, the default, follows the editor theme. <code>none</code> writes no colour, so Typst uses its own black on white. Any other value is a Typst colour expression written as it stands, for example <code>rgb("#ff9800")</code>.</p>
+<p>A <code>{typst}</code> cell keeps the colour contract of <code>typst-render</code> instead, so the image matches the render and not the editor. A cell that resolves a colour from a brand needs a side of that brand. <strong>Quarto Wizard: Switch Typst Preview Brand Mode</strong> shows the other side, and the panel header always says which side it used.</p>
+</section>
+<section id="paths-and-the-compile-root" class="level3">
+<h3 class="anchored" data-anchor-id="paths-and-the-compile-root">Paths and the Compile Root</h3>
+<p>The preview sends the block to Typst through standard input. A path inside the block therefore resolves against the compile root, and not against the file that holds the block.</p>
+<p>The preview uses the root that a render uses. For a <code>{typst}</code> cell, that is the <code>root</code> value under <code>extensions.typst-render</code>, whose default is the directory of the document. A cell also compiles with the <code>font-path</code>, the <code>package-path</code> and the <code>input</code> values of the extension. A plain block and a raw block always use the directory of the document.</p>
+</section>
+<section id="open-the-file-a-path-points-to" class="level3">
+<h3 class="anchored" data-anchor-id="open-the-file-a-path-points-to">Open the File a Path Points To</h3>
+<p>A <code>file:</code> option and a <code>preamble:</code> option name a file. Hold <kbd>Ctrl</kbd>, or <kbd>Cmd</kbd> on macOS, and select the value to open that file in the editor.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-option-link-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/typst-option-link-dark.webp" title="Opening a File a Typst Option Names" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A Typst cell whose preamble option value is underlined as a link, with
+the tooltip that names the file and says Cmd and click.
+" width="500"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-option-link-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/typst-option-link-light.webp" title="Opening a File a Typst Option Names" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A Typst cell whose preamble option value is underlined as a link, with
+the tooltip that names the file and says Cmd and click.
+" width="500"></a></p>
+</figure>
+</div>
+<p>The link appears only when the file is there. A path that leads to no file gets a warning instead. <code>file:</code> works in a cell only, while <code>preamble:</code> also works in the front matter of a document, and under <code>extensions.typst-render</code> in <code>_quarto.yml</code> or <code>_metadata.yml</code>.</p>
+</section>
+<section id="the-limits-of-the-preview" class="level3">
+<h3 class="anchored" data-anchor-id="the-limits-of-the-preview">The Limits of the Preview</h3>
+<p>The preview is an authoring aid, and it is not a render. The limits below are the limits of this first version, and most of them can be lifted later.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The preview differs from a render in two ways, and it says so beside the image when the difference applies. A raw block reaches Typst through the document template during a render, and the template contributes imports and rules that the preview does not apply yet. The preview also compiles one block on its own, so a plain block that uses a value from another block fails.</p>
+</div>
+</div>
+<p>The preview shows the first page of a block of several pages, it always compiles to SVG, and it does not yet see the payload that the R and Python helpers of <code>typst-render</code> produce during a render.</p>
+<p>One limit is deliberate and stays. The preview is off in an untrusted workspace, because it runs a compiler over the content of that workspace.</p>
+</section>
+</section>
+<section id="one-schema-two-validators" class="level2">
+<h2 class="anchored" data-anchor-id="one-schema-two-validators">One Schema, Two Validators</h2>
+<p>The other half of 3.3 is for people who write extensions. It is about <code>_schema.yml</code>, the file where an extension declares every option, shortcode argument, format key, attribute and class that it accepts. If you only use extensions, this part changes nothing for you, beyond better messages from the extensions that adopt it.</p>
+<p>Quarto Wizard has read that file for a while, to offer completion, hover documentation and diagnostics. A value of the wrong type, or a key the extension does not declare, is reported while you write.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/schema-diagnostics-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="assets/media/schema-diagnostics-dark.webp" title="Extension Schema Diagnostics" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A \_quarto.yml file where two extension options carry a squiggle, and
+the Problems panel below reports a wrong type and an unknown option.
+" width="600"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/schema-diagnostics-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="assets/media/schema-diagnostics-light.webp" title="Extension Schema Diagnostics" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="A \_quarto.yml file where two extension options carry a squiggle, and
+the Problems panel below reports a wrong type and an unknown option.
+" width="600"></a></p>
+</figure>
+</div>
+<p>That covers the editor only. Someone who writes an option by hand in <code>_quarto.yml</code>, with no editor to help, still reaches the render with a wrong value. So 3.3 publishes the Lua validator that reads the same file during the render.</p>
+<div class="highlight">
+<p><strong>Two artefacts, two jobs:</strong> the meta-schema JSON validates your <code>_schema.yml</code> while you write it, and the Lua module validates the metadata of your user while Quarto renders.</p>
+</div>
+<p>The meta-schema is the file you point <code>$schema</code> at.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/my-extension/_schema.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="_extensions/my-extension/_schema.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">$schema</span><span class="kw">:</span><span class="at"> https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">theme</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> </span><span class="st">"Colour theme for the extension output."</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> light</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">enum</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">light</span><span class="kw">,</span><span class="at"> dark</span><span class="kw">,</span><span class="at"> auto</span><span class="kw">]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">count</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> integer</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">minimum</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">maximum</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The module is published as <a href="https://m.canouil.dev/quarto-wizard/assets/schema/v2/schema.lua" target="_blank" rel="noopener noreferrer"><code>schema.lua</code></a>. Its version is the version of the vocabulary, so the v2 module implements the v2 meta-schema. Vendor it into your extension, because a render must not need network access.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/my-extension/my-extension.lua</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="_extensions/my-extension/my-extension.lua"><pre class="sourceCode lua code-annotation-code code-with-copy code-annotated"><code class="sourceCode lua"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><a href="#annotated-cell-2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">schema</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="va">quarto</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>resolve_path<span class="op">(</span><span class="st">'_modules/schema.lua'</span><span class="op">):</span><span class="fu">gsub</span><span class="op">(</span><span class="st">'%.lua$'</span><span class="op">,</span> <span class="st">''</span><span class="op">))</span></span>
+<span id="annotated-cell-2-2"><a href="#annotated-cell-2-2" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-3" class="code-annotation-target"><a href="#annotated-cell-2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">options</span> <span class="op">=</span> <span class="va">schema</span><span class="op">.</span>validate_options<span class="op">(</span></span>
+<span id="annotated-cell-2-4"><a href="#annotated-cell-2-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">meta</span><span class="op">,</span></span>
+<span id="annotated-cell-2-5"><a href="#annotated-cell-2-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">'my-extension'</span><span class="op">,</span></span>
+<span id="annotated-cell-2-6"><a href="#annotated-cell-2-6" aria-hidden="true" tabindex="-1"></a>  <span class="va">quarto</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>resolve_path<span class="op">(</span><span class="st">'_schema.yml'</span><span class="op">)</span></span>
+<span id="annotated-cell-2-7"><a href="#annotated-cell-2-7" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="1" data-code-annotation="1">Load the vendored copy by its absolute path. Lua keys its module cache by the name you pass, so <code>require('_modules.schema')</code> would hand the second extension of a render the copy of the first one.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="2">Read <code>meta.extensions.my-extension</code>, test every value against the schema, and return the options with the defaults applied.</span>
+</dd>
+</dl>
+<p>Errors and warnings go through the Quarto logger, and a schema that cannot be read never stops the render. Narrower entry points exist for a shortcode call, for the attributes of an element, and for a format block. The <a href="https://m.canouil.dev/quarto-wizard/reference/schema-validator.html">Using the Lua Validator</a> page, added to the Quarto Wizard documentation in this release, describes each one.</p>
+<p>The v2 meta-schema also accepts <code>uniqueItems</code> now. The validator already enforced that keyword, so a schema that used it was rejected by the meta-schema and accepted by the module. Both agree again.</p>
+</section>
+<section id="other-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="other-fixes">Other Fixes</h2>
 <ul>
-<li><a href="https://github.com/quarto-dev/quarto-examples" class="uri">https://github.com/quarto-dev/quarto-examples</a></li>
+<li>An extension in a repository whose default branch is <code>master</code> installs without writing <code>@master</code>. The branch is read from GitHub when the repository has no release, no tag and no registry entry.</li>
+<li>A Typst block written between two <code>---</code> lines that open no front matter is found. The rule the preview follows is the rule Pandoc applies.</li>
 </ul>
+<p>The <a href="https://github.com/mcanouil/quarto-wizard/blob/main/CHANGELOG.md">changelog</a> holds the full list.</p>
+<p>Happy writing!</p>
 
 
 </section>
 
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2023,
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
   author = {CANOUIL, Mickaël},
-  title = {Quarto {Q\&amp;A:} {How} to Have Labels and Captions for an
-    Unknown Number of Tables?},
-  date = {2023-03-05},
-  url = {https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/},
+  title = {Quarto {Wizard} 3.3: {Typst} {Preview} and {Schema}
+    {Validation}},
+  date = {2026-09-03},
+  url = {https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/},
   langid = {en-GB}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2023" class="csl-entry quarto-appendix-citeas" role="listitem">
-CANOUIL, M. (2023-03-05). Quarto Q&amp;A: How to have labels and
-captions for an unknown number of tables? <em>Mickael.canouil.fr</em>.
-<a href="https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/">https://mickael.canouil.fr/posts/2023-03-05-quarto-auto-table-crossref/</a>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-09-03). Quarto Wizard 3.3: Typst Preview and Schema
+Validation. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/">https://mickael.canouil.fr/posts/2026-09-03-quarto-wizard-3-3/</a>
 </div></div></section></div></main> <!-- /main -->
 <script id="mc-base64" type="text/javascript">
   /**
@@ -1819,7 +2015,7 @@ captions for an unknown number of tables? <em>Mickael.canouil.fr</em>.
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon aria-hidden="true" inline="" icon="octicon:heart-fill-16"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2023-03-05-quarto-auto-table-crossref/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-09-03-quarto-wizard-3-3/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
 </div>
