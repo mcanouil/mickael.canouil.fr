@@ -53,16 +53,16 @@ log() { printf '%s\n' "== $*" >&2; }
 
 prepare_extensions() {
 	# One directory holding only what a shot shows, so no other extension of
-	# yours appears in the window.
+	# yours appears in the window. It is built again every run, because a kept
+	# copy would capture the version of the last run after an upgrade.
 	local id dir
+	rm -rf "${EXTDIR}"
 	mkdir -p "${EXTDIR}"
 	for id in mcanouil.quarto-wizard github.github-vscode-theme quarto.quarto; do
-		if ! compgen -G "${EXTDIR}/${id}-*" >/dev/null; then
-			for dir in "${HOME}"/.vscode/extensions/"${id}"-*; do
-				[ -d "${dir}" ] || continue
-				cp -R "${dir}" "${EXTDIR}/"
-			done
-		fi
+		for dir in "${HOME}"/.vscode/extensions/"${id}"-*; do
+			[ -d "${dir}" ] || continue
+			cp -R "${dir}" "${EXTDIR}/"
+		done
 		compgen -G "${EXTDIR}/${id}-*" >/dev/null || {
 			log "${id} is not installed in ~/.vscode/extensions"
 			exit 1
@@ -350,6 +350,7 @@ type_text() {
 
 select_left() {
 	# select_left <count>, one character at a time
+	guard_window
 	local n="$1" i
 	for ((i = 0; i < n; i++)); do
 		proc_tell 'key code 123 using {shift down}'
