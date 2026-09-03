@@ -7,15 +7,8 @@
 # Visual Studio Code profile, drives the editor over AppleScript, and writes the
 # images straight into ../media, at the size the post uses.
 #
-# It needs:
-#   - Quarto Wizard 3.3 or later, the GitHub theme, and the Quarto extension in
-#     ~/.vscode/extensions;
-#   - the typst-render extension of this website, under _extensions/mcanouil;
-#   - Screen Recording and Accessibility permission for the terminal that runs
-#     the script, which on an integrated terminal means Visual Studio Code
-#     itself;
-#   - screencapture and osascript from macOS, magick and img2webp from
-#     Homebrew, and uv for the pointer moves.
+# README.md beside this script lists what it needs, and which constants to
+# measure again when the fixture or the font changes.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -36,12 +29,8 @@ WANT_Y=80
 WANT_W=1340
 WANT_H=720
 
-# Filled from the window itself after every raise, because the window manager
-# does not always grant the requested size.
-WIN_X=0
-WIN_Y=0
-WIN_W=0
-WIN_H=0
+# WIN_X, WIN_Y, WIN_W and WIN_H are filled from the window itself after every
+# raise, because the window manager does not always grant the requested size.
 
 # Editor text metrics, measured from a capture. The column step is in tenths of
 # a point, and the two vertical offsets are in points from the top of the
@@ -58,6 +47,7 @@ THEME_DARK="GitHub Dark Dimmed"
 # Width of the images in the post. The captures are twice that, for a screen
 # with two pixels per point.
 POST_WIDTH=1400
+ANIM_WIDTH=1200
 
 log() { printf '%s\n' "== $*" >&2; }
 
@@ -92,7 +82,8 @@ prepare_workspace() {
 TYP
 
 	# The cell asks for auto colours, which read the two sides of the brand, so
-	# the image matches the theme of the editor.
+	# the image matches the theme of the editor. The two sides carry the editor
+	# colours of THEME_LIGHT and THEME_DARK, so change them together.
 	cat >"${WORKSPACE}/_brand-light.yml" <<'YAML'
 color:
   palette:
@@ -112,7 +103,8 @@ color:
 YAML
 
 	# dpi holds a string and margine is not a key of the schema, which is what
-	# the diagnostics shot reports.
+	# the diagnostics shot reports. capture_profile addresses the wrong value by
+	# line number, so keep the layout of this file and that call in step.
 	cat >"${WORKSPACE}/_quarto.yml" <<'YAML'
 project:
   title: "Typst preview demo"
@@ -212,8 +204,6 @@ JSON
 
 osa() { osascript "$@"; }
 
-CAPTURE_PID=""
-
 find_capture_pid() {
 	# The window owning process is the one without a --type= flag. No head in
 	# the pipeline: it closes the pipe early and the shell dies on SIGPIPE.
@@ -270,7 +260,7 @@ launch_code() {
 
 position_window() {
 	local try name
-	for try in 1 2 3 4 5 6 7 8 9 10; do
+	for ((try = 1; try <= 10; try++)); do
 		osa >/dev/null 2>&1 <<EOF || true
 tell application "System Events"
   tell (first application process whose unix id is ${CAPTURE_PID})
@@ -285,12 +275,10 @@ end tell
 EOF
 		sleep 1.5
 		name="$(front_window_name)"
-		case "${name}" in
-		*.qmd* | *.yml* | *qw-demo*)
+		if is_capture_window "${name}"; then
 			read_window_bounds
 			return 0
-			;;
-		esac
+		fi
 		log "front window is '${name}', retrying (${try})"
 		sleep 2
 	done
@@ -314,18 +302,22 @@ EOF
 	read -r WIN_X WIN_Y WIN_W WIN_H <<<"${bounds}"
 }
 
+is_capture_window() {
+	case "$1" in
+	*.qmd* | *.yml* | *qw-demo*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+
 # A keystroke goes to whatever window is in front, so refuse to type when the
 # front window is not the capture one.
 guard_window() {
 	local name
 	name="$(front_window_name)"
-	case "${name}" in
-	*.qmd* | *.yml* | *qw-demo*) : ;;
-	*)
+	if ! is_capture_window "${name}"; then
 		log "front window is '${name}', not the capture window; stopping"
 		exit 1
-		;;
-	esac
+	fi
 }
 
 stop_code() {
@@ -333,8 +325,8 @@ stop_code() {
 	# instance outright and wait until every process is gone.
 	log "closing the capture window"
 	pkill -9 -f "user-data-dir ${PROFILE}" || true
-	local try
-	for try in 1 2 3 4 5 6 7 8 9 10; do
+	local _
+	for _ in 1 2 3 4 5 6 7 8 9 10; do
 		pgrep -f "user-data-dir ${PROFILE}" >/dev/null 2>&1 || break
 		sleep 1
 	done
@@ -356,8 +348,6 @@ type_text() {
 	proc_tell "keystroke \"$1\""
 }
 
-send_return() { proc_tell 'key code 36'; }
-
 select_left() {
 	# select_left <count>, one character at a time
 	local n="$1" i
@@ -373,7 +363,7 @@ run_command() {
 	sleep 0.7
 	type_text "$1"
 	sleep 1.2
-	send_return
+	proc_tell 'key code 36'
 	sleep "${2:-6}"
 }
 
@@ -400,15 +390,15 @@ hover_point() {
 }
 
 shot() {
+	# The post ships lossless WebP: the same pixels as the PNG the screen gives,
+	# at about half the bytes.
 	local name="$1"
 	sleep 1
-	screencapture -x -o -R"${WIN_X},${WIN_Y},${WIN_W},${WIN_H}" "/tmp/qw-${name}"
-	magick "/tmp/qw-${name}" -resize "${POST_WIDTH}x" -strip \
-		-define png:compression-level=9 "${OUT}/${name}"
-	log "wrote ${OUT}/${name}"
+	screencapture -x -o -R"${WIN_X},${WIN_Y},${WIN_W},${WIN_H}" "/tmp/qw-${name}.png"
+	magick "/tmp/qw-${name}.png" -resize "${POST_WIDTH}x" -strip "/tmp/qw-${name}-scaled.png"
+	cwebp -quiet -lossless -z 9 "/tmp/qw-${name}-scaled.png" -o "${OUT}/${name}.webp"
+	log "wrote ${OUT}/${name}.webp"
 }
-
-ANIM_INDEX=0
 
 frame() {
 	ANIM_INDEX=$((ANIM_INDEX + 1))
@@ -421,7 +411,6 @@ capture_animation() {
 	# the block valid, so the preview never has to report a failure here.
 	local out="${OUT}/$1"
 	ANIM_INDEX=0
-	mkdir -p "${FRAMES}"
 	rm -f "${FRAMES}"/*.png
 	local _ value
 
@@ -462,7 +451,7 @@ capture_animation() {
 		sleep 0.4
 	done
 
-	magick mogrify -resize 1200x -path "${FRAMES}" "${FRAMES}"/*.png
+	magick mogrify -resize "${ANIM_WIDTH}x" -path "${FRAMES}" "${FRAMES}"/*.png
 	img2webp -loop 0 -d 550 -q 72 "${FRAMES}"/*.png -o "${out}"
 	log "wrote ${out}"
 }
@@ -481,7 +470,7 @@ capture_profile() {
 	proc_tell 'key code 51'
 	sleep 6
 	run_command "Problems: Focus on Problems View" 3
-	shot "schema-diagnostics-${side}.png"
+	shot "schema-diagnostics-${side}"
 	run_command "View: Close Panel" 2
 
 	# The link a path option carries, under the command key.
@@ -489,13 +478,13 @@ capture_profile() {
 	hover_point 19 "${Y_PREAMBLE}"
 	osa -e 'tell application "System Events" to key down command'
 	sleep 2
-	shot "typst-option-link-${side}.png"
+	shot "typst-option-link-${side}"
 	osa -e 'tell application "System Events" to key up command'
 
 	# The panel, then the authoring loop over the three kinds of block.
 	goto demo.qmd 13 16
 	run_command "Preview Typst Block" 25
-	shot "typst-preview-panel-${side}.png"
+	shot "typst-preview-panel-${side}"
 	capture_animation "typst-preview-loop-${side}.webp"
 
 	# A failure keeps the last good image and says what went wrong. The cursor
@@ -506,7 +495,7 @@ capture_profile() {
 	sleep 1
 	proc_tell 'key code 53'
 	sleep 5
-	shot "typst-preview-error-${side}.png"
+	shot "typst-preview-error-${side}"
 
 	stop_code
 
@@ -516,7 +505,7 @@ capture_profile() {
 	goto demo.qmd 33 20
 	hover_point 20 "${Y_RECT}"
 	sleep 8
-	shot "typst-preview-hover-${side}.png"
+	shot "typst-preview-hover-${side}"
 	stop_code
 }
 

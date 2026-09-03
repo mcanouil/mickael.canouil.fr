@@ -1,5 +1,8 @@
 // The image on the card is real Typst output: this is the cell of the fixture
 // the post shows, compiled with the Typst binary that ships inside Quarto.
+//
+// quarto typst compile _plot.typ plot.svg
+// node screenshot.mjs
 #import "@preview/gribouille:0.7.0": *
 
 #set page(width: auto, height: auto, margin: 4pt, fill: none)

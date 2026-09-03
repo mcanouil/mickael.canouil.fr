@@ -8,7 +8,7 @@ posts/2026-09-03-quarto-wizard-3-3/assets/capture/capture.sh both
 ```
 
 The argument is `light`, `dark`, or `both`, which is the default.
-The images go to `../media`, under the names the post uses, at 1400 pixels wide.
+The images go to `../media`, under the names the post uses, at 1400 pixels wide, as lossless WebP.
 Set `OUT` to write them somewhere else.
 
 ## What you need
@@ -21,7 +21,7 @@ Set `OUT` to write them somewhere else.
 - Gribouille 0.7.0 in the local Typst package cache, or a network connection for the first compile.
 - Screen Recording and Accessibility permission for the terminal that runs the script.
   For an integrated terminal, that is Visual Studio Code itself.
-- `magick` and `img2webp` from Homebrew, and `uv` for the pointer moves.
+- `magick`, `cwebp` and `img2webp` from Homebrew, and `uv` for the pointer moves.
 
 ## How it works
 
@@ -42,3 +42,6 @@ Every event is addressed to the process id of the capture window, and the script
 Three constants near the top of the script hold the geometry of the text: `EDITOR_DX`, `CHAR_W10`, and the two vertical offsets `Y_PREAMBLE` and `Y_RECT`.
 They are measured from a capture, because a code lens takes a row of its own and is shorter than a line of text.
 Change the font size, the line height, or the fixture, and the two hover shots need those numbers measured again.
+
+The script also addresses the fixture by line and column, in the `capture_profile` and `capture_animation` calls.
+Add or remove a line in either heredoc and those numbers move with it.
