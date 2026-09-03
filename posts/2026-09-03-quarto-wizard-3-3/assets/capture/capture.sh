@@ -51,6 +51,16 @@ ANIM_WIDTH=1200
 
 log() { printf '%s\n' "== $*" >&2; }
 
+# Any exit, wanted or not, must release the command key the link shot holds
+# down and end the capture instance. A held modifier corrupts every keystroke
+# on the machine until someone taps the key.
+cleanup() {
+	osascript -e 'tell application "System Events" to key up command' >/dev/null 2>&1 || true
+	pkill -9 -f "user-data-dir ${PROFILE}" >/dev/null 2>&1 || true
+}
+
+trap cleanup EXIT
+
 prepare_extensions() {
 	# One directory holding only what a shot shows, so no other extension of
 	# yours appears in the window. It is built again every run, because a kept
