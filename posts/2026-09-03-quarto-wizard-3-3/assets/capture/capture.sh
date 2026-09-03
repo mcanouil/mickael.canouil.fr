@@ -209,7 +209,9 @@ find_capture_pid() {
 	# the pipeline: it closes the pipe early and the shell dies on SIGPIPE.
 	local pid pids
 	CAPTURE_PID=""
-	pids="$(pgrep -f "user-data-dir ${PROFILE}" || true)"
+	# --new-window is on the launch alone, so a short lived command line process
+	# from goto is never taken for the window owner.
+	pids="$(pgrep -f "user-data-dir ${PROFILE} .*--new-window" || true)"
 	for pid in ${pids}; do
 		case "$(ps -o command= -p "${pid}")" in
 		*--type=*) : ;;
@@ -309,10 +311,20 @@ is_capture_window() {
 	esac
 }
 
-# A keystroke goes to whatever window is in front, so refuse to type when the
-# front window is not the capture one.
+frontmost_pid() {
+	osa -e 'tell application "System Events" to get unix id of first application process whose frontmost is true' 2>/dev/null || true
+}
+
+# A keystroke goes to the application the system has in front, whatever process
+# the AppleScript names, so refuse to type unless that application is the
+# capture instance itself.
 guard_window() {
-	local name
+	local front name
+	front="$(frontmost_pid)"
+	if [ "${front}" != "${CAPTURE_PID}" ]; then
+		log "process ${front} is in front, not the capture instance; stopping"
+		exit 1
+	fi
 	name="$(front_window_name)"
 	if ! is_capture_window "${name}"; then
 		log "front window is '${name}', not the capture window; stopping"
@@ -395,7 +407,7 @@ shot() {
 	# at about half the bytes.
 	local name="$1"
 	sleep 1
-	screencapture -x -o -R"${WIN_X},${WIN_Y},${WIN_W},${WIN_H}" "/tmp/qw-${name}.png"
+	screencapture -x -R"${WIN_X},${WIN_Y},${WIN_W},${WIN_H}" "/tmp/qw-${name}.png"
 	magick "/tmp/qw-${name}.png" -resize "${POST_WIDTH}x" -strip "/tmp/qw-${name}-scaled.png"
 	cwebp -quiet -lossless -z 9 "/tmp/qw-${name}-scaled.png" -o "${OUT}/${name}.webp"
 	log "wrote ${OUT}/${name}.webp"
