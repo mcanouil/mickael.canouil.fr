@@ -4,7 +4,7 @@
 Run it again whenever Quarto Wizard, the typst-render extension, or the theme changes the picture.
 
 ```bash
-posts/2026-09-03-quarto-wizard-3-3/assets/capture/capture.sh both
+posts/2026-09-07-quarto-wizard-3-3/assets/capture/capture.sh both
 ```
 
 The argument is `light`, `dark`, or `both`, which is the default.
