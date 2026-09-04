@@ -486,18 +486,17 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 </section>
 <section id="other-fixes" class="level2">
 <h2 class="anchored" data-anchor-id="other-fixes">Other Fixes</h2>
+<p>3.4 follows straight after 3.3, and it is about the two features above, so the list below holds both releases.</p>
 <ul>
 <li>An extension in a repository whose default branch is <code>master</code> installs without writing <code>@master</code>. The branch is read from GitHub when the repository has no release, no tag and no registry entry.</li>
 <li>A Typst block written between two <code>---</code> lines that open no front matter is found. The rule the preview follows is the rule Pandoc applies.</li>
 <li>The search for Quarto projects no longer collects search processes. It applies your <code>files.exclude</code> and <code>search.exclude</code> settings, and it stops when a newer search replaces it.</li>
+<li>The preview reads a document again when that document takes the name of an untitled document you closed. It used to show you the blocks of the one before.</li>
+<li>A fenced block that a tab indents inside a blockquote is found, and a body line keeps the indent you wrote.</li>
+<li>A YAML diagnostic points at the key or the value it is about, rather than at the whole line, and an option written in flow style is checked as well.</li>
+<li>The Lua validator corrects two checks, accepts a name written with a hyphen where the schema declares it with an underscore, and reports a spelling that two attributes both declare. That last one used to leave the choice to the validator.</li>
 </ul>
-<p>The <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-3">changelog</a> holds the full list.</p>
-</section>
-<section id="what-3.4-adds" class="level2">
-<h2 class="anchored" data-anchor-id="what-3.4-adds">What 3.4 Adds</h2>
-<p>3.4 follows straight after, and it is about the two features above. The preview reads a document again when that document takes the name of an untitled document you closed, so it no longer shows you the blocks of the one before. It also finds a fenced block that a tab indents inside a blockquote.</p>
-<p>On the schema side, a YAML diagnostic now points at the key or the value it is about, rather than at the whole line, and an option written in flow style is checked as well. The Lua validator corrects two checks, accepts a name written with a hyphen where the schema declares it with an underscore, and reports a spelling that two attributes both declare, which used to leave the choice to the validator.</p>
-<p>The <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-4">3.4 changelog</a> holds that list.</p>
+<p>The changelog holds the full list, for <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-3">3.3</a> and for <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-4">3.4</a>.</p>
 <p>Happy writing!</p>
 
 
@@ -3344,7 +3343,7 @@ font-style: inherit;">]</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -4658,7 +4657,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -5107,12 +5106,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -20814,7 +20813,7 @@ font-style: inherit;">- </span>[]{.fragment .grow fragment-index="3"} Step three
 <section id="live-demo" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="live-demo"><span class="header-section-number">2.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-fragmention.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-fragmention.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/slides/demo-fragmention.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -20917,7 +20916,7 @@ font-style: inherit;">4. </span>Sort the resulting table.</span></code></pre></d
 <section id="live-demo-1" class="level3" data-number="3.4">
 <h3 data-number="3.4" class="anchored" data-anchor-id="live-demo-1"><span class="header-section-number">3.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-codefrag.html" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-codefrag.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/slides/demo-codefrag.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -21002,7 +21001,7 @@ font-style: inherit;">- </span>No regression on the held-out split.</span></code
 <section id="live-demo-2" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="live-demo-2"><span class="header-section-number">4.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-cascade.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-cascade.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/slides/demo-cascade.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -21108,7 +21107,7 @@ font-style: inherit;">- </span>Duplicates removed before splitting.</span>
 <section id="live-demo-3" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="live-demo-3"><span class="header-section-number">5.4</span> Live demo</h3>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-tabset.html" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title=""><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-tabset.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-5"><embed src="assets/slides/demo-tabset.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 </section>
@@ -21160,7 +21159,7 @@ font-style: inherit;">-</span><span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;"> tabset</span></span></code></pre></div></div>
 <div style="text-align: center;">
-<p><a href="assets/slides/demo-combined.html" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title=""><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/slides/demo-combined.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-6"><embed src="assets/slides/demo-combined.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 </section>
 <section id="wrap-up" class="level2" data-number="7">
