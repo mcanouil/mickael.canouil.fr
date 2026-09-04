@@ -51,6 +51,20 @@ ANIM_WIDTH=1200
 
 log() { printf '%s\n' "== $*" >&2; }
 
+# An upgrade of the editor invalidates its Accessibility grant, and every
+# AppleScript then fails the same silent way, so say it once and stop.
+require_assistive_access() {
+	local answer
+	answer="$(osascript -e 'tell application "System Events" to get name of front window of (first application process whose frontmost is true)' 2>&1 || true)"
+	case "${answer}" in
+	*"not allowed assistive access"*)
+		log "the terminal running this script has no Accessibility permission"
+		log "grant it in System Settings, Privacy & Security, Accessibility"
+		exit 1
+		;;
+	esac
+}
+
 # Any exit, wanted or not, must release the command key the link shot holds
 # down and end the capture instance. A held modifier corrupts every keystroke
 # on the machine until someone taps the key.
@@ -65,14 +79,20 @@ prepare_extensions() {
 	# One directory holding only what a shot shows, so no other extension of
 	# yours appears in the window. It is built again every run, because a kept
 	# copy would capture the version of the last run after an upgrade.
-	local id dir
+	local id dir newest
 	rm -rf "${EXTDIR}"
 	mkdir -p "${EXTDIR}"
 	for id in mcanouil.quarto-wizard github.github-vscode-theme quarto.quarto; do
+		# Several versions of one extension can sit side by side, so take the
+		# newest and leave the editor no version to choose between.
+		newest=""
 		for dir in "${HOME}"/.vscode/extensions/"${id}"-*; do
 			[ -d "${dir}" ] || continue
-			cp -R "${dir}" "${EXTDIR}/"
+			if [ -z "${newest}" ] || [ "$(printf '%s\n%s\n' "${newest##*-}" "${dir##*-}" | sort -V | tail -1)" = "${dir##*-}" ]; then
+				newest="${dir}"
+			fi
 		done
+		[ -z "${newest}" ] || cp -R "${newest}" "${EXTDIR}/"
 		compgen -G "${EXTDIR}/${id}-*" >/dev/null || {
 			log "${id} is not installed in ~/.vscode/extensions"
 			exit 1
@@ -533,6 +553,7 @@ capture_profile() {
 }
 
 main() {
+	require_assistive_access
 	mkdir -p "${OUT}" "${FRAMES}"
 	prepare_extensions
 	prepare_workspace

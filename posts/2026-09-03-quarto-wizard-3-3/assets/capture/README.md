@@ -21,6 +21,8 @@ Set `OUT` to write them somewhere else.
 - Gribouille 0.7.0 in the local Typst package cache, or a network connection for the first compile.
 - Screen Recording and Accessibility permission for the terminal that runs the script.
   For an integrated terminal, that is Visual Studio Code itself.
+  An update of that application invalidates the Accessibility grant, so it has to be given again after one.
+  The script says so and stops.
 - `magick`, `cwebp` and `img2webp` from Homebrew, and `uv` for the pointer moves.
 
 ## How it works
