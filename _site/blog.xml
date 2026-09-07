@@ -15,8 +15,515 @@
 <title>Mickaël CANOUIL</title>
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
-<generator>quarto-1.11.1</generator>
-<lastBuildDate>Tue, 25 Aug 2026 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.11.3</generator>
+<lastBuildDate>Mon, 07 Sep 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Quarto Wizard 3.3: Typst Preview and Schema Validation</title>
+  <link>https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/</link>
+  <description><![CDATA[ 
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+Skip to main content
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="A card titled Quarto Wizard 3.3, with the line &quot;Typst preview, beside
+the editor&quot; and the Typst wordmark under it. Beside the title, an editor
+window holds a Typst cell on the left and the preview panel on the
+right, where the cell compiles to a scatter plot of penguin flipper
+length against body mass.
+" width="600"></a></p>
+</figure>
+</div>
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 3.3</strong> adds a preview for Typst blocks, and publishes the Lua validator that an extension can use to check its own options. This post shows both.</p>
+<div class="highlight">
+<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 3.3</strong> is available from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code Marketplace</a> and the <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
+</div>
+<section id="preview-a-typst-block" class="level2">
+<h2 class="anchored" data-anchor-id="preview-a-typst-block">Preview a Typst Block</h2>
+<p>Writing Typst inside a Quarto document used to mean rendering the whole document to see one small block. Quarto Wizard 3.3 compiles the block under the cursor and shows the image beside the editor. It uses the Typst binary that ships inside Quarto, so there is nothing else to install.</p>
+<p>Put the cursor inside a Typst block, then run <strong>Quarto Wizard: Preview Typst Block</strong>, or select the code lens above the block. The cell below draws the penguins with <a href="https://m.canouil.dev/gribouille/">Gribouille</a>, and the image beside it is what the render produces.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-panel-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-panel-dark.webp" title="Typst Block Preview" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A Quarto document with a Typst cell on the left and the Quarto Wizard
+preview panel on the right, showing the scatter plot of penguin flipper
+length against body mass that the cell compiles to.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-panel-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-panel-light.webp" title="Typst Block Preview" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A Quarto document with a Typst cell on the left and the Quarto Wizard
+preview panel on the right, showing the scatter plot of penguin flipper
+length against body mass that the cell compiles to.
+"></a></p>
+</figure>
+</div>
+<p>The panel then follows the cursor, and it compiles again after each edit. Move the cursor to another block, of any of the three kinds, and the panel shows that one instead.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-loop-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-loop-dark.webp" title="Typst Block Preview" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The same document and preview panel, where the cursor visits a Typst
+cell, a raw block and a plain block in turn, and the compiled image
+follows every edit and every move.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-loop-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-loop-light.webp" title="Typst Block Preview" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The same document and preview panel, where the cursor visits a Typst
+cell, a raw block and a plain block in turn, and the compiled image
+follows every edit and every move.
+"></a></p>
+</figure>
+</div>
+<p>The panel writes a failure over the last good image of the same block. The preview therefore does not go empty while you type.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-error-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-error-dark.webp" title="A Failure in the Typst Preview" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The preview panel showing a compiler message about an invalid number
+suffix, with the last good image of the block still under it.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-error-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-error-light.webp" title="A Failure in the Typst Preview" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The preview panel showing a compiler message about an invalid number
+suffix, with the last good image of the block still under it.
+"></a></p>
+</figure>
+</div>
+<p>The full compiler output goes to the Quarto Wizard log.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>quartoWizard.typstPreview.debounceMs</code> sets how long an edit waits before the preview follows it. Its default is 300 milliseconds. Set it to <code>0</code> to compile on every keystroke, and raise it when a block is slow to compile.</p>
+</div>
+</div>
+<section id="where-the-image-appears" class="level3">
+<h3 class="anchored" data-anchor-id="where-the-image-appears">Where the Image Appears</h3>
+<p><code>quartoWizard.typstPreview.surface</code> selects where the image is shown.</p>
+<ul>
+<li><code>panel</code>, the default, shows the image beside the editor. The panel scrolls, so a tall image is never cut.</li>
+<li><code>hover</code> shows the image when the pointer rests on a block.</li>
+<li><code>off</code> shows no image, and offers no code lens.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-hover-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-hover-dark.webp" title="Typst Block Preview in a Hover" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A hover card over a Typst block, showing the compiled image of that
+block above the block itself.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-preview-hover-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-preview-hover-light.webp" title="Typst Block Preview in a Hover" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A hover card over a Typst block, showing the compiled image of that
+block above the block itself.
+"></a></p>
+</figure>
+</div>
+<p>A hover cannot scroll, so the image is scaled down to <code>quartoWizard.typstPreview.maxHeight</code>.</p>
+</section>
+<section id="three-kinds-of-block" class="level3">
+<h3 class="anchored" data-anchor-id="three-kinds-of-block">Three Kinds of Block</h3>
+<p>Three fences are spelled almost the same way, and Quarto treats each one differently. The preview treats them differently too, and the code lens above each block says which kind it is.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Fence</th>
+<th>What Quarto does with it</th>
+<th>What the preview compiles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>```typst</code></td>
+<td>Highlights it, and never executes it.</td>
+<td>The body, under the preview’s own page setup and colours.</td>
+</tr>
+<tr class="even">
+<td><code>```{=typst}</code></td>
+<td>Passes it to the Typst output untouched.</td>
+<td>The body, under every raw block above it in the document.</td>
+</tr>
+<tr class="odd">
+<td><code>```{typst}</code></td>
+<td>Executes it through the <a href="https://m.canouil.dev/quarto-typst-render/">typst-render</a> extension.</td>
+<td>The body, under the options and the colours of that extension.</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>{typst}</code> cell needs <code>typst-render</code> installed in the project. Without it the preview says so and shows nothing. An image compiled with guessed options is not the image the render produces, which is worse than no image at all.</p>
+<p>Quarto Wizard installs it for you, in the folder you pick:</p>
+<p><a href="vscode://mcanouil.quarto-wizard/install?repo=mcanouil/quarto-typst-render" class="btn btn-primary btn-sm">Install in VS Code</a> <a href="positron://mcanouil.quarto-wizard/install?repo=mcanouil/quarto-typst-render" class="btn btn-primary btn-sm">Install in Positron</a></p>
+<p>The other two kinds need no extension.</p>
+</section>
+<section id="colours" class="level3">
+<h3 class="anchored" data-anchor-id="colours">Colours</h3>
+<p>A plain block and a raw block take their colours from <code>quartoWizard.typstPreview.foreground</code> and <code>quartoWizard.typstPreview.background</code>. Both accept three forms. <code>auto</code>, the default, follows the editor theme. <code>none</code> writes no colour, so Typst uses its own black on white. Any other value is a Typst colour expression written as it stands, for example <code>rgb("#ff9800")</code>.</p>
+<p>A <code>{typst}</code> cell keeps the colour contract of <code>typst-render</code> instead, so the image matches the render and not the editor. A cell that resolves a colour from a brand needs a side of that brand. <strong>Quarto Wizard: Switch Typst Preview Brand Mode</strong> shows the other side, and the panel header always says which side it used.</p>
+</section>
+<section id="paths-and-the-compile-root" class="level3">
+<h3 class="anchored" data-anchor-id="paths-and-the-compile-root">Paths and the Compile Root</h3>
+<p>The preview sends the block to Typst through standard input. A path inside the block therefore resolves against the compile root, and not against the file that holds the block.</p>
+<p>The preview uses the root that a render uses. For a <code>{typst}</code> cell, that is the <code>root</code> value under <code>extensions.typst-render</code>, whose default is the directory of the document. A cell also compiles with the <code>font-path</code>, the <code>package-path</code> and the <code>input</code> values of the extension. A plain block and a raw block always use the directory of the document.</p>
+</section>
+<section id="open-the-file-a-path-points-to" class="level3">
+<h3 class="anchored" data-anchor-id="open-the-file-a-path-points-to">Open the File a Path Points To</h3>
+<p>A <code>file:</code> option and a <code>preamble:</code> option name a file. Hold <kbd>Ctrl</kbd>, or <kbd>Cmd</kbd> on macOS, and select the value to open that file in the editor.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-option-link-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-option-link-dark.webp" title="Opening a File a Typst Option Names" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A Typst cell whose preamble option value is underlined as a link, with
+the tooltip that names the file and says Cmd and click.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/typst-option-link-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/typst-option-link-light.webp" title="Opening a File a Typst Option Names" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A Typst cell whose preamble option value is underlined as a link, with
+the tooltip that names the file and says Cmd and click.
+"></a></p>
+</figure>
+</div>
+<p>The link appears only when the file is there. A path that leads to no file gets a warning instead. <code>file:</code> works in a cell only, while <code>preamble:</code> also works in the front matter of a document, and under <code>extensions.typst-render</code> in <code>_quarto.yml</code> or <code>_metadata.yml</code>.</p>
+</section>
+<section id="the-limits-of-the-preview" class="level3">
+<h3 class="anchored" data-anchor-id="the-limits-of-the-preview">The Limits of the Preview</h3>
+<p>The preview is an authoring aid, and it is not a render. The limits below are the limits of this first version, and most of them can be lifted later.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The preview differs from a render in two ways, and it says so beside the image when the difference applies. A raw block reaches Typst through the document template during a render, and the template contributes imports and rules that the preview does not apply yet. The preview also compiles one block on its own, so a plain block that uses a value from another block fails.</p>
+</div>
+</div>
+<p>The preview shows the first page of a block of several pages, it always compiles to SVG, and it does not yet see the payload that the R and Python helpers of <code>typst-render</code> produce during a render.</p>
+<p>One limit is deliberate and stays. The preview is off in an untrusted workspace, because it runs a compiler over the content of that workspace.</p>
+</section>
+</section>
+<section id="one-schema-two-validators" class="level2">
+<h2 class="anchored" data-anchor-id="one-schema-two-validators">One Schema, Two Validators</h2>
+<p>The other half of 3.3 is for people who write extensions. It is about <code>_schema.yml</code>, the file where an extension declares every option, shortcode argument, format key, attribute and class that it accepts. If you only use extensions, this part changes nothing for you, beyond better messages from the extensions that adopt it.</p>
+<p>Quarto Wizard has read that file for a while, to offer completion, hover documentation and diagnostics. A value of the wrong type, or a key the extension does not declare, is reported while you write.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/schema-diagnostics-dark.webp" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/schema-diagnostics-dark.webp" title="Extension Schema Diagnostics" class="dark-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A \_quarto.yml file where two extension options carry a squiggle, and
+the Problems panel below reports a wrong type and an unknown option.
+"></a></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/media/schema-diagnostics-light.webp" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/assets/media/schema-diagnostics-light.webp" title="Extension Schema Diagnostics" class="light-content img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="A \_quarto.yml file where two extension options carry a squiggle, and
+the Problems panel below reports a wrong type and an unknown option.
+"></a></p>
+</figure>
+</div>
+<p>That covers the editor only. Someone who writes an option by hand in <code>_quarto.yml</code>, with no editor to help, still reaches the render with a wrong value. So 3.3 publishes the Lua validator that reads the same file during the render.</p>
+<div class="highlight">
+<p><strong>Two artefacts, two jobs:</strong> the meta-schema JSON validates your <code>_schema.yml</code> while you write it, and the Lua module validates the metadata of your user while Quarto renders.</p>
+</div>
+<p>The meta-schema is the file you point <code>$schema</code> at.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/my-extension/_schema.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="_extensions/my-extension/_schema.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">$schema</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> https://m.canouil.dev/quarto-wizard/assets/schema/v2/extension-schema.json</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">options</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">type</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> string</span></span>
+<span id="cb1-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">description</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Colour theme for the extension output."</span></span>
+<span id="cb1-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">default</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> light</span></span>
+<span id="cb1-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">enum</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">[</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">light</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> dark</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">,</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> auto</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">]</span></span>
+<span id="cb1-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">count</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-9"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">type</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> integer</span></span>
+<span id="cb1-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">default</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span></span>
+<span id="cb1-11"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">minimum</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb1-12"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">maximum</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span></span></code></pre></div></div>
+</div>
+<p>The module is published as <a href="https://m.canouil.dev/quarto-wizard/assets/schema/v2/schema.lua" target="_blank" rel="noopener noreferrer"><code>schema.lua</code></a>. Its version is the version of the vocabulary, so the v2 module implements the v2 meta-schema. Vendor it into your extension, because a render must not need network access.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_extensions/my-extension/my-extension.lua</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-2" data-filename="_extensions/my-extension/my-extension.lua" style="background: #f1f3f5;"><pre class="sourceCode lua code-annotation-code code-with-copy code-annotated"><code class="sourceCode lua"><a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-2-1" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">local</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">schema</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">require</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">utils</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>resolve_path<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'_modules/schema.lua'</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">):</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">gsub</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'%.lua$'</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">''</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="annotated-cell-2-2"></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-2" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-2-3" class="code-annotation-target"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">local</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">options</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">schema</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>validate_options<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="annotated-cell-2-4">  <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">meta</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-5">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'my-extension'</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="annotated-cell-2-6">  <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">quarto</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">utils</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>resolve_path<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'_schema.yml'</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="annotated-cell-2-7"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+</div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-2" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="1" data-code-annotation="1">Load the vendored copy by its absolute path. Lua keys its module cache by the name you pass, so <code>require('_modules.schema')</code> would hand the second extension of a render the copy of the first one.</span>
+</dd>
+<dt data-target-cell="annotated-cell-2" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-2" data-code-lines="3" data-code-annotation="2">Read <code>meta.extensions.my-extension</code>, test every value against the schema, and return the options with the defaults applied.</span>
+</dd>
+</dl>
+<p>Errors and warnings go through the Quarto logger, and a schema that cannot be read never stops the render. Narrower entry points exist for a shortcode call, for the attributes of an element, and for a format block. The <a href="https://m.canouil.dev/quarto-wizard/reference/schema-validator.html">Using the Lua Validator</a> page, added to the Quarto Wizard documentation in this release, describes each one.</p>
+<p>The v2 meta-schema also accepts <code>uniqueItems</code> now. The validator already enforced that keyword, so a schema that used it was rejected by the meta-schema and accepted by the module. Both agree again.</p>
+</section>
+<section id="other-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="other-fixes">Other Fixes</h2>
+<p>3.4 follows straight after 3.3, and it is about the two features above, so the list below holds both releases.</p>
+<ul>
+<li>An extension in a repository whose default branch is <code>master</code> installs without writing <code>@master</code>. The branch is read from GitHub when the repository has no release, no tag and no registry entry.</li>
+<li>A Typst block written between two <code>---</code> lines that open no front matter is found. The rule the preview follows is the rule Pandoc applies.</li>
+<li>The search for Quarto projects no longer collects search processes. It applies your <code>files.exclude</code> and <code>search.exclude</code> settings, and it stops when a newer search replaces it.</li>
+<li>The preview reads a document again when that document takes the name of an untitled document you closed. It used to show you the blocks of the one before.</li>
+<li>A fenced block that a tab indents inside a blockquote is found, and a body line keeps the indent you wrote.</li>
+<li>A YAML diagnostic points at the key or the value it is about, rather than at the whole line, and an option written in flow style is checked as well.</li>
+<li>The Lua validator corrects two checks, accepts a name written with a hyphen where the schema declares it with an underscore, and reports a spelling that two attributes both declare. That last one used to leave the choice to the validator.</li>
+</ul>
+<p>The changelog holds the full list, for <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-3">3.3</a> and for <a href="https://m.canouil.dev/quarto-wizard/changelog.html#version-3-4">3.4</a>.</p>
+<p>Happy writing!</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {Quarto {Wizard} 3.3: {Typst} {Preview} and {Schema}
+    {Validation}},
+  date = {2026-09-07},
+  url = {https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2026-09-07). Quarto Wizard 3.3: Typst Preview and Schema
+Validation. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/">https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/</a>
+</div></div></section></div> ]]></description>
+  <category>quarto</category>
+  <category>vscode</category>
+  <category>positron</category>
+  <category>extensions</category>
+  <category>typst</category>
+  <category>quarto-wizard</category>
+  <guid>https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/</guid>
+  <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Gribouille 0.7.0: A Theme from Your Brand, and Plots That Fit</title>
   <link>https://mickael.canouil.fr/posts/2026-08-25-gribouille-0-7/</link>
@@ -3182,7 +3689,7 @@ background-color: null;
 font-style: inherit;">quarto</span> render</span></code></pre></div></div>
 <p>The repository is at <a href="https://github.com/mcanouil/demo-quarto-clinical-report">mcanouil/demo-quarto-clinical-report</a>, and the rendered report is published at <a href="https://m.canouil.dev/demo-quarto-clinical-report/" class="uri">https://m.canouil.dev/demo-quarto-clinical-report/</a>. Here is the whole PDF, the one the workflow publishes on every push to <code>main</code>.</p>
 <div style="text-align: center;">
-<p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-10"><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title=""><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open it full size: <a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="https://m.canouil.dev/demo-quarto-clinical-report/" target="_blank" rel="noopener noreferrer">HTML book</a>.</p>
 <p>Hope this shows that Quarto can be used in such context while providing profesional outputs.</p>
@@ -4150,7 +4657,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -4599,12 +5106,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -32606,712 +33113,6 @@ Management and Batch Operations. <em>Mickael.canouil.fr</em>. <a href="https://m
   <guid>https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/</guid>
   <pubDate>Mon, 12 Jan 2026 00:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png" medium="image" type="image/png" height="72" width="144"/>
-</item>
-<item>
-  <title>Quarto Extensions Updater: Automating Extension Maintenance with GitHub Actions</title>
-  <link>https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/</link>
-  <description><![CDATA[ 
-
-<!--
-@license MIT
-@copyright 2026 Mickaël Canouil
-@author Mickaël Canouil
--->
-Skip to main content
-
-
-
-
-
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Quarto Wizard puppy wearing pointed hat and holding magic wand within
-glowing orange circle decorated with mystical symbols next to Quarto Cli
-logo and GitHub Actions text.
-" width="600"></a></p>
-</figure>
-</div>
-<p>Managing dependencies is a cornerstone of modern software development, and Dependabot has long been the gold standard for automating dependency updates in GitHub repositories. But what about Quarto extensions?</p>
-<p>I’m thrilled to introduce <strong><a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a> 1.0.0</strong>, a GitHub Action that brings Dependabot-style automation to Quarto extension management. If you maintain Quarto projects with multiple extensions, this tool will transform your maintenance workflow from tedious manual checks into an effortless, automated process.</p>
-<div class="highlight">
-<p><strong>Quarto Extensions Updater 1.0.0</strong> brings <strong>Dependabot-style automation</strong> to Quarto extension management. <strong>Set it and forget it</strong>.</p>
-</div>
-<section id="key-features" class="level2">
-<h2 class="anchored" data-anchor-id="key-features">Key Features</h2>
-<p><strong>Quarto Extensions Updater</strong> automates the entire extension update workflow:</p>
-<ul>
-<li><strong>🔍 Automatic Detection</strong>: Scans your <code>_extensions/</code> directory to discover all installed extensions.</li>
-<li><strong>📦 Smart Updates</strong>: Uses the Quarto CLI (<code>quarto add</code>) to update extensions with proper dependency resolution.</li>
-<li><strong>🔄 Source Tracking</strong>: Maintains the <code>source</code> field in extension manifests for reliable version management<sup>1</sup>.</li>
-<li><strong>📝 Detailed Pull Requests</strong>: Creates PRs with comprehensive release notes, categorised by update type (major, minor, patch).</li>
-<li><strong>🔀 One PR Per Extension</strong>: Each extension gets its own pull request that updates when new versions are available.</li>
-<li><strong>🏷️ Semantic Versioning</strong>: Automatically categorises updates and adds appropriate labels.</li>
-<li><strong>⚡ Flexible Scheduling</strong>: Run daily, weekly, monthly, or manually via workflow dispatch.</li>
-<li><strong>⚙️ Highly Customisable</strong>: Configure branch names, commit messages, PR titles, and labels to match your workflow.</li>
-</ul>
-<div class="highlight">
-<p>Each extension gets its <strong>own dedicated pull request</strong> that <strong>automatically updates</strong> when new versions are available. No more blocked PRs!</p>
-</div>
-</section>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<p>Create a workflow file in your repository:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>.github/workflows/update-extensions.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename=".github/workflows/update-extensions.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Update Quarto Extensions</span></span>
-<span id="annotated-cell-1-2"></span>
-<span id="annotated-cell-1-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">schedule</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-5" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cron</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"0 0 * * *"</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-7"></span>
-<span id="annotated-cell-1-8"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">permissions</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-9" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">contents</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> write</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();">4</a><span id="annotated-cell-1-10" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pull-requests</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> write</span></span>
-<span id="annotated-cell-1-11"></span>
-<span id="annotated-cell-1-12"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-13"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">update</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-14"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ubuntu-latest</span></span>
-<span id="annotated-cell-1-15"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-16"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> actions/checkout@v4</span></span>
-<span id="annotated-cell-1-17"></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();">5</a><span id="annotated-cell-1-18" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Setup Quarto</span></span>
-<span id="annotated-cell-1-19"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> quarto-dev/quarto-actions/setup@v2</span></span>
-<span id="annotated-cell-1-20"></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="6" onclick="event.preventDefault();">6</a><span id="annotated-cell-1-21" class="code-annotation-target"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mcanouil/quarto-extensions-updater@v1</span></span>
-<span id="annotated-cell-1-22"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="annotated-cell-1-23"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">github-token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ${{ secrets.GITHUB_TOKEN }}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="5" data-code-annotation="1">Runs daily at midnight UTC. Adjust the cron schedule to suit your needs (weekly: <code>0 0 * * 0</code>, monthly: <code>0 0 1 * *</code>).</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="6" data-code-annotation="2">Allows manual triggering from the Actions tab.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="9" data-code-annotation="3">Required to create branches and commit changes.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="10" data-code-annotation="4">Required to create and update pull requests.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="18" data-code-annotation="5">Installs Quarto CLI, which is required for the <code>quarto add</code> command.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="6">6</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="21" data-code-annotation="6">Runs the updater with default settings.</span>
-</dd>
-</dl>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>First Time Setup
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The action works best with extensions that have proper <code>source</code> metadata in their <code>_extension.yml</code> files. If you installed extensions using <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>, this metadata is already present. Otherwise, you can manually add it:</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>_extensions/owner/name/_extension.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-3" data-filename="_extensions/owner/name/_extension.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-3-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Extension Name"</span></span>
-<span id="annotated-cell-3-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">version</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"1.0.0"</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-3" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-3-3" class="code-annotation-target"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">source</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"owner/repository@v1.0.0"</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
-</div>
-<dl class="code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-3" data-target-annotation="1">1</dt>
-<dd>
-<span data-code-cell="annotated-cell-3" data-code-lines="3" data-code-annotation="1">Add or update this line to enable tracking.</span>
-</dd>
-</dl>
-</div>
-</div>
-</section>
-<section id="configuration-options" class="level2">
-<h2 class="anchored" data-anchor-id="configuration-options">Configuration Options</h2>
-<p>The action supports extensive customisation through input parameters:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 11%">
-<col style="width: 28%">
-<col style="width: 4%">
-<col style="width: 55%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Input</th>
-<th>Description</th>
-<th>Required</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>github-token</code></td>
-<td>GitHub token for creating pull requests</td>
-<td>Yes</td>
-<td><code>${{ github.token }}</code></td>
-</tr>
-<tr class="even">
-<td><code>workspace-path</code></td>
-<td>Path to the workspace containing <code>_extensions</code> directory</td>
-<td>No</td>
-<td><code>.</code></td>
-</tr>
-<tr class="odd">
-<td><code>registry-url</code></td>
-<td>URL to the Quarto extensions registry JSON file</td>
-<td>No</td>
-<td><code>https://raw.githubusercontent.com/mcanouil/quarto-extensions/refs/heads/quarto-wizard/quarto-extensions.json</code></td>
-</tr>
-<tr class="even">
-<td><code>create-pr</code></td>
-<td>Whether to create pull requests</td>
-<td>No</td>
-<td><code>true</code></td>
-</tr>
-<tr class="odd">
-<td><code>branch-prefix</code></td>
-<td>Prefix for update branches</td>
-<td>No</td>
-<td><code>chore/quarto-extensions</code></td>
-</tr>
-<tr class="even">
-<td><code>base-branch</code></td>
-<td>Target branch for pull requests</td>
-<td>No</td>
-<td><code>main</code></td>
-</tr>
-<tr class="odd">
-<td><code>pr-title-prefix</code></td>
-<td>Prefix for PR titles</td>
-<td>No</td>
-<td><code>chore(deps):</code></td>
-</tr>
-<tr class="even">
-<td><code>commit-message-prefix</code></td>
-<td>Prefix for commit messages</td>
-<td>No</td>
-<td><code>chore(deps):</code></td>
-</tr>
-<tr class="odd">
-<td><code>pr-labels</code></td>
-<td>Comma-separated labels to add to PRs</td>
-<td>No</td>
-<td><code>dependencies,quarto-extensions</code></td>
-</tr>
-</tbody>
-</table>
-<p>The action also provides output values:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 24%">
-<col style="width: 75%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Output</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>updates-available</code></td>
-<td>Whether updates are available (<code>true</code>/<code>false</code>)</td>
-</tr>
-<tr class="even">
-<td><code>update-count</code></td>
-<td>Number of updates available</td>
-</tr>
-<tr class="odd">
-<td><code>updates</code></td>
-<td>JSON array of updates (name, currentVersion, latestVersion)</td>
-</tr>
-<tr class="even">
-<td><code>pr-number</code></td>
-<td>Pull request number (if created)</td>
-</tr>
-<tr class="odd">
-<td><code>pr-url</code></td>
-<td>Pull request URL (if created)</td>
-</tr>
-</tbody>
-</table>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Conventional Commits Integration
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Using conventional commits? Customise the prefixes to match your workflow:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="yaml" style="background: #f1f3f5;"><pre class="sourceCode yaml cw-auto code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mcanouil/quarto-extensions-updater@v1</span></span>
-<span id="cb1-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb1-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">github-token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb1-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branch-prefix</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"deps/quarto"</span></span>
-<span id="cb1-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pr-title-prefix</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"build(deps):"</span></span>
-<span id="cb1-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit-message-prefix</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"build(deps):"</span></span>
-<span id="cb1-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pr-labels</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"dependencies,quarto,automated"</span></span></code></pre></div></div>
-<p>This creates PRs with titles like <code>build(deps): update owner/name extension to 1.2.3</code>.</p>
-</div>
-</div>
-</section>
-<section id="how-it-works" class="level2">
-<h2 class="anchored" data-anchor-id="how-it-works">How It Works</h2>
-<p>The action follows a systematic workflow:</p>
-<ol type="1">
-<li><strong>Fetch Registry</strong>: Downloads the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions registry</a> from GitHub.</li>
-<li><strong>Scan Extensions</strong>: Discovers all installed extensions in your <code>_extensions/</code> directory.</li>
-<li><strong>Check Versions</strong>: Compares installed versions with the registry using semantic versioning.</li>
-<li><strong>Process Each Extension</strong>: Processes extensions individually to create separate pull requests.</li>
-<li><strong>Apply Updates</strong>: Uses the Quarto CLI (<code>quarto add owner/repo@version --no-prompt</code>) to update extensions.</li>
-<li><strong>Track Updates</strong>: Maintains or adds the <code>source</code> field in extension manifests.</li>
-<li><strong>Create/Update PR</strong>:
-<ul>
-<li>Creates a new pull request if none exists for the extension.</li>
-<li>Updates the existing PR if one already exists (same branch name).</li>
-<li>Ensures at most one PR per extension.</li>
-</ul></li>
-</ol>
-</section>
-<section id="understanding-pull-requests" class="level2">
-<h2 class="anchored" data-anchor-id="understanding-pull-requests">Understanding Pull Requests</h2>
-<p>The action creates detailed, informative pull requests that follow Dependabot’s style:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="markdown" style="background: #f1f3f5;"><pre class="sourceCode markdown cw-auto code-with-copy"><code class="sourceCode markdown"><span id="cb2-1">Updates the following Quarto extension(s):</span>
-<span id="cb2-2"></span>
-<span id="cb2-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">## ✨ Minor Updates</span></span>
-<span id="cb2-4"></span>
-<span id="cb2-5"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">- </span>**[mcanouil/quarto-iconify](https://github.com/mcanouil/quarto-iconify)**: <span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">`1.0.0`</span> → <span class="in" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">`3.0.1`</span></span>
-<span id="cb2-6"></span>
-<span id="cb2-7">---</span>
-<span id="cb2-8"></span>
-<span id="cb2-9"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">### Release Notes</span></span>
-<span id="cb2-10"></span>
-<span id="cb2-11">**mcanouil/quarto-iconify** (1.0.0 → 3.0.1)</span>
-<span id="cb2-12"></span>
-<span id="cb2-13"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">- </span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">Release notes</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">](https://github.com/mcanouil/quarto-iconify/releases/tag/v3.0.1)</span></span>
-<span id="cb2-14"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">- </span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">Repository</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">](https://github.com/mcanouil/quarto-iconify)</span></span>
-<span id="cb2-15"></span>
-<span id="cb2-16"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">&gt; A shortcode extension to use Iconify icons in HTML-based Quarto documents.</span></span>
-<span id="cb2-17"></span>
-<span id="cb2-18">---</span>
-<span id="cb2-19"></span>
-<span id="cb2-20">🤖 This PR was automatically generated by <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">quarto-extensions-updater</span><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">](https://github.com/mcanouil/quarto-extensions-updater)</span></span></code></pre></div></div>
-<p>Each PR includes:</p>
-<ul>
-<li><strong>Clear Title</strong>: Indicates the extension and version change.</li>
-<li><strong>Categorised Updates</strong>: Groups by major, minor, or patch changes.</li>
-<li><strong>Release Links</strong>: Direct links to release notes and repositories.</li>
-<li><strong>Extension Descriptions</strong>: Context about what the extension does.</li>
-<li><strong>Appropriate Labels</strong>: Automatically added based on update type.</li>
-</ul>
-<div class="highlight">
-<p><strong>Automated scanning</strong>, <strong>semantic versioning comparison</strong>, and <strong>automatic pull requests</strong> mean you’ll <strong>never miss an extension update</strong> again.</p>
-</div>
-</section>
-<section id="requirements" class="level2">
-<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Essential Requirements
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Before using the action, ensure:</p>
-<ol type="1">
-<li><strong>Quarto CLI</strong>: Must be installed in the workflow environment. Use <code>quarto-dev/quarto-actions/setup@v2</code> to install Quarto in GitHub Actions.</li>
-<li><strong>Extension Structure</strong>: Extensions should be in <code>_extensions/owner/name/</code> structure with <code>_extension.yml</code> or <code>_extension.yaml</code> files.</li>
-<li><strong>Semantic Versioning</strong>: Extension versions should follow semantic versioning (X.Y.Z).</li>
-<li><strong>Registry Listing</strong>: Extensions should be listed in the <a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions registry</a>.</li>
-<li><strong>Permissions</strong>: Workflow needs <code>contents: write</code> and <code>pull-requests: write</code> permissions.</li>
-<li><strong>Source Metadata</strong>: Extensions should have <code>source</code> fields in their manifests for reliable version tracking.</li>
-</ol>
-</div>
-</div>
-</section>
-<section id="troubleshooting" class="level2">
-<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
-<p>Common issues and solutions:</p>
-<ul>
-<li><strong>No Updates Detected</strong>: Verify extensions are in <a href="https://m.canouil.dev/quarto-extensions/">m.canouil.dev/quarto-extensions/</a> and have version and source fields in their manifests.</li>
-<li><strong>Permission Errors</strong>: Check that workflow has <code>contents: write</code> and <code>pull-requests: write</code> permissions.</li>
-<li><strong>Workflow Not Running</strong>: Verify cron syntax and ensure GitHub Actions are enabled. GitHub disables scheduled workflows in inactive repositories after 60 days.</li>
-<li><strong>Duplicate PRs</strong>: Ensure <code>branch-prefix</code> is consistent across workflow runs.</li>
-</ul>
-<p>Check the <a href="https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/using-workflow-run-logs">GitHub Actions logs</a> for detailed error messages.</p>
-</section>
-<section id="ecosystem-integration" class="level2">
-<h2 class="anchored" data-anchor-id="ecosystem-integration">Ecosystem Integration</h2>
-<p><strong>Quarto Extensions Updater</strong> complements existing tools in the Quarto ecosystem:</p>
-<ul>
-<li><strong><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></strong>: A VS Code extension for installing and managing Quarto extensions with a GUI. Extensions installed via Quarto Wizard include the <code>source</code> metadata needed for automated updates.</li>
-<li><strong><a href="https://github.com/mcanouil/quarto-extensions">Quarto Extensions</a></strong>: The community registry that powers both Quarto Wizard and Quarto Extensions Updater.</li>
-<li><strong><a href="https://quarto.org/">Quarto CLI</a></strong>: The action uses <code>quarto add</code> commands to perform updates, ensuring compatibility with Quarto’s extension system.</li>
-</ul>
-<div class="highlight">
-<p>Install extensions with <strong>Quarto Wizard</strong>, automate updates with <strong>Quarto Extensions Updater</strong>, and enjoy <strong>seamless maintenance</strong> across your entire Quarto project portfolio.</p>
-</div>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p><strong>Quarto Extensions Updater</strong> brings the automation and reliability of Dependabot to Quarto extension management. By automating the update workflow, you can focus on creating compelling content rather than tracking extension releases.</p>
-<p>The action handles checking for updates, creating pull requests, and maintaining version metadata, all whilst providing clear, detailed information about each change. Whether you’re managing a personal blog, maintaining a collaborative research project, or overseeing a documentation website, this tool ensures your extensions stay current without demanding your constant attention.</p>
-<div class="highlight">
-<p>Transform your extension maintenance from a <strong>tedious manual process</strong> into an <strong>effortless automated workflow</strong>.</p>
-</div>
-<p>Ready to automate your Quarto extension updates? Add the workflow to your repository today and experience the freedom of automated maintenance.</p>
-</section>
-<section id="resources" class="level2">
-<h2 class="anchored" data-anchor-id="resources">Resources</h2>
-<ul>
-<li><strong><a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a></strong>: GitHub repository and documentation.</li>
-<li><strong><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></strong>: VS Code / Positron extension for managing Quarto extensions.</li>
-<li><strong><a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions Registry</a></strong>: Browse and install Quarto extensions.</li>
-<li><strong><a href="https://quarto.org/docs/extensions/">Quarto Extensions Documentation</a></strong>: Official guide to Quarto extensions.</li>
-<li><strong><a href="https://docs.github.com/en/actions">GitHub Actions Documentation</a></strong>: Learn more about GitHub Actions workflows.</li>
-</ul>
-
-
-</section>
-
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Quarto CLI does not natively track installation sources as of version 1.8.24. See <a href="https://github.com/quarto-dev/quarto-cli/issues/11468"><span><span title="GitHub">quarto-dev/quarto-cli#11468</span><span class="gitlink-badge badge text-bg-secondary" style="background-color: #c3c3c3;" title="GitHub" aria-label="GitHub platform">GitHub</span></span></a>.↩︎</p></li>
-</ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2025,
-  author = {CANOUIL, Mickaël},
-  title = {Quarto {Extensions} {Updater:} {Automating} {Extension}
-    {Maintenance} with {GitHub} {Actions}},
-  date = {2025-12-12},
-  url = {https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/},
-  langid = {en-GB}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2025" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2025-12-12). Quarto Extensions Updater: Automating
-Extension Maintenance with GitHub Actions. <em>Mickael.canouil.fr</em>.
-<a href="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/">https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/</a>
-</div></div></section></div> ]]></description>
-  <category>quarto</category>
-  <category>github actions</category>
-  <category>extensions</category>
-  <category>automation</category>
-  <category>devops</category>
-  <guid>https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/</guid>
-  <pubDate>Fri, 12 Dec 2025 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2025-12-12-quarto-extensions-updater/featured.png" medium="image" type="image/png" height="77" width="144"/>
 </item>
 </channel>
 </rss>
