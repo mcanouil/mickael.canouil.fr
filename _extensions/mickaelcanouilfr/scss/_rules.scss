@@ -1946,7 +1946,6 @@ div.sourceCode {
       border: none;
       font-size: 0.85em;
       font-weight: 500;
-      color: rgba($body-color, 0.6);
       font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
       flex-grow: 1;
 
@@ -2113,14 +2112,12 @@ div.sourceCode {
 
     .quarto-grid-item,
     .quarto-post {
-      @media (prefers-reduced-motion: no-preference) {
-        animation: fadeInUp 0.6s ease-out;
-        animation-fill-mode: both;
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
 
-        @for $i from 1 through 20 {
-          &:nth-child(#{$i}) {
-            animation-delay: #{$i * 0.05}s;
-          }
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.05}s;
         }
       }
     }
@@ -2255,14 +2252,13 @@ div.sourceCode {
         border-bottom: none;
       }
 
-      @media (prefers-reduced-motion: no-preference) {
-        animation: fadeInUp 0.5s ease-out;
-        animation-fill-mode: both;
+      // Fade in animation for rows
+      animation: fadeInUp 0.5s ease-out;
+      animation-fill-mode: both;
 
-        @for $i from 1 through 20 {
-          &:nth-child(#{$i}) {
-            animation-delay: #{$i * 0.03}s;
-          }
+      @for $i from 1 through 20 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{$i * 0.03}s;
         }
       }
     }
@@ -3306,11 +3302,11 @@ main {
   }
 
   // Per-level resting/hover widths, thickness, section-number prominence.
-  @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size, $num-opacity in (
-    (h2, 50px, 100px, 4px, 2px, 700, 1em, 1),
-    (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em, 1),
-    (h4, 30px, 60px, 2px, 1px, 500, 0.85em, 0.85),
-    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em, 0.85),
+  @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size in (
+    (h2, 50px, 100px, 4px, 2px, 700, 1em),
+    (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em),
+    (h4, 30px, 60px, 2px, 1px, 500, 0.85em),
+    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em),
   ) {
     #{$level}.anchored:not(:where(.quarto-listing *)) {
       &::after {
@@ -3330,7 +3326,6 @@ main {
         font-weight: $num-weight;
         font-size: $num-size;
         @if $level == h2 { margin-right: 0.6em; }
-        @if $num-opacity != 1 { opacity: $num-opacity; }
       }
 
       &:hover .header-section-number {
@@ -3376,6 +3371,9 @@ main {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    // Staggered entrances keep their delay otherwise, and `fill-mode: both`
+    // holds each item invisible until it ends.
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
@@ -3502,10 +3500,7 @@ body {
   background: $body-bg;
   min-height: 100vh;
   font-family: $font-family-serif;
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: fadeIn 0.6s ease-in;
-  }
+  animation: fadeIn 0.6s ease-in;
 }
 
 // Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
@@ -4535,7 +4530,8 @@ $talks-muted: rgba($body-color, 0.62);
   color: $mc-accent-link-tint;
 }
 
-// Bootstrap greys summaries to #6c757d (4.49:1 light, 3.85:1 dark).
+// Quarto greys summaries with `$text-muted`, which an earlier layer sets to
+// #6c757d (4.49:1 light, 3.85:1 dark) before this theme's defaults load.
 details > summary {
   color: $mc-muted;
 }
@@ -4563,14 +4559,7 @@ main .btn-outline-primary {
 // `.btn-outline-light` has near-white text, invisible on the light theme.
 // Draw it in the body colour so it reads in both themes.
 main .btn-outline-light {
-  --bs-btn-color: #{$body-color};
-  --bs-btn-border-color: #{$body-color};
-  --bs-btn-hover-color: #{$body-bg};
-  --bs-btn-hover-bg: #{$body-color};
-  --bs-btn-hover-border-color: #{$body-color};
-  --bs-btn-active-color: #{$body-bg};
-  --bs-btn-active-bg: #{$body-color};
-  --bs-btn-active-border-color: #{$body-color};
+  @include button-outline-variant($body-color, $color-hover: $body-bg);
 }
 
 // Quarto hides the off-theme image but keeps its lightbox link, which leaves

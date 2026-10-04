@@ -124,10 +124,11 @@
 
     // Code blocks and cell outputs scroll sideways on narrow screens. Make a
     // block focusable only while it overflows, so keyboard users can scroll it
-    // and wide screens get no extra tab stops.
-    const markScrollableCode = () => {
-      document.querySelectorAll("div.sourceCode, div.cell-output-display").forEach((block) => {
-        const overflows = block.scrollWidth > block.clientWidth || block.scrollHeight > block.clientHeight;
+    // and wide screens get no extra tab stops. The observer runs after layout
+    // and again whenever a block's size changes, such as when an image loads.
+    const syncScrollFocus = (entries) => {
+      const states = entries.map(({ target }) => [target, target.scrollWidth > target.clientWidth]);
+      states.forEach(([block, overflows]) => {
         if (overflows && !block.hasAttribute("tabindex")) {
           block.setAttribute("tabindex", "0");
           block.dataset.scrollFocus = "";
@@ -137,11 +138,7 @@
         }
       });
     };
-    markScrollableCode();
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(markScrollableCode, 150);
-    });
+    const scrollObserver = new ResizeObserver(syncScrollFocus);
+    document.querySelectorAll("div.sourceCode, div.cell-output-display").forEach((block) => scrollObserver.observe(block));
   });
 </script>
