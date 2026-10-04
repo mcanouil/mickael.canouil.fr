@@ -2,7 +2,7 @@
 title: "An Extension Can Ship a Whole Quarto Project Type"
 description: |
   A Quarto extension can contribute a project type, not only a format or a filter.
-  This post shows how `quarto-atelier` gives every one of my documentation sites the same website configuration from a three-line `_quarto.yml`, how a site overrides one value, and where the approach stops.
+  This post shows how `quarto-atelier` gives every one of my documentation sites the same website configuration from a short `_quarto.yml`, how a site overrides one value, and where the approach stops.
 date: "2026-11-09"
 categories: [quarto, extensions, website, documentation]
 image: featured.png
@@ -75,12 +75,22 @@ From those few lines, the site inherits:
 - Page navigation, a back to top link, a table of contents, and copy buttons on code blocks.
 - An `llms.txt` file, and a search overlay in the navbar.
 - A footer, and a theme that reads the site's `_brand.yml` for its colours in light and dark mode.
-- A filter that adds the head tags Quarto leaves out, such as `og:url` and the page description.
+- A filter that adds the `og:type` and `og:url` tags, which Quarto leaves out.
 - Six small HTML scripts, among them a skip link and a few accessibility fixes.
 
 I checked this on a test site with only the lines above.
-The rendered page had the `og:locale` and `twitter:card` tags, the skip link, and the GitHub link in the navbar.
+The rendered page had the `og:locale`, `og:type`, and `twitter:card` tags, the skip link, and the edit and issue links beside the table of contents.
 The `_site` folder had an `llms.txt` next to the pages.
+
+One tag needs one more key.
+Quarto does not pass the `website` block to filters, so the filter cannot read `site-url` there.
+For `og:url`, the site repeats its URL under the extension name:
+
+```{.yaml filename="_quarto.yml"}
+extensions:
+  atelier:
+    site-url: https://example.org/my-extension
+```
 
 ::: {.highlight}
 
