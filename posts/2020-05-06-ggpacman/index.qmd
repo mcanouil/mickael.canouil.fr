@@ -122,6 +122,7 @@ base_layer <- base_layer +
 
 ```{r}
 #| label: base-layer-colours-print
+#| fig-alt: "An empty black rectangle, taller than it is wide, which is the blank base layer for the Pac-Man maze."
 #| echo: false
 #| classes: hcenter
 base_layer
@@ -132,6 +133,7 @@ My `base_layer` here is not really helpful, so I temporarily added some elements
 
 ```{r}
 #| label: base-layer-dev
+#| fig-alt: "The black base layer with a white grid of guide lines and axis labels, from 0 to 20 horizontally and from 0 to 26 vertically, used to place the maze elements."
 base_layer +
   scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
   scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
@@ -177,6 +179,7 @@ left_vertical_segments <- tribble(
 
 ```{r}
 #| label: left-vertical-plot
+#| fig-alt: "White vertical line segments on a black background, covering the left half of the maze, which form the vertical walls of the left side."
 base_layer +
   geom_segment(
     data = left_vertical_segments,
@@ -226,6 +229,7 @@ left_segments <- bind_rows(left_vertical_segments, left_horizontal_segments)
 
 ```{r}
 #| label: left-plot
+#| fig-alt: "White vertical and horizontal line segments on a black background, which form the walls of the left half of the Pac-Man maze."
 base_layer +
   geom_segment(
     data = left_segments,
@@ -250,6 +254,7 @@ right_segments <-  mutate(
 
 ```{r}
 #| label: right-plot
+#| fig-alt: "White line segments on a black background, which form the left half of the Pac-Man maze and its mirror image on the right. The vertical walls in the middle column and the ghost door are missing."
 base_layer +
   geom_segment(
     data = bind_rows(left_segments, right_segments),
@@ -291,6 +296,7 @@ maze_walls <- bind_rows(
 
 ```{r}
 #| label: maze-plot
+#| fig-alt: "The complete Pac-Man maze drawn with thin white lines on a black background. The door of the ghost area in the centre looks the same as the walls."
 base_layer +
   geom_segment(
     data = maze_walls,
@@ -309,6 +315,7 @@ The answer is the `colour` and `size` aesthetics.
 
 ```{r}
 #| label: maze-plot-colour
+#| fig-alt: "The complete Pac-Man maze with thick blue walls on a black background. The door of the central ghost area is a thinner blue line, which makes it different from the walls."
 base_layer +
   geom_segment(
     data = maze_walls,
@@ -376,6 +383,7 @@ maze_layer <- base_layer +
 
 ```{r}
 #| label: maze-point-plot-print
+#| fig-alt: "The blue Pac-Man maze on a black background, with small yellow bonus points along the corridors and four larger yellow bonus points near the corners."
 #| echo: false
 #| classes: hcenter
 maze_layer
@@ -398,6 +406,7 @@ To draw Pac-Man, I needed few things:
 
   ```{r}
   #| label: pacman-position-plot
+  #| fig-alt: "The blue Pac-Man maze with its bonus points, with yellow dots at every position of Pac-Man. The dots trace the path of Pac-Man through the corridors of the maze."
   maze_layer +
     geom_point(
       data = unnest(pacman, c("x", "y")),
@@ -426,6 +435,7 @@ To draw Pac-Man, I needed few things:
 
   ```{r}
   #| label: pacman-state-plot
+  #| fig-alt: "Eight yellow disc shapes in a grid of two rows and four columns, one for each state of Pac-Man. The four close states show an almost full disc with a thin line, and the four open states show a disc with a wedge removed, for a mouth open down, left, right, or up."
   ggplot() +
     geom_arc_bar(
       data = pacman_state,
@@ -480,6 +490,7 @@ pacman_moves
 
 ```{r}
 #| label: pacman-moves-plots
+#| fig-alt: "The blue Pac-Man maze with yellow Pac-Man shapes drawn at every position on top of each other. The shapes overlap into a thick yellow path, so it is not possible to see individual moves."
 maze_layer +
   geom_arc_bar(
     data = pacman_moves,
@@ -505,6 +516,7 @@ animated_pacman <- maze_layer +
 
 ```{r}
 #| label: pacman-plot-animated
+#| fig-alt: "Animation of a yellow Pac-Man that moves through the blue maze, opens and closes its mouth, and faces the direction of its movement."
 #| echo: false
 #| classes: hcenter
 animate(
@@ -553,6 +565,7 @@ top <- ggplot() +
 
 ```{r}
 #| label: ghost-top-plot
+#| fig-alt: "The outline of a half circle on a light grey grid, with the flat side at the bottom, which is the top of the ghost body."
 #| echo: false
 #| classes: hcenter
 top
@@ -579,6 +592,7 @@ bottom <- ggplot() +
 
 ```{r}
 #| label: ghost-bottom-plot
+#| fig-alt: "The outline of a row of small half circles on a light grey grid, which make the wavy bottom edge of the ghost body."
 #| echo: false
 #| classes: hcenter
 bottom
@@ -613,6 +627,7 @@ I finally got the whole ghost shape I was looking for.
 
 ```{r}
 #| label: ghost-body-plot
+#| fig-alt: "A dark grey ghost shape on a light grey grid, with a rounded top, straight sides, and a wavy bottom edge."
 ggplot() +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   geom_polygon(
@@ -653,6 +668,7 @@ ghost_eyes <- tribble(
 
 ```{r}
 #| label: ghost-eyes-plot
+#| fig-alt: "Five panels named down, left, middle, right, and up, each with two white eyes and black irises. In each panel, the irises move in the direction named by the panel, and they stay in the centre for middle."
 map_eyes <- c("eye" = "white", "iris" = "black")
 ggplot() +
   coord_fixed(xlim = c(-0.5, 0.5), ylim = c(-0.5, 0.5)) +
@@ -675,6 +691,7 @@ I had the whole ghost shape and the eyes.
 
 ```{r}
 #| label: ghost-shape-plot
+#| fig-alt: "Five panels named down, left, middle, right, and up, each with a dark grey ghost shape with white eyes. The black irises look in the direction named by the panel."
 ggplot() +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
@@ -805,6 +822,7 @@ blinky_plot <- base_layer +
 
 ```{r}
 #| label: blinky-plot-static
+#| fig-alt: "Four red Blinky ghosts on a black background at the corners of a small square, each drawn several times with a small random offset. The eyes of the ghosts look in different directions."
 #| echo: false
 #| classes: hcenter
 blinky_plot
@@ -819,6 +837,7 @@ animated_blinky <- blinky_plot + transition_manual(step)
 
 ```{r}
 #| label: blinky-plot-animated
+#| fig-alt: "Animation of the red ghost Blinky that moves around a small square on a black background, with a small shake at each position and eyes that look in the direction of movement."
 #| echo: false
 #| classes: hcenter
 animate(
@@ -866,6 +885,7 @@ If you don't recall, `maze_layer` already includes a geometry with the bonus poi
 
 ```{r}
 #| label: reminder-maze
+#| fig-alt: "The blue Pac-Man maze on a black background, with small yellow bonus points along the corridors and four larger yellow bonus points near the corners."
 #| echo: false
 #| classes: hcenter
 maze_layer
@@ -892,6 +912,7 @@ maze_layer_points <- maze_layer +
 
 ```{r}
 #| label: points-eaten-plot
+#| fig-alt: "The blue Pac-Man maze on a black background. The bonus points along the path of Pac-Man are covered by black points, so only the bonus points that Pac-Man did not eat stay visible."
 #| echo: false
 #| classes: hcenter
 maze_layer_points
@@ -906,6 +927,7 @@ animated_points <- maze_layer_points + transition_manual(step)
 
 ```{r}
 #| label: points-eaten-plot-animated
+#| fig-alt: "Animation of the blue Pac-Man maze in which the yellow bonus points disappear one after the other along the path of Pac-Man."
 #| echo: false
 #| classes: hcenter
 animate(
@@ -1008,6 +1030,7 @@ blinky_plot <- base_layer +
 
 ```{r}
 #| label: blinky-plot-line
+#| fig-alt: "A horizontal row of twelve ghosts on a black background. The first four are red, the next four are blue, and the last four show only their white eyes, because the body is transparent."
 #| echo: false
 #| classes: hcenter
 #| fig.height: 0.5
@@ -1034,6 +1057,7 @@ animated_blinky <- blinky_plot + transition_manual(step)
 
 ```{r}
 #| label: blinky-state-plot-animated
+#| fig-alt: "Animation of the ghost Blinky that moves from left to right. It is red at first, then blue when weak, and then only its eyes stay visible when eaten."
 #| echo: false
 #| classes: hcenter
 animate(
@@ -1114,6 +1138,7 @@ base_grid <- ggplot() +
 
 ```{r}
 #| label: base-grid-final
+#| fig-alt: "The blue Pac-Man maze on a black background with its yellow bonus points and the yellow text READY! in the centre, below the ghost area."
 base_grid
 ```
 
@@ -1132,6 +1157,7 @@ p_points <- list(
 
 ```{r}
 #| label: base-grid-points-final
+#| fig-alt: "The blue Pac-Man maze with the text READY! in the centre. The bonus points along the path of Pac-Man are covered by black points, so only the uneaten bonus points stay visible."
 base_grid + p_points
 ```
 
@@ -1156,6 +1182,7 @@ p_pacman <- list(
 
 ```{r}
 #| label: base-grid-pacman-final
+#| fig-alt: "The blue Pac-Man maze with the text READY! and its bonus points, with yellow Pac-Man shapes at every position. The shapes overlap into a thick yellow path through the maze."
 base_grid + p_pacman
 ```
 
@@ -1195,6 +1222,7 @@ p_ghosts <- map(.x = ghosts, .f = function(data) {
 
 ```{r}
 #| label: base-grid-ghosts-final
+#| fig-alt: "The blue Pac-Man maze with the text READY! and its bonus points, with the four ghosts at every position. The red, pink, cyan, and orange paths overlap, with blue ghosts where they are weak."
 base_grid + p_ghosts
 ```
 
@@ -1202,6 +1230,7 @@ base_grid + p_ghosts
   
 ```{r}
 #| label: plot-time-all
+#| fig-alt: "The complete Pac-Man game drawn at every step on top of each other. The yellow path of Pac-Man and the coloured paths of the four ghosts overlap in the blue maze."
 base_grid + p_points + p_pacman + p_ghosts
 ```
 
@@ -1215,6 +1244,7 @@ PacMan <- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)
 
 ```{r}
 #| label: plot-time-all-animated
+#| fig-alt: "Animation of the complete Pac-Man game. Pac-Man moves through the blue maze and eats the bonus points, and the four ghosts chase him. The ghosts turn blue after he eats a big bonus point and only their eyes stay visible after he eats them."
 #| echo: false
 #| classes: hcenter
 animate(
