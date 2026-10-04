@@ -2119,7 +2119,9 @@ div.sourceCode {
     .quarto-grid-item,
     .quarto-post {
       animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
+      // `backwards` holds the first frame through the stagger delay, then
+      // releases the transform so the hover lift still applies.
+      animation-fill-mode: backwards;
 
       @for $i from 1 through 20 {
         &:nth-child(#{$i}) {
@@ -2260,7 +2262,7 @@ div.sourceCode {
 
       // Fade in animation for rows
       animation: fadeInUp 0.5s ease-out;
-      animation-fill-mode: both;
+      animation-fill-mode: backwards;
 
       @for $i from 1 through 20 {
         &:nth-child(#{$i}) {
@@ -3377,28 +3379,12 @@ main {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    // Staggered entrances keep their delay otherwise, and `fill-mode: both`
-    // holds each item invisible until it ends.
+    // Staggered entrances keep their delay otherwise, and `fill-mode: backwards`
+    // holds each item invisible until the delay ends.
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  // Disable title-block animations for reduced motion
-  header#title-block-header {
-    &::after {
-      animation: none !important;
-    }
-
-    .quarto-title .title::after {
-      transition: none !important;
-    }
-
-    .quarto-title-meta::before {
-      animation: none !important;
-      opacity: 1 !important;
-    }
   }
 
   // Disable TOC animations for reduced motion
