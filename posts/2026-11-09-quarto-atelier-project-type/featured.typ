@@ -14,13 +14,15 @@
 #let body-font = ("Source Sans 3", "Inter")
 #let mono-font = ("JetBrains Mono", "DejaVu Sans Mono")
 
-#set page(width: 8in, height: 4.2in, margin: 0pt, fill: paper)
+#let page-w = 8in
+
+#set page(width: page-w, height: 4.2in, margin: 0pt, fill: paper)
 
 #let tile-w = 72pt
 #let tile-h = 32pt
 #let gap-x = 12pt
 #let gap-y = 9pt
-#let grid-x = 576pt - 40pt - 4 * tile-w - 3 * gap-x
+#let grid-x = page-w - 40pt - 4 * tile-w - 3 * gap-x
 #let grid-y = 168pt
 #let box-x = 40pt
 #let box-w = 150pt
