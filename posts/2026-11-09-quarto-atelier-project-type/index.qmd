@@ -26,7 +26,7 @@ This post shows how I moved that shared configuration into a Quarto extension th
   width="600px"
 }
 
-## The Problem
+## Copying `_quarto.yml`
 
 A good Quarto website needs more than a title and a navbar.
 You want edit and issue links, Open Graph and Twitter card tags, page navigation, search, a footer, a table of contents, and some accessibility fixes.
@@ -36,7 +36,7 @@ The usual way to get there is to copy `_quarto.yml` from the last site you built
 It works once.
 Then you fix something in one site, forget to fix it in the others, and after a year no two sites have the same configuration.
 
-## A Project Type in an Extension
+## The `atelier` Project Type
 
 Most Quarto extensions contribute a filter, a shortcode, or a format.
 An extension can also contribute a project type[^project-types].
@@ -66,7 +66,7 @@ website:
 The title, the URLs, and the navbar items belong to the site.
 Everything else comes from the extension.
 
-## What the Site Gets
+## Inherited Configuration
 
 From those few lines, the site inherits:
 
@@ -103,7 +103,7 @@ In each repository, a scheduled GitHub Actions [workflow](https://github.com/mca
 It compares the installed extensions with the [Quarto extensions registry](https://m.canouil.dev/quarto-extensions/), using the same core library as [Quarto Wizard](https://github.com/mcanouil/quarto-wizard).
 When `quarto-atelier` has a new release, it opens a pull request with the release notes, so every update is a change I can review before it lands.
 
-## Overriding One Value
+## Overriding the Defaults
 
 The site can still change any inherited value.
 Quarto merges the defaults of the project type with the site's `_quarto.yml`, and the site wins.
@@ -123,7 +123,7 @@ The merge works key by key.
 On my test site, I replaced only the centre of the footer.
 The left part of the footer, which I did not touch, stayed as `atelier` set it.
 
-## Where It Stops
+## Limitations
 
 There are two limits to keep in mind.
 
@@ -136,7 +136,7 @@ Then, every site moves with the extension.
 That is the point, but it also means a bad default reaches all of them.
 The monthly pull requests are the safety net, because each site takes the change through its own review.
 
-## Why So Few People Do This
+## Custom Project Types
 
 Custom project types are rare.
 On GitHub, code search finds `type: atelier` in 48 of my repositories, and in none outside them.
@@ -145,7 +145,7 @@ I think it is because the feature is easy to miss.
 The documentation shows it, but most people meet extensions as filters and formats, and never look further.
 If you maintain more than two or three Quarto websites, it is worth a look.
 
-## Try It
+## Installation
 
 Install the extension in your project:
 

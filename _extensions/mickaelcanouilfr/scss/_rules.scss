@@ -148,7 +148,9 @@ html {
 // Enhanced focus states for accessibility
 a:focus-visible,
 button:focus-visible,
-.btn:focus-visible {
+.btn:focus-visible,
+div.sourceCode:focus-visible,
+div.cell-output-display:focus-visible {
   outline: 2px solid $body-color;
   outline-offset: 2px;
   transition: outline-offset 0.2s ease;
@@ -281,6 +283,24 @@ a>code {
 div.sourceCode {
   background-color: body-mix(95%);
   border: 1px solid body-mix(50%);
+}
+
+code.sourceCode {
+  span.kw, span.cf, span.at, span.bu, span.dt, span.ex, span.pp {
+    color: $mc-syntax-keyword;
+  }
+
+  span.va {
+    color: $mc-syntax-variable;
+  }
+
+  span.co, span.an, span.cv, span.do, span.in, span.re {
+    color: $mc-syntax-comment;
+  }
+
+  span.al, span.er, span.wa {
+    color: $mc-syntax-alert;
+  }
 }
 
 p code.sourceCode,
@@ -2093,12 +2113,14 @@ div.sourceCode {
 
     .quarto-grid-item,
     .quarto-post {
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
+      @media (prefers-reduced-motion: no-preference) {
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
 
-      @for $i from 1 through 20 {
-        &:nth-child(#{$i}) {
-          animation-delay: #{$i * 0.05}s;
+        @for $i from 1 through 20 {
+          &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.05}s;
+          }
         }
       }
     }
@@ -2233,13 +2255,14 @@ div.sourceCode {
         border-bottom: none;
       }
 
-      // Fade in animation for rows
-      animation: fadeInUp 0.5s ease-out;
-      animation-fill-mode: both;
+      @media (prefers-reduced-motion: no-preference) {
+        animation: fadeInUp 0.5s ease-out;
+        animation-fill-mode: both;
 
-      @for $i from 1 through 20 {
-        &:nth-child(#{$i}) {
-          animation-delay: #{$i * 0.03}s;
+        @for $i from 1 through 20 {
+          &:nth-child(#{$i}) {
+            animation-delay: #{$i * 0.03}s;
+          }
         }
       }
     }
@@ -2558,7 +2581,7 @@ div.sourceCode {
   // Enhanced section number styling if present
   .header-section-number {
     transition: $_link-transition;
-    opacity: 0.7;
+    opacity: 0.85;
     margin-right: 0.5em;
   }
 
@@ -3141,7 +3164,7 @@ header#title-block-header {
 .quarto-title-author-degree {
   font-size: 0.65em;
   font-weight: 600;
-  color: $mc-accent;
+  color: $mc-accent-link;
   letter-spacing: 0.02em;
 }
 
@@ -3286,8 +3309,8 @@ main {
   @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size, $num-opacity in (
     (h2, 50px, 100px, 4px, 2px, 700, 1em, 1),
     (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em, 1),
-    (h4, 30px, 60px, 2px, 1px, 500, 0.85em, 0.65),
-    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em, 0.6),
+    (h4, 30px, 60px, 2px, 1px, 500, 0.85em, 0.85),
+    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em, 0.85),
   ) {
     #{$level}.anchored:not(:where(.quarto-listing *)) {
       &::after {
@@ -3302,7 +3325,7 @@ main {
 
       .header-section-number {
         transition: $_link-transition;
-        opacity: 0.7;
+        opacity: 0.85;
         margin-right: 0.5em;
         font-weight: $num-weight;
         font-size: $num-size;
@@ -3479,7 +3502,10 @@ body {
   background: $body-bg;
   min-height: 100vh;
   font-family: $font-family-serif;
-  animation: fadeIn 0.6s ease-in;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: fadeIn 0.6s ease-in;
+  }
 }
 
 // Drop cap — author-marked single-letter span: `[I]{.drop-cap}`.
@@ -3662,7 +3688,7 @@ body.quarto-about-solana #quarto-content.page-rows-contents,
 
   em,
   strong {
-    color: $mc-accent;
+    color: $mc-accent-link;
     font-style: normal;
   }
 
@@ -3955,7 +3981,7 @@ aside.sidebar.sidebar-navigation,
 .sidebar-navigation .sidebar-link.active,
 .sidebar-navigation .sidebar-item-section .sidebar-link.active,
 .sidebar a.active {
-  color: $mc-accent !important;
+  color: $mc-accent-link !important;
   font-weight: 700;
 }
 
@@ -4245,10 +4271,9 @@ $talks-muted: rgba($body-color, 0.62);
   letter-spacing: 0.12em;
   padding: 0.25em 0.7em;
   border-radius: 4px;
-  // Use $mc-accent-link so #fff text passes WCAG AA on the badge background
-  // (5.32:1 in light, 5.36:1 in dark — both above 4.5:1).
-  background-color: $mc-accent-link;
-  color: #fff;
+  // Ink on brand gold: 5.25:1 in both themes.
+  background-color: $mc-accent;
+  color: $mc-ink;
 }
 
 .blog-hero-title {
@@ -4473,12 +4498,18 @@ $talks-muted: rgba($body-color, 0.62);
   min-height: 55vh;
 }
 
+// The faint "404" is decoration, so it is drawn as generated content, which
+// screen readers and contrast checks ignore.
 .mc-404 .mc-404-code {
   font-size: clamp(6rem, 20vw, 11rem);
   font-weight: 700;
   line-height: 1;
   color: body-mix(88%);
   user-select: none;
+
+  &::before {
+    content: "404";
+  }
 }
 
 .mc-404 .mc-404-home {
@@ -4486,7 +4517,7 @@ $talks-muted: rgba($body-color, 0.62);
   padding: 0.45rem 1.1rem;
   border: 1px solid $primary;
   border-radius: $border-radius;
-  color: $primary;
+  color: $mc-accent-link;
   text-decoration: none;
 }
 
@@ -4494,4 +4525,57 @@ $talks-muted: rgba($body-color, 0.62);
 .mc-404 .mc-404-home:focus-visible {
   background: body-mix(92%);
   text-decoration: underline;
+}
+
+// ===========================
+// CONTRAST OVERRIDES
+// ===========================
+
+.callout .callout-body a:not(.btn) {
+  color: $mc-accent-link-tint;
+}
+
+// Bootstrap greys summaries to #6c757d (4.49:1 light, 3.85:1 dark).
+details > summary {
+  color: $mc-muted;
+}
+
+// The extension stylesheets below load after the theme, so these selectors
+// carry an extra type selector to win.
+
+// code-window greys the filename to 50% of the text colour (3.04:1).
+// Long paths wrap so the title bar never scrolls on narrow screens.
+div.code-with-filename .code-with-filename-file pre {
+  color: rgba($body-color, 0.72);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+// gitlink fades its badge to 70%, which drops the text below 3:1.
+span.gitlink-badge {
+  opacity: 1;
+}
+
+main .btn-outline-primary {
+  --bs-btn-color: #{$mc-accent-link};
+}
+
+// `.btn-outline-light` has near-white text, invisible on the light theme.
+// Draw it in the body colour so it reads in both themes.
+main .btn-outline-light {
+  --bs-btn-color: #{$body-color};
+  --bs-btn-border-color: #{$body-color};
+  --bs-btn-hover-color: #{$body-bg};
+  --bs-btn-hover-bg: #{$body-color};
+  --bs-btn-hover-border-color: #{$body-color};
+  --bs-btn-active-color: #{$body-bg};
+  --bs-btn-active-bg: #{$body-color};
+  --bs-btn-active-border-color: #{$body-color};
+}
+
+// Quarto hides the off-theme image but keeps its lightbox link, which leaves
+// an empty, invisible tab stop. Hide the link with its image.
+body.quarto-light a.lightbox:has(> img.dark-content),
+body.quarto-dark a.lightbox:has(> img.light-content) {
+  display: none !important;
 }
