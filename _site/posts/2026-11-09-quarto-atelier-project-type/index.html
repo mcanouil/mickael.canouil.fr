@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Senior biostatistician at Alsinova and freelance developer in the Quarto and R ecosystems, pairing genetics and multi-omics analysis with open-source tooling.">
+<meta name="description" content="A Quarto extension can contribute a project type, not only a format or a filter. This post shows how quarto-atelier gives every one of my documentation sites the same website configuration from a short _quarto.yml, how a site overrides one value, and where the approach stops.">
 
-<title>Mickaël CANOUIL, Ph.D. – Mickaël CANOUIL</title>
+<title>An Extension Can Ship a Whole Quarto Project Type – Mickaël CANOUIL</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -27,33 +27,67 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./favicon.ico" rel="icon">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-1515b2df39eee3b9429a373b7b8864d2.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-4b9fe424f892f05f79bd654b5013c584.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-c061c27e61f1ab83f38b090b15e8fea5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-4b9fe424f892f05f79bd654b5013c584.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-1515b2df39eee3b9429a373b7b8864d2.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-eda68d1b5acc999fa33ce94a9b6e9564.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-f4237399ed0230f37ad603c9a85548d3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-eda68d1b5acc999fa33ce94a9b6e9564.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
   document.querySelectorAll("pre.cw-auto").forEach(function(pre){
@@ -121,8 +155,11 @@ ul.task-list li input[type="checkbox"] {
     }
   });
 });</script>
-<script src="site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
-<link href="site_libs/quarto-contrib/quarto-gitlink-1.0.0/gitlink.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/iconify-3.0.0/iconify-icon.min.js"></script>
+<link href="../../site_libs/quarto-contrib/quarto-gitlink-1.0.0/gitlink.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -150,149 +187,40 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-home-featured .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-image','listing-title','listing-description','listing-featured',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] }],
-      
-      searchColumns: ["listing-image","listing-title","listing-description","listing-date","listing-categories","listing-featured","listing-template"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-home-featured'] = new List('listing-home-featured', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-home-posts .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-project','listing-website','listing-format','listing-lightbox','listing-execute','listing-filters','listing-extensions','listing-engines','listing-language','listing-freeze','listing-title-block-banner','listing-open-graph','listing-authors','listing-license','listing-citation','listing-csl','listing-code-annotations','listing-footnotes-hover','listing-toc','listing-number-sections','listing-back-to-top-navigation','listing-comments','listing-knitr','listing-title','listing-description','listing-date','listing-categories','listing-image','listing-image-alt','listing-aliases','listing-path','listing-outputHref','listing-date-modified','listing-author','listing-filename','listing-file-modified','listing-reading-time','listing-word-count','listing-toc-depth','listing-engine','listing-code-links','listing-resources','listing-include-in-header','listing-quarto-wizard','listing-alt-text','listing-editor','listing-subtitle','listing-jupyter','listing-metadata-files','listing-bibliography','listing-polar-alt',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-date-modified-sort'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
-      page: 25,
-    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
-      searchColumns: ["listing-project","listing-website","listing-format","listing-lightbox","listing-execute","listing-filters","listing-extensions","listing-engines","listing-language","listing-freeze","listing-title-block-banner","listing-open-graph","listing-authors","listing-license","listing-citation","listing-csl","listing-code-annotations","listing-footnotes-hover","listing-toc","listing-number-sections","listing-back-to-top-navigation","listing-comments","listing-knitr","listing-title","listing-description","listing-date","listing-categories","listing-image","listing-image-alt","listing-aliases","listing-path","listing-outputHref","listing-date-modified","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count","listing-toc-depth","listing-engine","listing-code-links","listing-resources","listing-include-in-header","listing-quarto-wizard","listing-alt-text","listing-editor","listing-subtitle","listing-jupyter","listing-metadata-files","listing-bibliography","listing-polar-alt"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-home-posts'] = new List('listing-home-posts', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-home-publications .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-abstract','listing-accessed','listing-author','listing-container-title','listing-doi','listing-id','listing-issn','listing-issue','listing-issued','listing-page','listing-title','listing-type','listing-url','listing-volume','listing-journal-title','listing-date','listing-position','listing-year','listing-pub-date-label','listing-bibtype','listing-bibkey','listing-bibtex','listing-pub-author','listing-title-short','listing-annote','listing-first','listing-editor','listing-last',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] }],
-      
-      searchColumns: ["listing-abstract","listing-accessed","listing-author","listing-container-title","listing-doi","listing-id","listing-issn","listing-issue","listing-issued","listing-page","listing-title","listing-type","listing-url","listing-volume","listing-journal-title","listing-date","listing-position","listing-year","listing-pub-date-label","listing-bibtype","listing-bibkey","listing-bibtex","listing-pub-author","listing-title-short","listing-annote","listing-first","listing-editor","listing-last"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-home-publications'] = new List('listing-home-publications', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://mickael.canouil.fr/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/">
 <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/svg+xml" href="assets/images/icon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
+<link rel="icon" type="image/svg+xml" href="../../assets/images/icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="Mickaël CANOUIL, Ph.D. – Mickaël CANOUIL">
-<meta property="og:description" content="Senior biostatistician at Alsinova and freelance developer in the Quarto and R ecosystems, pairing genetics and multi-omics analysis with open-source tooling.">
-<meta property="og:image" content="https://mickael.canouil.fr/assets/images/og-image.png">
+<meta property="og:title" content="An Extension Can Ship a Whole Quarto Project Type - mickael.canouil.fr">
+<meta property="og:description" content="A Quarto extension can contribute a project type, not only a format or a filter. This post shows how quarto-atelier gives every one of my documentation sites the same website configuration from a short _quarto.yml, how a site overrides one value, and where the approach stops.">
+<meta property="og:image" content="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/featured.png">
 <meta property="og:site_name" content="Mickaël CANOUIL">
 <meta property="og:locale" content="en_GB">
-<meta property="og:image:height" content="630">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:alt" content="Social preview card for mickael.canouil.fr: a gold MC monogram above the Mickaël CANOUIL wordmark, over a near-black background.">
-<meta name="twitter:title" content="Mickaël CANOUIL, Ph.D. – Mickaël CANOUIL">
-<meta name="twitter:description" content="Senior biostatistician at Alsinova and freelance developer in the Quarto and R ecosystems, pairing genetics and multi-omics analysis with open-source tooling.">
-<meta name="twitter:image" content="https://mickael.canouil.fr/assets/images/og-image.png">
+<meta property="og:image:height" content="806">
+<meta property="og:image:width" content="1536">
+<meta property="og:image:alt" content="Card on an off-white background, under a dark navy band reading &quot;Quarto, project types&quot; in beige.
+The title &quot;An Extension Can Ship a Whole Quarto Project Type&quot; in dark navy sits above a gold rule.
+Below, a navy tile labelled _extension.yml on the left has three gold lines fanning out to a grid of twelve cream site tiles on the right, each showing the line &quot;type: atelier&quot;.
+">
+<meta name="twitter:title" content="An Extension Can Ship a Whole Quarto Project Type – Mickaël CANOUIL">
+<meta name="twitter:description" content="A Quarto extension can contribute a project type, not only a format or a filter. This post shows how quarto-atelier gives every one of my documentation sites the same website configuration from a short _quarto.yml, how a site overrides one value, and where the approach stops.">
+<meta name="twitter:image" content="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/featured.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="630">
-<meta name="twitter:image-width" content="1200">
-<meta name="twitter:image:alt" content="Social preview card for mickael.canouil.fr: a gold MC monogram above the Mickaël CANOUIL wordmark, over a near-black background.">
-<link rel="canonical" href="https://mickael.canouil.fr/">
+<meta name="twitter:image-height" content="806">
+<meta name="twitter:image-width" content="1536">
+<meta name="twitter:image:alt" content="Card on an off-white background, under a dark navy band reading &quot;Quarto, project types&quot; in beige.
+The title &quot;An Extension Can Ship a Whole Quarto Project Type&quot; in dark navy sits above a gold rule.
+Below, a navy tile labelled _extension.yml on the left has three gold lines fanning out to a grid of twelve cream site tiles on the right, each showing the line &quot;type: atelier&quot;.
+">
+<link rel="canonical" href="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/">
 </head>
 
-<body class="nav-fixed home-page fullcontent quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -458,15 +386,15 @@ window.Quarto = {
   </script>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo light-content">
-    <img src="site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo dark-content">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo light-content">
+    <img src="../../site_libs/quarto-contrib/quarto-project/mickaelcanouilfr/assets/images/logo-gold-path.svg" alt="" class="navbar-logo dark-content">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Mickaël CANOUIL</span>
     </a>
   </div>
@@ -477,23 +405,23 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./blog.html"> 
+    <a class="nav-link" href="../../blog.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./projects/index.html"> 
+    <a class="nav-link" href="../../projects/index.html"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./talks/index.html"> 
+    <a class="nav-link" href="../../talks/index.html"> 
 <span class="menu-text">Talks</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./publications/index.html"> 
+    <a class="nav-link" href="../../publications/index.html"> 
 <span class="menu-text">Publications</span></a>
   </li>  
   <li class="nav-item">
@@ -525,12 +453,70 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">An Extension Can Ship a Whole Quarto Project Type</h1>
+                  <div>
+        <div class="description">
+          <p>A Quarto extension can contribute a project type, not only a format or a filter. This post shows how <code>quarto-atelier</code> gives every one of my documentation sites the same website configuration from a short <code>_quarto.yml</code>, how a site overrides one value, and where the approach stops.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">quarto</div>
+                <div class="quarto-category">extensions</div>
+                <div class="quarto-category">website</div>
+                <div class="quarto-category">documentation</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><!--
+  @license MIT
+  @copyright 2026 Mickaël Canouil
+  @author Mickaël Canouil
+  -->
+  <a href="https://mickael.canouil.fr">Mickaël CANOUIL</a><span class="quarto-title-author-degree">, Ph.D.</span> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Monday, the 9th of November, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link active" data-scroll-target="#the-problem">The Problem</a></li>
+  <li><a href="#a-project-type-in-an-extension" id="toc-a-project-type-in-an-extension" class="nav-link" data-scroll-target="#a-project-type-in-an-extension">A Project Type in an Extension</a></li>
+  <li><a href="#what-the-site-gets" id="toc-what-the-site-gets" class="nav-link" data-scroll-target="#what-the-site-gets">What the Site Gets</a></li>
+  <li><a href="#overriding-one-value" id="toc-overriding-one-value" class="nav-link" data-scroll-target="#overriding-one-value">Overriding One Value</a></li>
+  <li><a href="#where-it-stops" id="toc-where-it-stops" class="nav-link" data-scroll-target="#where-it-stops">Where It Stops</a></li>
+  <li><a href="#why-so-few-people-do-this" id="toc-why-so-few-people-do-this" class="nav-link" data-scroll-target="#why-so-few-people-do-this">Why So Few People Do This</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it">Try It</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-11-09-quarto-atelier-project-type/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
 <!-- main -->
-<main class="content page-columns page-full" id="quarto-document-content" tabindex="-1">
+<main class="content quarto-banner-title-block" id="quarto-document-content" tabindex="-1">
 
 <!--
 @license MIT
@@ -542,374 +528,128 @@ window.Quarto = {
 
 
 
-<div class="quarto-about-solana column-body">
-  <div class="about-entity">
-    <div class="entity-contents">
-      <header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Mickaël CANOUIL<span class="title-suffix">, Ph.D.</span></h1>
-<p class="subtitle lead">Biostatistician, Quarto wizard, and cinephile.</p>
-</div>
-<div>
-  <div class="description">
-    Senior biostatistician at Alsinova and freelance developer in the Quarto and R ecosystems, pairing genetics and multi-omics analysis with open-source tooling.
-  </div>
-</div>
-<div class="quarto-title-meta">
-  </div>
-</header> <div class="about-links">
-  <a href="/#mc-email-cHJvQG1pY2thZWwuY2Fub3VpbC5kZXY=" class="about-link" rel="" target="">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="octicon:mail-16" aria-label="Envelope logo opening an email to Mickaël CANOUIL" title="Contact"></iconify-icon></span>
-  </a>
-  <a href="https://orcid.org/0000-0002-3396-4549" class="about-link" rel="noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="fa7-brands:orcid" aria-label="ORCID logo linking to Mickaël CANOUIL ORCID account" title="ORCID"></iconify-icon></span>
-  </a>
-  <a href="https://bsky.app/profile/mickael.canouil.fr" class="about-link" rel="noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="fa7-brands:bluesky" aria-label="BlueSky logo linking to mickael.canouil.fr account" title="BlueSky"></iconify-icon></span>
-  </a>
-  <a href="https://www.linkedin.com/in/mickaelcanouil" class="about-link" rel="noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="fa7-brands:linkedin" aria-label="LinkedIn logo linking to mickaelcanouil account" title="LinkedIn"></iconify-icon></span>
-  </a>
-  <a href="https://fosstodon.org/@MickaelCanouil" class="about-link" rel="me noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="fa7-brands:mastodon" aria-label="Mastodon logo linking to MickaelCanouil Fosstodon account" title="Mastodon"></iconify-icon></span>
-  </a>
-  <a href="https://github.com/mcanouil" class="about-link" rel="noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="octicon:mark-github-16" aria-label="GitHub logo linking to mcanouil account" title="GitHub"></iconify-icon></span>
-  </a>
-  <a href="https://github.com/sponsors/mcanouil?o=esb" class="about-link" rel="noopener noreferrer" target="_blank">
-     <span class="about-link-text"><iconify-icon role="img" inline="" icon="octicon:heart-fill-16" aria-label="GitHub Sponsor" title="GitHub Sponsor"></iconify-icon></span>
-  </a>
-</div>
-      <div class="about-contents"><div id="edu-exp">
-</div></div>
-    </div>
-    <img src="/assets/images/profile.png" alt="Profile picture of Mickaël CANOUIL" class="about-image
-  round " style="height: 9em; width: 9em;" title="Mickaël CANOUIL">
-  </div>
-</div>
 
-<div class="about-body">
-<p><span class="drop-cap">I</span> am a <strong><em>senior biostatistician</em></strong> at <a href="https://www.alsinova.com/">Alsinova</a> and, separately, a <strong><em>freelance</em></strong> developer specialising in the Quarto and R ecosystems. I combine expertise in genetics and multi-omics analysis with open-source development, bridging academic/private research with practical tool creation.</p>
+<p>I maintain more than forty Quarto extensions, and each one has its own documentation website. For a long time, each site had its own copy of the same <code>_quarto.yml</code>, and the copies drifted apart. This post shows how I moved that shared configuration into a Quarto extension that ships a project type.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Card on an off-white background, under a dark navy band reading &quot;Quarto,
+project types&quot; in beige. The title &quot;An Extension Can Ship a Whole Quarto
+Project Type&quot; in dark navy sits above a gold rule. Below, a navy tile
+labelled \_extension.yml on the left has three gold lines fanning out to
+a grid of twelve cream site tiles on the right, each showing the line
+&quot;type: atelier&quot;.
+" width="600"></a></p>
+</figure>
+</div>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The Problem</h2>
+<p>A good Quarto website needs more than a title and a navbar. You want edit and issue links, Open Graph and Twitter card tags, page navigation, search, a footer, a table of contents, and some accessibility fixes. That is close to a hundred lines of YAML before you write the first page.</p>
+<p>The usual way to get there is to copy <code>_quarto.yml</code> from the last site you built. It works once. Then you fix something in one site, forget to fix it in the others, and after a year no two sites have the same configuration.</p>
+</section>
+<section id="a-project-type-in-an-extension" class="level2">
+<h2 class="anchored" data-anchor-id="a-project-type-in-an-extension">A Project Type in an Extension</h2>
+<p>Most Quarto extensions contribute a filter, a shortcode, or a format. An extension can also contribute a project type<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. It inherits from one of the base types (<code>default</code>, <code>website</code>, or <code>book</code>), and it sets the default values for <code>_quarto.yml</code>.</p>
+<p><a href="https://github.com/mcanouil/quarto-atelier"><code>quarto-atelier</code></a> is such an extension. I made it for the documentation websites of my extensions, so I could maintain one configuration instead of forty custom ones. Its project type is called <code>atelier</code>, and it is a <code>website</code> underneath. A site that uses it writes very little:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="_quarto.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> atelier</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">website</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"My Extension"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">site-url</span><span class="kw">:</span><span class="at"> https://example.org/my-extension</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">repo-url</span><span class="kw">:</span><span class="at"> https://github.com/example/my-extension</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">navbar</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> index.qmd</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Home</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The title, the URLs, and the navbar items belong to the site. Everything else comes from the extension.</p>
+</section>
+<section id="what-the-site-gets" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-site-gets">What the Site Gets</h2>
+<p>From those few lines, the site inherits:</p>
+<ul>
+<li><code>_site</code> as the output directory, and edit and issue links to the repository.</li>
+<li>Open Graph and Twitter card tags, with <code>en_GB</code> as the locale and a large image card.</li>
+<li>Page navigation, a back to top link, a table of contents, and copy buttons on code blocks.</li>
+<li>An <code>llms.txt</code> file, and a search overlay in the navbar.</li>
+<li>A footer, and a theme that reads the site’s <code>_brand.yml</code> for its colours in light and dark mode.</li>
+<li>A filter that adds the <code>og:type</code> and <code>og:url</code> tags, which Quarto leaves out.</li>
+<li>Six small HTML scripts, among them a skip link and a few accessibility fixes.</li>
+</ul>
+<p>I checked this on a test site with only the lines above. The rendered page had the <code>og:locale</code>, <code>og:type</code>, and <code>twitter:card</code> tags, the skip link, and the edit and issue links beside the table of contents. The <code>_site</code> folder had an <code>llms.txt</code> next to the pages.</p>
+<p>One tag needs one more key. Quarto does not pass the <code>website</code> block to filters, so the filter cannot read <code>site-url</code> there. For <code>og:url</code>, the site repeats its URL under the extension name:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="_quarto.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extensions</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">atelier</span><span class="kw">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">site-url</span><span class="kw">:</span><span class="at"> https://example.org/my-extension</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <div class="highlight">
-<p>I am <strong><em>available</em></strong> as a freelance for both short-term and extended engagements on <strong><em>Quarto related projects</em></strong>.</p>
+<p><strong>One release, every site:</strong> when I change a default in <code>quarto-atelier</code>, every site gets it at its next extension update.</p>
 </div>
-<div class="mc-cta-row">
-<p><a href="#" class="btn mc-cta mc-cta--primary mc-email" data-mc-email="cHJvQG1pY2thZWwuY2Fub3VpbC5kZXY="><iconify-icon aria-hidden="true" inline="" icon="octicon:mail-16"></iconify-icon> Hire me</a> <a href="./projects/index.html" class="btn mc-cta"><iconify-icon aria-hidden="true" inline="" icon="octicon:repo-16"></iconify-icon> View projects</a> <a href="https://m.canouil.dev/curriculum-vitae/" class="btn mc-cta"><iconify-icon aria-hidden="true" inline="" icon="octicon:file-badge-16"></iconify-icon> Curriculum vitae</a></p>
-</div>
-<div class="stats-strip">
-<div class="stat">
-<p><span class="stat-figure">50</span> <span class="stat-label">Peer-reviewed papers</span></p>
-</div>
-<div class="stat">
-<p><span class="stat-figure">30+</span> <span class="stat-label">Quarto extensions</span></p>
-</div>
-<div class="stat">
-<p><span class="stat-figure">58</span> <span class="stat-label">Open-source projects</span></p>
-</div>
-<div class="stat">
-<p><span class="stat-figure">2012</span> <span class="stat-label">Biostatistician since</span></p>
-</div>
-</div>
-<section id="what-i-do" class="level2">
-<h2 data-anchor-id="what-i-do"><iconify-icon aria-hidden="true" inline="" icon="octicon:briefcase-24"></iconify-icon> What I Do</h2>
-<p><span class="drop-cap">I</span> build tools that make reproducible research easier for data scientists and researchers. With a Ph.D.&nbsp;in biostatistics and deep expertise in the Quarto and R ecosystems, I combine statistical rigour with practical usability. My work spans multi-omics data analysis (genetics, proteomics, metabolomics, transcriptomics) mostly in a research setting, R package development, and Quarto ecosystem contributions.</p>
+<p>Each site keeps its own copy of the extension under <code>_extensions/</code>, so the update is not instant. In each repository, a scheduled GitHub Actions <a href="https://github.com/mcanouil/quarto-workflows/blob/main/.github/workflows/quarto-extensions-updates.yml">workflow</a> runs <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a> once a month, the action I wrote about in <a href="../../posts/2025-12-12-quarto-extensions-updater/index.html">an earlier post</a>. It compares the installed extensions with the <a href="https://m.canouil.dev/quarto-extensions/">Quarto extensions registry</a>, using the same core library as <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>. When <code>quarto-atelier</code> has a new release, it opens a pull request with the release notes, so every update is a change I can review before it lands.</p>
 </section>
-<section id="selected-work" class="level2">
-<h2 data-anchor-id="selected-work"><iconify-icon aria-hidden="true" inline="" icon="octicon:rocket-24"></iconify-icon> Selected Work</h2>
-<div id="listing-home-featured" class="quarto-listing quarto-listing-container-custom">
-<div class="list home-cards">
-  <a class="home-card" href="https://github.com/mcanouil/tidytuesday" target="_blank" rel="noopener noreferrer" data-index="0" data-categories="VHlwc3QlMkNHcmlib3VpbGxlJTJDUXVhcnRvJTJDRGF0YSUyMFZpc3VhbGlzYXRpb24lMkNUaWR5VHVlc2RheQ==" data-listing-date-sort="1779494400000">
-    <div class="home-card-thumb">
-      <img src="./projects/assets/images/tidytuesday.png" alt="" loading="lazy">
-    </div>
-    <h3 class="home-card-title no-anchor">
-<p>TidyTuesday</p>
-    </h3>
-    <div class="home-card-description">
-<p>Weekly TidyTuesday figures drawn in Typst with Gribouille.</p>
-    </div>
-  </a>
-  <a class="home-card" href="https://github.com/mcanouil/gribouille" target="_blank" rel="noopener noreferrer" data-index="1" data-categories="VHlwc3QlMkNHcmFtbWFyJTIwb2YlMjBHcmFwaGljcyUyQ0NlVFolMkNWaXN1YWxpc2F0aW9uJTJDUGFja2FnZQ==" data-listing-date-sort="1775001600000">
-    <div class="home-card-thumb">
-      <img src="./projects/assets/images/gribouille.png" alt="" loading="lazy">
-    </div>
-    <h3 class="home-card-title no-anchor">
-<p>Gribouille</p>
-    </h3>
-    <div class="home-card-description">
-<p>A Typst package that implements Wilkinson’s grammar of graphics on top of CeTZ, inspired by <code>ggplot2</code> and <code>plotnine</code>, with dozens of layer constructors and…</p>
-    </div>
-  </a>
-  <a class="home-card" href="https://github.com/mcanouil/quarto-wizard" target="_blank" rel="noopener noreferrer" data-index="2" data-categories="UXVhcnRvJTJDRXh0ZW5zaW9uJTJDUXVhcnRvJTIwV2l6YXJkJTJDVmlzdWFsJTIwU3R1ZGlvJTIwQ29kZSUyQ1Bvc2l0cm9u" data-listing-date-sort="1731628800000">
-    <div class="home-card-thumb">
-      <img src="./projects/assets/images/quarto-wizard.png" alt="" loading="lazy">
-    </div>
-    <h3 class="home-card-title no-anchor">
-<p>Quarto Wizard</p>
-    </h3>
-    <div class="home-card-description">
-<p>Quarto Wizard is a Visual Studio Code extension that assists you in managing Quarto projects.</p>
-    </div>
-  </a>
+<section id="overriding-one-value" class="level2">
+<h2 class="anchored" data-anchor-id="overriding-one-value">Overriding One Value</h2>
+<p>The site can still change any inherited value. Quarto merges the defaults of the project type with the site’s <code>_quarto.yml</code>, and the site wins.</p>
+<p>For example, <code>atelier</code> puts the search in the navbar as an overlay. The documentation site of <code>quarto-badge</code> has no navbar, only a sidebar. So it moves the search there:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
 </div>
-<div class="listing-no-matching d-none">No matching items</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="_quarto.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">website</span><span class="kw">:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">search</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">location</span><span class="kw">:</span><span class="at"> sidebar</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> textbox</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><a href="./projects/index.html" class="mc-more">All projects <iconify-icon aria-hidden="true" inline="" icon="octicon:arrow-right-16"></iconify-icon></a></p>
+<p>The merge works key by key. On my test site, I replaced only the centre of the footer. The left part of the footer, which I did not touch, stayed as <code>atelier</code> set it.</p>
 </section>
-<section id="open-source" class="level2">
-<h2 data-anchor-id="open-source"><iconify-icon aria-hidden="true" inline="" icon="octicon:code-24"></iconify-icon> Open Source Contributions</h2>
-<div class="highlight">
-<p>Creator of the <strong><em><a href="https://m.canouil.dev/quarto-extensions/">Quarto Extensions Directory</a></em></strong>, <strong><em><a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a></em></strong> Visual Studio Code extension, and <strong><em><a href="https://github.com/mcanouil/awesome-quarto">Awesome Quarto</a></em></strong> repository, with <strong><em>30+ Quarto extensions</em></strong> developed.</p>
-</div>
-<p><span class="drop-cap">M</span>y Quarto and Typst work covers Lua filters and shortcodes, HTML, Reveal.js, and Typst formats, plus <a href="https://github.com/mcanouil/gribouille">Gribouille</a>, a grammar of graphics for Typst. On the R side I have written packages for genomics quality control, statistical testing, and visualisation (<a href="https://github.com/mcanouil/NACHO">NACHO</a>, <a href="https://github.com/mcanouil/insane">insane</a>, <a href="https://github.com/mcanouil/MiSTr">MiSTr</a>, <a href="https://github.com/mcanouil/snpEnrichment">snpEnrichment</a>). I have also written some that are far less useful but much more entertaining (<a href="https://github.com/mcanouil/ggpacman">ggpacman</a>).</p>
+<section id="where-it-stops" class="level2">
+<h2 class="anchored" data-anchor-id="where-it-stops">Where It Stops</h2>
+<p>There are two limits to keep in mind.</p>
+<p>First, lists are added together, not replaced. If a site adds its own script to <code>include-after-body</code>, it gets that script and the five from <code>atelier</code>. A site cannot remove one inherited script or filter. If a site needs that, the default does not belong in the shared project type.</p>
+<p>Then, every site moves with the extension. That is the point, but it also means a bad default reaches all of them. The monthly pull requests are the safety net, because each site takes the change through its own review.</p>
 </section>
-<section id="from-the-blog" class="level2">
-<h2 data-anchor-id="from-the-blog"><iconify-icon aria-hidden="true" inline="" icon="octicon:megaphone-24"></iconify-icon> From the Blog</h2>
-<div id="listing-home-posts" class="quarto-listing quarto-listing-container-custom">
-<div class="list blog-list">
-
-  <article class="blog-hero" data-index="0" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3dlYnNpdGUlMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1794182400000" data-listing-file-modified-sort="1791130283092" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="885">
-    <a class="blog-hero-thumb" href="./posts/2026-11-09-quarto-atelier-project-type/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-11-09-quarto-atelier-project-type/featured.png" alt="" loading="lazy"></a>
-    <div class="blog-hero-meta">
-      <div class="blog-hero-eyebrow">
-        <span class="blog-hero-badge">Latest</span>
-        <time class="blog-date" datetime="Monday, the 9th of November, 2026">Monday, the 9th of November, 2026</time>
-      </div>
-      <a class="blog-title-link" href="./posts/2026-11-09-quarto-atelier-project-type/index.html">
-        <h2 class="blog-hero-title no-anchor">
-<p>An Extension Can Ship a Whole Quarto Project Type</p>
-        </h2>
-      </a>
-
-      <div class="blog-hero-lead">
-<p>A Quarto extension can contribute a project type, not only a format or a filter. This post shows how <code>quarto-atelier</code> gives every one of my documentation sites the same website configuration from a short <code>_quarto.yml</code>…</p>
-      </div>
-
-      <div class="blog-categories"><span class="blog-category" onclick="window.quartoListingCategory('cXVhcnRv'); return false;">quarto</span><span class="blog-category" onclick="window.quartoListingCategory('ZXh0ZW5zaW9ucw=='); return false;">extensions</span><span class="blog-category" onclick="window.quartoListingCategory('d2Vic2l0ZQ=='); return false;">website</span><span class="blog-category" onclick="window.quartoListingCategory('ZG9jdW1lbnRhdGlvbg=='); return false;">documentation</span></div>
-    </div>
-  </article>
-
-  <article class="blog-row blog-row--compact" data-index="1" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDdHlwc3QlMkNxdWFydG8td2l6YXJk" data-listing-date-sort="1788739200000" data-listing-file-modified-sort="1791130283091" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1812">
-    <a class="blog-thumb" href="./posts/2026-09-07-quarto-wizard-3-3/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-09-07-quarto-wizard-3-3/featured.png" alt="" loading="lazy"></a>
-    <div class="blog-meta">
-      <time class="blog-date" datetime="Monday, the 7th of September, 2026">Monday, the 7th of September, 2026</time>
-      <a class="blog-title-link" href="./posts/2026-09-07-quarto-wizard-3-3/index.html">
-        <h3 class="blog-title no-anchor">
-<p>Quarto Wizard 3.3: Typst Preview and Schema Validation</p>
-        </h3>
-      </a>
-
-      <div class="blog-lead">
-<p>Quarto Wizard 3.3 compiles the Typst block under your cursor and shows the image beside the editor. It also publishes the Lua validator of the extension schema vocabulary, so an extension can check its own options…</p>
-      </div>
-
-      <div class="blog-categories"><span class="blog-category" onclick="window.quartoListingCategory('cXVhcnRv'); return false;">quarto</span><span class="blog-category" onclick="window.quartoListingCategory('dnNjb2Rl'); return false;">vscode</span><span class="blog-category" onclick="window.quartoListingCategory('cG9zaXRyb24='); return false;">positron</span><span class="blog-category" onclick="window.quartoListingCategory('ZXh0ZW5zaW9ucw=='); return false;">extensions</span><span class="blog-category" onclick="window.quartoListingCategory('dHlwc3Q='); return false;">typst</span><span class="blog-category" onclick="window.quartoListingCategory('cXVhcnRvLXdpemFyZA=='); return false;">quarto-wizard</span></div>
-    </div>
-  </article>
-
-  <article class="blog-row blog-row--compact" data-index="2" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1787616000000" data-listing-file-modified-sort="1791130283088" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="20" data-listing-word-count-sort="3892">
-    <a class="blog-thumb" href="./posts/2026-08-25-gribouille-0-7/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-08-25-gribouille-0-7/featured.png" alt="" loading="lazy"></a>
-    <div class="blog-meta">
-      <time class="blog-date" datetime="Tuesday, the 25th of August, 2026">Tuesday, the 25th of August, 2026</time>
-      <a class="blog-title-link" href="./posts/2026-08-25-gribouille-0-7/index.html">
-        <h3 class="blog-title no-anchor">
-<p>Gribouille 0.7.0: A Theme from Your Brand, and Plots That Fit</p>
-        </h3>
-      </a>
-
-      <div class="blog-lead">
-<p>Gribouille 0.7.0 builds a theme from a parsed <code>_brand.yml</code>, so a document’s plots follow the same brand as its prose. A plot now draws at any size that gives it room to draw, keeps to the <code>width</code> and <code>height</code> you set…</p>
-      </div>
-
-      <div class="blog-categories"><span class="blog-category" onclick="window.quartoListingCategory('dHlwc3Q='); return false;">typst</span><span class="blog-category" onclick="window.quartoListingCategory('cXVhcnRv'); return false;">quarto</span><span class="blog-category" onclick="window.quartoListingCategory('Z3JhbW1hci1vZi1ncmFwaGljcw=='); return false;">grammar-of-graphics</span><span class="blog-category" onclick="window.quartoListingCategory('Z3JpYm91aWxsZQ=='); return false;">gribouille</span></div>
-    </div>
-  </article>
-
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-<p><a href="./blog.html" class="mc-more">All posts <iconify-icon aria-hidden="true" inline="" icon="octicon:arrow-right-16"></iconify-icon></a></p>
+<section id="why-so-few-people-do-this" class="level2">
+<h2 class="anchored" data-anchor-id="why-so-few-people-do-this">Why So Few People Do This</h2>
+<p>Custom project types are rare. On GitHub, code search finds <code>type: atelier</code> in 48 of my repositories, and in none outside them.</p>
+<p>I think it is because the feature is easy to miss. The documentation shows it, but most people meet extensions as filters and formats, and never look further. If you maintain more than two or three Quarto websites, it is worth a look.</p>
 </section>
-<section id="research" class="level2">
-<h2 data-anchor-id="research"><iconify-icon aria-hidden="true" inline="" icon="octicon:beaker-24"></iconify-icon> Research &amp; Publications</h2>
-<div class="highlight">
-<p><strong><em>50 peer-reviewed papers</em></strong> in top-tier journals, including <strong><em>Nature</em></strong>, <strong><em>Nature Genetics</em></strong>, and <strong><em>Diabetes</em></strong>.</p>
-</div>
-<p><span class="drop-cap">M</span>y research covers genome-wide and epigenome-wide association studies, expression quantitative trait loci mapping, and the joint modelling of longitudinal and time-to-event data. I apply this work mostly to type 2 diabetes and its complications. Eight of those papers place me as first, co-first, last, or co-last author.</p>
-<div id="listing-home-publications" class="quarto-listing quarto-listing-container-custom">
-<ol class="list home-pubs">
-  <li class="home-pub" data-index="0" data-listing-date-sort="1730419200000">
-    <div class="home-pub-head">
-      <span class="home-pub-mark">Co-last author</span>
-      <time class="home-pub-year">2024</time>
-    </div>
-    <a class="home-pub-title" href="https://doi.org/10.1038/s41467-024-53687-3" target="_blank" rel="noopener noreferrer">A Framework For Conducting GWAS Using Repeated Measures Data With An Application To Childhood BMI</a>
+<section id="try-it" class="level2">
+<h2 class="anchored" data-anchor-id="try-it">Try It</h2>
+<p>Install the extension in your project:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="bash"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> add mcanouil/quarto-atelier</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then set <code>type: atelier</code> in <code>_quarto.yml</code>. It needs Quarto 1.9.36 or later.</p>
+<p>The source is on <a href="https://github.com/mcanouil/quarto-atelier"><iconify-icon role="img" inline="" icon="fa7-brands:github" aria-label="GitHub" title="GitHub"></iconify-icon> GitHub</a>, and the <a href="https://m.canouil.dev/quarto-atelier/">documentation site</a> is built with the project type itself.</p>
+<p>Happy publishing!</p>
 
-    <span class="home-pub-venue">Nature Communications</span>
-  </li>
-  <li class="home-pub" data-index="1" data-listing-date-sort="1630454400000">
-    <div class="home-pub-head">
-      <span class="home-pub-mark">First author</span>
-      <time class="home-pub-year">2021</time>
-    </div>
-    <a class="home-pub-title" href="https://doi.org/10.2337/dc20-2960" target="_blank" rel="noopener noreferrer">Epigenome-Wide Association Study Reveals Methylation Loci Associated With Offspring Gestational Diabetes Mellitus Exposure And Maternal Methylome</a>
 
-    <span class="home-pub-venue">Diabetes Care</span>
-  </li>
-  <li class="home-pub" data-index="2" data-listing-date-sort="1580515200000">
-    <div class="home-pub-head">
-      <span class="home-pub-mark">First author</span>
-      <time class="home-pub-year">2020</time>
-    </div>
-    <a class="home-pub-title" href="https://doi.org/10.1093/bioinformatics/btz647" target="_blank" rel="noopener noreferrer">NACHO: An R Package For Quality Control Of NanoString nCounter Data</a>
+</section>
 
-    <span class="home-pub-venue">Bioinformatics</span>
-  </li>
-  <li class="home-pub" data-index="3" data-listing-date-sort="1527811200000">
-    <div class="home-pub-head">
-      <span class="home-pub-mark">First author</span>
-      <time class="home-pub-year">2018</time>
-    </div>
-    <a class="home-pub-title" href="https://doi.org/10.3389/fgene.2018.00210" target="_blank" rel="noopener noreferrer">Jointly Modelling Single Nucleotide Polymorphisms With Longitudinal And Time-To-Event Trait: An Application To Type 2 Diabetes And Fasting Plasma Glucose</a>
 
-    <span class="home-pub-venue">Frontiers in Genetics</span>
-  </li>
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>See the Quarto documentation on <a href="https://quarto.org/docs/extensions/project-types.html">Project Types</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-<div class="listing-no-matching d-none">No matching items</div>
-</div>
-<p><a href="./publications/index.html" class="mc-more">All publications <iconify-icon aria-hidden="true" inline="" icon="octicon:arrow-right-16"></iconify-icon></a></p>
-</section>
-<section id="experience" class="level2 experience">
-<h2 class="experience" data-anchor-id="experience"><iconify-icon aria-hidden="true" inline="" icon="octicon:organization-24"></iconify-icon> Experience</h2>
-<ul>
-<li><p><span class="year">2022</span> <strong>Senior Biostatistician</strong> (Nov.&nbsp;2022 – present)<br>
-<span class="institution"><em>Astek — Alsinova</em>, remote</span><br>
-<span class="role-detail">Production-grade R packages and end-to-end statistical pipelines for multi-omics data (microbiome, proteomics, lipidomics), on GitHub and Google Cloud (Actions, Cloud Build, Cloud Workstation, BigQuery); an all-in-one package for methylation sequencing built on <code>targets</code>, with an interactive <code>shiny</code> interface and automated Quarto CLI reports; statistical consulting and R and Quarto training.</span></p></li>
-<li><p><span class="year">2017</span> <strong>Head of Biostatistics</strong> (Oct.&nbsp;2017 – Oct.&nbsp;2022)<br>
-<span class="institution"><em>CNRS UMR 8199 / Inserm U1283 — EGID</em>, Lille, France</span><br>
-<span class="role-detail">Managed the biostatistics team, co-led one project within the EGG consortium, drove the tooling and statistical analyses of a RHAPSODY work package, and contributed analyses to the CKDgen, CHARGE, IMIDIA, and DIRECT consortia.</span></p></li>
-<li><p><span class="year">2012</span> <strong>Biostatistician</strong> (Sep.&nbsp;2012 – Sep.&nbsp;2017)<br>
-<span class="institution"><em>CNRS UMR 8199 / Inserm U1283 — EGID</em>, Lille, France</span><br>
-<span class="role-detail">Multi-omics research in the genetics of type 2 diabetes: genome-wide and epigenome-wide association studies, eQTL mapping, and joint longitudinal-survival models.</span></p></li>
-</ul>
-<div class="facts">
-<p><span class="fact"><iconify-icon aria-hidden="true" inline="" icon="octicon:location-16"></iconify-icon> Lille, France</span> <span class="fact"><iconify-icon aria-hidden="true" inline="" icon="octicon:broadcast-16"></iconify-icon> Fully remote since 2022</span> <span class="fact"><iconify-icon aria-hidden="true" inline="" icon="octicon:comment-16"></iconify-icon> French (native), English (fluent)</span></p>
-</div>
-</section>
-<section id="skills" class="level2">
-<h2 data-anchor-id="skills"><iconify-icon aria-hidden="true" inline="" icon="octicon:tools-24"></iconify-icon> Technical Skills</h2>
-<p><span class="drop-cap">W</span>hilst grounded in genetics and multi-omics, my skills extend across modern data science and software development. I support polyglot data science projects with deep R expertise complemented by Python integration, and I cover the full Quarto multi-format publishing pipeline.</p>
-<div class="stack">
-<div class="stack-row">
-<p><span class="stack-label"><iconify-icon aria-hidden="true" inline="" icon="octicon:graph-16"></iconify-icon> Statistics</span> <span class="chip">GWAS &amp; EWAS</span> <span class="chip">Multi-omics</span> <span class="chip">Mixed models</span> <span class="chip">Joint models</span> <span class="chip">Survival analysis</span> <span class="chip">Meta-analysis</span></p>
-</div>
-<div class="stack-row">
-<p><span class="stack-label"><iconify-icon aria-hidden="true" inline="" icon="octicon:code-16"></iconify-icon> Languages</span> <span class="chip">R</span> <span class="chip">Lua</span> <span class="chip">Typst</span> <span class="chip">Python</span> <span class="chip">TypeScript</span> <span class="chip">JavaScript</span> <span class="chip">Bash</span> <span class="chip">SQL</span></p>
-</div>
-<div class="stack-row">
-<p><span class="stack-label"><iconify-icon aria-hidden="true" inline="" icon="octicon:book-16"></iconify-icon> Publishing</span> <span class="chip">Quarto</span> <span class="chip">Typst</span> <span class="chip">Reveal.js</span> <span class="chip">Pandoc</span> <span class="chip">LaTeX</span> <span class="chip">R Markdown</span> <span class="chip">HTML/(S)CSS</span></p>
-</div>
-<div class="stack-row">
-<p><span class="stack-label"><iconify-icon aria-hidden="true" inline="" icon="octicon:container-16"></iconify-icon> Infrastructure</span> <span class="chip">GitHub Actions</span> <span class="chip">GitHub Pages</span> <span class="chip">Docker</span> <span class="chip">Dev Containers</span> <span class="chip">Google Cloud</span> <span class="chip">VS Code / Positron</span></p>
-</div>
-<div class="stack-row">
-<p><span class="stack-label"><iconify-icon aria-hidden="true" inline="" icon="octicon:package-16"></iconify-icon> R ecosystem</span> <span class="chip">tidyverse</span> <span class="chip">shiny</span> <span class="chip">devtools</span> <span class="chip">testthat</span> <span class="chip">roxygen2</span> <span class="chip">Bioconductor</span> <span class="chip">renv</span> <span class="chip">targets</span></p>
-</div>
-</div>
-</section>
-<section id="teaching" class="level2">
-<h2 data-anchor-id="teaching"><iconify-icon aria-hidden="true" inline="" icon="octicon:people-24"></iconify-icon> Teaching &amp; Workshops</h2>
-<p><span class="drop-cap">I</span> teach R and Quarto, with pre-configured Dev Container templates so that participants spend the session working rather than installing. Existing material includes the two-day <a href="https://github.com/mcanouil/mastering-quarto-cli">Mastering Quarto CLI</a> workshop, <a href="https://github.com/mcanouil/radvanced">R Advanced</a>, <a href="https://github.com/mcanouil/rshiny">Shiny: First Steps</a>, <a href="https://github.com/mcanouil/rpackages">R Packages</a>, and <a href="https://github.com/mcanouil/rdatabase">R and Databases</a>. Recent talks include <em>Introduction to Development Containers</em> and <em>A Gentle Introduction to Quarto</em>.</p>
-<p><a href="./talks/index.html" class="mc-more">All talks <iconify-icon aria-hidden="true" inline="" icon="octicon:arrow-right-16"></iconify-icon></a></p>
-</section>
-<section id="education" class="level2 education">
-<h2 class="education" data-anchor-id="education"><iconify-icon aria-hidden="true" inline="" icon="octicon:mortar-board-24"></iconify-icon> Education</h2>
-<ul>
-<li><p><span class="year">2017</span> <strong><em>Ph.D.</em> in Biostatistics</strong><br>
-<span class="institution"><em>University of Lille, France</em></span><br>
-<span class="role-detail">Thesis: <em>Joint Modelling of Longitudinal and Survival Data Applied to Genetic Association Studies</em>.</span></p></li>
-<li><p><span class="year">2011</span> <strong><em>M.Sc.</em> in Biostatistics, Bioinformatics and Genomics</strong> (<em>Specialised in Biostatistics</em>)<br>
-<span class="institution"><em>University Claude Bernard Lyon 1, France</em></span></p></li>
-<li><p><span class="year">2009</span> <strong><em>B.Sc.</em> in Biology</strong> (<em>Specialised in Biostatistics</em>)<br>
-<span class="institution"><em>University Claude Bernard Lyon 1, France</em></span></p></li>
-</ul>
-</section>
-<section id="interests" class="level2 interests">
-<h2 class="interests" data-anchor-id="interests"><iconify-icon aria-hidden="true" inline="" icon="octicon:star-24"></iconify-icon> Interests</h2>
-<ul>
-<li>Quarto Extensions</li>
-<li>Multi-omics Data Analysis</li>
-<li>Longitudinal &amp; Mixed Models</li>
-<li>Data Visualisation &amp; Storytelling</li>
-<li>R Package Development</li>
-<li>Reproducible Research</li>
-<li>Statistical Genetics</li>
-<li>Open Source Contributions</li>
-<li>Cinephile</li>
-</ul>
-<p>Away from the keyboard I watch a lot of films (<img src="https://raw.githubusercontent.com/mcanouil/imdb-ratings/main/media/imdb.svg" class="img-fluid" alt="Films seen count">), about half of them in a theatre. I also play board games, from heavy strategy to party games, and walk Saga, my black Labrador Retriever.</p>
-<div class="light-content">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://raw.githubusercontent.com/mcanouil/imdb-ratings/main/media/streak-light.svg" class="img-styled nolightbox img-fluid figure-img" alt="Movies seen in a movie theatre year streak"></p>
-<figcaption>Source: <a href="https://github.com/mcanouil/imdb-ratings">github.com/mcanouil/imdb-ratings</a></figcaption>
-</figure>
-</div>
-</div>
-<div class="dark-content">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://raw.githubusercontent.com/mcanouil/imdb-ratings/main/media/streak-dark.svg" class="img-styled nolightbox img-fluid figure-img" alt="Movies seen in a movie theatre year streak"></p>
-<figcaption>Source: <a href="https://github.com/mcanouil/imdb-ratings">github.com/mcanouil/imdb-ratings</a></figcaption>
-</figure>
-</div>
-</div>
-</section>
-<section id="work-with-me" class="level2">
-<h2 data-anchor-id="work-with-me"><iconify-icon aria-hidden="true" inline="" icon="octicon:comment-discussion-24"></iconify-icon> Work with Me</h2>
-<div class="faq">
-<details>
-<summary>
-What do you take on as a freelance?
-</summary>
-<p>Tooling and publishing work only: Quarto extensions and multi-format pipelines (HTML, Typst/PDF, Reveal.js), R package development, <code>shiny</code> applications, reproducible workflows with Dev Containers and continuous integration, and training. In practice that ranges from a single Lua filter to a full reporting pipeline with brand theming. Biostatistics, clinical, and data-analysis work is not part of my freelance offer.</p>
-</details>
-<details>
-<summary>
-Why the distinction between freelance and employed work?
-</summary>
-<p>I wear two hats. As a freelance I take on Quarto, Typst, and R engineering work in my own name. Biostatistics goes through my employer, <a href="https://www.alsinova.com/">Alsinova</a>, where I am a senior biostatistician: genome-wide and epigenome-wide association studies, longitudinal and mixed models, joint longitudinal-survival modelling, and meta-analysis, with the reporting that goes with them. If that is what you need, write to me anyway and I will point you to the right contact there.</p>
-</details>
-<details>
-<summary>
-How does a freelance engagement usually start?
-</summary>
-<p>With an email describing what you are trying to publish or automate, and what currently gets in the way. I answer with a scope, a rough estimate, and the questions I need answered before quoting properly. Short engagements of a few days work as well as multi-month ones.</p>
-</details>
-<details>
-<summary>
-Do you work remotely?
-</summary>
-<p>Yes, exclusively, and I have done so since 2022. I am based in Lille, France, and used to working asynchronously with teams across time zones, on GitHub or GitLab.</p>
-</details>
-<details>
-<summary>
-Do you provide training?
-</summary>
-<p>Yes, on Quarto, Typst, R, and reproducible workflows with Dev Containers. Existing material includes a two-day <a href="https://github.com/mcanouil/mastering-quarto-cli">Mastering Quarto CLI</a> workshop, alongside R and Shiny courses, all adaptable to your team’s level.</p>
-</details>
-</div>
-<div class="mc-cta-row">
-<p><a href="#" class="btn mc-cta mc-cta--primary mc-email" data-mc-email="cHJvQG1pY2thZWwuY2Fub3VpbC5kZXY="><iconify-icon aria-hidden="true" inline="" icon="octicon:mail-16"></iconify-icon> Email me</a></p>
-</div>
-</section>
-</div>
-
-
-
-
-
-<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {An {Extension} {Can} {Ship} a {Whole} {Quarto} {Project}
+    {Type}},
+  date = {2026-11-09},
+  url = {https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/},
+  langid = {en-GB}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+CANOUIL, M. (2026-11-09). An Extension Can Ship a Whole Quarto Project
+Type. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/">https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/</a>
+</div></div></section></div></main> <!-- /main -->
 <script id="mc-base64" type="text/javascript">
   /**
    * @license MIT
@@ -1607,6 +1347,13 @@ Do you provide training?
       window.document.body.appendChild(container);
     }
     setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     
@@ -2054,6 +1801,38 @@ Do you provide training?
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark_dimmed">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "mcanouil/mickael.canouil.fr";
+    script.dataset.repoId = "MDEwOlJlcG9zaXRvcnkzNDcwODgwMDM=";
+    script.dataset.category = "Blog posts";
+    script.dataset.categoryId = "DIC_kwDOFLAkg84CwnxO";
+    script.dataset.mapping = "og:title";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -2062,12 +1841,44 @@ Do you provide training?
 </div>   
     <div class="nav-footer-center">
 <p>© <span id="current-year">2026</span> <a href="https://mickael.canouil.fr" target="_blank" rel="noopener noreferrer">Mickaël CANOUIL</a>. <a href="https://github.com/sponsors/mcanouil?o=esb" target="_blank" rel="noopener noreferrer"><iconify-icon aria-hidden="true" inline="" icon="octicon:heart-fill-16"></iconify-icon> Sponsor</a>.</p>
-<div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-11-09-quarto-atelier-project-type/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
 </div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 

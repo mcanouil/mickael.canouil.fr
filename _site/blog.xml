@@ -16,7 +16,290 @@
 <link>https://mickael.canouil.fr/blog.html</link>
 </image>
 <generator>quarto-1.11.5</generator>
-<lastBuildDate>Mon, 07 Sep 2026 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Mon, 09 Nov 2026 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>An Extension Can Ship a Whole Quarto Project Type</title>
+  <link>https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/</link>
+  <description><![CDATA[ 
+
+<!--
+@license MIT
+@copyright 2026 Mickaël Canouil
+@author Mickaël Canouil
+-->
+Skip to main content
+
+
+
+
+
+<p>I maintain more than forty Quarto extensions, and each one has its own documentation website. For a long time, each site had its own copy of the same <code>_quarto.yml</code>, and the copies drifted apart. This post shows how I moved that shared configuration into a Quarto extension that ships a project type.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Card on an off-white background, under a dark navy band reading &quot;Quarto,
+project types&quot; in beige. The title &quot;An Extension Can Ship a Whole Quarto
+Project Type&quot; in dark navy sits above a gold rule. Below, a navy tile
+labelled \_extension.yml on the left has three gold lines fanning out to
+a grid of twelve cream site tiles on the right, each showing the line
+&quot;type: atelier&quot;.
+" width="600"></a></p>
+</figure>
+</div>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The Problem</h2>
+<p>A good Quarto website needs more than a title and a navbar. You want edit and issue links, Open Graph and Twitter card tags, page navigation, search, a footer, a table of contents, and some accessibility fixes. That is close to a hundred lines of YAML before you write the first page.</p>
+<p>The usual way to get there is to copy <code>_quarto.yml</code> from the last site you built. It works once. Then you fix something in one site, forget to fix it in the others, and after a year no two sites have the same configuration.</p>
+</section>
+<section id="a-project-type-in-an-extension" class="level2">
+<h2 class="anchored" data-anchor-id="a-project-type-in-an-extension">A Project Type in an Extension</h2>
+<p>Most Quarto extensions contribute a filter, a shortcode, or a format. An extension can also contribute a project type<sup>1</sup>. It inherits from one of the base types (<code>default</code>, <code>website</code>, or <code>book</code>), and it sets the default values for <code>_quarto.yml</code>.</p>
+<p><a href="https://github.com/mcanouil/quarto-atelier"><code>quarto-atelier</code></a> is such an extension. I made it for the documentation websites of my extensions, so I could maintain one configuration instead of forty custom ones. Its project type is called <code>atelier</code>, and it is a <code>website</code> underneath. A site that uses it writes very little:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="_quarto.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">project</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">type</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> atelier</span></span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">website</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">title</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"My Extension"</span></span>
+<span id="cb1-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">site-url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> https://example.org/my-extension</span></span>
+<span id="cb1-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">repo-url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> https://github.com/example/my-extension</span></span>
+<span id="cb1-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">navbar</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-9"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">left</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb1-10"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">-</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">href</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> index.qmd</span></span>
+<span id="cb1-11"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">text</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Home</span></span></code></pre></div></div>
+</div>
+<p>The title, the URLs, and the navbar items belong to the site. Everything else comes from the extension.</p>
+</section>
+<section id="what-the-site-gets" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-site-gets">What the Site Gets</h2>
+<p>From those few lines, the site inherits:</p>
+<ul>
+<li><code>_site</code> as the output directory, and edit and issue links to the repository.</li>
+<li>Open Graph and Twitter card tags, with <code>en_GB</code> as the locale and a large image card.</li>
+<li>Page navigation, a back to top link, a table of contents, and copy buttons on code blocks.</li>
+<li>An <code>llms.txt</code> file, and a search overlay in the navbar.</li>
+<li>A footer, and a theme that reads the site’s <code>_brand.yml</code> for its colours in light and dark mode.</li>
+<li>A filter that adds the <code>og:type</code> and <code>og:url</code> tags, which Quarto leaves out.</li>
+<li>Six small HTML scripts, among them a skip link and a few accessibility fixes.</li>
+</ul>
+<p>I checked this on a test site with only the lines above. The rendered page had the <code>og:locale</code>, <code>og:type</code>, and <code>twitter:card</code> tags, the skip link, and the edit and issue links beside the table of contents. The <code>_site</code> folder had an <code>llms.txt</code> next to the pages.</p>
+<p>One tag needs one more key. Quarto does not pass the <code>website</code> block to filters, so the filter cannot read <code>site-url</code> there. For <code>og:url</code>, the site repeats its URL under the extension name:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="_quarto.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">extensions</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb2-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">atelier</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb2-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">site-url</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> https://example.org/my-extension</span></span></code></pre></div></div>
+</div>
+<div class="highlight">
+<p><strong>One release, every site:</strong> when I change a default in <code>quarto-atelier</code>, every site gets it at its next extension update.</p>
+</div>
+<p>Each site keeps its own copy of the extension under <code>_extensions/</code>, so the update is not instant. In each repository, a scheduled GitHub Actions <a href="https://github.com/mcanouil/quarto-workflows/blob/main/.github/workflows/quarto-extensions-updates.yml">workflow</a> runs <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater</a> once a month, the action I wrote about in <a href="../../posts/2025-12-12-quarto-extensions-updater/index.html">an earlier post</a>. It compares the installed extensions with the <a href="https://m.canouil.dev/quarto-extensions/">Quarto extensions registry</a>, using the same core library as <a href="https://github.com/mcanouil/quarto-wizard">Quarto Wizard</a>. When <code>quarto-atelier</code> has a new release, it opens a pull request with the release notes, so every update is a change I can review before it lands.</p>
+</section>
+<section id="overriding-one-value" class="level2">
+<h2 class="anchored" data-anchor-id="overriding-one-value">Overriding One Value</h2>
+<p>The site can still change any inherited value. Quarto merges the defaults of the project type with the site’s <code>_quarto.yml</code>, and the site wins.</p>
+<p>For example, <code>atelier</code> puts the search in the navbar as an overlay. The documentation site of <code>quarto-badge</code> has no navbar, only a sidebar. So it moves the search there:</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="_quarto.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">website</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">search</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb3-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">location</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> sidebar</span></span>
+<span id="cb3-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">type</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> textbox</span></span></code></pre></div></div>
+</div>
+<p>The merge works key by key. On my test site, I replaced only the centre of the footer. The left part of the footer, which I did not touch, stayed as <code>atelier</code> set it.</p>
+</section>
+<section id="where-it-stops" class="level2">
+<h2 class="anchored" data-anchor-id="where-it-stops">Where It Stops</h2>
+<p>There are two limits to keep in mind.</p>
+<p>First, lists are added together, not replaced. If a site adds its own script to <code>include-after-body</code>, it gets that script and the five from <code>atelier</code>. A site cannot remove one inherited script or filter. If a site needs that, the default does not belong in the shared project type.</p>
+<p>Then, every site moves with the extension. That is the point, but it also means a bad default reaches all of them. The monthly pull requests are the safety net, because each site takes the change through its own review.</p>
+</section>
+<section id="why-so-few-people-do-this" class="level2">
+<h2 class="anchored" data-anchor-id="why-so-few-people-do-this">Why So Few People Do This</h2>
+<p>Custom project types are rare. On GitHub, code search finds <code>type: atelier</code> in 48 of my repositories, and in none outside them.</p>
+<p>I think it is because the feature is easy to miss. The documentation shows it, but most people meet extensions as filters and formats, and never look further. If you maintain more than two or three Quarto websites, it is worth a look.</p>
+</section>
+<section id="try-it" class="level2">
+<h2 class="anchored" data-anchor-id="try-it">Try It</h2>
+<p>Install the extension in your project:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="bash" style="background: #f1f3f5;"><pre class="sourceCode bash cw-auto code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><span class="ex" style="color: null;
+background-color: null;
+font-style: inherit;">quarto</span> add mcanouil/quarto-atelier</span></code></pre></div></div>
+<p>Then set <code>type: atelier</code> in <code>_quarto.yml</code>. It needs Quarto 1.9.36 or later.</p>
+<p>The source is on <a href="https://github.com/mcanouil/quarto-atelier"><iconify-icon inline="" icon="fa7-brands:github" aria-label="GitHub" title="GitHub"></iconify-icon> GitHub</a>, and the <a href="https://m.canouil.dev/quarto-atelier/">documentation site</a> is built with the project type itself.</p>
+<p>Happy publishing!</p>
+
+
+</section>
+
+
+<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>See the Quarto documentation on <a href="https://quarto.org/docs/extensions/project-types.html">Project Types</a>.↩︎</p></li>
+</ol>
+</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
+  author = {CANOUIL, Mickaël},
+  title = {An {Extension} {Can} {Ship} a {Whole} {Quarto} {Project}
+    {Type}},
+  date = {2026-11-09},
+  url = {https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/},
+  langid = {en-GB}
+}
+</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
+CANOUIL, M. (2026-11-09). An Extension Can Ship a Whole Quarto Project
+Type. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/">https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/</a>
+</div></div></section></div> ]]></description>
+  <category>quarto</category>
+  <category>extensions</category>
+  <category>website</category>
+  <category>documentation</category>
+  <guid>https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/</guid>
+  <pubDate>Mon, 09 Nov 2026 00:00:00 GMT</pubDate>
+  <media:content url="https://mickael.canouil.fr/posts/2026-11-09-quarto-atelier-project-type/featured.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
 <item>
   <title>Quarto Wizard 3.3: Typst Preview and Schema Validation</title>
   <link>https://mickael.canouil.fr/posts/2026-09-07-quarto-wizard-3-3/</link>
@@ -3343,7 +3626,7 @@ font-style: inherit;">]</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge text-bg-secondary" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3;">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -3689,7 +3972,7 @@ background-color: null;
 font-style: inherit;">quarto</span> render</span></code></pre></div></div>
 <p>The repository is at <a href="https://github.com/mcanouil/demo-quarto-clinical-report">mcanouil/demo-quarto-clinical-report</a>, and the rendered report is published at <a href="https://m.canouil.dev/demo-quarto-clinical-report/" class="uri">https://m.canouil.dev/demo-quarto-clinical-report/</a>. Here is the whole PDF, the one the workflow publishes on every push to <code>main</code>.</p>
 <div style="text-align: center;">
-<p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-10"><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title=""><embed src="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open it full size: <a href="https://m.canouil.dev/demo-quarto-clinical-report/Clinical-Study-Report.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="https://m.canouil.dev/demo-quarto-clinical-report/" target="_blank" rel="noopener noreferrer">HTML book</a>.</p>
 <p>Hope this shows that Quarto can be used in such context while providing profesional outputs.</p>
@@ -4657,7 +4940,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" style="background-color: #c3c3c3;" title="GitHub">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -5106,12 +5389,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" style="background-color: #c3c3c3;" title="GitHub">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" aria-label="GitHub platform" style="background-color: #c3c3c3;" title="GitHub">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge text-bg-secondary" title="GitHub" style="background-color: #c3c3c3;" aria-label="GitHub platform">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -5736,15 +6019,15 @@ font-style: inherit;">|</span></span>
 <p>Here are the three outputs, rendered from that one file.</p>
 <p>The HTML handout, with the headings at their written levels and no slide break in sight.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-2"><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.html" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title=""><embed src="assets/output/demo.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The PDF, through Typst, with the same heading levels as the HTML.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo.pdf" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-3"><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo.pdf" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title=""><embed src="assets/output/demo.pdf" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>The deck, with the promoted headings and the repeated heading on the continuation slide.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/demo-slides.html" class="lightbox" title="" data-gallery="quarto-lightbox-gallery-4"><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
+<p><a href="assets/output/demo-slides.html" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title=""><embed src="assets/output/demo-slides.html" class="hero-art slide-deck img-fluid" loading="lazy"></a></p>
 </div>
 <p>Open them full size: <a href="assets/output/demo.html" target="_blank" rel="noopener noreferrer">HTML</a>, <a href="assets/output/demo.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>, <a href="assets/output/demo-slides.html" target="_blank" rel="noopener noreferrer">Reveal.js</a>.</p>
 <div class="highlight">
@@ -32881,238 +33164,6 @@ Extensions. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/pos
   <guid>https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/</guid>
   <pubDate>Mon, 19 Jan 2026 00:00:00 GMT</pubDate>
   <media:content url="https://mickael.canouil.fr/posts/2026-01-19-typst-document-dispatcher/featured.png" medium="image" type="image/png" height="76" width="144"/>
-</item>
-<item>
-  <title>Quarto Wizard 2.0.0: Native Extension Management and Batch Operations</title>
-  <link>https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/</link>
-  <description><![CDATA[ 
-
-<!--
-@license MIT
-@copyright 2026 Mickaël Canouil
-@author Mickaël Canouil
--->
-Skip to main content
-
-
-
-
-
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Cartoon dog wizard wearing blue hat with red band holding magic wand creating HTML and CSS code scrolls in starry night scene." width="600"></a></p>
-</figure>
-</div>
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is here with a major architectural overhaul and new features for managing your Quarto extensions.</p>
-<div class="highlight">
-<p><strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> is now available!</p>
-<p>Upgrade today from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
-</div>
-<section id="from-1.0.0-to-2.0.0" class="level2">
-<h2 class="anchored" data-anchor-id="from-1.0.0-to-2.0.0">From 1.0.0 to 2.0.0</h2>
-<p>Version 1.0.0 was not around for long. As I worked on improving Quarto Wizard and enabling features beyond what the Quarto CLI offers, what started as small enhancements quickly grew into a major internal refactoring. The result is a more self-contained extension.</p>
-<div class="highlight">
-<p>No more Quarto CLI dependency.</p>
-</div>
-<p>The biggest change in 2.0.0: <strong>Quarto Wizard no longer requires the Quarto CLI</strong> for extension management. The extension now handles everything natively, including:</p>
-<ul>
-<li>Downloading and extracting extension archives directly.</li>
-<li>GitHub API integration for repository access.</li>
-<li>Proxy support via environment variables (<code>HTTP_PROXY</code>, <code>HTTPS_PROXY</code>, <code>NO_PROXY</code>).</li>
-</ul>
-<p>This means faster installations and fewer external dependencies.</p>
-</section>
-<section id="whats-new" class="level2">
-<h2 class="anchored" data-anchor-id="whats-new">What’s New</h2>
-<section id="extension-type-filtering" class="level3">
-<h3 class="anchored" data-anchor-id="extension-type-filtering">Extension Type Filtering</h3>
-<p>Quickly filter extensions by type when browsing the registry.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/extension-browser-1-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/extension-browser-1-dark.png" title="Extension Type Filtering" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The extension browser interface showing extension type filters with
-options for Shortcodes, Filters, Formats, Reveal.js Plugins, and
-Projects.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/extension-browser-1-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/extension-browser-1-light.png" title="Extension Type Filtering" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The extension browser interface showing extension type filters with
-options for Shortcodes, Filters, Formats, Reveal.js Plugins, and
-Projects.
-" width="500"></a></p>
-</figure>
-</div>
-</section>
-<section id="multi-extension-selection" class="level3">
-<h3 class="anchored" data-anchor-id="multi-extension-selection">Multi-Extension Selection</h3>
-<p>When installing from repositories containing multiple extensions, select exactly which ones you need.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/extension-selection-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/extension-selection-dark.png" title="Extension Selection Dialog" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing a list of discovered extensions with
-checkboxes for multi-selection when installing from a repository
-containing multiple extensions.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/extension-selection-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/extension-selection-light.png" title="Extension Selection Dialog" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing a list of discovered extensions with
-checkboxes for multi-selection when installing from a repository
-containing multiple extensions.
-" width="500"></a></p>
-</figure>
-</div>
-</section>
-<section id="template-file-selection" class="level3">
-<h3 class="anchored" data-anchor-id="template-file-selection">Template File Selection</h3>
-<p>Choose which files to copy when using templates, with support for target subdirectories.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/template-files-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/template-files-dark.png" title="Template Files Selection" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing available template files to copy with
-checkboxes for selective file installation.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/template-files-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/template-files-light.png" title="Template Files Selection" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The QuickPick dialog showing available template files to copy with
-checkboxes for selective file installation.
-" width="500"></a></p>
-</figure>
-</div>
-</section>
-<section id="private-repositories" class="level3">
-<h3 class="anchored" data-anchor-id="private-repositories">Private Repositories</h3>
-<p>Access private GitHub repositories with improved authentication support.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/github-token-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/github-token-dark.png" title="GitHub Token Setup" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The input dialog for entering a GitHub personal access token for private
-repository access.
-" width="500"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/github-token-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/github-token-light.png" title="GitHub Token Setup" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The input dialog for entering a GitHub personal access token for private
-repository access.
-" width="500"></a></p>
-</figure>
-</div>
-<p>Authentication priority: Manual token &gt; VS Code GitHub session &gt; Environment variables.</p>
-</section>
-<section id="quarto-version-validation" class="level3">
-<h3 class="anchored" data-anchor-id="quarto-version-validation">Quarto Version Validation</h3>
-<p>Get warned before installing extensions that require a newer Quarto version.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/version-validation-dark.png" class="lightbox" data-gallery="quarto-wizard-dark"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/version-validation-dark.png" title="Version Validation Warning" class="dark-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The warning dialog indicating that the extension version requirement is
-not met, showing the required and current Quarto versions with options
-to Install Anyway or Cancel.
-" width="250"></a></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/version-validation-light.png" class="lightbox" data-gallery="quarto-wizard-light"><img src="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/assets/media/version-validation-light.png" title="Version Validation Warning" class="light-content img-fluid img-thumbnail rounded-3 border-light quarto-figure quarto-figure-center figure-img" alt="The warning dialog indicating that the extension version requirement is
-not met, showing the required and current Quarto versions with options
-to Install Anyway or Cancel.
-" width="250"></a></p>
-</figure>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Requires to have Quarto VSCode/Positron extension and Quarto CLI installed for version detection.</p>
-</div>
-</div>
-</section>
-<section id="install-from-specific-references" class="level3">
-<h3 class="anchored" data-anchor-id="install-from-specific-references">Install from Specific References</h3>
-<p>Install extensions from specific commits, tags, or branches using the format <code>owner/repo@reference</code>.</p>
-</section>
-</section>
-<section id="new-commands" class="level2">
-<h2 class="anchored" data-anchor-id="new-commands">New Commands</h2>
-<ul>
-<li><strong>Install Extension from Registry</strong> - Direct registry installation.</li>
-<li><strong>Install Extension from URL</strong> - Install from archive URLs.</li>
-<li><strong>Install Extension from Local</strong> - Install from local directories or archives.</li>
-<li><strong>Update All Extensions</strong> - Batch update all outdated extensions.</li>
-<li><strong>Remove Multiple Extensions</strong> - Batch removal of extensions.</li>
-<li><strong>Clear Extension Cache</strong> - Force registry refresh.</li>
-<li><strong>Set GitHub Token (Manual)</strong> - Configure authentication.</li>
-<li><strong>Clear GitHub Token</strong> - Remove stored token.</li>
-</ul>
-</section>
-<section id="new-configuration-options" class="level2">
-<h2 class="anchored" data-anchor-id="new-configuration-options">New Configuration Options</h2>
-<ul>
-<li><code>quartoWizard.cache.ttlMinutes</code> - Configure cache duration.</li>
-<li><code>quartoWizard.registry.url</code> - Use a custom registry URL.</li>
-</ul>
-</section>
-<section id="documentation-website" class="level2">
-<h2 class="anchored" data-anchor-id="documentation-website">Documentation Website</h2>
-<p>A new documentation website is now available at <a href="https://m.canouil.dev/quarto-wizard">m.canouil.dev/quarto-wizard</a>, featuring:</p>
-<ul>
-<li>User guide with step-by-step instructions.</li>
-<li>Command and configuration reference.</li>
-<li>API documentation for developers.</li>
-</ul>
-</section>
-<section id="breaking-changes" class="level2">
-<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
-<ul>
-<li>Removed <code>quartoWizard.quarto.path</code> setting (no longer needed).</li>
-<li>Quarto CLI is no longer required for extension operations.</li>
-</ul>
-<div class="highlight">
-<p>Ready to upgrade? Install <strong><span class="quarto-wizard" title="Quarto Wizard Logo" aria-label="Quarto Wizard Logo"></span> Quarto Wizard 2.0.0</strong> from the <a href="https://marketplace.visualstudio.com/items?itemName=mcanouil.quarto-wizard">VS Code Marketplace</a> or <a href="https://open-vsx.org/extension/mcanouil/quarto-wizard">Open VSX Registry</a>.</p>
-</div>
-</section>
-<section id="whats-next" class="level2">
-<h2 class="anchored" data-anchor-id="whats-next">What’s Next</h2>
-<p>This major refactoring introduced <code>@quarto-wizard/core</code><sup>1</sup>, a platform-agnostic package for extension management.</p>
-<p>Next on the roadmap: a new version of the <a href="https://github.com/mcanouil/quarto-extensions-updater">Quarto Extensions Updater GitHub Action</a> that will use this core package, bringing the same native installation capabilities to your CI/CD workflows.</p>
-
-
-</section>
-
-
-<a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Not published on any registry.↩︎</p></li>
-</ol>
-</section><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
-  author = {CANOUIL, Mickaël},
-  title = {Quarto {Wizard} 2.0.0: {Native} {Extension} {Management} and
-    {Batch} {Operations}},
-  date = {2026-01-12},
-  url = {https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/},
-  langid = {en-GB}
-}
-</code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2026-01-12). Quarto Wizard 2.0.0: Native Extension
-Management and Batch Operations. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/">https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/</a>
-</div></div></section></div> ]]></description>
-  <category>quarto</category>
-  <category>vscode</category>
-  <category>positron</category>
-  <category>extensions</category>
-  <category>productivity</category>
-  <category>quarto-wizard</category>
-  <guid>https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/</guid>
-  <pubDate>Mon, 12 Jan 2026 00:00:00 GMT</pubDate>
-  <media:content url="https://mickael.canouil.fr/posts/2026-01-12-quarto-wizard-2-0-0/featured.png" medium="image" type="image/png" height="72" width="144"/>
 </item>
 </channel>
 </rss>
