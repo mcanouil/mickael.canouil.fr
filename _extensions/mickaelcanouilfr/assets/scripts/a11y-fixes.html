@@ -126,9 +126,14 @@
     // block focusable only while it overflows, so keyboard users can scroll it
     // and wide screens get no extra tab stops. The observer runs after layout
     // and again whenever a block's size changes, such as when an image loads.
-    // A focused block keeps its tab stop, so a resize never drops focus.
+    // A focused block keeps its tab stop, so a resize never drops focus; the
+    // check runs again when focus leaves.
+    const scrolls = (block) => {
+      const { overflowX } = getComputedStyle(block);
+      return (overflowX === "auto" || overflowX === "scroll") && block.scrollWidth > block.clientWidth;
+    };
     const syncScrollFocus = (entries) => {
-      const states = entries.map(({ target }) => [target, target.scrollWidth > target.clientWidth]);
+      const states = entries.map(({ target }) => [target, scrolls(target)]);
       states.forEach(([block, overflows]) => {
         if (overflows && !block.hasAttribute("tabindex")) {
           block.setAttribute("tabindex", "0");
@@ -140,6 +145,9 @@
       });
     };
     const scrollObserver = new ResizeObserver(syncScrollFocus);
-    document.querySelectorAll("div.sourceCode, div.cell-output-display").forEach((block) => scrollObserver.observe(block));
+    document.querySelectorAll("div.sourceCode, div.cell-output-display").forEach((block) => {
+      scrollObserver.observe(block);
+      block.addEventListener("focusout", () => syncScrollFocus([{ target: block }]));
+    });
   });
 </script>
