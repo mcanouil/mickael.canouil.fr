@@ -14,9 +14,9 @@ engine: markdown
 number-sections: false
 ---
 
-I maintain more than forty Quarto extensions, and each one has its own documentation website.
-For a long time, each site had its own copy of the same `_quarto.yml`, and the copies drifted apart.
-This post shows how I moved that shared configuration into a Quarto extension that ships a project type.
+I maintain more than forty Quarto extensions.
+For a long time, a single `template.qmd` or `example.qmd` was all the documentation each of them had.
+This post shows how I gave every one of them a proper documentation website, without having to maintain the styling of forty websites.
 
 ![](featured.png){
   .img-featured
@@ -26,15 +26,19 @@ This post shows how I moved that shared configuration into a Quarto extension th
   width="600px"
 }
 
-## Copying `_quarto.yml`
+## Extension Documentation
 
-A good Quarto website needs more than a title and a navbar.
-You want edit and issue links, Open Graph and Twitter card tags, page navigation, search, a footer, a table of contents, and some accessibility fixes.
-That is close to a hundred lines of YAML before you write the first page.
+A Quarto extension usually comes with a `template.qmd` or an `example.qmd`.
+It shows the extension at work, and for years it was the only documentation mine had.
+But it is one document.
+The usage, the options, and the examples all end up on the same long page.
 
-The usual way to get there is to copy `_quarto.yml` from the last site you built.
-It works once.
-Then you fix something in one site, forget to fix it in the others, and after a year no two sites have the same configuration.
+So I decided to give each extension a proper documentation website.
+The pages were not the problem, since each extension needs its own content anyway.
+The styling and the chrome were.
+A good Quarto website needs a navbar, a footer, a theme, edit and issue links, Open Graph and Twitter card tags, search, and some accessibility fixes.
+That is close to a hundred lines of YAML, plus a few style sheets and HTML files, before the first page.
+I did not want to keep forty copies of that in step by hand.
 
 ## The `atelier` Project Type
 
@@ -45,7 +49,7 @@ It inherits from one of the base types (`default`, `website`, or `book`), and it
 [^project-types]: See the Quarto documentation on [Project Types](https://quarto.org/docs/extensions/project-types.html).
 
 [`quarto-atelier`](https://github.com/mcanouil/quarto-atelier) is such an extension.
-I made it for the documentation websites of my extensions, so I could maintain one configuration instead of forty custom ones.
+I made it for the documentation websites of my extensions, so the styling and the chrome live in one place instead of forty.
 Its project type is called `atelier`, and it is a `website` underneath.
 A site that uses it writes very little:
 
