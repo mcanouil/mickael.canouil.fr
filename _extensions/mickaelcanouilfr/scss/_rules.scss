@@ -2118,8 +2118,9 @@ div.sourceCode {
 
     .quarto-grid-item,
     .quarto-post {
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
+      // `backwards` holds the first frame through the stagger delay, then
+      // lets go once the entrance ends.
+      animation: fadeInUp 0.6s ease-out backwards;
 
       @for $i from 1 through 20 {
         &:nth-child(#{$i}) {
@@ -2245,6 +2246,7 @@ div.sourceCode {
       border-bottom: 1px solid rgba($body-color, 0.08);
       transition: all $_anim-standard $_easing-standard;
       background-color: transparent;
+      animation: fadeInUp 0.5s ease-out backwards;
 
       &:hover {
         background-color: rgba($body-color, 0.04);
@@ -2257,10 +2259,6 @@ div.sourceCode {
       &:last-child {
         border-bottom: none;
       }
-
-      // Fade in animation for rows
-      animation: fadeInUp 0.5s ease-out;
-      animation-fill-mode: both;
 
       @for $i from 1 through 20 {
         &:nth-child(#{$i}) {
@@ -2748,15 +2746,17 @@ div.sourceCode {
   }
 }
 
+// Animates `translate`, not `transform`, so hover transforms on the same
+// elements still apply while the entrance runs.
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    translate: 0 20px;
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 
@@ -3377,28 +3377,12 @@ main {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    // Staggered entrances keep their delay otherwise, and `fill-mode: both`
-    // holds each item invisible until it ends.
+    // Staggered entrances keep their delay otherwise, and `fill-mode: backwards`
+    // holds each item invisible until the delay ends.
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  // Disable title-block animations for reduced motion
-  header#title-block-header {
-    &::after {
-      animation: none !important;
-    }
-
-    .quarto-title .title::after {
-      transition: none !important;
-    }
-
-    .quarto-title-meta::before {
-      animation: none !important;
-      opacity: 1 !important;
-    }
   }
 
   // Disable TOC animations for reduced motion
