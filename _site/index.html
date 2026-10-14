@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.11.5">
+<meta name="generator" content="quarto-1.11.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -42,12 +42,13 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-1515b2df39eee3b9429a373b7b8864d2.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-668cd953e96ff0b99e69e041834e9194.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-eeaefdede7a282907b4496c7dc9cda76.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -345,13 +346,19 @@ window.Quarto = {
       manageTransitions('#quarto-margin-sidebar .nav-link', true);
       // Switch the toggles
       setColorSchemeToggle(alternate)
-      // Hack to workaround the fact that safari doesn't
-      // properly recolor the scrollbar when toggling (#1455)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
       if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
         manageTransitions("body", false);
-        window.scrollTo(0, 1);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
         setTimeout(() => {
-          window.scrollTo(0, 0);
+          window.scrollTo(0, scrollY);
           manageTransitions("body", true);
         }, 40);
       }
@@ -445,6 +452,7 @@ window.Quarto = {
       // Read the current dark / light value
       let toAlternate = !hasAlternateSentinel();
       toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
       setStyleSentinel(toAlternate);
       toggleGiscusIfUsed(toAlternate, darkModeDefault);
       window.dispatchEvent(new Event('resize'));
@@ -668,7 +676,7 @@ window.Quarto = {
 <div id="listing-home-posts" class="quarto-listing quarto-listing-container-custom">
 <div class="list blog-list">
 
-  <article class="blog-hero" data-index="0" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3dlYnNpdGUlMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1791158400000" data-listing-file-modified-sort="1791277110044" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1204">
+  <article class="blog-hero" data-index="0" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3dlYnNpdGUlMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1791158400000" data-listing-file-modified-sort="1792014394416" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1204">
     <a class="blog-hero-thumb" href="./posts/2026-10-05-quarto-atelier-project-type/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-10-05-quarto-atelier-project-type/featured.png" alt="" loading="lazy"></a>
     <div class="blog-hero-meta">
       <div class="blog-hero-eyebrow">
@@ -689,7 +697,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="1" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDdHlwc3QlMkNxdWFydG8td2l6YXJk" data-listing-date-sort="1788739200000" data-listing-file-modified-sort="1791277110041" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1812">
+  <article class="blog-row blog-row--compact" data-index="1" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDdHlwc3QlMkNxdWFydG8td2l6YXJk" data-listing-date-sort="1788739200000" data-listing-file-modified-sort="1792014394414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1812">
     <a class="blog-thumb" href="./posts/2026-09-07-quarto-wizard-3-3/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-09-07-quarto-wizard-3-3/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 7th of September, 2026">Monday, the 7th of September, 2026</time>
@@ -707,7 +715,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="2" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1787616000000" data-listing-file-modified-sort="1791277110037" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="20" data-listing-word-count-sort="3892">
+  <article class="blog-row blog-row--compact" data-index="2" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1787616000000" data-listing-file-modified-sort="1792014394410" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="20" data-listing-word-count-sort="3892">
     <a class="blog-thumb" href="./posts/2026-08-25-gribouille-0-7/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-08-25-gribouille-0-7/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Tuesday, the 25th of August, 2026">Tuesday, the 25th of August, 2026</time>
@@ -2081,6 +2089,9 @@ Do you provide training?
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 </div> <!-- /content -->
 <footer class="footer">
