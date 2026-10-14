@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.11.5">
+<meta name="generator" content="quarto-1.11.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,13 +75,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-1515b2df39eee3b9429a373b7b8864d2.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-668cd953e96ff0b99e69e041834e9194.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-a322492b3053c9e40c253866af1f2277.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -269,13 +270,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       manageTransitions('#quarto-margin-sidebar .nav-link', true);
       // Switch the toggles
       setColorSchemeToggle(alternate)
-      // Hack to workaround the fact that safari doesn't
-      // properly recolor the scrollbar when toggling (#1455)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
       if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
         manageTransitions("body", false);
-        window.scrollTo(0, 1);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
         setTimeout(() => {
-          window.scrollTo(0, 0);
+          window.scrollTo(0, scrollY);
           manageTransitions("body", true);
         }, 40);
       }
@@ -369,6 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       // Read the current dark / light value
       let toAlternate = !hasAlternateSentinel();
       toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
       setStyleSentinel(toAlternate);
       toggleGiscusIfUsed(toAlternate, darkModeDefault);
       window.dispatchEvent(new Event('resize'));
@@ -716,7 +724,7 @@ At this stage, we did all we could in the Rmarkdown file <code>index.en.Rmd</cod
 <section id="modify-the-layout" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="modify-the-layout"><span class="header-section-number">5</span> Modify the Layout</h2>
 <p>Because everything that relates to the structure of the pages on the website are defined in HTML template files stored in a <code>layouts</code> directory, the answer to our “problem” should be there.<br>
-And that is the case, as stated in a issue opened on GitHub (<a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520">wowchemy/wowchemy-hugo-themes <span><span title="GitHub">#1520</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>). More precisely in <a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609"><span><span title="GitHub">@CharlieLeee</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>’s comment.</p>
+And that is the case, as stated in a issue opened on GitHub (<a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520">wowchemy/wowchemy-hugo-themes <span><span title="GitHub">#1520</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>). More precisely in <a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609"><span><span title="GitHub">@CharlieLeee</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>’s comment.</p>
 <p>As mentioned in the comment, we need to modify a particular file, namely <code>layouts/_default/single.html</code>, but what is inside this <code>layouts/_default/single.html</code> file from the “<a href="https://github.com/wowchemy/starter-hugo-academic">wowchemy/starter-hugo-academic</a>” theme?<br>
 In a default installation, the file is located in the following path <code>themes/github.com/wowchemy/wowchemy-hugo-themes/wowchemy/layouts/_default/single.html</code> and it includes the following HTML/code.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="html"><pre class="sourceCode html cw-auto code-with-copy"><code class="sourceCode html"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>{{- define "main" -}}</span>
@@ -739,7 +747,7 @@ In a default installation, the file is located in the following path <code>theme
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>{{- end -}}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><em>Note</em>: Have a look at <a href="https://gohugo.io/templates/introduction/">HUGO website</a> for the HUDO templating syntax.</p>
 <p>We do not want to modify any of the files in the <code>themes</code> directory, so we will create a new file at the root directory of our <code>blogdown</code> website (<code>layouts/_default/single.html</code>).<br>
-I am not going to use the code proposed in <a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609"><span><span title="GitHub">@CharlieLeee</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>’s comment, but instead a slight modification to make the TOC a bit more responsive.</p>
+I am not going to use the code proposed in <a href="https://github.com/wowchemy/wowchemy-hugo-themes/issues/1520#issuecomment-601982609"><span><span title="GitHub">@CharlieLeee</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>’s comment, but instead a slight modification to make the TOC a bit more responsive.</p>
 <p>In this case, the TOC will use three out of the twelve columns in a wide screen (<em>i.e.</em>,&nbsp;grid layout). On a smaller screen, the TOC will occupy twelve columns (<em>i.e.</em>,&nbsp;equivalent to the css <code>width: 100%;</code>) and will be wrapped after the contents, hence it will be under.</p>
 <p>To note and for later, in the code chunk below:</p>
 <ul>
@@ -2137,6 +2145,9 @@ CANOUIL, M. (2021-05-06). Add a Floating Table of Contents in
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 <input type="hidden" id="giscus-base-theme" value="light">
 <input type="hidden" id="giscus-alt-theme" value="dark_dimmed">

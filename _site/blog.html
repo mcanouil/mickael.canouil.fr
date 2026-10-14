@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.11.5">
+<meta name="generator" content="quarto-1.11.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -42,13 +42,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-1515b2df39eee3b9429a373b7b8864d2.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-9fcfec41e33c9f1bc88ea66dbe4c3e3e.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-668cd953e96ff0b99e69e041834e9194.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e8fdba9a301566b7baf6d6224efcbe7.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-a322492b3053c9e40c253866af1f2277.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -290,13 +291,19 @@ window.Quarto = {
       manageTransitions('#quarto-margin-sidebar .nav-link', true);
       // Switch the toggles
       setColorSchemeToggle(alternate)
-      // Hack to workaround the fact that safari doesn't
-      // properly recolor the scrollbar when toggling (#1455)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
       if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
         manageTransitions("body", false);
-        window.scrollTo(0, 1);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
         setTimeout(() => {
-          window.scrollTo(0, 0);
+          window.scrollTo(0, scrollY);
           manageTransitions("body", true);
         }, 40);
       }
@@ -390,6 +397,7 @@ window.Quarto = {
       // Read the current dark / light value
       let toAlternate = !hasAlternateSentinel();
       toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
       setStyleSentinel(toAlternate);
       toggleGiscusIfUsed(toAlternate, darkModeDefault);
       window.dispatchEvent(new Event('resize'));
@@ -517,7 +525,7 @@ window.Quarto = {
 <div class="quarto-listing quarto-listing-container-custom" id="listing-listing">
 <div class="list blog-list">
 
-  <article class="blog-hero" data-index="0" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3dlYnNpdGUlMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1791158400000" data-listing-file-modified-sort="1791277110044" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1204">
+  <article class="blog-hero" data-index="0" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3dlYnNpdGUlMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1791158400000" data-listing-file-modified-sort="1792014394416" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1204">
     <a class="blog-hero-thumb" href="./posts/2026-10-05-quarto-atelier-project-type/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-10-05-quarto-atelier-project-type/featured.png" alt="" loading="lazy"></a>
     <div class="blog-hero-meta">
       <div class="blog-hero-eyebrow">
@@ -538,7 +546,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="1" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDdHlwc3QlMkNxdWFydG8td2l6YXJk" data-listing-date-sort="1788739200000" data-listing-file-modified-sort="1791277110041" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1812">
+  <article class="blog-row blog-row--compact" data-index="1" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDdHlwc3QlMkNxdWFydG8td2l6YXJk" data-listing-date-sort="1788739200000" data-listing-file-modified-sort="1792014394414" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1812">
     <a class="blog-thumb" href="./posts/2026-09-07-quarto-wizard-3-3/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-09-07-quarto-wizard-3-3/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 7th of September, 2026">Monday, the 7th of September, 2026</time>
@@ -556,7 +564,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="2" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1787616000000" data-listing-file-modified-sort="1791277110037" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="20" data-listing-word-count-sort="3892">
+  <article class="blog-row blog-row--compact" data-index="2" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1787616000000" data-listing-file-modified-sort="1792014394410" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="20" data-listing-word-count-sort="3892">
     <a class="blog-thumb" href="./posts/2026-08-25-gribouille-0-7/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-08-25-gribouille-0-7/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Tuesday, the 25th of August, 2026">Tuesday, the 25th of August, 2026</time>
@@ -574,7 +582,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="3" data-categories="cXVhcnRvJTJDdHlwc3QlMkNyJTJDY2xpbmljYWwlMkNwaGFybWF2ZXJzZSUyQ2JyYW5kJTJDZXh0ZW5zaW9ucw==" data-listing-date-sort="1786924800000" data-listing-file-modified-sort="1791277110034" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4269">
+  <article class="blog-row blog-row--compact" data-index="3" data-categories="cXVhcnRvJTJDdHlwc3QlMkNyJTJDY2xpbmljYWwlMkNwaGFybWF2ZXJzZSUyQ2JyYW5kJTJDZXh0ZW5zaW9ucw==" data-listing-date-sort="1786924800000" data-listing-file-modified-sort="1792014394407" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4269">
     <a class="blog-thumb" href="./posts/2026-08-17-quarto-clinical-report/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-08-17-quarto-clinical-report/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 17th of August, 2026">Monday, the 17th of August, 2026</time>
@@ -592,7 +600,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="4" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1785196800000" data-listing-file-modified-sort="1791277110025" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3029">
+  <article class="blog-row blog-row--compact" data-index="4" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1785196800000" data-listing-file-modified-sort="1792014394397" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3029">
     <a class="blog-thumb" href="./posts/2026-07-28-gribouille-0-6/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-07-28-gribouille-0-6/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Tuesday, the 28th of July, 2026">Tuesday, the 28th of July, 2026</time>
@@ -610,7 +618,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="5" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDcmV2ZWFsLmpzJTJDbXVsdGktZm9ybWF0JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1784851200000" data-listing-file-modified-sort="1791277110023" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1405">
+  <article class="blog-row blog-row--compact" data-index="5" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDcmV2ZWFsLmpzJTJDbXVsdGktZm9ybWF0JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1784851200000" data-listing-file-modified-sort="1792014394396" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1406">
     <a class="blog-thumb" href="./posts/2026-07-24-quarto-stop-duplicating/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-07-24-quarto-stop-duplicating/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Friday, the 24th of July, 2026">Friday, the 24th of July, 2026</time>
@@ -628,7 +636,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="6" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1783900800000" data-listing-file-modified-sort="1791277110012" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3797">
+  <article class="blog-row blog-row--compact" data-index="6" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1783900800000" data-listing-file-modified-sort="1792014394385" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3797">
     <a class="blog-thumb" href="./posts/2026-07-13-gribouille-0-5/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-07-13-gribouille-0-5/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 13th of July, 2026">Monday, the 13th of July, 2026</time>
@@ -646,7 +654,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="7" data-categories="cHl0aG9uJTJDc2hpbnklMkNxdWFydG8lMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1783296000000" data-listing-file-modified-sort="1791277110010" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1285">
+  <article class="blog-row blog-row--compact" data-index="7" data-categories="cHl0aG9uJTJDc2hpbnklMkNxdWFydG8lMkNkb2N1bWVudGF0aW9u" data-listing-date-sort="1783296000000" data-listing-file-modified-sort="1792014394383" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1285">
     <a class="blog-thumb" href="./posts/2026-07-06-shiny-great-docs/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-07-06-shiny-great-docs/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 6th of July, 2026">Monday, the 6th of July, 2026</time>
@@ -664,7 +672,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="8" data-categories="ciUyQ3NoaW55JTJDcXVhcnRvJTJDczclMkN0YXJnZXRz" data-listing-date-sort="1782864000000" data-listing-file-modified-sort="1791277110008" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2818">
+  <article class="blog-row blog-row--compact" data-index="8" data-categories="ciUyQ3NoaW55JTJDcXVhcnRvJTJDczclMkN0YXJnZXRz" data-listing-date-sort="1782864000000" data-listing-file-modified-sort="1792014394381" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2818">
     <a class="blog-thumb" href="./posts/2026-07-01-r-package-shiny-quarto/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-07-01-r-package-shiny-quarto/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 1st of July, 2026">Wednesday, the 1st of July, 2026</time>
@@ -682,7 +690,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="9" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1782086400000" data-listing-file-modified-sort="1791277110007" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4828">
+  <article class="blog-row blog-row--compact" data-index="9" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1782086400000" data-listing-file-modified-sort="1792014394380" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="25" data-listing-word-count-sort="4828">
     <a class="blog-thumb" href="./posts/2026-06-22-gribouille-0-4/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-06-22-gribouille-0-4/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 22nd of June, 2026">Monday, the 22nd of June, 2026</time>
@@ -700,7 +708,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="10" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1781481600000" data-listing-file-modified-sort="1791277110003" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1881">
+  <article class="blog-row blog-row--compact" data-index="10" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1781481600000" data-listing-file-modified-sort="1792014394377" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1881">
     <a class="blog-thumb" href="./posts/2026-06-15-gribouille-0-3/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-06-15-gribouille-0-3/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 15th of June, 2026">Monday, the 15th of June, 2026</time>
@@ -718,7 +726,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="11" data-categories="cXVhcnRvJTJDdHlwc3QlMkNleHRlbnNpb25zJTJDcm1hcmtkb3du" data-listing-date-sort="1781049600000" data-listing-file-modified-sort="1791277110001" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1889">
+  <article class="blog-row blog-row--compact" data-index="11" data-categories="cXVhcnRvJTJDdHlwc3QlMkNleHRlbnNpb25zJTJDcm1hcmtkb3du" data-listing-date-sort="1781049600000" data-listing-file-modified-sort="1792014394374" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1889">
     <a class="blog-thumb" href="./posts/2026-06-10-why-quarto-stuck/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-06-10-why-quarto-stuck/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 10th of June, 2026">Wednesday, the 10th of June, 2026</time>
@@ -736,7 +744,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="12" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1780444800000" data-listing-file-modified-sort="1791277109995" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2383">
+  <article class="blog-row blog-row--compact" data-index="12" data-categories="dHlwc3QlMkNxdWFydG8lMkNncmFtbWFyLW9mLWdyYXBoaWNzJTJDZ3JpYm91aWxsZQ==" data-listing-date-sort="1780444800000" data-listing-file-modified-sort="1792014394369" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2383">
     <a class="blog-thumb" href="./posts/2026-06-03-gribouille-0-2/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-06-03-gribouille-0-2/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 3rd of June, 2026">Wednesday, the 3rd of June, 2026</time>
@@ -754,7 +762,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="13" data-categories="dHlwc3QlMkNkZXNpZ24lMkNsaW5rZWRpbiUyQ2Nhcm91c2VsJTJDcHJvZHVjdGl2aXR5" data-listing-date-sort="1779926400000" data-listing-file-modified-sort="1791277109993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1848">
+  <article class="blog-row blog-row--compact" data-index="13" data-categories="dHlwc3QlMkNkZXNpZ24lMkNsaW5rZWRpbiUyQ2Nhcm91c2VsJTJDcHJvZHVjdGl2aXR5" data-listing-date-sort="1779926400000" data-listing-file-modified-sort="1792014394367" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1848">
     <a class="blog-thumb" href="./posts/2026-05-28-typst-linkedin-carousels/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-05-28-typst-linkedin-carousels/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Thursday, the 28th of May, 2026">Thursday, the 28th of May, 2026</time>
@@ -772,7 +780,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="14" data-categories="dHlwc3QlMkNxdWFydG8lMkNjb21wdXRhdGlvbiUyQ2dyYW1tYXItb2YtZ3JhcGhpY3MlMkNncmlib3VpbGxl" data-listing-date-sort="1779235200000" data-listing-file-modified-sort="1791277109991" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3533">
+  <article class="blog-row blog-row--compact" data-index="14" data-categories="dHlwc3QlMkNxdWFydG8lMkNjb21wdXRhdGlvbiUyQ2dyYW1tYXItb2YtZ3JhcGhpY3MlMkNncmlib3VpbGxl" data-listing-date-sort="1779235200000" data-listing-file-modified-sort="1792014394365" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3533">
     <a class="blog-thumb" href="./posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 20th of May, 2026">Wednesday, the 20th of May, 2026</time>
@@ -790,7 +798,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="15" data-categories="cXVhcnRvJTJDcmV2ZWFsLmpzJTJDZXh0ZW5zaW9ucyUyQ3ByZXNlbnRhdGlvbnM=" data-listing-date-sort="1776729600000" data-listing-file-modified-sort="1791277109990" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="534">
+  <article class="blog-row blog-row--compact" data-index="15" data-categories="cXVhcnRvJTJDcmV2ZWFsLmpzJTJDZXh0ZW5zaW9ucyUyQ3ByZXNlbnRhdGlvbnM=" data-listing-date-sort="1776729600000" data-listing-file-modified-sort="1792014394364" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="534">
     <a class="blog-thumb" href="./posts/2026-04-21-quarto-revealjs-extensions/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-04-21-quarto-revealjs-extensions/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Tuesday, the 21st of April, 2026">Tuesday, the 21st of April, 2026</time>
@@ -808,7 +816,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="16" data-categories="cXVhcnRvJTJDYnJhbmQlMkNyJTJDcHl0aG9uJTJDZ2dwbG90MiUyQ3Bsb3RuaW5l" data-listing-date-sort="1776211200000" data-listing-file-modified-sort="1791277109969" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5017">
+  <article class="blog-row blog-row--compact" data-index="16" data-categories="cXVhcnRvJTJDYnJhbmQlMkNyJTJDcHl0aG9uJTJDZ2dwbG90MiUyQ3Bsb3RuaW5l" data-listing-date-sort="1776211200000" data-listing-file-modified-sort="1792014394343" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5017">
     <a class="blog-thumb" href="./posts/2026-04-15-quarto-brand-figures-tables/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-04-15-quarto-brand-figures-tables/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 15th of April, 2026">Wednesday, the 15th of April, 2026</time>
@@ -826,7 +834,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="17" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDbHVhJTJDcGRm" data-listing-date-sort="1772668800000" data-listing-file-modified-sort="1791277109954" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5154">
+  <article class="blog-row blog-row--compact" data-index="17" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDbHVhJTJDcGRm" data-listing-date-sort="1772668800000" data-listing-file-modified-sort="1792014394328" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5154">
     <a class="blog-thumb" href="./posts/2026-03-05-typst-template-tutorial-part2/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-03-05-typst-template-tutorial-part2/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Thursday, the 5th of March, 2026">Thursday, the 5th of March, 2026</time>
@@ -844,7 +852,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="18" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDbHVhJTJDcGRm" data-listing-date-sort="1772150400000" data-listing-file-modified-sort="1791277109948" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="23" data-listing-word-count-sort="4425">
+  <article class="blog-row blog-row--compact" data-index="18" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDbHVhJTJDcGRm" data-listing-date-sort="1772150400000" data-listing-file-modified-sort="1792014394323" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="23" data-listing-word-count-sort="4425">
     <a class="blog-thumb" href="./posts/2026-02-27-typst-template-tutorial-part1/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-02-27-typst-template-tutorial-part1/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Friday, the 27th of February, 2026">Friday, the 27th of February, 2026</time>
@@ -862,7 +870,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="19" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDcGRm" data-listing-date-sort="1768780800000" data-listing-file-modified-sort="1791277109943" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1629">
+  <article class="blog-row blog-row--compact" data-index="19" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3R5cHN0JTJDcGRm" data-listing-date-sort="1768780800000" data-listing-file-modified-sort="1792014394318" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1629">
     <a class="blog-thumb" href="./posts/2026-01-19-typst-document-dispatcher/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-01-19-typst-document-dispatcher/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 19th of January, 2026">Monday, the 19th of January, 2026</time>
@@ -880,7 +888,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="20" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDcHJvZHVjdGl2aXR5JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1768176000000" data-listing-file-modified-sort="1791277109940" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="629">
+  <article class="blog-row blog-row--compact" data-index="20" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDcHJvZHVjdGl2aXR5JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1768176000000" data-listing-file-modified-sort="1792014394314" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="629">
     <a class="blog-thumb" href="./posts/2026-01-12-quarto-wizard-2-0-0/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2026-01-12-quarto-wizard-2-0-0/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 12th of January, 2026">Monday, the 12th of January, 2026</time>
@@ -898,7 +906,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="21" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwYWN0aW9ucyUyQ2V4dGVuc2lvbnMlMkNhdXRvbWF0aW9uJTJDZGV2b3Bz" data-listing-date-sort="1765497600000" data-listing-file-modified-sort="1791277109935" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2792">
+  <article class="blog-row blog-row--compact" data-index="21" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwYWN0aW9ucyUyQ2V4dGVuc2lvbnMlMkNhdXRvbWF0aW9uJTJDZGV2b3Bz" data-listing-date-sort="1765497600000" data-listing-file-modified-sort="1792014394310" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2792">
     <a class="blog-thumb" href="./posts/2025-12-12-quarto-extensions-updater/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-12-12-quarto-extensions-updater/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Friday, the 12th of December, 2025">Friday, the 12th of December, 2025</time>
@@ -916,7 +924,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="22" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNwcm9kdWN0aXZpdHk=" data-listing-date-sort="1763596800000" data-listing-file-modified-sort="1791277109909" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1235">
+  <article class="blog-row blog-row--compact" data-index="22" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNwcm9kdWN0aXZpdHk=" data-listing-date-sort="1763596800000" data-listing-file-modified-sort="1792014394284" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1235">
     <a class="blog-thumb" href="./posts/2025-11-20-quarto-editor-settings/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-11-20-quarto-editor-settings/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Thursday, the 20th of November, 2025">Thursday, the 20th of November, 2025</time>
@@ -934,7 +942,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="23" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3Byb2R1Y3Rpdml0eSUyQ2Jlc3QlMjBwcmFjdGljZXMlMkNsdWE=" data-listing-date-sort="1762387200000" data-listing-file-modified-sort="1791277109908" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1798">
+  <article class="blog-row blog-row--compact" data-index="23" data-categories="cXVhcnRvJTJDZXh0ZW5zaW9ucyUyQ3Byb2R1Y3Rpdml0eSUyQ2Jlc3QlMjBwcmFjdGljZXMlMkNsdWE=" data-listing-date-sort="1762387200000" data-listing-file-modified-sort="1792014394283" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1798">
     <a class="blog-thumb" href="./posts/2025-11-06-quarto-extensions-lua/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-11-06-quarto-extensions-lua/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Thursday, the 6th of November, 2025">Thursday, the 6th of November, 2025</time>
@@ -952,7 +960,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="24" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDcHJvZHVjdGl2aXR5JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1760918400000" data-listing-file-modified-sort="1791277109907" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2063">
+  <article class="blog-row blog-row--compact" data-index="24" data-categories="cXVhcnRvJTJDdnNjb2RlJTJDcG9zaXRyb24lMkNleHRlbnNpb25zJTJDcHJvZHVjdGl2aXR5JTJDcXVhcnRvLXdpemFyZA==" data-listing-date-sort="1760918400000" data-listing-file-modified-sort="1792014394282" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2063">
     <a class="blog-thumb" href="./posts/2025-10-20-quarto-wizard-1-0-0/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-10-20-quarto-wizard-1-0-0/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 20th of October, 2025">Monday, the 20th of October, 2025</time>
@@ -970,7 +978,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="25" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwY29kZXNwYWNlcyUyQ3RlYWNoaW5nJTJDZGV2JTIwY29udGFpbmVy" data-listing-date-sort="1747612800000" data-listing-file-modified-sort="1791277109862" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1904">
+  <article class="blog-row blog-row--compact" data-index="25" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwY29kZXNwYWNlcyUyQ3RlYWNoaW5nJTJDZGV2JTIwY29udGFpbmVy" data-listing-date-sort="1747612800000" data-listing-file-modified-sort="1792014394238" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1904">
     <a class="blog-thumb" href="./posts/2025-05-19-quarto-codespaces/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-05-19-quarto-codespaces/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 19th of May, 2025">Monday, the 19th of May, 2025</time>
@@ -988,7 +996,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="26" data-categories="cXVhcnRvJTJDcmV2ZWFsLmpzJTJDcGRmJTJDcHJlc2VudGF0aW9ucyUyQ2RlY2t0YXBl" data-listing-date-sort="1745193600000" data-listing-file-modified-sort="1791277109861" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="810">
+  <article class="blog-row blog-row--compact" data-index="26" data-categories="cXVhcnRvJTJDcmV2ZWFsLmpzJTJDcGRmJTJDcHJlc2VudGF0aW9ucyUyQ2RlY2t0YXBl" data-listing-date-sort="1745193600000" data-listing-file-modified-sort="1792014394237" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="810">
     <a class="blog-thumb" href="./posts/2025-04-21-quarto-revealjs-tabset-pdf/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2025-04-21-quarto-revealjs-tabset-pdf/featured.gif" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 21st of April, 2025">Monday, the 21st of April, 2025</time>
@@ -1006,7 +1014,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="27" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwcGFnZXMlMkNwdWJsaXNoaW5nJTJDZGVwbG95bWVudCUyQ2dpdGh1YiUyMGFjdGlvbnM=" data-listing-date-sort="1735516800000" data-listing-file-modified-sort="1791277109854" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2516">
+  <article class="blog-row blog-row--compact" data-index="27" data-categories="cXVhcnRvJTJDZ2l0aHViJTIwcGFnZXMlMkNwdWJsaXNoaW5nJTJDZGVwbG95bWVudCUyQ2dpdGh1YiUyMGFjdGlvbnM=" data-listing-date-sort="1735516800000" data-listing-file-modified-sort="1792014394230" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2516">
     <a class="blog-thumb" href="./posts/2024-12-30-quarto-github-pages/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2024-12-30-quarto-github-pages/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Monday, the 30th of December, 2024">Monday, the 30th of December, 2024</time>
@@ -1024,7 +1032,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="28" data-categories="cXVhcnRvJTJDcSUyNmElMkNqYXZhc2NyaXB0JTJDdGhlbWUlMkNkYXJrJTIwbW9kZSUyQ2xpZ2h0JTIwbW9kZQ==" data-listing-date-sort="1685404800000" data-listing-file-modified-sort="1791277109853" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="414">
+  <article class="blog-row blog-row--compact" data-index="28" data-categories="cXVhcnRvJTJDcSUyNmElMkNqYXZhc2NyaXB0JTJDdGhlbWUlMkNkYXJrJTIwbW9kZSUyQ2xpZ2h0JTIwbW9kZQ==" data-listing-date-sort="1685404800000" data-listing-file-modified-sort="1792014394229" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="414">
     <a class="blog-thumb" href="./posts/2023-05-30-quarto-light-dark/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2023-05-30-quarto-light-dark/featured.gif" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Tuesday, the 30th of May, 2023">Tuesday, the 30th of May, 2023</time>
@@ -1042,7 +1050,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="29" data-categories="cXVhcnRvJTJDcSUyNmElMkNkb2NrZXI=" data-listing-date-sort="1683417600000" data-listing-file-modified-sort="1791277109845" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1867">
+  <article class="blog-row blog-row--compact" data-index="29" data-categories="cXVhcnRvJTJDcSUyNmElMkNkb2NrZXI=" data-listing-date-sort="1683417600000" data-listing-file-modified-sort="1792014394221" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1867">
     <a class="blog-thumb" href="./posts/2023-05-07-quarto-docker/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2023-05-07-quarto-docker/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Sunday, the 7th of May, 2023">Sunday, the 7th of May, 2023</time>
@@ -1060,7 +1068,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="30" data-categories="cXVhcnRvJTJDcSUyNmElMkNtYXRoamF4JTJDbGF0ZXg=" data-listing-date-sort="1678579200000" data-listing-file-modified-sort="1791277109844" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="212">
+  <article class="blog-row blog-row--compact" data-index="30" data-categories="cXVhcnRvJTJDcSUyNmElMkNtYXRoamF4JTJDbGF0ZXg=" data-listing-date-sort="1678579200000" data-listing-file-modified-sort="1792014394221" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="212">
     <a class="blog-thumb" href="./posts/2023-03-12-quarto-mathjax-packages/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2023-03-12-quarto-mathjax-packages/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Sunday, the 12th of March, 2023">Sunday, the 12th of March, 2023</time>
@@ -1078,7 +1086,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="31" data-categories="cXVhcnRvJTJDcSUyNmElMkNyJTJDa25pdHI=" data-listing-date-sort="1677974400000" data-listing-file-modified-sort="1791277109843" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="310">
+  <article class="blog-row blog-row--compact" data-index="31" data-categories="cXVhcnRvJTJDcSUyNmElMkNyJTJDa25pdHI=" data-listing-date-sort="1677974400000" data-listing-file-modified-sort="1792014394219" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="310">
     <a class="blog-thumb" href="./posts/2023-03-05-quarto-auto-table-crossref/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2023-03-05-quarto-auto-table-crossref/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Sunday, the 5th of March, 2023">Sunday, the 5th of March, 2023</time>
@@ -1096,7 +1104,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="32" data-categories="ciUyQ2Jsb2dkb3duJTJDcm1hcmtkb3duJTJDaHVnbyUyQ3dlYnNpdGU=" data-listing-date-sort="1620259200000" data-listing-file-modified-sort="1791277109842" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3344">
+  <article class="blog-row blog-row--compact" data-index="32" data-categories="ciUyQ2Jsb2dkb3duJTJDcm1hcmtkb3duJTJDaHVnbyUyQ3dlYnNpdGU=" data-listing-date-sort="1620259200000" data-listing-file-modified-sort="1792014394218" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3344">
     <a class="blog-thumb" href="./posts/2021-05-06-floating-toc-in-blogdown/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2021-05-06-floating-toc-in-blogdown/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Thursday, the 6th of May, 2021">Thursday, the 6th of May, 2021</time>
@@ -1114,7 +1122,7 @@ window.Quarto = {
     </div>
   </article>
 
-  <article class="blog-row blog-row--compact" data-index="33" data-categories="ciUyQ3Zpc3VhbGlzYXRpb24lMkNnZ3Bsb3QyJTJDZ2dhbmltYXRlJTJDZnVu" data-listing-date-sort="1588723200000" data-listing-file-modified-sort="1791277109826" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="33" data-listing-word-count-sort="6547">
+  <article class="blog-row blog-row--compact" data-index="33" data-categories="ciUyQ3Zpc3VhbGlzYXRpb24lMkNnZ3Bsb3QyJTJDZ2dhbmltYXRlJTJDZnVu" data-listing-date-sort="1588723200000" data-listing-file-modified-sort="1792014394203" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="33" data-listing-word-count-sort="6547">
     <a class="blog-thumb" href="./posts/2020-05-06-ggpacman/index.html" aria-hidden="true" tabindex="-1"><img src="./posts/2020-05-06-ggpacman/featured.png" alt="" loading="lazy"></a>
     <div class="blog-meta">
       <time class="blog-date" datetime="Wednesday, the 6th of May, 2020">Wednesday, the 6th of May, 2020</time>
@@ -2316,6 +2324,9 @@ window.Quarto = {
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 </div> <!-- /content -->
 <footer class="footer">
