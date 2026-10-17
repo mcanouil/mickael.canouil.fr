@@ -24,44 +24,20 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Create GitHub App token
-        uses: actions/create-github-app-token@v3
-        id: app-token
+      - name: Get the token
+        id: token
+        uses: mcanouil/release-actions/token@v1
         with:
-          client-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_KEY }}
-
-      - name: Get GitHub App User ID
-        id: get-user-id
-        if: ${{ steps.app-token.outputs.app-slug != '' }}
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-        run: |
-          echo "user-id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "${GITHUB_OUTPUT}"
-
-      - name: Configure Environment for Git User
-        env:
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-          USER_ID: ${{ steps.get-user-id.outputs.user-id }}
-        run: |
-          if [ -z "${APP_SLUG}" ]; then
-            USER_NAME="github-actions[bot]"
-            USER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
-          else
-            USER_NAME="${APP_SLUG}[bot]"
-            USER_EMAIL="${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
-          fi
-          git config --global user.name "${USER_NAME}"
-          git config --global user.email "${USER_EMAIL}"
+          app-id: ${{ vars.APP_ID }}
+          app-key: ${{ secrets.APP_KEY }}
 
       - name: Get Pull Request Details
         id: pr-details
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.token.outputs.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          PR_DATA=$(gh pr view ${ISSUE_NUMBER} --json headRefName,baseRefName --repo ${GITHUB_REPOSITORY})
+          PR_DATA=$(gh pr view "${ISSUE_NUMBER}" --json headRefName,baseRefName --repo "${GITHUB_REPOSITORY}")
           HEAD_REF=$(echo "${PR_DATA}" | jq -r .headRefName)
           BASE_REF=$(echo "${PR_DATA}" | jq -r .baseRefName)
 
@@ -73,7 +49,7 @@ jobs:
         with:
           ref: ${{ steps.pr-details.outputs.head-ref }}
           fetch-depth: 0
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ steps.token.outputs.token }}
 
       - name: Update PR Branch with Base Branch
         id: merge
@@ -124,14 +100,14 @@ jobs:
       - name: Update Comment on Success
         if: ${{ steps.merge.outputs.merge-status == 'success' }}
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.token.outputs.token }}
           COMMENT_ID: ${{ github.event.comment.id }}
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
           ORIGINAL_BODY: ${{ github.event.comment.body }}
         run: |
           gh api \
             --method PATCH \
-            /repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID} \
+            "/repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID}" \
             -f body="${ORIGINAL_BODY}
 
           ---
@@ -141,7 +117,7 @@ jobs:
       - name: Update Comment on Conflict
         if: ${{ failure() && steps.merge.outputs.merge-status == 'conflict' }}
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.token.outputs.token }}
           COMMENT_ID: ${{ github.event.comment.id }}
           BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
           CONFLICTS: ${{ steps.merge.outputs.conflicts }}
@@ -149,7 +125,7 @@ jobs:
         run: |
           gh api \
             --method PATCH \
-            /repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID} \
+            "/repos/${GITHUB_REPOSITORY}/issues/comments/${COMMENT_ID}" \
             -f body="${ORIGINAL_BODY}
 
           ---
@@ -170,47 +146,3 @@ jobs:
           git commit
           git push
           \`\`\`"
-
-      - name: Workflow Summary
-        if: always()
-        env:
-          JOB_STATUS: ${{ job.status }}
-          MERGE_STATUS: ${{ steps.merge.outputs.merge-status }}
-          BASE_REF: ${{ steps.pr-details.outputs.base-ref }}
-          HEAD_REF: ${{ steps.pr-details.outputs.head-ref }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          (
-            echo "# Update Pull Request Workflow Summary"
-            echo ""
-            echo "## Configuration"
-            echo "- **Event:** ${GITHUB_EVENT_NAME}"
-            echo "- **Repository:** ${GITHUB_REPOSITORY}"
-            echo "- **PR Number:** ${ISSUE_NUMBER}"
-            echo "- **Head Branch:** ${HEAD_REF}"
-            echo "- **Base Branch:** ${BASE_REF}"
-            echo ""
-            echo "## Workflow Status"
-          ) >> ${GITHUB_STEP_SUMMARY}
-          if [ "${JOB_STATUS}" == "success" ]; then
-            (
-              echo "✅ **Status:** Success"
-              echo ""
-              echo "## Actions Taken"
-              echo "- Merged \`${BASE_REF}\` into \`${HEAD_REF}\`"
-              echo "- Kept all changes from \`${BASE_REF}\` in \`_site\` directory"
-              echo "- Pushed updated branch to remote"
-            ) >> ${GITHUB_STEP_SUMMARY}
-          else
-            (
-              echo "❌ **Status:** Failed"
-              echo ""
-            ) >> ${GITHUB_STEP_SUMMARY}
-            if [ "${MERGE_STATUS}" == "conflict" ]; then
-              (
-                echo "## Merge Conflicts"
-                echo "Unable to automatically merge due to conflicts."
-                echo "Manual intervention required."
-              ) >> ${GITHUB_STEP_SUMMARY}
-            fi
-          fi

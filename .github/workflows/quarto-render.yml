@@ -36,45 +36,17 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - name: Create GitHub App token
-        uses: actions/create-github-app-token@v3
-        id: app-token
+      - name: Get the token
+        id: token
+        uses: mcanouil/release-actions/token@v1
         with:
-          client-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_KEY }}
+          app-id: ${{ vars.APP_ID }}
+          app-key: ${{ secrets.APP_KEY }}
 
       - uses: actions/checkout@v7
         with:
-          token: ${{ steps.app-token.outputs.token }}
-
-      - name: Get GitHub App User ID
-        id: get-user-id
-        if: ${{ steps.app-token.outputs.app-slug != '' }}
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-        run: |
-          echo "user-id=$(gh api "/users/${APP_SLUG}[bot]" --jq .id)" >> "${GITHUB_OUTPUT}"
-
-      - name: Configure Environment for Git User
-        env:
-          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
-          USER_ID: ${{ steps.get-user-id.outputs.user-id }}
-        run: |
-          if [ -z "${APP_SLUG}" ]; then
-            USER_NAME="github-actions[bot]"
-            USER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com"
-          else
-            USER_NAME="${APP_SLUG}[bot]"
-            USER_EMAIL="${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
-          fi
-          git config --global user.name "${USER_NAME}"
-          git config --global user.email "${USER_EMAIL}"
-
-      - if: ${{ github.event_name == 'pull_request' }}
-        uses: r-lib/actions/pr-fetch@v2
-        with:
-          repo-token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.head_ref }}
+          token: ${{ steps.token.outputs.token }}
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -88,21 +60,10 @@ jobs:
       #       any::xml2
       #       any::webshot2
 
-      - name: Set Quarto Version
-        id: quarto-version
-        env:
-          INPUT_VERSION: ${{ github.event.inputs.version }}
-        run: |
-          if [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
-            echo "version=${INPUT_VERSION}" >> ${GITHUB_OUTPUT}
-          else
-            echo "version=pre-release" >> ${GITHUB_OUTPUT}
-          fi
-
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: ${{ steps.quarto-version.outputs.version }}
+          version: ${{ inputs.version || 'pre-release' }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -142,84 +103,32 @@ jobs:
             quarto render --output-dir _site
           fi
 
-      - name: Commit to Pull Request
-        shell: bash
-        run: |
-          git add _site
-          git add _freeze
-          git commit -m 'ci: quarto automatic render
-
-
-          skip-checks: true' || echo "No changes to commit"
-
-      - name: Create Pull Request
-        if: ${{ github.event_name != 'pull_request' }}
-        id: create-pr
-        env:
-          BRANCH: ci/latest-quarto-updates
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        shell: bash
-        run: |
-          if git show-ref --quiet refs/heads/${BRANCH}; then
-            echo "Branch ${BRANCH} already exists."
-            git checkout "${BRANCH}"
-          else
-            echo "Branch ${BRANCH} does not exist. Creating..."
-            git checkout -b "${BRANCH}"
-          fi
-          git push --force origin ${BRANCH}
-          PR_URL=$(gh pr create \
-            --title "ci: quarto automatic render" \
-            --body "GitHub Actions: ${GITHUB_WORKFLOW} (${GITHUB_WORKFLOW_SHA})" \
-            --base "main" \
-            --label "Type: CI/CD :robot:" \
-            --head "${BRANCH}" \
-            --repo ${GITHUB_REPOSITORY} \
-            --assignee "${GITHUB_ACTOR}" \
-            --reviewer "${GITHUB_ACTOR}")
-          echo "pr-url=${PR_URL}" >> ${GITHUB_OUTPUT}
-
-      - name: Push to Pull Request
+      - name: Push the render to the pull request
         if: ${{ github.event_name == 'pull_request' }}
-        uses: r-lib/actions/pr-push@v2
+        uses: mcanouil/release-actions/land@v1
         with:
-          repo-token: ${{ steps.app-token.outputs.token }}
+          mode: push
+          base: ${{ github.head_ref }}
+          files: |
+            _site
+            _freeze
+          message: |
+            ci: quarto automatic render
 
-      - name: Workflow Summary
-        if: always()
-        env:
-          QUARTO_VERSION: ${{ steps.quarto-version.outputs.version }}
-          JOB_STATUS: ${{ job.status }}
-          PR_URL: ${{ steps.create-pr.outputs.pr-url }}
-        shell: bash
-        run: |
-          echo "# Quarto Render Workflow Summary" >> ${GITHUB_STEP_SUMMARY}
-          echo "" >> ${GITHUB_STEP_SUMMARY}
-          echo "## Configuration" >> ${GITHUB_STEP_SUMMARY}
-          echo "- **Event:** ${GITHUB_EVENT_NAME}" >> ${GITHUB_STEP_SUMMARY}
-          echo "- **Repository:** ${GITHUB_REPOSITORY}" >> ${GITHUB_STEP_SUMMARY}
-          echo "- **Branch:** ${GITHUB_REF_NAME}" >> ${GITHUB_STEP_SUMMARY}
-          echo "- **Commit:** ${GITHUB_SHA}" >> ${GITHUB_STEP_SUMMARY}
-          echo "- **Quarto Version:** ${QUARTO_VERSION}" >> ${GITHUB_STEP_SUMMARY}
-          echo "" >> ${GITHUB_STEP_SUMMARY}
-          echo "## Workflow Status" >> ${GITHUB_STEP_SUMMARY}
-          if [ "${JOB_STATUS}" == "success" ]; then
-            echo "✅ **Status:** Success" >> ${GITHUB_STEP_SUMMARY}
-          else
-            echo "❌ **Status:** Failed" >> ${GITHUB_STEP_SUMMARY}
-          fi
-          echo "" >> ${GITHUB_STEP_SUMMARY}
-          if [ "${GITHUB_EVENT_NAME}" == "pull_request" ]; then
-            echo "## Pull Request Actions" >> ${GITHUB_STEP_SUMMARY}
-            echo "- Rendered Quarto project" >> ${GITHUB_STEP_SUMMARY}
-            echo "- Committed changes to PR branch" >> ${GITHUB_STEP_SUMMARY}
-          else
-            echo "## Actions Taken" >> ${GITHUB_STEP_SUMMARY}
-            echo "- Rendered Quarto project" >> ${GITHUB_STEP_SUMMARY}
-            echo "- Created/updated branch: \`ci/latest-quarto-updates\`" >> ${GITHUB_STEP_SUMMARY}
-            if [ -n "${PR_URL}" ]; then
-              echo "- Created pull request: [${PR_URL}](${PR_URL})" >> ${GITHUB_STEP_SUMMARY}
-            else
-              echo "- Updated existing pull request for automatic updates" >> ${GITHUB_STEP_SUMMARY}
-            fi
-          fi
+            skip-checks: true
+          allow-unchanged: true
+
+      - name: Open the render pull request
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: mcanouil/release-actions/land@v1
+        with:
+          mode: pull-request
+          files: |
+            _site
+            _freeze
+          message: "ci: quarto automatic render"
+          branch: ci/latest-quarto-updates
+          body: "GitHub Actions: ${{ github.workflow }} (${{ github.sha }})"
+          merge: none
+          allow-unchanged: true
+          token: ${{ steps.token.outputs.token }}
