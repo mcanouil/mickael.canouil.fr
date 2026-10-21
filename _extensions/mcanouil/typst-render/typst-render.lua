@@ -147,6 +147,15 @@ local global_brand_mode = 'light'
 --- Quarto's own pass leaves them literal instead of removing them.
 local code_annotations_disabled = false
 
+--- Whether Quarto's markdown reader is ready (set during Meta pass).
+--- False when the filter runs at `pre-ast`, before Quarto captures its reader
+--- options, where `quarto.utils.string_to_inlines` fails.
+local quarto_reader_ready = true
+
+--- Quarto's reader options at `pre-ast` (set during Meta pass), used to parse
+--- captions with Quarto's own reader there; nil once Quarto's reader is ready.
+local pre_ast_reader_options = nil
+
 --- Resolved Typst binary path (cached)
 local typst_bin = nil
 
@@ -614,17 +623,50 @@ local function extract_local_file_refs(source)
   return refs
 end
 
+--- Resolve an import path the way Typst does: a leading `/` is relative to the
+--- project root, anything else to the folder of the file that imports it.
+--- @param ref string Path as written in the #import or #include
+--- @param root string Absolute Typst project root path
+--- @param base_dir string Absolute folder of the importing file
+--- @return string Absolute path with `.` and `..` collapsed
+local function resolve_import_path(ref, root, base_dir)
+  local joined = ref:sub(1, 1) == '/' and (root .. ref) or pandoc.path.join({ base_dir, ref })
+  -- pandoc.path.normalize keeps `..`, so collapse it here: one file must map to
+  -- one path, or a cycle spelt through `..` would never be seen as visited.
+  -- An absolute path clamps `..` at its root component; a relative one, as when
+  -- the root is not a project directory, keeps the `..` it cannot pop.
+  local absolute = pandoc.path.is_absolute(joined)
+  local segments = {}
+  for _, part in ipairs(pandoc.path.split(pandoc.path.normalize(joined))) do
+    if part == '..' then
+      local last = segments[#segments]
+      if last and last ~= '..' and not (absolute and #segments == 1) then
+        segments[#segments] = nil
+      elseif not absolute then
+        segments[#segments + 1] = '..'
+      end
+    elseif part ~= '.' then
+      segments[#segments + 1] = part
+    end
+  end
+  if #segments == 0 then return '.' end
+  return pandoc.path.join(segments)
+end
+
 --- Recursively collect the content of locally imported Typst files for cache hashing.
---- All paths are resolved relative to root (matching how Typst resolves stdin imports).
+--- The block itself compiles from stdin, which Typst places at the root, so its
+--- imports resolve against the root; a nested file's imports resolve against its
+--- own folder.
 --- Missing files are silently skipped; cycles are prevented via visited table.
 --- @param source string Typst source to scan for imports
 --- @param root string Absolute Typst project root path
+--- @param base_dir string Absolute folder that relative imports in source resolve against
 --- @param visited table Set of already-visited absolute paths (prevents cycles)
---- @return string Concatenated rel_path+content string for all reachable local imports
-local function collect_import_content(source, root, visited)
+--- @return string Concatenated path+content string for all reachable local imports
+local function collect_import_content(source, root, base_dir, visited)
   local parts = {}
-  for _, rel_path in ipairs(extract_local_file_refs(source)) do
-    local abs_path = pandoc.path.normalize(pandoc.path.join({ root, rel_path }))
+  for _, ref in ipairs(extract_local_file_refs(source)) do
+    local abs_path = resolve_import_path(ref, root, base_dir)
     if not visited[abs_path] then
       visited[abs_path] = true
       local content = read_file_cache[abs_path]
@@ -635,8 +677,8 @@ local function collect_import_content(source, root, visited)
         content = nil
       end
       if content then
-        parts[#parts + 1] = rel_path .. '\0' .. content
-        local sub = collect_import_content(content, root, visited)
+        parts[#parts + 1] = ref .. '\0' .. content
+        local sub = collect_import_content(content, root, pandoc.path.directory(abs_path), visited)
         if sub ~= '' then parts[#parts + 1] = sub end
       end
     end
@@ -1286,7 +1328,7 @@ local function build_hash_source(source, opts, resolved_root, merged_input)
     hash_source = hash_source .. '|input:' .. input_serial
   end
   hash_source = hash_source .. '|opts:' .. serialise_opts(opts)
-  local import_content = collect_import_content(source, resolved_root, {})
+  local import_content = collect_import_content(source, resolved_root, resolved_root, {})
   if import_content ~= '' then
     hash_source = hash_source .. '|imports:' .. import_content
   end
@@ -1508,8 +1550,16 @@ local REF_TYPE_NAMES = {
 --- @param opts table Merged options
 --- @return pandoc.Para Para containing the image
 local function create_image_element(img_path, opts)
+  -- Without an explicit alt, a labelled block's caption already describes the
+  -- figure, so it gets no alt, as Quarto's own figures do. An unlabelled
+  -- caption is shown nowhere else, so it becomes the alt as plain text.
   local caption_text = cell.resolve_caption(opts)
-  local fallback = caption_text ~= '' and caption_text or opts._source or ''
+  local fallback = opts._source or ''
+  if caption_text ~= '' and cell.ref_type(opts.label) then
+    fallback = ''
+  elseif caption_text ~= '' then
+    fallback = pandoc.utils.stringify(pandoc.read(caption_text, 'markdown').blocks)
+  end
   local alt_text = cell.resolve_alt(opts, fallback)
 
   local classes = {}
@@ -1537,13 +1587,27 @@ local function create_image_element(img_path, opts)
     kvpairs[#kvpairs + 1] = { 'fig-alt', alt_text }
   end
 
+  -- HTML and Typst take the alt from `fig-alt`, so the description stays empty
+  -- there: at `pre-ast`, a lone image with a description becomes an implicit
+  -- figure captioned by it. Other formats (docx, LaTeX) read the alt from the
+  -- description only.
+  local description = { pandoc.Str(alt_text) }
+  if alt_text == '' or quarto.format.is_html_output() or quarto.format.is_typst_output() then
+    description = {}
+  end
+
   local img = pandoc.Image(
-    { pandoc.Str(alt_text) },
+    description,
     img_path,
     '',
     pandoc.Attr('', classes, kvpairs)
   )
 
+  -- Quarto only promotes a Para holding a lone image with a description, so
+  -- a Plain keeps the description as alt without the implicit figure.
+  if not quarto_reader_ready and #description > 0 then
+    return pandoc.Plain({ img })
+  end
   return pandoc.Para({ img })
 end
 
@@ -1791,6 +1855,14 @@ local function get_configuration(meta)
   local code_annotations_meta = meta['code-annotations']
   code_annotations_disabled = code_annotations_meta ~= nil
     and pandoc.utils.stringify(code_annotations_meta) == 'false'
+
+  -- Quarto removes `quarto_pandoc_reader_opts` from the metadata when it
+  -- captures its reader options, so the key is only present at `pre-ast`.
+  quarto_reader_ready = meta['quarto_pandoc_reader_opts'] == nil
+  pre_ast_reader_options = nil
+  if not quarto_reader_ready then
+    pre_ast_reader_options = require('readqmd').meta_to_options(meta['quarto_pandoc_reader_opts'])
+  end
 
   checker:options(meta)
 
@@ -2117,7 +2189,7 @@ local function process_codeblock(el)
     if opts.align and opts.align ~= 'default' and VALID_ALIGN_SET[opts.align] then
       scoped_code = '#align(' .. opts.align .. ')[\n' .. scoped_code .. '\n]'
     end
-    local result = cell.wrap_crossref(pandoc.RawBlock('typst', scoped_code), opts, REF_TYPE_NAMES)
+    local result = cell.wrap_crossref(pandoc.RawBlock('typst', scoped_code), opts, REF_TYPE_NAMES, pre_ast_reader_options)
     if do_echo then
       -- Native Typst pass-through does not support annotations; strip markers.
       return cell.create_echo_block(code, is_fenced, option_lines, fold, result, false, line_numbers)
@@ -2200,7 +2272,7 @@ local function process_codeblock(el)
         pandoc.Attr('', { 'dark-content' }, {})
       )
     end
-    result = cell.wrap_crossref(pandoc.Div(blocks), opts, REF_TYPE_NAMES)
+    result = cell.wrap_crossref(pandoc.Div(blocks), opts, REF_TYPE_NAMES, pre_ast_reader_options)
   else
     -- Single-mode: resolve colours to brand mode
     local resolved_opts = has_dual_mode_colours(opts)
@@ -2241,7 +2313,7 @@ local function process_codeblock(el)
       end
     end
 
-    result = cell.wrap_crossref(content, opts, REF_TYPE_NAMES)
+    result = cell.wrap_crossref(content, opts, REF_TYPE_NAMES, pre_ast_reader_options)
   end
 
   -- Compilation and file-save side effects have run; suppress embedding if include is false.
@@ -2302,20 +2374,20 @@ local function create_inline_image_element(img_path, opts)
     )
   end
 
-  if quarto.format.is_docx_output() then
+  if not quarto.format.is_html_output() then
     local img = pandoc.Image(
       { pandoc.Str(opts._alt or '') },
       img_path
     )
-    img.attr = pandoc.Attr('', {}, { { 'height', '1em' } })
+    if quarto.format.is_docx_output() then
+      img.attr = pandoc.Attr('', {}, { { 'height', '1em' } })
+    end
+    -- At `pre-ast`, Quarto promotes a Para holding only this image to a figure
+    -- captioned by its alt; the Span keeps the image out of that pattern.
+    if not quarto_reader_ready then
+      return pandoc.Span({ img })
+    end
     return img
-  end
-
-  if not quarto.format.is_html_output() then
-    return pandoc.Image(
-      { pandoc.Str(opts._alt or '') },
-      img_path
-    )
   end
 
   local extra_classes = ''
