@@ -1,5 +1,4 @@
 // Gallery: laboratory assay, built with Keisen.
-// Its native twin is gallery-assay-native.typ; the two render alike.
 
 #import "@preview/keisen:0.1.0": *
 

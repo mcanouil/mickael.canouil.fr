@@ -1,5 +1,4 @@
 // Gallery: income statement, built with Keisen.
-// Its native twin is gallery-income-statement-native.typ; the two render alike.
 
 #import "@preview/keisen:0.1.0": *
 

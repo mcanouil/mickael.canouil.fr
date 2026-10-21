@@ -1,5 +1,4 @@
 // Gallery: population by region, built with Keisen.
-// Its native twin is gallery-population-native.typ; the two render alike.
 
 #import "@preview/keisen:0.1.0": *
 
