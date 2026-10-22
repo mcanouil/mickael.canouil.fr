@@ -35,6 +35,8 @@
       if (contents) {
         if (!contents.id) contents.id = `${container.id || "quarto-sidebar-toggle"}-contents`;
         title.setAttribute("aria-controls", contents.id);
+        // The contents are clones of the hidden column, so they copy its inert.
+        for (const clone of contents.children) clone.inert = false;
       }
       title.querySelectorAll(".quarto-sidebar-toggle-icon").forEach((icon) => {
         icon.setAttribute("aria-hidden", "true");
@@ -62,6 +64,19 @@
       if (node.matches(".quarto-sidebar-toggle-title")) enhance(node);
       node.querySelectorAll(".quarto-sidebar-toggle-title").forEach(enhance);
     };
+
+    // While the toggle shows, quarto.js hides each child of the original
+    // column with an inline opacity: 0, and its links stay in the tab order.
+    // Make each hidden child inert, and follow Quarto when it shows it again.
+    document.querySelectorAll("#quarto-sidebar, #quarto-sidebar-toc-left, #quarto-margin-sidebar").forEach((column) => {
+      for (const child of column.children) {
+        const syncInert = () => {
+          child.inert = child.style.opacity === "0";
+        };
+        syncInert();
+        new MutationObserver(syncInert).observe(child, { attributes: true, attributeFilter: ["style"] });
+      }
+    });
 
     enhanceWithin(document.body);
     new MutationObserver((mutations) => {
