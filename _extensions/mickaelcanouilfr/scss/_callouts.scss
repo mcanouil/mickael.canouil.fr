@@ -47,6 +47,28 @@ div.callout:is(.callout-style-default, .callout-style-simple, .callout-style-min
     margin: 0;
   }
 
+  // With a link in the title, callout-a11y.html moves the toggle to the
+  // chevron, and Quarto's rules keyed on the header's aria-expanded miss it.
+  // Remove when https://github.com/quarto-dev/quarto-cli/issues/4934 is fixed.
+  > .callout-header:has(> .callout-btn-toggle[aria-expanded]) {
+    align-items: center;
+  }
+
+  > .callout-header > .callout-btn-toggle[aria-expanded] {
+    min-width: 24px;
+    min-height: 24px;
+    text-align: center;
+    cursor: pointer;
+
+    &[aria-expanded="false"] .callout-toggle::before {
+      transform: rotate(-90deg);
+    }
+
+    &[aria-expanded="true"] .callout-toggle::before {
+      transform: none;
+    }
+  }
+
   // The icon sits in a line box of the body font size, which makes the header
   // taller than the small title.
   .callout-icon-container {
