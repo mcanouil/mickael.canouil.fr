@@ -1,0 +1,58 @@
+<script id="sidebar-toggle-a11y" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/14969 is fixed.
+    // When margin content overlaps a side column, quarto.js swaps the column
+    // for a toggle whose title is a plain div with only an onclick handler.
+    // Give the title a button role, a tab stop, Enter and Space, and an
+    // aria-expanded state that follows the "expanded" class Quarto sets.
+    // Quarto builds the toggles after load and rebuilds them on scroll and
+    // resize, so watch the page for new ones.
+    const enhanced = new WeakSet();
+
+    const enhance = (title) => {
+      if (enhanced.has(title)) return;
+      enhanced.add(title);
+      const container = title.parentElement;
+      const contents = container.querySelector(":scope > .quarto-sidebar-toggle-contents");
+
+      title.setAttribute("role", "button");
+      title.setAttribute("tabindex", "0");
+      if (contents) {
+        if (!contents.id) contents.id = `${container.id || "quarto-sidebar-toggle"}-contents`;
+        title.setAttribute("aria-controls", contents.id);
+      }
+      title.querySelectorAll(".quarto-sidebar-toggle-icon").forEach((icon) => {
+        icon.setAttribute("aria-hidden", "true");
+      });
+
+      const syncExpanded = () => {
+        title.setAttribute("aria-expanded", String(container.classList.contains("expanded")));
+      };
+      syncExpanded();
+      new MutationObserver(syncExpanded).observe(container, { attributes: true, attributeFilter: ["class"] });
+
+      title.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        // Space would scroll the page, and Quarto closes the toggle on scroll.
+        event.preventDefault();
+        if (!event.repeat) title.click();
+      });
+    };
+
+    const enhanceWithin = (node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      if (node.matches(".quarto-sidebar-toggle-title")) enhance(node);
+      node.querySelectorAll(".quarto-sidebar-toggle-title").forEach(enhance);
+    };
+
+    enhanceWithin(document.body);
+    new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => mutation.addedNodes.forEach(enhanceWithin));
+    }).observe(document.body, { childList: true, subtree: true });
+  });
+</script>
