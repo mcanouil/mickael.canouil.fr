@@ -1,0 +1,155 @@
+// Code blocks and the code window as panels.
+//
+// A code block keeps the body-mix(95%) surface and takes the panel radius and
+// the gold hairline edge. A code window is one panel: the title bar is its
+// header with the small upper-case label, and the code block inside it has
+// no edge of its own. The upper-case label is CSS only, so the filename text
+// and its accessible name stay as written. The BibTeX block of the citation
+// appendix is a bare pre.sourceCode; it takes the same surface and radius,
+// and _appendix.scss gives it the quiet line edge inside the appendix panel.
+//
+// The window decorations (dots, window buttons) come from the vendored
+// code-window extension and are not restyled here. The extension reads
+// --code-window-title-bg, so the title bar colour is set through it.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+div.sourceCode,
+pre.sourceCode.quarto-appendix-bibtex {
+  background-color: body-mix(95%);
+  border: 1px solid var(--mc-edge);
+  border-radius: var(--mc-radius-panel);
+}
+
+// Code block inside a code window: the window supplies the edge.
+// The doubled class outranks the extension rules that set the same properties.
+.code-with-filename.code-with-filename {
+  --code-window-title-bg: #{body-mix(95%)};
+  margin: 1.5rem 0;
+  border: 1px solid var(--mc-edge);
+  border-radius: var(--mc-radius-panel);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  .code-with-filename-file {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--mc-line);
+
+    pre {
+      @include mc-panel-label();
+      // The muted colour is 4.2:1 on the title bar, so it is mixed with the ink.
+      color: color-mix(in srgb, var(--mc-muted) 55%, var(--mc-ink));
+      flex: 1;
+
+      strong {
+        font-size: inherit;
+        font-weight: inherit;
+      }
+    }
+  }
+
+  .code-copy-outer-scaffold,
+  div.sourceCode {
+    border: 0;
+    border-radius: 0;
+  }
+
+  &.code-window-collapsible:not([open]),
+  &.code-window-collapsible:not([open]) > summary.code-with-filename-file {
+    border-radius: var(--mc-radius-panel);
+  }
+}
+
+// Copy button as a small control with its own edge and a 24px target.
+// The global focus ring from _focus-motion.scss applies to it.
+.code-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--mc-gold-text);
+  border-radius: 6px;
+  color: var(--mc-ink);
+  background-color: body-mix(95%);
+  transition: transform $_anim-fast ease, background-color $_anim-fast ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+code.sourceCode {
+  // Quarto colours code annotation markers from these properties.
+  --quarto-hl-kw-color: #{$mc-syntax-keyword};
+  --quarto-hl-va-color: #{$mc-syntax-variable};
+  --quarto-hl-co-color: #{$mc-syntax-comment};
+  --quarto-hl-al-color: #{$mc-syntax-alert};
+
+  span.kw, span.cf, span.at, span.bu, span.dt, span.ex, span.pp {
+    color: $mc-syntax-keyword;
+  }
+
+  span.va {
+    color: $mc-syntax-variable;
+  }
+
+  span.co, span.an, span.cv, span.do, span.in, span.re {
+    color: $mc-syntax-comment;
+  }
+
+  span.al, span.er, span.wa {
+    color: $mc-syntax-alert;
+  }
+}
+
+p code.sourceCode,
+li code.sourceCode,
+td code.sourceCode {
+  background-color: inherit;
+}
+
+.code-annotation-gutter {
+  background-color: body-mix(95%);
+}
+
+// Restore consistent vertical padding for code blocks with annotations
+// Quarto removes padding on .code-annotation-code, causing visual inconsistency
+pre.code-annotation-code {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+// Style code annotation markers as interactive buttons
+.code-annotation-anchor {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+
+// Prevent copy button overlap with code annotation gutter
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/13444 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/15136).
+.code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
+  right: 1.5em;
+  margin-right: 0;
+}
+
+// Code annotation workaround
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/13448 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/13429).
+#code-annotation-line-highlight {
+  margin-left: unset;
+  width: 100%;
+  // Offset highlight to account for restored vertical padding
+  margin-top: 0.4rem;
+}
+
+#code-annotation-line-highlight-gutter,
+.code-annotation-gutter-bg,
+.code-annotation-gutter {
+  all: unset;
+}
