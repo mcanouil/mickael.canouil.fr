@@ -1,0 +1,63 @@
+// Blockquotes and footnotes.
+//
+// A blockquote has a muted gold inset bar, upright text a little larger than
+// the body, and a small gold opening curly quote between the bar and the text.
+// The quote mark is a pseudo-element, so screen readers do not read it. A last
+// paragraph after the first is the attribution and uses the muted colour.
+//
+// The "Notes" label of the footnotes is the appendix heading label from
+// _appendix.scss. Here the back-links get a 24px target.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+// Quarto sets padding and size on the .blockquote class, so the selector
+// list matches its specificity and wins by coming later.
+blockquote,
+.blockquote {
+  @include mc-inset-bar(var(--mc-edge));
+  margin: 1.5rem 0;
+  padding: 0.125rem 0 0.125rem 2.5rem;
+  border: 0;
+  background: none;
+  font-style: normal;
+  font-size: 1.0625em;
+
+  &::after {
+    content: "\201C";
+    position: absolute;
+    top: -0.1rem;
+    left: 1rem;
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--mc-gold);
+    pointer-events: none;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  > p + p:last-child {
+    margin-top: 0.25rem;
+    font-size: 0.85em;
+    color: var(--mc-muted);
+  }
+}
+
+// The back-link is a 15px glyph by default, below the 24px target size.
+// Remove the size rule when
+// https://github.com/quarto-dev/quarto-cli/issues/15064 is fixed.
+.footnote-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+}
