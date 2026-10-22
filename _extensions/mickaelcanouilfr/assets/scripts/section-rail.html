@@ -91,6 +91,13 @@
       }
     };
 
+    // Keyboard focus in the bottom dock: centre the focused chip so a keyboard
+    // reader is never left at the clipped edge of the strip.
+    nav.addEventListener("focusin", (event) => {
+      const link = event.target.closest(".mc-section-rail__link");
+      if (link) revealActive(link);
+    });
+
     let activeId = null;
     const setActive = (targetId) => {
       if (activeId === targetId) return;
