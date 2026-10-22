@@ -1,0 +1,61 @@
+// Docked sidebar: the column stays flush, the links take the pill style of
+// the table of contents. The copy in the collapsed toggle is styled with the
+// toggle panel in _toc.scss.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+.sidebar.sidebar-navigation {
+  padding-top: 1rem;
+  margin-top: 0;
+}
+
+// Quarto hard-codes the column edge as #dee2e6 with !important, also in the
+// dark bundle, where it is a bright line. No quarto-cli issue is filed yet;
+// remove this rule when Quarto themes the edge.
+.sidebar.sidebar-navigation:not(.rollup) {
+  border-right-color: var(--mc-line) !important;
+}
+
+#quarto-sidebar,
+#quarto-sidebarnav-toggle {
+  .sidebar-link {
+    display: block;
+    min-height: 24px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .sidebar-link.active {
+    @include mc-active-pill();
+    // Quarto sets the active colour with !important.
+    color: var(--mc-ink) !important;
+  }
+
+  // Bootstrap draws the divider with currentColor at 25% opacity.
+  .sidebar-divider {
+    opacity: 1;
+    border-top-color: var(--mc-line);
+  }
+
+  // Quarto dims the sidebar tools to 0.7.
+  .sidebar-tools-main,
+  .sidebar-tools-collapse,
+  .quarto-navigation-tool {
+    opacity: 1;
+  }
+}
+
+// The sidebar copy starts with the space kept for the sidebar title, which
+// the toggle title already fills. Bootstrap sets mt-1 on the list with
+// !important.
+#quarto-sidebarnav-toggle .sidebar-menu-container {
+  padding-top: 0;
+
+  > ul:first-child {
+    margin-top: 0 !important;
+  }
+}
