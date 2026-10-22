@@ -1,0 +1,36 @@
+<script id="callout-a11y" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/4934 is fixed.
+    // The header of a collapsible callout is a plain div with aria-expanded,
+    // no role and no tab stop, and its aria-label hides the title.
+    // Give the header a button role, a tab stop, and Enter and Space.
+    // Bootstrap keeps aria-expanded in step and hides the closed body with
+    // display: none, so the body needs no inert.
+    document.querySelectorAll(".callout > .callout-header[data-bs-toggle='collapse']").forEach((header) => {
+      header.setAttribute("role", "button");
+      header.setAttribute("tabindex", "0");
+      header.removeAttribute("aria-label");
+
+      // The hidden type label runs into the title, giving "NoteTitle".
+      const label = header.querySelector(".callout-title-container > .screen-reader-only");
+      if (label && !/\s$/.test(label.textContent)) label.append(" ");
+
+      header.querySelectorAll(".callout-icon, .callout-toggle").forEach((icon) => {
+        icon.setAttribute("aria-hidden", "true");
+      });
+
+      header.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        if (event.ctrlKey || event.altKey || event.metaKey) return;
+        // Space would scroll the page.
+        event.preventDefault();
+        if (!event.repeat) header.click();
+      });
+    });
+  });
+</script>
