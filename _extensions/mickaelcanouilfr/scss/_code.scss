@@ -2,9 +2,8 @@
 //
 // A code block keeps the body-mix(95%) surface and takes the panel radius and
 // the gold hairline edge. A code window is one panel: the title bar is its
-// header with the small upper-case label, and the code block inside it has
-// no edge of its own. The upper-case label is CSS only, so the filename text
-// and its accessible name stay as written. The BibTeX block of the citation
+// header with the small sans label, and the code block inside it has
+// no edge of its own. The filename keeps its case. The BibTeX block of the citation
 // appendix is a bare pre.sourceCode; it takes the same surface and radius,
 // and _appendix.scss gives it the quiet line edge inside the appendix panel.
 //
@@ -38,6 +37,7 @@ pre.sourceCode.quarto-appendix-bibtex {
 
     pre {
       @include mc-panel-label();
+      text-transform: none;
       // The muted colour is 4.2:1 on the title bar, so it is mixed with the ink.
       color: color-mix(in srgb, var(--mc-muted) 55%, var(--mc-ink));
       flex: 1;
@@ -47,6 +47,13 @@ pre.sourceCode.quarto-appendix-bibtex {
         font-weight: inherit;
       }
     }
+  }
+
+  // The extension shrinks and upper-cases the auto label with a selector of
+  // the same weight as the one above, so the auto class is added here.
+  &.code-window-auto .code-with-filename-file pre strong {
+    font-size: inherit;
+    text-transform: none;
   }
 
   .code-copy-outer-scaffold,
@@ -59,6 +66,11 @@ pre.sourceCode.quarto-appendix-bibtex {
   &.code-window-collapsible:not([open]) > summary.code-with-filename-file {
     border-radius: var(--mc-radius-panel);
   }
+}
+
+// Keep long lines clear of the copy button.
+pre.sourceCode.code-with-copy {
+  padding-right: 2.75rem;
 }
 
 // Copy button as a small control with its own edge and a 24px target.
