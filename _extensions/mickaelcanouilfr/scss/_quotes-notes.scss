@@ -2,8 +2,10 @@
 //
 // A blockquote has a muted gold inset bar, upright text a little larger than
 // the body, and a small gold opening curly quote between the bar and the text.
-// The quote mark is a pseudo-element, so screen readers do not read it. A last
-// paragraph after the first is the attribution and uses the muted colour.
+// The quote mark is a pseudo-element with an empty alternative text, because
+// browsers expose generated content to screen readers otherwise. An
+// attribution is explicit markup (a footer, a cite or the .attribution class)
+// and uses the muted colour. Embedded tweets keep their own style.
 //
 // The "Notes" label of the footnotes is the appendix heading label from
 // _appendix.scss. Here the back-links get a 24px target.
@@ -14,8 +16,8 @@
 
 // Quarto sets padding and size on the .blockquote class, so the selector
 // list matches its specificity and wins by coming later.
-blockquote,
-.blockquote {
+blockquote:not(.twitter-tweet),
+.blockquote:not(.twitter-tweet) {
   @include mc-inset-bar(var(--mc-edge));
   margin: 1.5rem 0;
   padding: 0.125rem 0 0.125rem 2.5rem;
@@ -25,7 +27,7 @@ blockquote,
   font-size: 1.0625em;
 
   &::after {
-    content: "\201C";
+    content: "\201C" / "";
     position: absolute;
     top: -0.1rem;
     left: 1rem;
@@ -44,9 +46,13 @@ blockquote,
     margin-bottom: 0;
   }
 
-  > p + p:last-child {
+  footer,
+  cite,
+  .attribution {
+    display: block;
     margin-top: 0.25rem;
     font-size: 0.85em;
+    font-style: normal;
     color: var(--mc-muted);
   }
 }
