@@ -5,6 +5,12 @@
    * @author Mickaël Canouil
    */
   document.addEventListener("DOMContentLoaded", () => {
+    // In every titled callout, the hidden type label runs into the title,
+    // giving "NoteTitle". No quarto-cli issue exists yet for the missing space.
+    document.querySelectorAll(".callout .callout-title-container > .screen-reader-only").forEach((label) => {
+      if (!/\s$/.test(label.textContent)) label.append(" ");
+    });
+
     // Remove when https://github.com/quarto-dev/quarto-cli/issues/4934 is fixed.
     // The header of a collapsible callout is a plain div with aria-expanded,
     // no role and no tab stop, and its aria-label hides the title.
@@ -20,10 +26,6 @@
       header.removeAttribute("aria-label");
 
       const title = header.querySelector(".callout-title-container");
-      // The hidden type label runs into the title, giving "NoteTitle".
-      const label = title?.querySelector(":scope > .screen-reader-only");
-      if (label && !/\s$/.test(label.textContent)) label.append(" ");
-
       header.querySelectorAll(".callout-icon, .callout-toggle").forEach((icon) => {
         icon.setAttribute("aria-hidden", "true");
       });
