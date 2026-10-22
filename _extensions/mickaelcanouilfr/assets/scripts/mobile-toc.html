@@ -51,7 +51,11 @@
       pill.setAttribute("popovertarget", "toc-sheet");
       pill.innerHTML = '<i class="bi bi-list-nested" aria-hidden="true"></i>';
       pill.append(label);
-      document.body.append(pill, sheet);
+      // Before main, so the pill comes before the content and the footer in
+      // the Tab order. Its fixed position does not depend on where it sits.
+      const main = document.querySelector("#quarto-content > main");
+      if (main) main.before(pill, sheet);
+      else document.body.append(pill, sheet);
 
       // quarto.js keeps the hidden original up to date while the page scrolls:
       // "active" on the current link, and "show" on the nested lists it expands.
