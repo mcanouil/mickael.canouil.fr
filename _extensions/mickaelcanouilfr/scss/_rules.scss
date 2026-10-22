@@ -144,16 +144,6 @@ html {
   }
 }
 
-// Enhanced focus states for accessibility
-// Remove when https://github.com/quarto-dev/quarto-cli/issues/15139 is fixed.
-a:focus-visible,
-button:focus-visible,
-.btn:focus-visible {
-  outline: 2px solid $body-color;
-  outline-offset: 2px;
-  transition: outline-offset 0.2s ease;
-}
-
 // Ordinal date suffixes (st, nd, rd, th) wrapped by ordinal-dates.html.
 // Override <sup> default raise: stay on baseline, shrink, italicise.
 .ordinal-suffix {
@@ -1036,6 +1026,21 @@ hr {
 
 .quarto-listing-category .category {
   text-transform: uppercase;
+}
+
+// Quarto removes the link underline in listing tables, so a link in a
+// description differs from the text by colour alone (WCAG 1.4.1).
+// No quarto-cli issue exists yet for this workaround.
+table.quarto-listing-table .listing-description a {
+  text-decoration: underline;
+}
+
+// Quarto's `pre.sourceCode { overflow-y: visible !important }` beats Bootstrap's
+// `.visually-hidden { overflow: hidden !important }`, so a screen-reader-only
+// code block keeps a 1px box that scrolls.
+// No quarto-cli issue exists yet for this workaround.
+pre.sourceCode.visually-hidden {
+  overflow: hidden !important;
 }
 
 .listing-description {
@@ -2504,8 +2509,6 @@ div.sourceCode {
     }
 
     &:focus {
-      outline: 2px solid $body-color;
-      outline-offset: 2px;
       text-decoration: none;
     }
 
@@ -2646,12 +2649,6 @@ div.sourceCode {
       &:hover {
         background-color: rgba($body-color, 0.12);
       }
-    }
-
-    // Focus state for accessibility
-    &:focus {
-      outline: 2px solid rgba($body-color, 0.3);
-      outline-offset: 2px;
     }
 
     .quarto-category-count {
@@ -2924,7 +2921,6 @@ nav#TOC {
     &:hover {
       color: rgba($body-color, 0.95);
       background-color: rgba($body-color, 0.04);
-      transform: translateX(2px);
       padding-left: 0.85rem;
 
       .header-section-number {
@@ -2952,27 +2948,9 @@ nav#TOC {
         transform: scaleY(1);
         width: 4px;
       }
-
-      // Subtle pulse animation for active item
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        width: 4px;
-        height: 4px;
-        background: $body-color;
-        border-radius: 50%;
-        transform: translateY(-50%);
-        opacity: 0;
-        animation: tocPulse 2s ease-in-out infinite;
-      }
     }
 
-    // Focus state for accessibility
     &:focus-visible {
-      outline: 2px solid $body-color;
-      outline-offset: 2px;
       background-color: rgba($body-color, 0.06);
     }
   }
@@ -3061,21 +3039,6 @@ nav#TOC {
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-  }
-}
-
-// Animation for active item pulse
-@keyframes tocPulse {
-
-  0%,
-  100% {
-    opacity: 0;
-    transform: translateY(-50%) scale(1);
-  }
-
-  50% {
-    opacity: 0.4;
-    transform: translateY(-50%) scale(1.5);
   }
 }
 
@@ -3349,31 +3312,6 @@ main {
 // ===========================
 // ACCESSIBILITY & REDUCED MOTION
 // ===========================
-
-// Disable all animations for users who prefer reduced motion
-// Note: !important is intentional here to ensure accessibility overrides all other styles
-@media (prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    // Staggered entrances keep their delay otherwise, and `fill-mode: backwards`
-    // holds each item invisible until the delay ends.
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  // Disable TOC animations for reduced motion
-  nav#TOC {
-    .nav-link.active::after {
-      animation: none !important;
-      opacity: 0 !important;
-    }
-  }
-}
 
 // ---------------------------
 // BLOCKQUOTE WITH CURLY QUOTES
