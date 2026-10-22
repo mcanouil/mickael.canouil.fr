@@ -5,8 +5,10 @@
    * @author Mickaël Canouil
    */
   document.addEventListener("DOMContentLoaded", () => {
-    // Logo link: Quarto emits <a class="navbar-brand-logo"> with an inner <img alt>
-    // but axe sees no accessible name when the img is hidden by CSS.
+    // Logo link: with navbar.logo given as {light, dark}, Quarto writes alt=""
+    // on both images, because website-shared.ts applies logo-alt only when
+    // navbar.logo is a string. The link then has no accessible name.
+    // No quarto-cli issue exists yet for the logo link name.
     document.querySelectorAll("a.navbar-brand-logo:not([aria-label])").forEach((a) => {
       a.setAttribute("aria-label", "Mickaël CANOUIL — home");
     });
