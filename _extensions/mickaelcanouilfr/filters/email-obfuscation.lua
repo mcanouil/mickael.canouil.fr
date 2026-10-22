@@ -10,6 +10,8 @@
 -- script `assets/scripts/email.html` restores the real href on load, using the
 -- `window.mcDecodeB64` helper from `assets/scripts/base64.html`.
 --
+-- No quarto-cli issue exists yet for the markup that Quarto's own
+-- `email-obfuscation` escapes.
 -- Quarto's own `email-obfuscation` is not usable here: `javascript` mode
 -- HTML-escapes the whole anchor, which printed the `iconify-icon` tags of the
 -- mail buttons as literal text, and `references` mode escapes inline markup

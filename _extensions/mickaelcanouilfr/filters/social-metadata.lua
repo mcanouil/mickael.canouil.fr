@@ -13,7 +13,8 @@
 --- `og:type` or `og:url`, `<meta name="description">` needs the pandoc
 --- `description-meta` variable that Quarto never populates, and the icon and
 --- manifest links beyond `rel="icon"` have no configuration key. This filter
---- fills those gaps and nothing else. The canonical link is Quarto's own
+--- fills those gaps and nothing else.
+--- Remove when https://github.com/quarto-dev/quarto-cli/issues/14306 is fixed. The canonical link is Quarto's own
 --- `canonical-url`, which the format turns on.
 
 --- Extension name constant
