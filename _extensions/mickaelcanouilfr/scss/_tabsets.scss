@@ -1,0 +1,52 @@
+// Tabsets as panels: one panel with the tab row in its header and the active
+// tab shown as the pill, with bold ink text.
+//
+// Quarto puts a fixed #dee2e6 border on the left, right and bottom of
+// .tab-content, so the panel edge moves to .panel-tabset and the content
+// border goes.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+.panel-tabset {
+  @include mc-panel();
+  overflow: hidden;
+  margin-bottom: 1rem;
+
+  > .nav-tabs {
+    --bs-nav-tabs-border-width: 0;
+    --bs-nav-tabs-link-hover-border-color: transparent;
+    --bs-nav-tabs-link-active-color: var(--mc-ink);
+    --bs-nav-tabs-link-active-bg: var(--mc-pill-bg);
+    --bs-nav-tabs-link-active-border-color: transparent;
+    gap: 0.25rem;
+    padding: 0.375rem;
+    border-bottom: 1px solid var(--mc-line);
+    opacity: 1;
+
+    .nav-link {
+      min-height: 1.5rem;
+      border: 0;
+      border-radius: 8px;
+      color: var(--mc-muted);
+
+      &:hover {
+        color: var(--mc-ink);
+      }
+
+      &.active,
+      &.active:hover {
+        @include mc-active-pill();
+        border-radius: 8px;
+        background: var(--mc-pill-bg);
+      }
+    }
+  }
+
+  > .tab-content {
+    border: 0;
+    background: transparent;
+    padding: 0.625rem 0.75rem 0.75rem;
+  }
+}
