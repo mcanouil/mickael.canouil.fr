@@ -1,0 +1,143 @@
+// Table of contents pill and bottom sheet for narrow screens, built by
+// assets/scripts/mobile-toc.html. Quarto hides the side table of contents
+// below the md breakpoint: https://github.com/quarto-dev/quarto-cli/issues/5961
+//
+// Colours and the radius come from --toc-sheet-* custom properties, with
+// Bootstrap values as fallbacks, so a theme can map them to its own tokens.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+.toc-sheet-pill,
+.toc-sheet {
+  background: var(--toc-sheet-bg, var(--bs-body-bg, #fff));
+  color: var(--toc-sheet-fg, var(--bs-body-color, #212529));
+}
+
+.toc-sheet-pill {
+  position: fixed;
+  right: calc(1rem + env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--toc-sheet-edge, var(--bs-border-color, #dee2e6));
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: var(--bs-font-sans-serif, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+// Back-to-top goes above the pill, so the two never overlap.
+body:has(> .toc-sheet-pill) #quarto-back-to-top {
+  bottom: calc(1rem + env(safe-area-inset-bottom) + 44px + 0.75rem);
+}
+
+.toc-sheet {
+  inset: auto 0 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.6rem 0.75rem calc(1rem + env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid var(--toc-sheet-edge, var(--bs-border-color, #dee2e6));
+  border-radius: var(--toc-sheet-radius, var(--bs-border-radius-lg, 0.5rem)) var(--toc-sheet-radius, var(--bs-border-radius-lg, 0.5rem)) 0 0;
+  box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease-out;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+  }
+
+  ul ul a {
+    padding-left: 1.2rem;
+  }
+
+  ul ul ul a {
+    padding-left: 1.9rem;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    color: inherit;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  a.active {
+    background: var(--toc-sheet-active-bg, var(--bs-tertiary-bg, #f8f9fa));
+    font-weight: 700;
+  }
+
+  .header-section-number {
+    margin-right: 0.35rem;
+  }
+}
+
+@starting-style {
+  .toc-sheet:popover-open {
+    transform: translateY(100%);
+  }
+}
+
+.toc-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 0.4rem 0.5rem;
+}
+
+.toc-sheet-label {
+  color: var(--toc-sheet-muted, var(--bs-secondary-color, #6c757d));
+  font-family: var(--bs-font-sans-serif, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.toc-sheet-close {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid var(--toc-sheet-edge, var(--bs-border-color, #dee2e6));
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-sheet {
+    transition: none;
+  }
+}
+
+@media print {
+  .toc-sheet-pill,
+  .toc-sheet {
+    display: none !important;
+  }
+}

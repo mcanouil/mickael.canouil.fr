@@ -1,0 +1,90 @@
+<script id="mobile-toc" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/5961 is fixed.
+    // Quarto hides the side table of contents below the Bootstrap md
+    // breakpoint and shows nothing in its place. Below that width, add a
+    // pill that opens a copy of the list in a bottom sheet (a popover).
+    const toc = document.querySelector("nav#TOC");
+    const list = toc?.querySelector(":scope > ul");
+    if (!list || toc.closest("main") || !Object.hasOwn(HTMLElement.prototype, "popover")) return;
+    if (list.querySelectorAll("a").length < 2) return;
+
+    const label = toc.querySelector("#toc-title")?.textContent.trim() || "Contents";
+    const breakpoint = getComputedStyle(document.documentElement).getPropertyValue("--bs-breakpoint-md").trim() || "768px";
+    const narrow = window.matchMedia(`(width < ${breakpoint})`);
+
+    const build = () => {
+      const sheet = document.createElement("div");
+      sheet.id = "toc-sheet";
+      sheet.className = "toc-sheet";
+      sheet.popover = "auto";
+      sheet.setAttribute("role", "navigation");
+      sheet.setAttribute("aria-labelledby", "toc-sheet-label");
+      sheet.innerHTML =
+        '<div class="toc-sheet-header"><span class="toc-sheet-label" id="toc-sheet-label"></span>' +
+        '<button type="button" class="toc-sheet-close" popovertarget="toc-sheet" popovertargetaction="hide" aria-label="Close">' +
+        '<i class="bi bi-x-lg" aria-hidden="true"></i></button></div>';
+      sheet.querySelector(".toc-sheet-label").textContent = label;
+
+      // The copy drops every id, and the inert that the hidden column may carry.
+      const copy = list.cloneNode(true);
+      copy.removeAttribute("id");
+      copy.inert = false;
+      copy.querySelectorAll("[id], [inert]").forEach((el) => {
+        el.removeAttribute("id");
+        el.inert = false;
+      });
+      sheet.append(copy);
+      const copies = Array.from(copy.querySelectorAll("a"));
+      copy.addEventListener("click", (event) => {
+        if (event.target.closest("a")) sheet.hidePopover();
+      });
+
+      const pill = document.createElement("button");
+      pill.type = "button";
+      pill.className = "toc-sheet-pill";
+      pill.setAttribute("popovertarget", "toc-sheet");
+      pill.innerHTML = '<i class="bi bi-list-nested" aria-hidden="true"></i>';
+      pill.append(label);
+      document.body.append(pill, sheet);
+
+      // quarto.js keeps the hidden original up to date while the page scrolls:
+      // "active" on the current link, and "show" on the nested lists it expands.
+      const sourceNodes = Array.from(list.querySelectorAll("*"));
+      const copyNodes = Array.from(copy.querySelectorAll("*"));
+      const mirror = () => {
+        sourceNodes.forEach((source, i) => {
+          copyNodes[i].className = source.className;
+        });
+        copies.forEach((link) => link.removeAttribute("aria-current"));
+        copies.findLast((link) => link.classList.contains("active"))?.setAttribute("aria-current", "location");
+      };
+      mirror();
+      const observer = new MutationObserver(mirror);
+      observer.observe(list, { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+      return () => {
+        observer.disconnect();
+        if (sheet.matches(":popover-open")) sheet.hidePopover();
+        pill.remove();
+        sheet.remove();
+      };
+    };
+
+    let teardown = null;
+    const sync = () => {
+      if (narrow.matches && !teardown) teardown = build();
+      if (!narrow.matches && teardown) {
+        teardown();
+        teardown = null;
+      }
+    };
+    sync();
+    narrow.addEventListener("change", sync);
+  });
+</script>
