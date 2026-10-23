@@ -1,0 +1,132 @@
+// Table of contents as a panel: the margin TOC, the year TOC and the copy
+// that Quarto moves into a toggle when margin content overlaps the column.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+$_toc-link-font-size: 0.875rem;
+
+// Quarto keeps the margin sidebar sticky below the navbar, and the navbar
+// retracts when scrolling down. A margin on the panel, held inside the
+// sticky box, keeps the same 1rem gap at the top of the page and while it
+// sticks. The sidebar is a grid item, so the margin does not collapse
+// through it. Padding on the sidebar is not usable: Quarto zeroes it with
+// !important. The display property is left to Quarto, which hides the
+// sidebar on narrow screens.
+#quarto-margin-sidebar {
+  nav#TOC {
+    margin-top: 1rem;
+  }
+}
+
+nav#TOC {
+  @include mc-panel();
+  padding: 0.8rem 0.6rem 0.7rem;
+
+  > h2,
+  #toc-title {
+    @include mc-panel-label();
+    margin: 0 0 0.4rem 0.45rem;
+    padding: 0;
+    border: 0;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+  }
+
+  ul > li > a {
+    display: block;
+    min-height: 24px;
+    padding: 0.2rem 0.5rem;
+    border-left: 0;
+    border-radius: var(--mc-radius-item);
+    font-size: $_toc-link-font-size;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  ul ul > li > a {
+    padding-left: 1.2rem;
+  }
+
+  ul ul ul > li > a {
+    padding-left: 1.9rem;
+  }
+
+  .header-section-number {
+    margin-right: 0.35rem;
+  }
+
+  // Quarto sets the active entry colour with !important.
+  ul > li > a.active {
+    @include mc-active-pill();
+    color: var(--mc-ink) !important;
+    border-left: 0;
+  }
+
+  .toc-actions {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--mc-line);
+  }
+}
+
+// When page content scrolls under a side column, quarto.js swaps it for a
+// toggle that opens a copy of it, outside the column. The ids outrank
+// Quarto's #quarto-content .quarto-sidebar-toggle rules.
+#quarto-content #quarto-toc-toggle,
+#quarto-content #quarto-sidebarnav-toggle {
+  @include mc-panel();
+
+  .quarto-sidebar-toggle-title {
+    @include mc-panel-label();
+    margin: 0;
+    padding: 0.55rem 0.8rem 0.5rem 1.05rem;
+    border-bottom: 0;
+    text-align: left;
+  }
+
+  .quarto-sidebar-toggle-icon {
+    margin-right: 0;
+    color: var(--mc-muted);
+  }
+
+  .quarto-sidebar-toggle-contents {
+    padding: 0 0.6rem;
+    background: transparent;
+  }
+
+  &.expanded .quarto-sidebar-toggle-contents {
+    padding-bottom: 0.7rem;
+  }
+
+  nav#TOC {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+
+    > h2 {
+      display: none;
+    }
+  }
+}
+
+// The narrow-screen sheet from _mobile-toc.scss, in this theme's tokens. The
+// mapping sits on the elements, not on :root, so that the dark tokens on
+// body.quarto-dark reach it.
+.toc-sheet-pill,
+.toc-sheet {
+  --toc-sheet-bg: var(--mc-panel-bg);
+  --toc-sheet-fg: var(--mc-ink);
+  --toc-sheet-muted: var(--mc-muted);
+  --toc-sheet-edge: var(--mc-edge-strong);
+  --toc-sheet-active-bg: var(--mc-pill-bg);
+  --toc-sheet-radius: var(--mc-radius-panel);
+  --toc-sheet-item-radius: var(--mc-radius-item);
+  --toc-sheet-font: #{$font-family-system-sans};
+}

@@ -1,0 +1,119 @@
+// Docked sidebar: the column stays flush, the links take the pill style of
+// the table of contents. The copy in the collapsed toggle is styled with the
+// toggle panel in _toc.scss.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+.sidebar.sidebar-navigation {
+  padding-top: 1rem;
+  margin-top: 0;
+}
+
+// Quarto hard-codes the column edge as #dee2e6 with !important, also in the
+// dark bundle, where it is a bright line. Wide content runs into the column
+// and the line would cut through it, so the column has no edge. No
+// quarto-cli issue is filed yet; remove this rule when Quarto themes the edge.
+.sidebar.sidebar-navigation:not(.rollup) {
+  border-right: 0 !important;
+}
+
+#quarto-sidebar,
+#quarto-sidebarnav-toggle {
+  .sidebar-link {
+    display: block;
+    min-height: 24px;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--mc-radius-item);
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .sidebar-link.active {
+    @include mc-active-pill();
+    // Quarto sets the active colour with !important.
+    color: var(--mc-ink) !important;
+  }
+
+  // Bootstrap draws the divider with currentColor at 25% opacity.
+  .sidebar-divider {
+    opacity: 1;
+    border-top-color: var(--mc-line);
+  }
+
+  // Quarto dims the sidebar tools to 0.7.
+  .sidebar-tools-main,
+  .sidebar-tools-collapse,
+  .quarto-navigation-tool {
+    opacity: 1;
+  }
+
+  // Tools row, the counterpart of the actions row of the TOC: it lines up
+  // with the link text and is separated from the list above it by a thin line.
+  .sidebar-tools-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0 0 0.25rem;
+    border-top: 1px solid var(--mc-line);
+  }
+
+  .sidebar-tools-main .quarto-navigation-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
+    color: var(--mc-muted);
+    text-decoration: none;
+
+    // Bootstrap's px-1 utility is !important.
+    padding-inline: 0.25rem !important;
+
+    &:hover {
+      color: var(--mc-gold-text);
+    }
+  }
+}
+
+// The sidebar copy starts with the space kept for the sidebar title, which
+// the toggle title already fills. Bootstrap sets mt-1 on the list with
+// !important.
+#quarto-sidebarnav-toggle .sidebar-menu-container {
+  padding-top: 0;
+
+  > ul:first-child {
+    margin-top: 0 !important;
+  }
+}
+
+// Quarto colours the previous and next page links with the Bootstrap
+// secondary grey, which is 4.49:1 on the light page and 3.86:1 on the dark
+// one. No quarto-cli issue is filed yet; remove this rule when Quarto themes
+// the link colour.
+.page-navigation .pagination-link,
+.page-navigation .pagination-link .nav-page-text {
+  color: var(--mc-muted);
+
+  &:hover {
+    color: var(--mc-gold-text);
+  }
+}
+
+// Quarto fades the breadcrumb on the narrow-screen secondary bar to 3.35:1.
+// No quarto-cli issue is filed yet; remove this rule when Quarto themes the
+// breadcrumb colour.
+.quarto-secondary-nav nav.quarto-page-breadcrumbs .breadcrumb {
+  .breadcrumb-item,
+  .breadcrumb-item a,
+  .breadcrumb-item.active,
+  .breadcrumb-item::before {
+    color: var(--mc-muted);
+  }
+
+  .breadcrumb-item:last-of-type a {
+    color: var(--mc-ink);
+  }
+}
