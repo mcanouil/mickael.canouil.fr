@@ -10,8 +10,10 @@
 -- script `assets/scripts/email.html` restores the real href on load, using the
 -- `window.mcDecodeB64` helper from `assets/scripts/base64.html`.
 --
--- No quarto-cli issue exists yet for the markup that Quarto's own
--- `email-obfuscation` escapes.
+-- Pandoc 3.12 fixed the markup escaping, but Quarto still bundles Pandoc 3.10.
+-- Fix: https://github.com/jgm/pandoc/commit/10e95ba298d568ab7baa48d5866cdb5a46d18fc6
+-- Remove the markup workaround when Quarto bundles Pandoc 3.12 or newer.
+-- The `about` links are https://github.com/quarto-dev/quarto-cli/issues/10023.
 -- Quarto's own `email-obfuscation` is not usable here: `javascript` mode
 -- HTML-escapes the whole anchor, which printed the `iconify-icon` tags of the
 -- mail buttons as literal text, and `references` mode escapes inline markup

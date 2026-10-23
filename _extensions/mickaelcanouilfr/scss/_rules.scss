@@ -432,6 +432,7 @@ img.about-image {
   // breakpoint the column-reverse stack keeps the profile image pinned left.
   // `align-self` on the image beats the container's `align-items` without
   // touching the contents column.
+  // Remove when https://github.com/quarto-dev/quarto-cli/issues/15178 is fixed.
   @media (max-width: $_breakpoint-lg) {
     >.about-image {
       align-self: center;
@@ -589,8 +590,8 @@ $_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
   }
 }
 
-// Quarto's `body .nav-footer` sets border-top to #dee2e6 — match that
-// specificity with `body` prefix.
+// Quarto's `body .nav-footer` sets the border-top from $footer-border-color or
+// $table-border-color — match that specificity with `body` prefix.
 body .nav-footer,
 body .footer {
   border-top: 1px solid rgba($footer-fg, 0.3);
@@ -786,6 +787,7 @@ hr {
 // Other tools (.quarto-navigation-tool) use font-size: .875rem + opacity: .7.
 // The toggle already has .quarto-navigation-tool so it gets those, but the
 // ::before pseudo-element is hardcoded at 1rem.  Override to match.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15179 is fixed.
 .sidebar-navigation .quarto-color-scheme-toggle {
   .bi::before {
     height: 0.875rem;
@@ -835,7 +837,7 @@ hr {
 
 // Quarto applies opacity: 0.6 to .quarto-title .quarto-category which drops
 // link contrast on the dark title banner below WCAG AA. Restore full opacity.
-// No quarto-cli issue exists yet for this workaround.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15167 is fixed.
 .quarto-title .quarto-categories .quarto-category {
   opacity: 1;
 }
@@ -847,7 +849,7 @@ hr {
 // Quarto's `pre.sourceCode { overflow-y: visible !important }` beats Bootstrap's
 // `.visually-hidden { overflow: hidden !important }`, so a screen-reader-only
 // code block keeps a 1px box that scrolls.
-// No quarto-cli issue exists yet for this workaround.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15174 is fixed.
 pre.sourceCode.visually-hidden {
   overflow: hidden !important;
 }
@@ -1769,35 +1771,6 @@ nav span code:not(.sourceCode) {
   color: $sidebar-fg;
 }
 
-// Sidebar search theming (no quarto-cli issue exists yet for the input
-// colour): use $sidebar-fg explicitly because Quarto does not set a `color`
-// on .sidebar-navigation, so `inherit` falls through to body.
-// The .aa-Input override is needed because Quarto's base rule
-// (.aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input) has higher
-// specificity (4 classes) and sets color to $body-color, which can match the
-// sidebar background in dark mode, making the cursor and text invisible.
-.sidebar-search .aa-Form {
-  background-color: transparent;
-  border-color: $sidebar-fg;
-  color: $sidebar-fg;
-
-  .aa-InputWrapper .aa-Input {
-    color: $sidebar-fg;
-    caret-color: $sidebar-fg;
-
-    &::placeholder {
-      color: $sidebar-fg;
-      opacity: 0.5;
-    }
-  }
-
-  .aa-InputWrapperPrefix .aa-Label svg,
-  .aa-InputWrapperPrefix .aa-LoadingIndicator svg {
-    color: $sidebar-fg;
-    opacity: 0.8;
-  }
-}
-
 .sidebar-tools-collapse,
 .sidebar-tools-main {
 
@@ -2618,7 +2591,7 @@ h2,
 
 // Quarto applies opacity: 0.9 to h3-h6 which drops link contrast below WCAG AA.
 // Restore full opacity; visual hierarchy is carried by font-size and weight.
-// No quarto-cli issue exists yet for the h3-h6 opacity.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15169 is fixed.
 h3, .h3,
 h4, .h4,
 h5, .h5,
@@ -3680,7 +3653,7 @@ main .btn-outline-light {
 
 // Quarto hides the off-theme image but keeps its lightbox link, which leaves
 // an empty, invisible tab stop. Hide the link with its image.
-// No quarto-cli issue exists yet for this workaround.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15170 is fixed.
 body.quarto-light a.lightbox:has(> img.dark-content),
 body.quarto-dark a.lightbox:has(> img.light-content) {
   display: none !important;
