@@ -146,11 +146,10 @@ html {
 }
 
 // Enhanced focus states for accessibility
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/15139 is fixed.
 a:focus-visible,
 button:focus-visible,
-.btn:focus-visible,
-div.sourceCode:focus-visible,
-div.cell-output-display:focus-visible {
+.btn:focus-visible {
   outline: 2px solid $body-color;
   outline-offset: 2px;
   transition: outline-offset 0.2s ease;
@@ -337,14 +336,14 @@ pre.code-annotation-code {
 }
 
 // Prevent copy button overlap with code annotation gutter
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/13444 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/15136).
 .code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
   right: 1.5em;
   margin-right: 0;
 }
 
 // Code annotation workaround
-// Workaround: Quarto PR #13429 (still open as of 2026-01)
-// Remove this block once the PR is merged
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/13448 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/13429).
 #code-annotation-line-highlight {
   margin-left: unset;
   width: 100%;
@@ -694,8 +693,8 @@ $_navbar-search-icon-size: $_navbar-control-icon-size * 1.2;
     }
   }
 
-  // Quarto ships the toggle as an inline <a class="… px-1">, so it has no
-  // height of its own and sits on a different baseline to the nav links.
+  // Quarto ships the toggle as a <button class="… px-1"> with no height of
+  // its own, so it sits on a different baseline to the nav links.
   .quarto-navbar-tools {
     display: inline-flex;
     align-items: center;
@@ -1031,6 +1030,7 @@ hr {
 
 // Quarto applies opacity: 0.6 to .quarto-title .quarto-category which drops
 // link contrast on the dark title banner below WCAG AA. Restore full opacity.
+// No quarto-cli issue exists yet for this workaround.
 .quarto-title .quarto-categories .quarto-category {
   opacity: 1;
 }
@@ -2072,8 +2072,9 @@ div.sourceCode {
   color: $sidebar-fg;
 }
 
-// Sidebar search theming: use $sidebar-fg explicitly because Quarto does not
-// set a `color` on .sidebar-navigation, so `inherit` falls through to body.
+// Sidebar search theming (no quarto-cli issue exists yet for the input
+// colour): use $sidebar-fg explicitly because Quarto does not set a `color`
+// on .sidebar-navigation, so `inherit` falls through to body.
 // The .aa-Input override is needed because Quarto's base rule
 // (.aa-DetachedFormContainer .aa-Form .aa-InputWrapper .aa-Input) has higher
 // specificity (4 classes) and sets color to $body-color, which can match the
@@ -3228,31 +3229,9 @@ h2,
   }
 }
 
-// Skip-to-content link. Visually hidden until focused; lands on Quarto's
-// <main id="quarto-document-content">.
-.skip-link {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  z-index: 10000;
-  padding: 0.5rem 1rem;
-  background-color: $body-bg;
-  color: $body-color;
-  border: 2px solid $body-color;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 600;
-
-  &:focus,
-  &:focus-visible {
-    outline: 2px solid $body-color;
-    outline-offset: 2px;
-  }
-}
-
-// Quarto applies opacity: 0.9 to h3-h6 (and to appendix headings) which drops
-// link contrast below WCAG AA. Restore full opacity; visual hierarchy is
-// carried by font-size and weight.
+// Quarto applies opacity: 0.9 to h3-h6 which drops link contrast below WCAG AA.
+// Restore full opacity; visual hierarchy is carried by font-size and weight.
+// No quarto-cli issue exists yet for the h3-h6 opacity.
 h3, .h3,
 h4, .h4,
 h5, .h5,
@@ -3260,6 +3239,9 @@ h6, .h6 {
   opacity: 1;
 }
 
+// Quarto also applies opacity: 0.9 to the appendix, which pushes the footnote
+// back-links below WCAG AA.
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/14679 is fixed.
 #quarto-appendix.default .quarto-appendix-heading,
 #quarto-appendix.default section [role="doc-endnotes"],
 #quarto-appendix.default section > :not(a) {
@@ -4521,6 +4503,7 @@ $talks-muted: rgba($body-color, 0.62);
   color: $mc-accent-link-tint;
 }
 
+// Remove when https://github.com/quarto-dev/quarto-cli/issues/14383 and https://github.com/quarto-dev/quarto-cli/issues/14678 are fixed.
 // Quarto greys summaries with `$text-muted`, which an earlier layer sets to
 // #6c757d (4.49:1 light, 3.85:1 dark) before this theme's defaults load.
 details > summary {
@@ -4555,6 +4538,7 @@ main .btn-outline-light {
 
 // Quarto hides the off-theme image but keeps its lightbox link, which leaves
 // an empty, invisible tab stop. Hide the link with its image.
+// No quarto-cli issue exists yet for this workaround.
 body.quarto-light a.lightbox:has(> img.dark-content),
 body.quarto-dark a.lightbox:has(> img.light-content) {
   display: none !important;

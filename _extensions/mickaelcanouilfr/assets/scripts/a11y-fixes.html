@@ -5,33 +5,24 @@
    * @author Mickaël Canouil
    */
   document.addEventListener("DOMContentLoaded", () => {
-    // Logo link: Quarto emits <a class="navbar-brand-logo"> with an inner <img alt>
-    // but axe sees no accessible name when the img is hidden by CSS.
+    // Logo link: with navbar.logo given as {light, dark}, Quarto writes alt=""
+    // on both images, because website-shared.ts applies logo-alt only when
+    // navbar.logo is a string. The link then has no accessible name.
+    // No quarto-cli issue exists yet for the logo link name.
     document.querySelectorAll("a.navbar-brand-logo:not([aria-label])").forEach((a) => {
       a.setAttribute("aria-label", "Mickaël CANOUIL — home");
     });
 
-    // Color scheme toggle: Quarto adds title= but no aria-label.
-    document.querySelectorAll("a.quarto-color-scheme-toggle:not([aria-label])").forEach((a) => {
-      a.setAttribute("aria-label", a.getAttribute("title") || "Toggle colour scheme");
-    });
-
-    // Navbar search input: Quarto's inline button has no visible label.
-    const searchInput = document.querySelector(
-      ".aa-Input, input.aa-Input, input[placeholder='Search'], input[type='search']"
-    );
-    if (searchInput && !searchInput.getAttribute("aria-label")) {
-      searchInput.setAttribute("aria-label", "Search the site");
-    }
-
-    // CSL bibliography appendix: Quarto emits role="listitem" without role="list"
-    // parent. Promote each listitem itself to a list (it already wraps its own
-    // content); avoids adding role="list" to a parent that also contains
-    // unrelated children (axe rejects buttons inside role="list").
-    document.querySelectorAll('[role="listitem"]').forEach((el) => {
+    // The cite-as entry of the citation appendix: Quarto emits role="listitem"
+    // without a role="list" parent. Removing the role leaves a plain div.
+    // No quarto-cli issue exists yet for the appendix cite-as entry.
+    // Related, for margin citations only: https://github.com/quarto-dev/quarto-cli/issues/14755
+    // Remove when the cite-as entry is fixed upstream.
+    document.querySelectorAll('.quarto-appendix-citeas[role="listitem"]').forEach((el) => {
       el.removeAttribute("role");
     });
 
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/14375 is fixed.
     // Disambiguate duplicate banner landmarks. The Quarto title-block header
     // (page-level) is also a <header>, which axe flags as a duplicate banner
     // role alongside the site navbar. Strip the implicit banner role from the
@@ -44,15 +35,8 @@
     if (titleHeader) {
       titleHeader.setAttribute("role", "presentation");
     }
-    const navbarPrimary = document.querySelector(".navbar");
-    if (navbarPrimary && !navbarPrimary.getAttribute("aria-label")) {
-      navbarPrimary.setAttribute("aria-label", "Primary");
-    }
-    const tocNav = document.querySelector("#TOC, nav#TOC, .sidebar-toc nav");
-    if (tocNav && !tocNav.getAttribute("aria-label")) {
-      tocNav.setAttribute("aria-label", "On this page");
-    }
 
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/14384 is fixed.
     // Listing category sidebar: Quarto emits <h5>Categories</h5> after page <h1>,
     // breaking the heading order. Re-tag to <h2> so the document outline stays
     // monotonic, and put the sidebar block in a labelled landmark.
@@ -63,6 +47,7 @@
       h5.replaceWith(h2);
     });
 
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/14377 is fixed.
     // Wrap orphan listing-category, listing-category-title, margin-header, and
     // title-banner in labelled landmarks so axe's region rule passes. Skip if
     // already inside another landmark (axe rejects nested top-level complementary).
@@ -105,6 +90,7 @@
     document.querySelectorAll(".quarto-title-banner").forEach((el) => labelOnce(el, "region", "Page header"));
     document.querySelectorAll(".quarto-title-meta").forEach((el) => labelOnce(el, "region", "Page metadata"));
 
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/14868 is fixed.
     // Quarto's sidebar-toggle clones the labelled landmarks into a mobile-only
     // container after our handlers run. Suffix the cloned landmarks' labels so
     // axe sees them as unique from the desktop originals.
@@ -121,33 +107,5 @@
     dedupeCloneLandmarks();
     setTimeout(dedupeCloneLandmarks, 50);
     setTimeout(dedupeCloneLandmarks, 250);
-
-    // Code blocks and cell outputs scroll sideways on narrow screens. Make a
-    // block focusable only while it overflows, so keyboard users can scroll it
-    // and wide screens get no extra tab stops. The observer runs after layout
-    // and again whenever a block's size changes, such as when an image loads.
-    // A focused block keeps its tab stop, so a resize never drops focus; the
-    // check runs again when focus leaves.
-    const scrolls = (block) => {
-      const { overflowX } = getComputedStyle(block);
-      return (overflowX === "auto" || overflowX === "scroll") && block.scrollWidth > block.clientWidth;
-    };
-    const syncScrollFocus = (entries) => {
-      const states = entries.map(({ target }) => [target, scrolls(target)]);
-      states.forEach(([block, overflows]) => {
-        if (overflows && !block.hasAttribute("tabindex")) {
-          block.setAttribute("tabindex", "0");
-          block.dataset.scrollFocus = "";
-        } else if (!overflows && "scrollFocus" in block.dataset && document.activeElement !== block) {
-          block.removeAttribute("tabindex");
-          delete block.dataset.scrollFocus;
-        }
-      });
-    };
-    const scrollObserver = new ResizeObserver(syncScrollFocus);
-    document.querySelectorAll("div.sourceCode, div.cell-output-display").forEach((block) => {
-      scrollObserver.observe(block);
-      block.addEventListener("focusout", () => syncScrollFocus([{ target: block }]));
-    });
   });
 </script>

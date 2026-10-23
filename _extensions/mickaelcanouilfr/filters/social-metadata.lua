@@ -15,6 +15,7 @@
 --- manifest links beyond `rel="icon"` have no configuration key. This filter
 --- fills those gaps and nothing else. The canonical link is Quarto's own
 --- `canonical-url`, which the format turns on.
+--- Remove when https://github.com/quarto-dev/quarto-cli/issues/14306 is fixed.
 
 --- Extension name constant
 local EXTENSION_NAME = 'mickaelcanouilfr'
