@@ -268,84 +268,6 @@ a>code {
   text-decoration: underline;
 }
 
-div.sourceCode {
-  background-color: body-mix(95%);
-  border: 1px solid body-mix(50%);
-}
-
-code.sourceCode {
-  // Quarto colours code annotation markers from these properties.
-  --quarto-hl-kw-color: #{$mc-syntax-keyword};
-  --quarto-hl-va-color: #{$mc-syntax-variable};
-  --quarto-hl-co-color: #{$mc-syntax-comment};
-  --quarto-hl-al-color: #{$mc-syntax-alert};
-
-  span.kw, span.cf, span.at, span.bu, span.dt, span.ex, span.pp {
-    color: $mc-syntax-keyword;
-  }
-
-  span.va {
-    color: $mc-syntax-variable;
-  }
-
-  span.co, span.an, span.cv, span.do, span.in, span.re {
-    color: $mc-syntax-comment;
-  }
-
-  span.al, span.er, span.wa {
-    color: $mc-syntax-alert;
-  }
-}
-
-p code.sourceCode,
-li code.sourceCode,
-td code.sourceCode {
-  background-color: inherit;
-}
-
-.code-annotation-gutter {
-  background-color: body-mix(95%);
-}
-
-// Restore consistent vertical padding for code blocks with annotations
-// Quarto removes padding on .code-annotation-code, causing visual inconsistency
-pre.code-annotation-code {
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
-}
-
-// Style code annotation markers as interactive buttons
-.code-annotation-anchor {
-  cursor: pointer;
-  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-  &:hover {
-    transform: scale(1.15);
-  }
-}
-
-// Prevent copy button overlap with code annotation gutter
-// Remove when https://github.com/quarto-dev/quarto-cli/issues/13444 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/15136).
-.code-copy-outer-scaffold:has(.code-annotated)>.code-copy-button {
-  right: 1.5em;
-  margin-right: 0;
-}
-
-// Code annotation workaround
-// Remove when https://github.com/quarto-dev/quarto-cli/issues/13448 is fixed (fix proposed in PR https://github.com/quarto-dev/quarto-cli/pull/13429).
-#code-annotation-line-highlight {
-  margin-left: unset;
-  width: 100%;
-  // Offset highlight to account for restored vertical padding
-  margin-top: 0.4rem;
-}
-
-#code-annotation-line-highlight-gutter,
-.code-annotation-gutter-bg,
-.code-annotation-gutter {
-  all: unset;
-}
-
 // ===========================
 // PRINT PAGINATION STYLES
 // ===========================
@@ -404,71 +326,6 @@ pre.code-annotation-code {
 }
 
 // ===========================
-// CALLOUT STYLING
-// ===========================
-// Callout styling matching Typst: left border in callout colour, subtle background
-// Border colour matches the callout type for visual consistency
-
-.callout {
-  // Override Quarto defaults (!important required to override inline styles)
-  border: none !important;
-  border-left: 4px solid !important;
-  border-radius: 4px !important;
-
-  // Pagination control for print/PDF output
-  page-break-inside: avoid;
-  break-inside: avoid;
-
-  // Subtle background using SCSS mix (computed at build time for browser compatibility)
-  &.callout-note {
-    background-color: mix($callout-color-note, $body-bg, 15%) !important;
-    border-left-color: $callout-color-note !important;
-  }
-
-  &.callout-tip {
-    background-color: mix($callout-color-tip, $body-bg, 15%) !important;
-    border-left-color: $callout-color-tip !important;
-  }
-
-  &.callout-warning {
-    background-color: mix($callout-color-warning, $body-bg, 15%) !important;
-    border-left-color: $callout-color-warning !important;
-  }
-
-  &.callout-important {
-    background-color: mix($callout-color-important, $body-bg, 15%) !important;
-    border-left-color: $callout-color-important !important;
-  }
-
-  &.callout-caution {
-    background-color: mix($callout-color-caution, $body-bg, 15%) !important;
-    border-left-color: $callout-color-caution !important;
-  }
-
-  // Title styling
-  .callout-title-container {
-    font-weight: 600;
-  }
-
-  // Remove edge spacing from first/last elements in callout body (except raw code blocks)
-  &.callout-titled .callout-body> :first-child:not(.sourceCode),
-  &.callout-titled .callout-body>div> :first-child:not(.sourceCode) {
-    padding-top: 0;
-    margin-top: 0;
-  }
-
-  &.callout-titled .callout-body> :last-child:not(.sourceCode),
-  &.callout-titled .callout-body>div> :last-child:not(.sourceCode) {
-    padding-bottom: 0;
-    margin-bottom: 0;
-  }
-
-  &.callout-style-default .callout-body {
-    padding: .5em;
-  }
-}
-
-// ===========================
 // BOOTSTRAP COMPONENTS
 // ===========================
 
@@ -480,29 +337,6 @@ pre.code-annotation-code {
     color: unset;
     background-color: unset;
   }
-}
-
-// Navigation Tabs
-.nav-tabs {
-  border-bottom: 1px solid $body-color;
-
-  .nav-link.active,
-  .nav-item.show .nav-link {
-    color: $body-color;
-    background-color: $body-bg;
-    border-color: $body-color;
-  }
-
-  .nav-link,
-  .nav-pills .nav-link {
-    color: $body-color;
-  }
-}
-
-// Tab content borders (Quarto/Bootstrap default is #dee2e6)
-.tab-content {
-  border-color: rgba($body-color, 0.15);
-  background-color: $body-bg;
 }
 
 // Tooltips
@@ -777,24 +611,6 @@ hr {
   color: $body-color;
   border-top-color: $body-color;
   opacity: 0.25;
-}
-
-// Appendix: override Quarto's #dee2e6 border default and pin colour to body
-// so dark mode keeps readable contrast (Quarto sets no explicit colour and
-// the inline code rule above paints a stray background on the bibtex code).
-#quarto-appendix.default {
-  border-top-color: rgba($body-color, 0.15);
-
-  .quarto-appendix-bibtex,
-  .quarto-appendix-citeas {
-    border-color: rgba($body-color, 0.15);
-    color: $body-color;
-  }
-
-  .quarto-appendix-bibtex code.sourceCode {
-    color: inherit;
-    background-color: transparent;
-  }
 }
 
 .nav-footer-center {
@@ -1915,122 +1731,6 @@ nav span code:not(.sourceCode) {
   border: 1px solid rgba($body-color, 0.12);
 }
 
-div.sourceCode {
-  border-radius: $_radius-md;
-}
-
-// Code with filename wrapper (multi-style code window)
-.code-with-filename {
-  margin: 1em 0;
-  border: 1px solid rgba($body-color, 0.5);
-  border-radius: $_radius-md;
-  overflow: hidden;
-
-  // Filename header (title bar)
-  .code-with-filename-file {
-    background-color: body-mix(92%);
-
-    .quarto-dark & {
-      background-color: body-mix(92%);
-    }
-
-    border-bottom: 1px solid rgba($body-color, 0.5);
-    padding: 0.2em 1em;
-    line-height: 1.2;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    transition: $_link-transition;
-
-    pre {
-      margin: 0;
-      padding: 0;
-      background-color: transparent;
-      border: none;
-      font-size: 0.85em;
-      font-weight: 500;
-      font-family: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
-      flex-grow: 1;
-
-      strong {
-        font-weight: 500;
-      }
-    }
-  }
-
-  // Code block immediately after filename
-  .code-copy-outer-scaffold,
-  div.sourceCode {
-    margin-top: 0;
-    border-radius: 0;
-    border: none;
-  }
-
-  // Remove top border from nested code block
-  div.sourceCode {
-    border-top: none;
-  }
-
-  // Auto-generated filenames display in simulated small caps (uppercase, smaller)
-  &.code-window-auto {
-    .code-with-filename-file pre strong {
-      text-transform: uppercase;
-      font-size: 0.8em;
-    }
-  }
-}
-
-// Style: default (plain filename, no decorations)
-.code-with-filename.code-window-default .code-with-filename-file pre {
-  text-align: left;
-}
-
-// Style: macOS (traffic lights left, filename right)
-.code-with-filename.code-window-macos .code-with-filename-file {
-  &::before {
-    content: "";
-    display: inline-flex;
-    flex-shrink: 0;
-    width: 52px;
-    height: 12px;
-    margin-right: 8px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12'%3E%3Ccircle cx='6' cy='6' r='5' fill='%23ff5f56'/%3E%3Ccircle cx='24' cy='6' r='5' fill='%23ffbd2e'/%3E%3Ccircle cx='42' cy='6' r='5' fill='%2327c93f'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-
-  pre {
-    text-align: right;
-  }
-}
-
-// Style: Windows (filename left, window buttons right)
-.code-with-filename.code-window-windows .code-with-filename-file {
-  pre {
-    text-align: left;
-  }
-
-  &::after {
-    content: '';
-    display: inline-flex;
-    flex-shrink: 0;
-    width: 3.6em;
-    height: 0.85em;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' fill='none'%3E%3Cline x1='3' y1='5' x2='11' y2='5' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3Crect x='17' y='1' width='8' height='8' rx='1' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3Cline x1='31' y1='1' x2='39' y2='9' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='39' y1='1' x2='31' y2='9' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-position: right;
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-}
-
-.code-copy-button {
-  transition: all $_anim-fast ease;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-}
-
 // ===========================
 // SEARCH & INTERACTION
 // ===========================
@@ -2926,91 +2626,6 @@ h6, .h6 {
   opacity: 1;
 }
 
-// Quarto also applies opacity: 0.9 to the appendix, which pushes the footnote
-// back-links below WCAG AA.
-// Remove when https://github.com/quarto-dev/quarto-cli/issues/14679 is fixed.
-#quarto-appendix.default .quarto-appendix-heading,
-#quarto-appendix.default section [role="doc-endnotes"],
-#quarto-appendix.default section > :not(a) {
-  opacity: 1;
-}
-
-// Animated underlines for section headings in main content
-main {
-
-  // Top-level headings keep gold accent colour. Use $mc-accent-link so light
-  // mode passes WCAG AA on the paper background; dark mode keeps brand gold.
-  h2.anchored:not(:where(.quarto-listing *)) {
-    color: $mc-accent-link;
-  }
-
-  h2.anchored:not(:where(.quarto-listing *)),
-  h3.anchored:not(:where(.quarto-listing *)),
-  h4.anchored:not(:where(.quarto-listing *)),
-  h5.anchored:not(:where(.quarto-listing *)) {
-    position: relative;
-    transition: all $_anim-standard $_easing-standard;
-    cursor: default;
-    padding-bottom: 4px;
-
-    // Remove default border for animated version
-    border-bottom: none !important;
-
-    // Gradient underline: always visible, extends on hover
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 40px;
-      height: 2px;
-      background: linear-gradient(90deg,
-          $body-color 0%,
-          rgba($body-color, 0.4) 100%);
-      transition: width $_anim-slow $_easing-standard;
-      border-radius: 1px;
-    }
-
-    &:hover::after {
-      width: 80px;
-    }
-  }
-
-  // Per-level resting/hover widths, thickness, section-number prominence.
-  @each $level, $w, $w-hover, $h, $r, $num-weight, $num-size in (
-    (h2, 50px, 100px, 4px, 2px, 700, 1em),
-    (h3, 40px, 80px, 3px, 1.5px, 600, 0.9em),
-    (h4, 30px, 60px, 2px, 1px, 500, 0.85em),
-    (h5, 25px, 50px, 1.5px, 1px, 500, 0.8em),
-  ) {
-    #{$level}.anchored:not(:where(.quarto-listing *)) {
-      &::after {
-        width: $w;
-        height: $h;
-        border-radius: $r;
-      }
-
-      &:hover::after {
-        width: $w-hover;
-      }
-
-      .header-section-number {
-        transition: $_link-transition;
-        opacity: 0.85;
-        margin-right: 0.5em;
-        font-weight: $num-weight;
-        font-size: $num-size;
-        @if $level == h2 { margin-right: 0.6em; }
-      }
-
-      &:hover .header-section-number {
-        opacity: 1;
-        transform: translateX(-2px);
-      }
-    }
-  }
-}
-
 // ===========================
 // KEYFRAME ANIMATIONS
 // ===========================
@@ -3038,59 +2653,8 @@ main {
 // ACCESSIBILITY & REDUCED MOTION
 // ===========================
 
-// ---------------------------
-// BLOCKQUOTE WITH CURLY QUOTES
-// ---------------------------
-blockquote {
-  position: relative;
-  margin: 1.5em 0;
-  padding: 1.5em 2em 1.5em 3em;
-  background-color: body-mix(98%);
-  border-left: 4px solid body-mix(70%);
-  border-radius: $_radius-sm;
-  font-style: italic;
-
-  // Opening curly quote (top-left)
-  &::before {
-    content: '\201C';
-    position: absolute;
-    top: 0.1em;
-    left: 0.3em;
-    font-size: 3em;
-    line-height: 1;
-    color: body-mix(70%);
-    font-family: Georgia, serif;
-    font-style: normal;
-  }
-
-  // Closing curly quote (bottom-right)
-  &::after {
-    content: '\201D';
-    position: absolute;
-    bottom: -0.3em;
-    right: 0.3em;
-    font-size: 3em;
-    line-height: 1;
-    color: body-mix(70%);
-    font-family: Georgia, serif;
-    font-style: normal;
-  }
-
-  > :first-child {
-    margin-top: 0;
-  }
-
-  > :last-child {
-    margin-bottom: 0;
-  }
-}
-
 a.navbar-brand {
   display: none;
-}
-
-.code-with-filename:not(.code-window-windows) .code-with-filename-file::after {
-  width: 0px !important;
 }
 
 .slide-deck {
@@ -3542,40 +3106,6 @@ main,
       }
     }
   }
-}
-
-// Footnotes block — neutralise every Quarto/Bootstrap tint so the page bg
-// shows through uniformly. Single hairline rule above, no nested bands.
-section.footnotes,
-section.footnotes hr,
-section.footnotes ol,
-section.footnotes li,
-section.footnotes p,
-.footnotes,
-.footnotes hr,
-.footnotes ol,
-.footnotes li,
-.footnotes p,
-#footnotes,
-.footnote-back,
-.footnote-ref {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-section.footnotes,
-.footnotes {
-  margin-top: 2rem;
-  padding-top: 0;
-  border-top: 0;
-}
-
-section.footnotes > hr,
-.footnotes > hr {
-  border: 0;
-  border-top: 1px solid $mc-rule-web;
-  margin: 0 0 1rem;
-  padding: 0;
 }
 
 // =============================================================================
@@ -4123,11 +3653,6 @@ $talks-muted: rgba($body-color, 0.62);
 // CONTRAST OVERRIDES
 // ===========================
 
-.callout .callout-body a:not(.btn),
-.callout .callout-title-container a:not(.btn) {
-  color: $mc-accent-link-tint;
-}
-
 // Remove when https://github.com/quarto-dev/quarto-cli/issues/14383 and https://github.com/quarto-dev/quarto-cli/issues/14678 are fixed.
 // Quarto greys summaries with `$text-muted`, which an earlier layer sets to
 // #6c757d (4.49:1 light, 3.85:1 dark) before this theme's defaults load.
@@ -4137,14 +3662,6 @@ details > summary {
 
 // The extension stylesheets below load after the theme, so these selectors
 // carry an extra type selector to win.
-
-// code-window greys the filename to 50% of the text colour (3.04:1).
-// Long paths wrap so the title bar never scrolls on narrow screens.
-div.code-with-filename .code-with-filename-file pre {
-  color: rgba($body-color, 0.72);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 
 // gitlink fades its badge to 70%, which drops the text below 3:1.
 span.gitlink-badge {

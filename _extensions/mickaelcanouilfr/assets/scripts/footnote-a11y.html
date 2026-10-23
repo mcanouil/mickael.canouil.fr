@@ -1,0 +1,18 @@
+<script id="footnote-a11y" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/15064 is fixed.
+    // The back-link of a footnote is only an arrow glyph, which a screen
+    // reader reads as "return" or nothing. Name it after the note.
+    document.querySelectorAll("section.footnotes .footnote-back").forEach((link) => {
+      const note = link.closest("li[id^='fn']");
+      const number = note ? note.id.replace("fn", "") : "";
+      if (!/^\d+$/.test(number)) return;
+      link.setAttribute("aria-label", `Back to note ${number} in the text`);
+    });
+  });
+</script>

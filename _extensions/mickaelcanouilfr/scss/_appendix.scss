@@ -1,0 +1,71 @@
+// Citation appendix as one panel. The sections (Reuse, Citation) keep
+// Quarto's DOM order, which is also the visual and the tab order. A line
+// separates the sections, each heading is a panel label and the "cite as"
+// entry has a gold inset bar.
+//
+// The BibTeX block keeps Quarto's markup and its copy button. Its code block
+// style comes from _code.scss.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+#quarto-appendix.default {
+  @include mc-panel();
+  margin-top: 2rem;
+  padding: 0.25rem 1.25rem;
+  color: var(--mc-ink);
+
+  section {
+    padding: 1rem 0;
+
+    & + section {
+      border-top: 1px solid var(--mc-line);
+    }
+  }
+
+  // Quarto fades the appendix to opacity 0.9, which pulls the footnote
+  // back-links and the licence link below AA.
+  // Remove the opacity rules when
+  // https://github.com/quarto-dev/quarto-cli/issues/14679 is fixed.
+  .quarto-appendix-heading,
+  section [role="doc-endnotes"],
+  section > :not(a) {
+    opacity: 1;
+  }
+
+  // The page-body heading rules in _headings.scss skip this heading with
+  // :not(.quarto-appendix-heading), so it takes the panel label style alone.
+  .quarto-appendix-heading.anchored {
+    @include mc-panel-label();
+    // Quarto sets the heading size with !important, so the label size needs it too.
+    font-size: 0.75rem !important;
+    margin: 0 0 0.5rem;
+    border: 0;
+    line-height: 1.4;
+  }
+
+  .quarto-appendix-secondary-label {
+    margin-bottom: 0.4rem;
+    color: var(--mc-muted);
+  }
+
+  .quarto-appendix-bibtex {
+    margin-bottom: 1rem;
+    border-color: var(--mc-line);
+    color: var(--mc-ink);
+
+    code.sourceCode {
+      color: inherit;
+      background-color: transparent;
+    }
+  }
+
+  .quarto-appendix-citeas {
+    @include mc-inset-bar();
+    margin-bottom: 0;
+    padding: 0.5rem 0 0.5rem 1.375rem;
+    border: 0;
+    color: var(--mc-ink);
+  }
+}

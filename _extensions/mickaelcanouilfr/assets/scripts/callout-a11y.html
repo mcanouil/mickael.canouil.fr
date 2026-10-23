@@ -1,0 +1,57 @@
+<script id="callout-a11y" type="text/javascript">
+  /**
+   * @license MIT
+   * @copyright 2026 Mickaël Canouil
+   * @author Mickaël Canouil
+   */
+  document.addEventListener("DOMContentLoaded", () => {
+    // In every titled callout, the hidden type label runs into the title,
+    // giving "NoteTitle". No quarto-cli issue exists yet for the missing space.
+    document.querySelectorAll(".callout .callout-title-container > .screen-reader-only").forEach((label) => {
+      if (!/\s$/.test(label.textContent)) label.append(" ");
+    });
+
+    // Remove when https://github.com/quarto-dev/quarto-cli/issues/4934 is fixed.
+    // The header of a collapsible callout is a plain div with aria-expanded,
+    // no role and no tab stop, and its aria-label hides the title.
+    // Give the header a button role, a tab stop, and Enter and Space.
+    // Bootstrap keeps aria-expanded in step and hides the closed body with
+    // display: none, so the body needs no inert.
+    // A link in the title cannot sit inside a button, and Bootstrap cancels
+    // a click on a link inside its trigger. Then the chevron becomes the
+    // button: the toggle attributes move to it, and the title link only
+    // follows its href.
+    const moved = ["data-bs-toggle", "data-bs-target", "aria-controls", "aria-expanded"];
+    document.querySelectorAll(".callout > .callout-header[data-bs-toggle='collapse']").forEach((header) => {
+      header.removeAttribute("aria-label");
+
+      const title = header.querySelector(".callout-title-container");
+      header.querySelectorAll(".callout-icon, .callout-toggle").forEach((icon) => {
+        icon.setAttribute("aria-hidden", "true");
+      });
+
+      let control = header;
+      const chevron = header.querySelector(":scope > .callout-btn-toggle");
+      if (chevron && title?.querySelector("a[href], button, input, select, textarea")) {
+        control = chevron;
+        moved.forEach((name) => {
+          control.setAttribute(name, header.getAttribute(name));
+          header.removeAttribute(name);
+        });
+        control.setAttribute("aria-label", title.textContent.trim());
+      }
+      control.setAttribute("role", "button");
+      control.setAttribute("tabindex", "0");
+
+      control.addEventListener("keydown", (event) => {
+        // Keys pressed on a link or another control in the title are theirs.
+        if (event.target !== control) return;
+        if (event.key !== "Enter" && event.key !== " ") return;
+        if (event.ctrlKey || event.altKey || event.metaKey) return;
+        // Space would scroll the page.
+        event.preventDefault();
+        if (!event.repeat) control.click();
+      });
+    });
+  });
+</script>
