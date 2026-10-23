@@ -1,0 +1,88 @@
+// Panel tokens and shapes shared by the navigation chrome and content blocks.
+//
+// Light values go on :root and dark values on body.quarto-dark.
+// Quarto keeps the light stylesheet enabled in dark mode and layers the dark
+// one on top, and it can also add a second copy of the light stylesheet after
+// the dark one. The stronger body.quarto-dark selector wins in dark mode
+// whatever the stylesheet order, and the light-only tokens below still apply.
+// Each bundle emits only its own scheme, chosen by $mc-scheme from
+// _defaults.scss or _dark.scss.
+//
+// @license MIT
+// @copyright 2026 Mickaël Canouil
+// @author Mickaël Canouil
+
+$_mc-colour-tokens: (
+  "page-bg": $body-bg,
+  "panel-bg": $mc-panel-bg,
+  "ink": $body-color,
+  "muted": $mc-muted,
+  "gold": $mc-accent,
+  "gold-text": $mc-accent-link,
+  "edge": $mc-edge,
+  "edge-strong": $mc-edge-strong,
+  "line": $mc-line,
+  "pill-bg": $mc-pill-bg,
+);
+
+@if $mc-scheme == "dark" {
+  body.quarto-dark {
+    @each $name, $value in $_mc-colour-tokens {
+      --mc-#{$name}: #{$value};
+    }
+  }
+} @else {
+  :root {
+    @each $name, $value in $_mc-colour-tokens {
+      --mc-#{$name}: #{$value};
+    }
+    --mc-radius-panel: 12px;
+    --mc-radius-item: 8px;
+    --mc-bar-width: 5px;
+    --mc-shadow-panel: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Panel surface with a gold hairline edge, the panel radius and a soft shadow.
+@mixin mc-panel() {
+  background: var(--mc-panel-bg);
+  border: 1px solid var(--mc-edge);
+  border-radius: var(--mc-radius-panel);
+  box-shadow: var(--mc-shadow-panel);
+}
+
+// Small upper-case label in the system sans and the muted colour.
+@mixin mc-panel-label() {
+  font-family: $font-family-system-sans;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mc-muted);
+}
+
+// Decorative bar with rounded ends, inside the left edge of the element.
+@mixin mc-inset-bar($colour: var(--mc-gold)) {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.375rem;
+    width: var(--mc-bar-width);
+    border-radius: calc(var(--mc-bar-width) / 2);
+    background: $colour;
+    pointer-events: none;
+  }
+}
+
+// Active item: gold tint over the panel, with bold ink text. Resting items
+// use the same --mc-radius-item, so an entry that wraps keeps its shape.
+@mixin mc-active-pill() {
+  background: var(--mc-pill-bg);
+  color: var(--mc-ink);
+  font-weight: 700;
+  border-radius: var(--mc-radius-item);
+}
