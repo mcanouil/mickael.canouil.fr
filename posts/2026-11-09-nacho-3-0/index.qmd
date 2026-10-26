@@ -1,0 +1,369 @@
+---
+title: "NACHO 3.0: A New Object, a New App and a New Report"
+description: |
+  NACHO 3.0.0 replaces the big S3 list with an S7 object, and gives the Shiny app, the report and the website a new look.
+  This post compares it with NACHO 2.0.7 and shows how to move your code and your saved objects.
+date: "2026-11-09"
+categories:
+  - r
+  - shiny
+  - quarto
+  - typst
+  - nacho
+image: featured.png
+image-alt: |
+  A card titled NACHO 3, with the line "A new object, app and report." and the NACHO hexagon logo on a dark navy background.
+  Beside the title, two overlapping screenshots of the app: the orange NACHO 2.0.7 app behind, and the dark NACHO 3.0.0 app in front.
+number-sections: false
+engine: markdown
+resources:
+  - assets/output/nacho-report.pdf
+alt-text:
+  app-old-qc: |
+    The QC Metrics page of NACHO 2.0.7: an orange navbar, a column of sliders called QC Thresholds on the left, and four plots on the right for binding density, field of view, positive control linearity and limit of detection.
+  app-new-qc-light: |
+    The QC metrics page of NACHO 3.0.0 in light mode: a navy navbar with eight pages, a summary strip, a collapsible sidebar of thresholds, and four plot cards.
+  app-new-qc-dark: |
+    The same QC metrics page of NACHO 3.0.0 in dark mode, where the page, the cards and the plots all use dark colours.
+  app-new-tour: |
+    A short recording of the NACHO 3.0.0 app on the example data: a threshold moves, the summary strip shows a flagged sample, and the pages and the Export page follow.
+  app-tour: |
+    The guided tour of the app: a popover over the Thresholds sidebar says what the sidebar does, and the rest of the page is dimmed.
+  app-upload-preview: |
+    The Data page after two files were chosen: a table lists each RCC file, the zip archive it came from, whether it is a PlexSet file and whether the sample sheet lists it.
+  app-selected-samples: |
+    The Samples page: a sortable table with one row per sample, flagged samples first, and the selected sample outlined in the plots beside it.
+  app-export: |
+    The Export page with the downloads for the quality-control table, the thresholds and the object, a report ready to download, and the Reproduce in R card holding an R script.
+  site-old-home: |
+    The home page of the NACHO 2.0.7 website: a plain title, the installation code and a long overview, with the links in a sidebar.
+  site-new-home-light: |
+    The home page of the NACHO 3.0.0 website in light mode: a dark banner with a headline, an install command and a screenshot of the app, then three steps called Load, Check and Share.
+  site-new-home-dark: |
+    The same home page in dark mode.
+  report-old-top: |
+    The top of the NACHO 2.0.7 report: a title, a numbered list of settings and the first plots, with no summary of the decision.
+  report-new-top: |
+    The top of the NACHO 3.0.0 HTML report: a navy cover with the study title, the author and the study details, then a decision summary with three counts and a table of settings.
+---
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+**NACHO 3.0.0** is on CRAN.
+NACHO reads NanoString nCounter data, flags the samples that fail quality control, and normalises the counts.
+This release rebuilds the object, the Shiny app, the report and the website.
+This post compares it with NACHO 2.0.7, so you can see what changed and decide when to move.
+
+::: {.highlight}
+
+**NACHO 3.0.0** is available from CRAN with `install.packages("NACHO")`, and the [package website](https://m.canouil.dev/NACHO/) has the documentation.
+
+:::
+
+## Why NACHO 3
+
+NACHO 2 did its job, but three things got in the way.
+
+- The object was a big S3 list.
+  The counts, the samples and the probes lived in one long table called `$nacho`, and every sample column was repeated on every probe row.
+  It was hard to read and hard to subset.
+- The app and the website looked dated.
+  Their style and their chrome had aged, and the two did not match.
+- The report could be better.
+  Quarto and Typst make a much better report possible, as a self-contained HTML file and as a PDF.
+
+## The Object
+
+`load_rcc()` and `normalise()` now return an S7 object of class `nacho`.
+In NACHO 2.0.7 the same call gave a list, and `$nacho` held 3456 rows and 86 columns for the 72 probes of 48 samples.
+
+```r
+library(NACHO)
+
+x <- GSE74821
+dim(x$nacho) # NACHO 2.0.7
+#> [1] 3456   86
+```
+
+In NACHO 3 the object keeps the counts, the samples and the probes apart, and you read each one with an accessor.
+
+```r
+x <- GSE74821
+x
+#> <nacho> 48 samples, 72 probes, from single-sample RCC files
+#> Normalisation: GLM, with 8 housekeeping genes
+#> Flagged samples: 0 of 48
+
+dim(nacho_counts(x))
+#> [1] 72 48
+```
+
+`nacho_counts()` returns a matrix, `nacho_samples()` and `nacho_probes()` return one row per sample and per probe, and `as.data.frame(x, long = TRUE)` gives the old long table back when you need it for `ggplot2` or `dplyr`.
+
+The quality-control flags changed too.
+`nacho_qc()` gives one row per sample, with a status for each metric, the number of flags and a readable reason.
+
+```r
+head(nacho_qc(x)[, c("IDFILE", "status", "n_flags", "reason")], n = 3)
+```
+
+You can also subset the object like a matrix.
+`x[, 1:12]` keeps the first twelve samples and `x[i, ]` keeps probes, and both compute the PCA and the flags again.
+
+## A New App
+
+The two screenshots below show the same page, the quality-control metrics, in 2.0.7 and in 3.0.0.
+
+::: {layout-ncol="2" style="text-align:center;"}
+
+![**NACHO 2.0.7**](assets/media/app-old-qc.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.app-old-qc >}}'
+}
+
+![**NACHO 3.0.0**](assets/media/app-new-qc-light.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.app-new-qc-light >}}'
+}
+
+:::
+
+The app now has one navy navbar with eight pages, and one sidebar that holds every threshold.
+The sidebar folds its sections, and each page opens the section that matches it.
+A summary strip at the top of every page shows the samples, the cartridges, the flagged samples with their reasons, and the method.
+Each plot sits in a card that opens full screen, and a toggle in the navbar switches the whole app to dark mode.
+
+![The quality-control metrics page of NACHO 3.0.0 in dark mode.](assets/media/app-new-qc-dark.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.app-new-qc-dark >}}'
+}
+
+The recording below shows a short session on the example data.
+
+![A short session of the NACHO 3.0.0 app on the example data.](assets/media/app-new-tour.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  width="600px"
+  fig-alt='{{< meta alt-text.app-new-tour >}}'
+}
+
+### Guided Tour
+
+The Help menu in the navbar starts a guided tour of the app.
+When no data are loaded, the tour loads the example data first.
+
+![The guided tour of the app.](assets/media/app-tour.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  width="600px"
+  fig-alt='{{< meta alt-text.app-tour >}}'
+}
+
+Each threshold has a help popover next to it, and the pages without data say what to do.
+Errors from an upload and warnings from the normalisation show once, as toasts.
+
+### Loading Data
+
+When you choose files, the Data page lists the RCC files of the upload before you import anything.
+It also looks inside zip archives, and says for each file whether it is a PlexSet file and whether the sample sheet lists it.
+
+![The preview of an upload on the Data page.](assets/media/app-upload-preview.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  width="600px"
+  fig-alt='{{< meta alt-text.app-upload-preview >}}'
+}
+
+### Samples
+
+The Samples page lists every sample in one table, with the flagged ones first and the status as a coloured word.
+With `reactable` installed, you can sort and search the table, and a click on a row selects that sample in the plots.
+With `ggiraph` installed, hovering over a point shows the sample, and clicking it outlines that sample in every plot.
+
+![The Samples page, with one sample selected.](assets/media/app-selected-samples.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  width="600px"
+  fig-alt='{{< meta alt-text.app-selected-samples >}}'
+}
+
+### Export
+
+The Export page writes the thresholds you tuned to a YAML file, and the Preset section of the sidebar loads that file again, so one set of limits can serve every study.
+The same page downloads the quality-control table, the object and the report.
+The report renders in the background when `mirai` is installed, so the app stays usable.
+
+The Export page also has a **Reproduce in R** card.
+It shows an R script that repeats your session with `load_rcc()`, `normalise()` and the thresholds you set.
+
+![The Export page and its Reproduce in R card.](assets/media/app-export.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  width="600px"
+  fig-alt='{{< meta alt-text.app-export >}}'
+}
+
+## A New Website
+
+The website got the same treatment as the app.
+Here is the home page in 2.0.7 and in 3.0.0.
+
+::: {layout-ncol="2" style="text-align:center;"}
+
+![**NACHO 2.0.7**](assets/media/site-old-home.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.site-old-home >}}'
+}
+
+![**NACHO 3.0.0**](assets/media/site-new-home-light.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.site-new-home-light >}}'
+}
+
+:::
+
+The app, the report and the website now share one brand file, with the Source Sans 3 and JetBrains Mono fonts.
+The package ships that file, so the three look the same, even offline.
+The website also follows your light or dark preference.
+
+![The NACHO 3.0.0 home page in dark mode.](assets/media/site-new-home-dark.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.site-new-home-dark >}}'
+}
+
+The plots follow the brand as well.
+Groups take the Okabe-Ito colours, a palette designed for colour vision deficiency, and a flagged sample is a rust triangle instead of a red point.
+
+## A Better Report
+
+`render()` now builds the report with Quarto, and not with R Markdown.
+The same content comes out as a self-contained HTML file, or as a PDF made by Typst with `format = "typst"`.
+
+```r
+render(nacho, output_dir = "reports", title = "Example study", author = "Your Name")
+render(nacho, output_dir = "reports", format = "typst")
+```
+
+The report is now a quality-control record.
+Here are the tops of the 2.0.7 and the 3.0.0 HTML reports.
+
+::: {layout-ncol="2" style="text-align:center;"}
+
+![**NACHO 2.0.7**](assets/media/report-old-top.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.report-old-top >}}'
+}
+
+![**NACHO 3.0.0**](assets/media/report-new-top.webp){
+  .img-fluid .hero-art
+  fig-align="center"
+  fig-alt='{{< meta alt-text.report-new-top >}}'
+}
+
+:::
+
+It opens with a cover that holds the study details, then a summary of the decision with the flagged samples.
+A table lists every setting and limit with its meaning and its source.
+Each figure and table has a short "How to read this", and an appendix gives the methods, the citation and the package versions.
+With `group`, the report adds the batch design and warns when the batches and the biology are confounded.
+
+The PDF has the same content and the same look.
+It is a tagged PDF that declares PDF/UA-1, and Typst checks it against the rules of that standard that it can enforce.
+The HTML report has landmarks, a skip link and labelled tables.
+Below is the PDF of the example data.
+
+::: {style="text-align: center;"}
+
+![The NACHO report of the example data, as a PDF.](assets/output/nacho-report.pdf){
+  .hero-art
+  .slide-deck
+  loading="lazy"
+  title="Typst PDF report of the NACHO example data"
+}
+
+:::
+
+Open it full size: [Typst PDF](assets/output/nacho-report.pdf){target="_blank" rel="noopener noreferrer"}.
+
+::: {.callout-note}
+
+The report needs the Quarto command-line interface 1.9.18 or newer.
+RStudio and Positron bundle it.
+
+:::
+
+## Changes in Results
+
+The same RCC files can give a different answer in NACHO 3, so here is what changes by default.
+
+- Samples are flagged against the nSolver thresholds, where NACHO 2 used its own limits.
+- Negative probes are excluded with Bruker's rule, which drops at most two probes that sit 3-fold above the others.
+- Normalised counts are no longer rounded, and no longer floored at 0.1.
+- There is no background correction by default.
+- miRNA panels are no longer normalised with housekeeping genes by default, because their housekeeping mRNAs sit at background.
+
+If you need the NACHO 2 behaviour, the `legacy` preset gives back the old limits.
+With a background correction on top, it also gives back the old outlier calls.
+
+```r
+nacho <- load_rcc(
+  data_directory,
+  ssheet_csv,
+  id_colname = "IDFILE",
+  preset = "legacy",
+  background = "geo",
+  background_mode = "subtract"
+)
+```
+
+## Moving From NACHO 2
+
+You do not have to move.
+NACHO 2.0.8 keeps working with the code you have, and you can pin it, for example with `renv::install("NACHO@2.0.8")`.
+NACHO 3 needs R 4.3 or newer.
+
+To move, convert the objects you saved.
+`read_nacho()` reads a file saved by any NACHO version, and `upgrade_nacho()` converts an object that is already in your session.
+
+```r
+nacho <- read_nacho("nacho-2-object.rds")
+```
+
+The conversion keeps the raw counts, the sample sheet, the settings and the thresholds.
+It then moves the object to the legacy preset, so the flags stay close to what NACHO 2 gave you.
+Use `normalise()` when you want the nSolver preset.
+
+A few calls changed as well.
+
+- `autoplot(x, x = "BD")` is now `autoplot(x, type = "BD")`.
+- `normalise(x, remove_outliers = TRUE)` is now `exclude_outliers(x)`.
+- `x$nacho` is now `as.data.frame(x, long = TRUE)`.
+- `deploy()` has no default `directory` any more.
+
+The article [Moving from NACHO 2](https://m.canouil.dev/NACHO/articles/moving-from-nacho-2.html) on the website maps each NACHO 2 call to its NACHO 3 version.
+
+## Other Changes
+
+- Loading 768 samples takes about 2.5 seconds, against about 9 in NACHO 2.
+- `nacho_thresholds()` builds the thresholds for the MAX, FLEX, PRO and SPRINT instruments, and `load_rcc()` reads the instrument from MAX and FLEX files.
+- `normalisation_method = "RUVg"` removes unwanted variation, and `housekeeping_stability()` ranks the reference genes with geNorm and NormFinder.
+- `batch_diagnostics()` crosses the study groups with the cartridges and the dates.
+- `as_summarized_experiment()` and `as_nacho()` convert between a `nacho` object and a `SummarizedExperiment`.
+- Errors, warnings and messages carry classes such as `nacho_error_bad_argument`, so your code can catch the ones it expects.
+
+The [changelog](https://m.canouil.dev/NACHO/news/index.html) holds the full list.
+
+Happy quality controlling!
