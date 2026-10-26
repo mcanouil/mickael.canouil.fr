@@ -94,6 +94,8 @@ dim(x$nacho)
 In NACHO 3 the object keeps the counts, the samples and the probes apart, and you read each one with an accessor.
 
 ```r
+library(NACHO)
+
 x <- GSE74821
 x
 #> <nacho> 48 samples, 72 probes, from single-sample RCC files
@@ -119,7 +121,7 @@ head(nacho_qc(x)[, c("status", "n_flags", "reason")], n = 3)
 ```
 
 You can also subset the object like a matrix.
-`x[, 1:12]` keeps the first twelve samples and `x[i, ]` keeps probes, and both compute the PCA and the flags again.
+`x[, 1:12]` keeps the first twelve samples and `x[1:20, ]` keeps the first twenty probes, and both compute the PCA and the flags again.
 
 ## A New App
 
@@ -257,8 +259,8 @@ Groups take the Okabe-Ito colours, a palette designed for colour vision deficien
 The same content comes out as a self-contained HTML file, or as a PDF made by Typst with `format = "typst"`.
 
 ```r
-render(nacho, output_dir = "reports", title = "Example study", author = "Your Name")
-render(nacho, output_dir = "reports", format = "typst")
+render(x, output_dir = "reports", title = "Example study", author = "Your Name")
+render(x, output_dir = "reports", format = "typst")
 ```
 
 The report is now a quality-control record.
@@ -292,7 +294,7 @@ Below is the PDF of the example data.
 
 ::: {style="text-align: center;"}
 
-![The NACHO report of the example data, as a PDF.](assets/output/nacho-report.pdf){
+![](assets/output/nacho-report.pdf){
   .hero-art
   .slide-deck
   loading="lazy"
