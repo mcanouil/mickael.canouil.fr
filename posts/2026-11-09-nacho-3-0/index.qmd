@@ -4,6 +4,7 @@ description: |
   NACHO 3.0.0 replaces the big S3 list with an S7 object, and gives the Shiny app, the report and the website a new look.
   This post compares it with NACHO 2.0.7 and shows how to move your code and your saved objects.
 date: "2026-11-09"
+draft: true
 categories:
   - r
   - shiny
@@ -110,7 +111,11 @@ The quality-control flags changed too.
 `nacho_qc()` gives one row per sample, with a status for each metric, the number of flags and a readable reason.
 
 ```r
-head(nacho_qc(x)[, c("IDFILE", "status", "n_flags", "reason")], n = 3)
+head(nacho_qc(x)[, c("status", "n_flags", "reason")], n = 3)
+#>   status n_flags reason
+#> 1   pass       0   <NA>
+#> 2   pass       0   <NA>
+#> 3   pass       0   <NA>
 ```
 
 You can also subset the object like a matrix.
@@ -291,7 +296,7 @@ Below is the PDF of the example data.
   .hero-art
   .slide-deck
   loading="lazy"
-  title="Typst PDF report of the NACHO example data"
+  aria-label="Typst PDF report of the NACHO example data"
 }
 
 :::
@@ -332,7 +337,7 @@ nacho <- load_rcc(
 ## Moving From NACHO 2
 
 You do not have to move.
-NACHO 2.0.8 keeps working with the code you have, and you can pin it, for example with `renv::install("NACHO@2.0.8")`.
+NACHO 2.0.8, the last 2.x release, keeps working with the code you have, and you can pin it, for example with `renv::install("NACHO@2.0.8")`.
 NACHO 3 needs R 4.3 or newer.
 
 To move, convert the objects you saved.
