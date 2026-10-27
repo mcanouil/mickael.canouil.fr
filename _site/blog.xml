@@ -20,7 +20,7 @@
 <generator>quarto-1.11.6</generator>
 <lastBuildDate>Mon, 09 Nov 2026 00:00:00 GMT</lastBuildDate>
 <item>
-  <title>NACHO 3: A New Object, a New App and a New Report</title>
+  <title>NACHO 3.0: A New Object, a New App and a New Report</title>
   <link>https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/</link>
   <description><![CDATA[ 
 
@@ -31,20 +31,20 @@
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="A card titled NACHO 3, with the line &quot;A new object, app and report.&quot; and
-the NACHO hexagon logo on a dark navy background. Beside the title, two
-overlapping screenshots of the app: the orange NACHO 2 app behind, and
-the dark NACHO 3 app in front.
+<p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="A card titled NACHO 3.0, with the line &quot;A new object, app and report.&quot;
+and the NACHO hexagon logo on a dark navy background. Beside the title,
+two overlapping screenshots of the app: the orange NACHO 2.0 app behind,
+and the dark NACHO 3.0 app in front.
 " width="600"></a></p>
 </figure>
 </div>
-<p><strong>NACHO 3</strong> is on CRAN. NACHO reads NanoString nCounter data, flags the samples that fail quality control, and normalises the counts. This release rebuilds the object, the Shiny app, the report and the website. This post compares it with NACHO 2, so you can see what changed and decide when to move.</p>
+<p><strong>NACHO 3.0</strong> is on CRAN. NACHO reads NanoString nCounter data, flags the samples that fail quality control, and normalises the counts. This release rebuilds the object, the Shiny app, the report and the website. This post compares it with NACHO 2.0, so you can see what changed and decide when to move.</p>
 <div class="highlight">
-<p><strong>NACHO 3</strong> is available from CRAN with <code>install.packages("NACHO")</code>, and the <a href="https://m.canouil.dev/NACHO/">package website</a> has the documentation.</p>
+<p><strong>NACHO 3.0</strong> is available from CRAN with <code>install.packages("NACHO")</code>, and the <a href="https://m.canouil.dev/NACHO/">package website</a> has the documentation.</p>
 </div>
-<section id="why-nacho-3" class="level2">
-<h2 class="anchored" data-anchor-id="why-nacho-3">Why NACHO 3</h2>
-<p>NACHO 2 did its job, but three things got in the way.</p>
+<section id="why-nacho-3.0" class="level2">
+<h2 class="anchored" data-anchor-id="why-nacho-3.0">Why NACHO 3.0</h2>
+<p>NACHO 2.0 did its job, but three things got in the way.</p>
 <ul>
 <li>The object was a big S3 list. The counts, the samples and the probes lived in one long table called <code>$nacho</code>, and every sample column was repeated on every probe row. It was hard to read and hard to subset.</li>
 <li>The app and the website looked dated. Their style and their chrome had aged, and the two did not match.</li>
@@ -53,10 +53,10 @@ the dark NACHO 3 app in front.
 </section>
 <section id="the-object" class="level2">
 <h2 class="anchored" data-anchor-id="the-object">The Object</h2>
-<p><code>load_rcc()</code> and <code>normalise()</code> now return an S7 object of class <code>nacho</code>. In NACHO 2 the same call gave a list, and <code>$nacho</code> held 3456 rows and 86 columns for the 72 probes of 48 samples.</p>
+<p><code>load_rcc()</code> and <code>normalise()</code> now return an S7 object of class <code>nacho</code>. In NACHO 2.0 the same call gave a list, and <code>$nacho</code> held 3456 rows and 86 columns for the 72 probes of 48 samples.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># With NACHO 2 installed</span></span>
+font-style: inherit;"># With NACHO 2.0 installed</span></span>
 <span id="cb1-2">x <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> NACHO<span class="sc" style="color: #5E5E5E;
@@ -70,7 +70,7 @@ font-style: inherit;">$</span>nacho)</span>
 <span id="cb1-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#&gt; [1] 3456   86</span></span></code></pre></div></div>
-<p>In NACHO 3 the object keeps the counts, the samples and the probes apart, and you read each one with an accessor.</p>
+<p>In NACHO 3.0 the object keeps the counts, the samples and the probes apart, and you read each one with an accessor.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(NACHO)</span>
@@ -135,22 +135,22 @@ font-style: inherit;">#&gt; 3   pass       0   &lt;NA&gt;</span></span></code></
 </section>
 <section id="a-new-app" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-app">A New App</h2>
-<p>The two screenshots below show the same page, the quality-control metrics, in NACHO 2 and in NACHO 3.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<p>The two screenshots below show the same page, the quality-control metrics, in NACHO 2.0 and in NACHO 3.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-old-qc.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="NACHO 2"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-old-qc.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The QC Metrics page of NACHO 2: an orange navbar, a column of sliders
+<p><a href="assets/media/app-old-qc.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-old-qc.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The QC Metrics page of NACHO 2.0: an orange navbar, a column of sliders
 called QC Thresholds on the left, and four plots on the right for
 binding density, field of view, positive control linearity and limit of
 detection.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 2</strong></figcaption>
+<figcaption><strong>NACHO 2.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -159,13 +159,13 @@ detection.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-new-qc-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="NACHO 3"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-qc-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The QC metrics page of NACHO 3 in light mode: a navy navbar with eight
+<p><a href="assets/media/app-new-qc-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-qc-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The QC metrics page of NACHO 3.0 in light mode: a navy navbar with eight
 pages, a summary strip, a collapsible sidebar of thresholds, and four
 plot cards.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 3</strong></figcaption>
+<figcaption><strong>NACHO 3.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -176,12 +176,12 @@ plot cards.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-new-qc-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="The quality-control metrics page of NACHO 3 in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-qc-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same QC metrics page of NACHO 3 in dark mode, where the page, the
+<p><a href="assets/media/app-new-qc-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="The quality-control metrics page of NACHO 3.0 in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-qc-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same QC metrics page of NACHO 3.0 in dark mode, where the page, the
 cards and the plots all use dark colours.
 "></a></p>
 </figure>
 </div>
-<figcaption>The quality-control metrics page of NACHO 3 in dark mode.</figcaption>
+<figcaption>The quality-control metrics page of NACHO 3.0 in dark mode.</figcaption>
 </figure>
 </div>
 <p>The recording below shows a short session on the example data.</p>
@@ -189,13 +189,13 @@ cards and the plots all use dark colours.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-new-tour.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="A short session of the NACHO 3 app on the example data."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-tour.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="A short recording of the NACHO 3 app on the example data: a threshold
+<p><a href="assets/media/app-new-tour.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="A short session of the NACHO 3.0 app on the example data."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-new-tour.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="A short recording of the NACHO 3.0 app on the example data: a threshold
 moves, the summary strip shows a flagged sample, and the pages and the
 Export page follow.
 "></a></p>
 </figure>
 </div>
-<figcaption>A short session of the NACHO 3 app on the example data.</figcaption>
+<figcaption>A short session of the NACHO 3.0 app on the example data.</figcaption>
 </figure>
 </div>
 <section id="guided-tour" class="level3">
@@ -269,20 +269,20 @@ in R card holding an R script.
 </section>
 <section id="a-new-website" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-website">A New Website</h2>
-<p>The website got the same treatment as the app. Here is the home page in NACHO 2 and in NACHO 3.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<p>The website got the same treatment as the app. Here is the home page in NACHO 2.0 and in NACHO 3.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-old-home.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="NACHO 2"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-old-home.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 2 website: an orange navbar, a plain title,
+<p><a href="assets/media/site-old-home.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-old-home.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 2.0 website: an orange navbar, a plain title,
 the installation code and a long overview, with the links in a sidebar.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 2</strong></figcaption>
+<figcaption><strong>NACHO 2.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -291,13 +291,13 @@ the installation code and a long overview, with the links in a sidebar.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-new-home-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="NACHO 3"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 3 website in light mode: a dark banner with a
-headline, an install command and a screenshot of the app, then three
+<p><a href="assets/media/site-new-home-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 3.0 website in light mode: a dark banner with
+a headline, an install command and a screenshot of the app, then three
 steps called Load, Check and Share.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 3</strong></figcaption>
+<figcaption><strong>NACHO 3.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -308,11 +308,11 @@ steps called Load, Check and Share.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-new-home-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="The NACHO 3 home page in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same home page in dark mode.
+<p><a href="assets/media/site-new-home-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="The NACHO 3.0 home page in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same home page in dark mode.
 "></a></p>
 </figure>
 </div>
-<figcaption>The NACHO 3 home page in dark mode.</figcaption>
+<figcaption>The NACHO 3.0 home page in dark mode.</figcaption>
 </figure>
 </div>
 <p>The plots follow the brand as well. Groups take the Okabe-Ito colours, a palette designed for colour vision deficiency, and a flagged sample is a rust triangle instead of a red point.</p>
@@ -346,20 +346,20 @@ background-color: null;
 font-style: inherit;">format =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"typst"</span>)</span></code></pre></div></div>
-<p>The report is now a quality-control record. Here are the tops of the NACHO 2 and the NACHO 3 HTML reports.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<p>The report is now a quality-control record. Here are the tops of the NACHO 2.0 and the NACHO 3.0 HTML reports.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/report-old-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="NACHO 2"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-old-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 2 report: a title, a numbered list of settings and
-the first plots, with no summary of the decision.
+<p><a href="assets/media/report-old-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-old-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 2.0 report: a title, a numbered list of settings
+and the first plots, with no summary of the decision.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 2</strong></figcaption>
+<figcaption><strong>NACHO 2.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -368,13 +368,13 @@ the first plots, with no summary of the decision.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/report-new-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="NACHO 3"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-new-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 3 HTML report: a navy cover with the study title,
+<p><a href="assets/media/report-new-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-new-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 3.0 HTML report: a navy cover with the study title,
 the author and the study details, then a decision summary with three
 counts and a table of settings.
 "></a></p>
 </figure>
 </div>
-<figcaption><strong>NACHO 3</strong></figcaption>
+<figcaption><strong>NACHO 3.0</strong></figcaption>
 </figure>
 </div>
 </div>
@@ -402,15 +402,15 @@ Note
 </section>
 <section id="changes-in-results" class="level2">
 <h2 class="anchored" data-anchor-id="changes-in-results">Changes in Results</h2>
-<p>The same RCC files can give a different answer in NACHO 3, so here is what changes by default.</p>
+<p>The same RCC files can give a different answer in NACHO 3.0, so here is what changes by default.</p>
 <ul>
-<li>Samples are flagged against the nSolver thresholds, where NACHO 2 used its own limits.</li>
+<li>Samples are flagged against the nSolver thresholds, where NACHO 2.0 used its own limits.</li>
 <li>Negative probes are excluded with Bruker’s rule, which drops at most two probes that sit 3-fold above the others.</li>
 <li>Normalised counts are no longer rounded, and no longer floored at 0.1.</li>
 <li>There is no background correction by default.</li>
 <li>miRNA panels are no longer normalised with housekeeping genes by default, because their housekeeping mRNAs sit at background.</li>
 </ul>
-<p>If you need the NACHO 2 behaviour, the <code>legacy</code> preset gives back the old limits. With a background correction on top, it also gives back the old outlier calls.</p>
+<p>If you need the NACHO 2.0 behaviour, the <code>legacy</code> preset gives back the old limits. With a background correction on top, it also gives back the old outlier calls.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb5-1">nacho <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
@@ -440,9 +440,9 @@ background-color: null;
 font-style: inherit;">"subtract"</span></span>
 <span id="cb5-8">)</span></code></pre></div></div>
 </section>
-<section id="moving-from-nacho-2" class="level2">
-<h2 class="anchored" data-anchor-id="moving-from-nacho-2">Moving From NACHO 2</h2>
-<p>You do not have to move. The last NACHO 2 release keeps working with the code you have, and you can pin it, for example with <code>renv::install("NACHO@2.0.8")</code>. NACHO 3 needs R 4.3 or newer.</p>
+<section id="moving-from-nacho-2.0" class="level2">
+<h2 class="anchored" data-anchor-id="moving-from-nacho-2.0">Moving From NACHO 2.0</h2>
+<p>You do not have to move. The last NACHO 2.0 release keeps working with the code you have, and you can pin it, for example with <code>renv::install("NACHO@2.0.8")</code>. NACHO 3.0 needs R 4.3 or newer.</p>
 <p>To move, convert the objects you saved. <code>read_nacho()</code> reads a file saved by any NACHO version, and <code>upgrade_nacho()</code> converts an object that is already in your session.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="r" style="background: #f1f3f5;"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb6-1">nacho <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -451,7 +451,7 @@ background-color: null;
 font-style: inherit;">read_nacho</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"nacho-2-object.rds"</span>)</span></code></pre></div></div>
-<p>The conversion keeps the raw counts, the sample sheet, the settings and the thresholds. It then moves the object to the legacy preset, so the flags stay close to what NACHO 2 gave you. Use <code>normalise()</code> when you want the nSolver preset.</p>
+<p>The conversion keeps the raw counts, the sample sheet, the settings and the thresholds. It then moves the object to the legacy preset, so the flags stay close to what NACHO 2.0 gave you. Use <code>normalise()</code> when you want the nSolver preset.</p>
 <p>A few calls changed as well.</p>
 <ul>
 <li><code>autoplot(x, x = "BD")</code> is now <code>autoplot(x, type = "BD")</code>.</li>
@@ -459,12 +459,12 @@ font-style: inherit;">"nacho-2-object.rds"</span>)</span></code></pre></div></di
 <li><code>x$nacho</code> is now <code>as.data.frame(x, long = TRUE)</code>.</li>
 <li><code>deploy()</code> has no default <code>directory</code> any more.</li>
 </ul>
-<p>The article <a href="https://m.canouil.dev/NACHO/articles/moving-from-nacho-2.html">Moving from NACHO 2</a> on the website maps each NACHO 2 call to its NACHO 3 version.</p>
+<p>The article <a href="https://m.canouil.dev/NACHO/articles/moving-from-nacho-2.html">Moving from NACHO 2</a> on the website maps each NACHO 2.0 call to its NACHO 3.0 version.</p>
 </section>
 <section id="other-changes" class="level2">
 <h2 class="anchored" data-anchor-id="other-changes">Other Changes</h2>
 <ul>
-<li>Loading 768 samples takes about 2.5 seconds, against about 9 in NACHO 2.</li>
+<li>Loading 768 samples takes about 2.5 seconds, against about 9 in NACHO 2.0.</li>
 <li><code>nacho_thresholds()</code> builds the thresholds for the MAX, FLEX, PRO and SPRINT instruments, and <code>load_rcc()</code> reads the instrument from MAX and FLEX files.</li>
 <li><code>normalisation_method = "RUVg"</code> removes unwanted variation, and <code>housekeeping_stability()</code> ranks the reference genes with geNorm and NormFinder.</li>
 <li><code>batch_diagnostics()</code> crosses the study groups with the cartridges and the dates.</li>
@@ -479,14 +479,14 @@ font-style: inherit;">"nacho-2-object.rds"</span>)</span></code></pre></div></di
 
 <a onclick="window.scrollTo(0, 0); return false;" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_gb">CC BY-NC-SA 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@misc{canouil2026,
   author = {CANOUIL, Mickaël},
-  title = {NACHO 3: {A} {New} {Object,} a {New} {App} and a {New}
+  title = {NACHO 3.0: {A} {New} {Object,} a {New} {App} and a {New}
     {Report}},
   date = {2026-11-09},
   url = {https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/},
   langid = {en-GB}
 }
 </code></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-canouil2026" class="csl-entry quarto-appendix-citeas">
-CANOUIL, M. (2026-11-09). NACHO 3: A New Object, a New App and a New
+CANOUIL, M. (2026-11-09). NACHO 3.0: A New Object, a New App and a New
 Report. <em>Mickael.canouil.fr</em>. <a href="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/">https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/</a>
 </div></div></section></div> ]]></description>
   <category>r</category>
@@ -5679,7 +5679,7 @@ font-style: inherit;">]</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -6987,7 +6987,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -7436,12 +7436,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -8089,7 +8089,7 @@ Warning
 <div class="callout-body-container callout-body">
 <p>Three things caught me out while writing real modules with these filters.</p>
 <ul>
-<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>). Put it on an inner div instead.</li>
+<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a>). Put it on an inner div instead.</li>
 <li><code>cascade</code> does not hoist a <code>---</code> that sits inside a <code>.panel-tabset</code> div, so a slide break there is left alone rather than split into a continuation slide.</li>
 <li>The first child of a section heading should be a heading, not prose. Otherwise <code>cascade</code> reads the slide level wrongly and repeats the wrong heading on the continuation slides.</li>
 </ul>
