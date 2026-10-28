@@ -242,20 +242,27 @@ It shows an R script that repeats your session with `load_rcc()`, `normalise()` 
   fig-alt='{{< meta alt-text.app-export >}}'
 }
 
-### Background Work
+### Responsiveness
 
-The app keeps working while it computes, thanks to [mirai](https://mirai.r-lib.org/), the asynchronous framework of Charlie Gao (@shikokuchuo).
+The app stays responsive while it computes, thanks to [mirai](https://mirai.r-lib.org/), the asynchronous framework of Charlie Gao (@shikokuchuo).
 NACHO 3.0 suggests `mirai` and does not require it, so the app runs without it.
+When `mirai` is installed, the app hands three jobs to background R processes, and the page keeps answering you.
 
-When `mirai` is installed, the app uses background R processes for three jobs.
-
-- Importing: the Data page reads the RCC files in the background, and the line under **Import** shows the current stage.
+- Importing: reading the RCC files no longer freezes the page, and the line under **Import** shows the current stage.
 - Reporting: the Export page renders the HTML or PDF report in the background.
-- Plotting: the interactive plots of a page are built at the same time, by plot workers that all users of the app share.
+- Plotting: the plots of a page are built at the same time, by plot workers that all users of the app share.
+
+The plots gain the most.
+If you change a threshold while the plots of a page are still building, the app stops the older builds, so you only wait for the plots of the last values.
+A finished plot goes into a cache that the workers share, so going back to a page, or to settings you already used, shows it at once.
+
+On my machine, the four plots of the QC metrics page appear in about 0.7 seconds with the plot workers.
+With `nacho.plot_workers` set to `0`, which builds them in the app process, they take about 3.5 seconds.
+Those are three runs of each, with a fresh start of the app every time.
 
 By default the app starts one plot worker for each CPU core minus one, with a maximum of four, and an app from `deploy()` starts one.
 Each worker keeps a copy of the study, and for the example data that is about 170 MB per worker.
-The `nacho.plot_workers` option sets the number of workers, and `0` builds the plots in the app process.
+The `nacho.plot_workers` option sets the number of workers.
 
 ```r
 options(nacho.plot_workers = 2)
