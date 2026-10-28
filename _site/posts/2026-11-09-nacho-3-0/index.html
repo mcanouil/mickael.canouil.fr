@@ -85,9 +85,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-4a664930be8932da11441c0e8ea6bc37.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-ee5ac5b2f71190ecbff743709ca129ad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-47da1699defff29037d8c259a1546678.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-ee5ac5b2f71190ecbff743709ca129ad.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-a51c794599ddc6b830e86a08a0d225cd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-eb96b8eaf467500779aa45c585678678.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-a51c794599ddc6b830e86a08a0d225cd.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
@@ -556,7 +556,7 @@ and the dark NACHO 3.0 app in front.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The name stands for NAnoString quality Control dasHbOard. We published it in <em>Bioinformatics</em> in 2020 <span><a href="https://github.com/canouil" title="GitHub">[@canouil_nacho_2020]</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>. Gerard Bouland and Roderick Slieker are co-authors of the package. The original development, described in the article, was funded by the <a href="https://www.imi-rhapsody.eu/consortium/">RHAPSODY consortium</a>, as part of the Innovative Medicines Initiative 2 Joint Undertaking (grant agreement No 115881). All development since then, including NACHO 3.0, was unfunded open source work.</p>
+<p>The name stands for NAnoString quality Control dasHbOard. We published it in <em>Bioinformatics</em> in 2020 <span><a href="https://github.com/canouil" title="GitHub">[@canouil_nacho_2020]</a><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span>. Gerard Bouland and Roderick Slieker are co-authors of the package. The original development, described in the article, was funded by the <a href="https://www.imi-rhapsody.eu/consortium/">RHAPSODY consortium</a>, as part of the Innovative Medicines Initiative 2 Joint Undertaking (grant agreement No 115881). All development since then, including NACHO 3.0, was unfunded open source work.</p>
 </div>
 </div>
 <p>I described the way I structure this kind of package in <a href="../../posts/2026-07-01-r-package-shiny-quarto/">R Package Architecture: Shiny, Quarto, targets, and S7</a>. NACHO 3.0 follows part of that pattern, with an S7 object, a modular Shiny app and a Quarto report.</p>
@@ -593,6 +593,9 @@ and the dark NACHO 3.0 app in front.
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(<span class="fu">nacho_counts</span>(x))</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 72 48</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>nacho_counts()</code> returns a matrix, <code>nacho_samples()</code> and <code>nacho_probes()</code> return one row per sample and per probe, and <code>as.data.frame(x, long = TRUE)</code> gives the old long table back when you need it for <code>ggplot2</code> or <code>dplyr</code>.</p>
+<div class="highlight">
+<p><strong>One object, one accessor for each question:</strong> <code>nacho_counts()</code>, <code>nacho_samples()</code>, <code>nacho_probes()</code> and <code>nacho_qc()</code> replace the long <code>$nacho</code> table, and the long layout is one call away.</p>
+</div>
 <p>The quality-control flags changed too. <code>nacho_qc()</code> gives one row per sample, with a status for each metric, the number of flags and a readable reason.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-filename="r"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">nacho_qc</span>(x)[, <span class="fu">c</span>(<span class="st">"status"</span>, <span class="st">"n_flags"</span>, <span class="st">"reason"</span>)], <span class="at">n =</span> <span class="dv">3</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   status n_flags reason</span></span>
@@ -718,6 +721,9 @@ samples first, and the selected sample outlined in the plots beside it.
 <h3 class="anchored" data-anchor-id="export">Export</h3>
 <p>The Export page writes the thresholds you tuned to a YAML file, and the Preset section of the sidebar loads that file again, so one set of limits can serve every study. The same page downloads the quality-control table, the object and the report. The report renders in the background when <code>mirai</code> is installed, so the app stays usable.</p>
 <p>The Export page also has a <strong>Reproduce in R</strong> card. It shows an R script that repeats your session with <code>load_rcc()</code>, <code>normalise()</code> and the thresholds you set.</p>
+<div class="highlight">
+<p><strong>What you tune in the app, you can take with you:</strong> the thresholds go to a YAML file, and the session goes to an R script that repeats it.</p>
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
@@ -734,7 +740,7 @@ in R card holding an R script.
 </section>
 <section id="responsiveness" class="level3">
 <h3 class="anchored" data-anchor-id="responsiveness">Responsiveness</h3>
-<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
+<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
 <ul>
 <li>Importing: reading the RCC files no longer freezes the page, and the line under <strong>Import</strong> shows the current stage.</li>
 <li>Reporting: the Export page renders the HTML or PDF report in the background.</li>
@@ -742,6 +748,9 @@ in R card holding an R script.
 </ul>
 <p>The plots gain the most. If you change a threshold while the plots of a page are still building, the app stops the older builds, so you only wait for the plots of the last values. A finished plot goes into a cache that the workers share, so going back to a page, or to settings you already used, shows it at once.</p>
 <p>On my machine, the four plots of the QC metrics page appear in about 0.7 seconds with the plot workers. With <code>nacho.plot_workers</code> set to <code>0</code>, which builds them in the app process, they take about 3.5 seconds. Those are three runs of each, with a fresh start of the app every time.</p>
+<div class="highlight">
+<p><strong>The plots no longer hold the app:</strong> with <code>mirai</code>, the QC metrics plots appear about five times faster, and a changed threshold stops the older builds.</p>
+</div>
 <p>By default the app starts one plot worker for each CPU core minus one, with a maximum of four, and an app from <code>deploy()</code> starts one. Each worker keeps a copy of the study, and for the example data that is about 170 MB per worker. The <code>nacho.plot_workers</code> option sets the number of workers.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="r"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">nacho.plot_workers =</span> <span class="dv">2</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">visualise</span>(GSE74821)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -838,7 +847,11 @@ counts and a table of settings.
 </div>
 </div>
 <p>It opens with a cover that holds the study details, then a summary of the decision with the flagged samples. A table lists every setting and limit with its meaning and its source. Each figure and table has a short “How to read this”, and an appendix gives the methods, the citation and the package versions. With <code>group</code>, the report adds the batch design and warns when the batches and the biology are confounded.</p>
-<p>The PDF has the same content and the same look. It is a tagged PDF that declares PDF/UA-1, and Typst checks it against the rules of that standard that it can enforce. The HTML report has landmarks, a skip link and labelled tables. Below is the PDF of the example data.</p>
+<p>The PDF has the same content and the same look. It is a tagged PDF that declares PDF/UA-1, and Typst checks it against the rules of that standard that it can enforce. The HTML report has landmarks, a skip link and labelled tables.</p>
+<div class="highlight">
+<p><strong>One report, two formats:</strong> the same Quarto content comes out as a self-contained HTML file and as a tagged PDF (PDF/UA-1) made by Typst.</p>
+</div>
+<p>Below is the PDF of the example data.</p>
 <div style="text-align: center;">
 <p><a href="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><embed src="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="hero-art slide-deck img-fluid" style="width: 400px; aspect-ratio: 210 / 297;" loading="lazy" aria-label="Typst PDF report of the NACHO example data"></a></p>
 </div>
@@ -867,6 +880,9 @@ Note
 <li>There is no background correction by default.</li>
 <li>miRNA panels are no longer normalised with housekeeping genes by default, because their housekeeping mRNAs sit at background.</li>
 </ul>
+<div class="highlight">
+<p><strong>The defaults changed, so the results can change:</strong> samples are now flagged against the nSolver thresholds, and <code>preset = "legacy"</code> gives back the NACHO 2.0 limits.</p>
+</div>
 <p>If you need the NACHO 2.0 behaviour, the <code>legacy</code> preset gives back the old limits. With a background correction on top, it also gives back the old outlier calls.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="r"><pre class="sourceCode r cw-auto code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nacho <span class="ot">&lt;-</span> <span class="fu">load_rcc</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  data_directory,</span>
