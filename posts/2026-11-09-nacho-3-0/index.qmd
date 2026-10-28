@@ -127,6 +127,13 @@ dim(nacho_counts(x))
 
 `nacho_counts()` returns a matrix, `nacho_samples()` and `nacho_probes()` return one row per sample and per probe, and `as.data.frame(x, long = TRUE)` gives the old long table back when you need it for `ggplot2` or `dplyr`.
 
+::: {.highlight}
+
+**One object, one accessor for each question:** `nacho_counts()`, `nacho_samples()`, `nacho_probes()` and `nacho_qc()` replace the long `$nacho` table, and the long layout is one call away.
+
+:::
+
+
 The quality-control flags changed too.
 `nacho_qc()` gives one row per sample, with a status for each metric, the number of flags and a readable reason.
 
@@ -235,6 +242,13 @@ The report renders in the background when `mirai` is installed, so the app stays
 The Export page also has a **Reproduce in R** card.
 It shows an R script that repeats your session with `load_rcc()`, `normalise()` and the thresholds you set.
 
+::: {.highlight}
+
+**What you tune in the app, you can take with you:** the thresholds go to a YAML file, and the session goes to an R script that repeats it.
+
+:::
+
+
 ![The Export page and its Reproduce in R card.](assets/media/app-export.webp){
   .img-fluid .hero-art
   fig-align="center"
@@ -259,6 +273,13 @@ A finished plot goes into a cache that the workers share, so going back to a pag
 On my machine, the four plots of the QC metrics page appear in about 0.7 seconds with the plot workers.
 With `nacho.plot_workers` set to `0`, which builds them in the app process, they take about 3.5 seconds.
 Those are three runs of each, with a fresh start of the app every time.
+
+::: {.highlight}
+
+**The plots no longer hold the app:** with `mirai`, the QC metrics plots appear about five times faster, and a changed threshold stops the older builds.
+
+:::
+
 
 By default the app starts one plot worker for each CPU core minus one, with a maximum of four, and an app from `deploy()` starts one.
 Each worker keeps a copy of the study, and for the example data that is about 170 MB per worker.
@@ -345,6 +366,13 @@ With `group`, the report adds the batch design and warns when the batches and th
 The PDF has the same content and the same look.
 It is a tagged PDF that declares PDF/UA-1, and Typst checks it against the rules of that standard that it can enforce.
 The HTML report has landmarks, a skip link and labelled tables.
+
+::: {.highlight}
+
+**One report, two formats:** the same Quarto content comes out as a self-contained HTML file and as a tagged PDF (PDF/UA-1) made by Typst.
+
+:::
+
 Below is the PDF of the example data.
 
 ::: {style="text-align: center;"}
@@ -377,6 +405,13 @@ The same RCC files can give a different answer in NACHO 3.0, so here is what cha
 - Normalised counts are no longer rounded, and no longer floored at 0.1.
 - There is no background correction by default.
 - miRNA panels are no longer normalised with housekeeping genes by default, because their housekeeping mRNAs sit at background.
+
+::: {.highlight}
+
+**The defaults changed, so the results can change:** samples are now flagged against the nSolver thresholds, and `preset = "legacy"` gives back the NACHO 2.0 limits.
+
+:::
+
 
 If you need the NACHO 2.0 behaviour, the `legacy` preset gives back the old limits.
 With a background correction on top, it also gives back the old outlier calls.
