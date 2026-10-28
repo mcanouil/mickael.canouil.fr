@@ -239,10 +239,34 @@ It shows an R script that repeats your session with `load_rcc()`, `normalise()` 
   fig-alt='{{< meta alt-text.app-export >}}'
 }
 
+### Background Work
+
+The app keeps working while it computes, thanks to [mirai](https://mirai.r-lib.org/), the asynchronous framework of Charlie Gao (@shikokuchuo).
+NACHO 3.0 suggests `mirai` and does not require it, so the app runs without it.
+
+When `mirai` is installed, the app uses background R processes for three jobs.
+
+- Importing: the Data page reads the RCC files in the background, and the line under **Import** shows the current stage.
+- Reporting: the Export page renders the HTML or PDF report in the background.
+- Plotting: the interactive plots of a page are built at the same time, by plot workers that all users of the app share.
+
+By default the app starts one plot worker for each CPU core minus one, with a maximum of four, and an app from `deploy()` starts one.
+Each worker keeps a copy of the study, and for the example data that is about 170 MB per worker.
+The `nacho.plot_workers` option sets the number of workers, and `0` builds the plots in the app process.
+
+```r
+options(nacho.plot_workers = 2)
+visualise(GSE74821)
+```
+
+The NACHO 2.0 app had no import page and no report export, and it drew its plots one after the other in the app process.
+A long computation therefore held the whole page until it ended.
+Without `mirai`, NACHO 3.0 does the same for the import and the report, and falls back to the app process for the plots.
+
 ## A New Website
 
 The website got the same treatment as the app.
-Here is the home page in NACHO 2.0 and in NACHO 3.
+Here is the home page in NACHO 2.0 and in NACHO 3.0.
 
 ::: {layout-ncol="2" style="text-align:center;"}
 
