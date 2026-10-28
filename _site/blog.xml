@@ -39,7 +39,19 @@ and the dark NACHO 3.0 app in front.
 </figure>
 </div>
 <p><strong>NACHO 3.0</strong> is on CRAN. NACHO reads NanoString nCounter data, flags the samples that fail quality control, and normalises the counts.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>History
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The name stands for NAnoString quality Control dasHbOard. We published it in <em>Bioinformatics</em> in 2020<sup>1</sup>. Gerard Bouland and Roderick Slieker are co-authors of the package. The initial work was funded by the <a href="https://www.imi-rhapsody.eu/consortium/">RHAPSODY consortium</a>, as part of the Innovative Medicines Initiative 2 Joint Undertaking (grant agreement No 115881). NACHO 3.0 has no funding behind it: it is open source work.</p>
+</div>
+</div>
 <p>I described the way I structure this kind of package in <a href="../../posts/2026-07-01-r-package-shiny-quarto/">R Package Architecture: Shiny, Quarto, targets, and S7</a>. NACHO 3.0 follows part of that pattern, with an S7 object, a modular Shiny app and a Quarto report.</p>
 <p>This release rebuilds the object, the Shiny app, the report and the website. This post compares it with NACHO 2.0, so you can see what changed and decide when to move.</p>
 <div class="highlight">
@@ -202,22 +214,19 @@ Export page follow.
 </figure>
 </div>
 <section id="guided-tour" class="level3">
-<h3 class="anchored" data-anchor-id="guided-tour">Guided Tour</h3>
+<h3 class="anchored">Guided Tour</h3>
 <p>The Help menu in the navbar starts a guided tour of the app. When no data are loaded, the tour loads the example data first.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/media/app-tour.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The guided tour of the app."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-tour.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The guided tour of the app: a popover over the Thresholds sidebar says
-what the sidebar does, and the rest of the page is dimmed.
-"></a></p>
-</figure>
-</div>
-<figcaption>The guided tour of the app.</figcaption>
-</figure>
-</div>
+<div style="text-align: center;">
+<!-- Raw HTML, not the video shortcode: for a local file the shortcode adds Video.js and a single source, sets preload="auto" and has no poster, muted, loop or playsinline option. -->
+<video class="hero-art" style="width: 600px; max-width: 100%; height: auto;" controls="" muted="" loop="" playsinline="" preload="metadata" poster="assets/media/app-tour-poster.webp" aria-label="A silent video of the guided tour of the NACHO app. Nine steps follow
+one another, and each one dims the page, outlines one part of the app,
+and shows a card that says what it does, from the Data page to the Help
+menu.
+">
+<source src="assets/media/app-tour.mp4" type="video/mp4">
+</video>
+<p>:::</p>
 <p>Each threshold has a help popover next to it, and the pages without data say what to do. Errors from an upload and warnings from the normalisation show once, as toasts.</p>
-</section>
 <section id="loading-data" class="level3">
 <h3 class="anchored" data-anchor-id="loading-data">Loading Data</h3>
 <p>When you choose files, the Data page lists the RCC files of the upload before you import anything. It also looks inside zip archives, and says for each file whether it is a PlexSet file and whether the sample sheet lists it.</p>
@@ -225,7 +234,7 @@ what the sidebar does, and the rest of the page is dimmed.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-upload-preview.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="The preview of an upload on the Data page."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-upload-preview.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Data page after two files were chosen: a table lists each RCC file,
+<p><a href="assets/media/app-upload-preview.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="The preview of an upload on the Data page."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-upload-preview.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Data page after two files were chosen: a table lists each RCC file,
 the zip archive it came from, whether it is a PlexSet file and whether
 the sample sheet lists it.
 "></a></p>
@@ -242,7 +251,7 @@ the sample sheet lists it.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-selected-samples.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="The Samples page, with one sample selected."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-selected-samples.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Samples page: a sortable table with one row per sample, flagged
+<p><a href="assets/media/app-selected-samples.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="The Samples page, with one sample selected."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-selected-samples.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Samples page: a sortable table with one row per sample, flagged
 samples first, and the selected sample outlined in the plots beside it.
 "></a></p>
 </figure>
@@ -259,7 +268,7 @@ samples first, and the selected sample outlined in the plots beside it.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/app-export.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="The Export page and its Reproduce in R card."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-export.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Export page with the downloads for the quality-control table, the
+<p><a href="assets/media/app-export.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="The Export page and its Reproduce in R card."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/app-export.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The Export page with the downloads for the quality-control table, the
 thresholds and the object, a report ready to download, and the Reproduce
 in R card holding an R script.
 "></a></p>
@@ -268,7 +277,6 @@ in R card holding an R script.
 <figcaption>The Export page and its Reproduce in R card.</figcaption>
 </figure>
 </div>
-</section>
 </section>
 <section id="a-new-website" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-website">A New Website</h2>
@@ -280,7 +288,7 @@ in R card holding an R script.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-old-home.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-old-home.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 2.0 website: an orange navbar, a plain title,
+<p><a href="assets/media/site-old-home.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-old-home.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 2.0 website: an orange navbar, a plain title,
 the installation code and a long overview, with the links in a sidebar.
 "></a></p>
 </figure>
@@ -294,7 +302,7 @@ the installation code and a long overview, with the links in a sidebar.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-new-home-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 3.0 website in light mode: a dark banner with
+<p><a href="assets/media/site-new-home-light.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-10" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-light.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The home page of the NACHO 3.0 website in light mode: a dark banner with
 a headline, an install command and a screenshot of the app, then three
 steps called Load, Check and Share.
 "></a></p>
@@ -311,7 +319,7 @@ steps called Load, Check and Share.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/site-new-home-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="The NACHO 3.0 home page in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same home page in dark mode.
+<p><a href="assets/media/site-new-home-dark.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-11" title="The NACHO 3.0 home page in dark mode."><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/site-new-home-dark.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" style="max-width: 600px;" alt="The same home page in dark mode.
 "></a></p>
 </figure>
 </div>
@@ -357,7 +365,7 @@ font-style: inherit;">"typst"</span>)</span></code></pre></div></div>
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/report-old-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-old-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 2.0 report: a title, a numbered list of settings
+<p><a href="assets/media/report-old-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-12" title="NACHO 2.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-old-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 2.0 report: a title, a numbered list of settings
 and the first plots, with no summary of the decision.
 "></a></p>
 </figure>
@@ -371,7 +379,7 @@ and the first plots, with no summary of the decision.
 <figure class="figure">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><a href="assets/media/report-new-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-14" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-new-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 3.0 HTML report: a navy cover with the study title,
+<p><a href="assets/media/report-new-top.webp" class="lightbox" data-gallery="quarto-lightbox-gallery-13" title="NACHO 3.0"><img src="https://mickael.canouil.fr/posts/2026-11-09-nacho-3-0/assets/media/report-new-top.webp" class="img-fluid hero-art quarto-figure quarto-figure-center figure-img" alt="The top of the NACHO 3.0 HTML report: a navy cover with the study title,
 the author and the study details, then a decision summary with three
 counts and a table of settings.
 "></a></p>
@@ -386,7 +394,7 @@ counts and a table of settings.
 <p>It opens with a cover that holds the study details, then a summary of the decision with the flagged samples. A table lists every setting and limit with its meaning and its source. Each figure and table has a short “How to read this”, and an appendix gives the methods, the citation and the package versions. With <code>group</code>, the report adds the batch design and warns when the batches and the biology are confounded.</p>
 <p>The PDF has the same content and the same look. It is a tagged PDF that declares PDF/UA-1, and Typst checks it against the rules of that standard that it can enforce. The HTML report has landmarks, a skip link and labelled tables. Below is the PDF of the example data.</p>
 <div style="text-align: center;">
-<p><a href="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><embed src="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="hero-art slide-deck img-fluid" style="width: 400px; aspect-ratio: 210 / 297;" loading="lazy" aria-label="Typst PDF report of the NACHO example data"></a></p>
+<p><a href="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><embed src="assets/output/nacho-report.pdf#toolbar=0&amp;navpanes=0&amp;view=Fit" class="hero-art slide-deck img-fluid" style="width: 400px; aspect-ratio: 210 / 297;" loading="lazy" aria-label="Typst PDF report of the NACHO example data"></a></p>
 </div>
 <p>Open it full size: <a href="assets/output/nacho-report.pdf" target="_blank" rel="noopener noreferrer">Typst PDF</a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -478,6 +486,9 @@ font-style: inherit;">"nacho-2-object.rds"</span>)</span></code></pre></div></di
 <p>Happy quality controlling!</p>
 
 
+</section>
+</div>
+</section>
 </section>
 
 
@@ -1834,7 +1845,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-10;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-glightbox="description: .lightbox-desc-10;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
 </div>
 </div>
 </div>
@@ -1846,7 +1857,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-11;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-glightbox="description: .lightbox-desc-11;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
 </div>
 </div>
 </div>
@@ -1858,7 +1869,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-12;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-glightbox="description: .lightbox-desc-12;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
 </div>
 </div>
 </div>
@@ -1872,7 +1883,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-13;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-glightbox="description: .lightbox-desc-13;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -1884,7 +1895,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-14;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-glightbox="description: .lightbox-desc-14;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
 </div>
 </div>
 </div>
@@ -1896,7 +1907,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-15;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-glightbox="description: .lightbox-desc-15;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
 </div>
 </div>
 </div>
@@ -1910,7 +1921,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-16;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-glightbox="description: .lightbox-desc-16;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -1922,7 +1933,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-17;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-glightbox="description: .lightbox-desc-17;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
 </div>
 </div>
 </div>
@@ -1934,7 +1945,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-18;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-glightbox="description: .lightbox-desc-18;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
 </div>
 </div>
 </div>
@@ -1952,7 +1963,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-19;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-glightbox="description: .lightbox-desc-19;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
 </div>
 </div>
 </div>
@@ -1964,7 +1975,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-20;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-glightbox="description: .lightbox-desc-20;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
 </div>
 </div>
 </div>
@@ -1976,7 +1987,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-21;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-glightbox="description: .lightbox-desc-21;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
 </div>
 </div>
 </div>
@@ -1988,7 +1999,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-22;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-glightbox="description: .lightbox-desc-22;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
 </div>
 </div>
 </div>
@@ -6996,7 +7007,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="breaks-that-land-on-round-numbers" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="breaks-that-land-on-round-numbers"><span class="header-section-number">3</span> Breaks that land on round numbers</h2>
-<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
+<p>Until now, automatic breaks came from a fixed 1/2/5 ladder: pick the step from that list, cover the range. It is simple, and it is regularly a bit off, either too far from the data or with more ticks than anyone asked for. 0.6.0 replaces it with the extended Wilkinson search <span><a href="https://github.com/talbot" title="GitHub">[@talbot_extension_2010]</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform" title="GitHub">GitHub</span></span>. It scores candidate tick sequences on three things at once: how simple the numbers are, how well they cover the data, and how close the count lands to the target. There is nothing to change in your code, plots come out with rounder ticks that sit closer to the data.</p>
 <p>The same search is available as <a href="https://m.canouil.dev/gribouille/reference/scales/breaks-extended.html"><code>breaks-extended(n:)</code></a> when you want a different tick count. It is one of four helpers that build a closure for the <code>breaks:</code> and <code>minor-breaks:</code> arguments of a continuous scale. The closure is called with the values the scale trained on, once per panel, and returns the positions, so free-scale facets each get their own.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="annotated-cell-5" data-filename="typst" style="background: #f1f3f5;"><pre class="sourceCode typst cw-auto code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="kw" style="color: #003B4F;
@@ -7445,12 +7456,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform" title="GitHub">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform" title="GitHub">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -8098,7 +8109,7 @@ Warning
 <div class="callout-body-container callout-body">
 <p>Three things caught me out while writing real modules with these filters.</p>
 <ul>
-<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a>). Put it on an inner div instead.</li>
+<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" title="GitHub" aria-label="GitHub platform">GitHub</span></span></a>). Put it on an inner div instead.</li>
 <li><code>cascade</code> does not hoist a <code>---</code> that sits inside a <code>.panel-tabset</code> div, so a slide break there is left alone rather than split into a continuation slide.</li>
 <li>The first child of a section heading should be a heading, not prose. Otherwise <code>cascade</code> reads the slide level wrongly and repeats the wrong heading on the continuation slides.</li>
 </ul>
