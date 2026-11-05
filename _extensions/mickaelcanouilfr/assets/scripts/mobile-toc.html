@@ -92,6 +92,10 @@
           root.style.setProperty("--mobile-toc-offset-left", `${vv.offsetLeft}px`);
         };
         const { signal } = listeners;
+        signal.addEventListener("abort", () => {
+          cancelAnimationFrame(frame);
+          ["x", "y", "left"].forEach((side) => root.style.removeProperty(`--mobile-toc-offset-${side}`));
+        });
         vv.addEventListener("resize", place, { signal });
         vv.addEventListener("scroll", place, { signal });
         // Late images can widen the layout viewport without a visualViewport event.
