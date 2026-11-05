@@ -73,13 +73,18 @@
       observer.observe(list, { subtree: true, attributes: true, attributeFilter: ["class"] });
 
       // On a phone, content wider than the screen widens the layout viewport,
-      // and a fixed element follows its far edge off screen. Shift the pill and
-      // back-to-top by the gap between the layout and the visual viewport.
+      // and a fixed element follows its far edge off screen. Shift the pill, the
+      // sheet and back-to-top by the gap between the layout and the visual viewport.
       const listeners = new AbortController();
       const vv = window.visualViewport;
       if (vv) {
         const root = document.documentElement;
+        let frame = 0;
         const place = () => {
+          if (!frame) frame = requestAnimationFrame(apply);
+        };
+        const apply = () => {
+          frame = 0;
           const offsetX = window.innerWidth - (vv.offsetLeft + vv.width);
           const offsetY = window.innerHeight - (vv.offsetTop + vv.height);
           root.style.setProperty("--mobile-toc-offset-x", `${Math.max(0, offsetX)}px`);
@@ -92,7 +97,7 @@
         // Late images can widen the layout viewport without a visualViewport event.
         window.addEventListener("resize", place, { signal });
         window.addEventListener("load", place, { signal });
-        place();
+        apply();
       }
 
       return () => {
