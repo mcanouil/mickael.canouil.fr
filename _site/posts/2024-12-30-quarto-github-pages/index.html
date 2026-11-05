@@ -85,9 +85,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-529091808f0d7497cc629ab874d4f99b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-60a3aa0a130d342e68c76479911c54aa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-04e24a7760a4f4d1a59c15fb099004a3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-60a3aa0a130d342e68c76479911c54aa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-f00334adaddf0f14c070616db93d6e34.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-6e0a461dcfd19700d8590c82fb07ca59.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-f00334adaddf0f14c070616db93d6e34.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-0.1.0/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
@@ -1234,7 +1234,49 @@ CANOUIL, M. (2024-12-30). Quarto: Publishing to GitHub Pages.
       const observer = new MutationObserver(mirror);
       observer.observe(list, { subtree: true, attributes: true, attributeFilter: ["class"] });
 
+      // On a phone, content wider than the screen widens the layout viewport,
+      // and a fixed element follows its far edge off screen. Shift the pill, the
+      // sheet and back-to-top by the gap between the layout and the visual viewport.
+      const listeners = new AbortController();
+      const vv = window.visualViewport;
+      if (vv) {
+        const root = document.documentElement;
+        // A fixed, full-inset box measures the area fixed elements use: the
+        // widened layout viewport on a phone, the window less any classic
+        // scrollbar on a desktop.
+        const area = document.createElement("div");
+        area.setAttribute("aria-hidden", "true");
+        area.style.cssText = "display: block; position: fixed; inset: 0; visibility: hidden; pointer-events: none;";
+        document.body.append(area);
+        let frame = 0;
+        const place = () => {
+          if (!frame) frame = requestAnimationFrame(apply);
+        };
+        const apply = () => {
+          frame = 0;
+          const { width, height } = area.getBoundingClientRect();
+          const offsetX = width - (vv.offsetLeft + vv.width);
+          const offsetY = height - (vv.offsetTop + vv.height);
+          root.style.setProperty("--mobile-toc-offset-x", `${Math.max(0, offsetX)}px`);
+          root.style.setProperty("--mobile-toc-offset-y", `${Math.max(0, offsetY)}px`);
+          root.style.setProperty("--mobile-toc-offset-left", `${vv.offsetLeft}px`);
+        };
+        const { signal } = listeners;
+        signal.addEventListener("abort", () => {
+          cancelAnimationFrame(frame);
+          area.remove();
+          ["x", "y", "left"].forEach((side) => root.style.removeProperty(`--mobile-toc-offset-${side}`));
+        });
+        vv.addEventListener("resize", place, { signal });
+        vv.addEventListener("scroll", place, { signal });
+        // Late images can widen the layout viewport without a visualViewport event.
+        window.addEventListener("resize", place, { signal });
+        window.addEventListener("load", place, { signal });
+        apply();
+      }
+
       return () => {
+        listeners.abort();
         observer.disconnect();
         if (sheet.matches(":popover-open")) sheet.hidePopover();
         pill.remove();
