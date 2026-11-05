@@ -18,8 +18,8 @@
 
 .toc-sheet-pill {
   position: fixed;
-  right: calc(1rem + env(safe-area-inset-right));
-  bottom: calc(1rem + env(safe-area-inset-bottom));
+  right: calc(1rem + env(safe-area-inset-right) + var(--mobile-toc-offset-x, 0px));
+  bottom: calc(1rem + env(safe-area-inset-bottom) + var(--mobile-toc-offset-y, 0px));
   z-index: 1000;
   display: inline-flex;
   align-items: center;
@@ -39,7 +39,9 @@
 
 // Back-to-top goes above the pill, so the two never overlap.
 body:has(.toc-sheet-pill) #quarto-back-to-top {
-  bottom: calc(1rem + env(safe-area-inset-bottom) + 44px + 0.75rem);
+  // Quarto centres it with left: 50%; move that centre to the visible area.
+  left: calc(50% + (var(--mobile-toc-offset-left, 0px) - var(--mobile-toc-offset-x, 0px)) / 2);
+  bottom: calc(1rem + env(safe-area-inset-bottom) + var(--mobile-toc-offset-y, 0px) + 44px + 0.75rem);
 }
 
 .toc-sheet {

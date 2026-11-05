@@ -72,7 +72,35 @@
       const observer = new MutationObserver(mirror);
       observer.observe(list, { subtree: true, attributes: true, attributeFilter: ["class"] });
 
+      // On a phone, content wider than the screen widens the layout viewport,
+      // and a fixed element follows its far edge off screen. Shift the pill and
+      // back-to-top by the gap between the layout and the visual viewport.
+      const root = document.documentElement;
+      const vv = window.visualViewport;
+      const place = () => {
+        if (!vv) return;
+        const offsetX = window.innerWidth - (vv.offsetLeft + vv.width);
+        const offsetY = window.innerHeight - (vv.offsetTop + vv.height);
+        root.style.setProperty("--mobile-toc-offset-x", `${Math.max(0, offsetX)}px`);
+        root.style.setProperty("--mobile-toc-offset-y", `${Math.max(0, offsetY)}px`);
+        root.style.setProperty("--mobile-toc-offset-left", `${vv.offsetLeft}px`);
+      };
+      vv?.addEventListener("resize", place);
+      vv?.addEventListener("scroll", place);
+      window.addEventListener("resize", place);
+      window.addEventListener("scroll", place, { passive: true });
+      window.addEventListener("load", place);
+      place();
+
       return () => {
+        vv?.removeEventListener("resize", place);
+        vv?.removeEventListener("scroll", place);
+        window.removeEventListener("resize", place);
+        window.removeEventListener("scroll", place);
+        window.removeEventListener("load", place);
+        root.style.removeProperty("--mobile-toc-offset-x");
+        root.style.removeProperty("--mobile-toc-offset-y");
+        root.style.removeProperty("--mobile-toc-offset-left");
         observer.disconnect();
         if (sheet.matches(":popover-open")) sheet.hidePopover();
         pill.remove();
