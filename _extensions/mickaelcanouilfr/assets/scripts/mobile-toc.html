@@ -79,14 +79,22 @@
       const vv = window.visualViewport;
       if (vv) {
         const root = document.documentElement;
+        // A fixed, full-inset box measures the area fixed elements use: the
+        // widened layout viewport on a phone, the window less any classic
+        // scrollbar on a desktop.
+        const area = document.createElement("div");
+        area.setAttribute("aria-hidden", "true");
+        area.style.cssText = "display: block; position: fixed; inset: 0; visibility: hidden; pointer-events: none;";
+        document.body.append(area);
         let frame = 0;
         const place = () => {
           if (!frame) frame = requestAnimationFrame(apply);
         };
         const apply = () => {
           frame = 0;
-          const offsetX = window.innerWidth - (vv.offsetLeft + vv.width);
-          const offsetY = window.innerHeight - (vv.offsetTop + vv.height);
+          const { width, height } = area.getBoundingClientRect();
+          const offsetX = width - (vv.offsetLeft + vv.width);
+          const offsetY = height - (vv.offsetTop + vv.height);
           root.style.setProperty("--mobile-toc-offset-x", `${Math.max(0, offsetX)}px`);
           root.style.setProperty("--mobile-toc-offset-y", `${Math.max(0, offsetY)}px`);
           root.style.setProperty("--mobile-toc-offset-left", `${vv.offsetLeft}px`);
@@ -94,6 +102,7 @@
         const { signal } = listeners;
         signal.addEventListener("abort", () => {
           cancelAnimationFrame(frame);
+          area.remove();
           ["x", "y", "left"].forEach((side) => root.style.removeProperty(`--mobile-toc-offset-${side}`));
         });
         vv.addEventListener("resize", place, { signal });
