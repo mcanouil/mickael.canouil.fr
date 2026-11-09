@@ -46,7 +46,7 @@ render_pinned_post posts/2023-05-30-quarto-light-dark
 
 quarto render posts/2024-12-30-quarto-github-pages
 quarto render posts/2025-04-21-quarto-revealjs-tabset-pdf
-bash posts/2025-04-21-quarto-revealjs-tabset-pdf/assets/featured.sh
+(cd posts/2025-04-21-quarto-revealjs-tabset-pdf/assets && bash featured.sh)
 quarto render posts/2025-05-19-quarto-codespaces
 quarto render posts/2025-10-20-quarto-wizard-1-0-0
 quarto render posts/2025-11-06-quarto-extensions-lua
