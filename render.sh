@@ -2,6 +2,14 @@
 
 set -euo pipefail
 
+export CHROMOTE_CHROME="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
+export PUPPETEER_EXECUTABLE_PATH="${CHROMOTE_CHROME}"
+
+render_pinned_post() {
+	# shellcheck source=/dev/null
+	(cd "$1" && rig --user proj sync && . .rvenv/bin/activate && quarto render .)
+}
+
 # Icon set and social card.
 # Every raster below is derived from `assets/images/icon.svg`, and the card
 # from `assets/og-image.typ`, so the committed binaries can always be rebuilt
@@ -20,28 +28,25 @@ magick /tmp/mc-icon-32.png -define icon:auto-resize=32 favicon.ico
 # 1200pt by 630pt at 72 ppi is exactly the 1200x630 Open Graph expects.
 typst compile --root . assets/og-image.typ assets/images/og-image.png --ppi 72
 
-Rscript -e "renv::activate(profile = '2020-05-06-ggpacman'); renv::restore()"
-quarto render posts/2020-05-06-ggpacman
+rig --user proj sync
+# shellcheck source=/dev/null
+. .rvenv/bin/activate
 
-Rscript -e "renv::activate(profile = '2021-05-06-floating-toc-in-blogdown'); renv::restore()"
-quarto render posts/2021-05-06-floating-toc-in-blogdown
+render_pinned_post posts/2020-05-06-ggpacman
 
-Rscript -e "renv::activate(profile = '2023-03-05-quarto-auto-table-crossref'); renv::restore()"
-quarto render posts/2023-03-05-quarto-auto-table-crossref
+render_pinned_post posts/2021-05-06-floating-toc-in-blogdown
 
-Rscript -e "renv::activate(profile = '2023-03-12-quarto-mathjax-packages'); renv::restore()"
-quarto render posts/2023-03-12-quarto-mathjax-packages
+render_pinned_post posts/2023-03-05-quarto-auto-table-crossref
 
-Rscript -e "renv::activate(profile = 'default'); renv::restore()"
+render_pinned_post posts/2023-03-12-quarto-mathjax-packages
+
 quarto render posts/2023-05-07-quarto-docker
 
-Rscript -e "renv::activate(profile = '2023-05-30-quarto-light-dark'); renv::restore()"
-quarto render posts/2023-05-30-quarto-light-dark
+render_pinned_post posts/2023-05-30-quarto-light-dark
 
-Rscript -e "renv::activate(profile = 'default'); renv::restore()"
 quarto render posts/2024-12-30-quarto-github-pages
 quarto render posts/2025-04-21-quarto-revealjs-tabset-pdf
-bash posts/2025-04-21-quarto-revealjs-tabset-pdf/assets/featured.sh
+(cd posts/2025-04-21-quarto-revealjs-tabset-pdf/assets && bash featured.sh)
 quarto render posts/2025-05-19-quarto-codespaces
 quarto render posts/2025-10-20-quarto-wizard-1-0-0
 quarto render posts/2025-11-06-quarto-extensions-lua
@@ -60,6 +65,7 @@ quarto render posts/2026-04-21-quarto-revealjs-extensions
 # Typst automatically). Prerequisite: a Python environment with `jupyter`,
 # `polars`, and `ipython`, exposed to Quarto as a kernel named `gribouille-post`.
 uv venv --python 3.13 .venv
+# shellcheck source=/dev/null
 . .venv/bin/activate
 uv pip install jupyter polars ipython
 python -m ipykernel install --user --name gribouille-post --display-name "Python (gribouille-post)"
@@ -68,12 +74,13 @@ deactivate
 
 quarto render posts/2026-05-28-typst-linkedin-carousels
 quarto render posts/2026-06-03-gribouille-0-2
-Rscript posts/2026-06-10-why-quarto-stuck/assets/scripts/quarto-cli-activity.R
+rig --user run posts/2026-06-10-why-quarto-stuck/assets/scripts/quarto-cli-activity.R
 quarto render posts/2026-06-10-why-quarto-stuck
 quarto render posts/2026-06-15-gribouille-0-3
 quarto render posts/2026-06-22-gribouille-0-4
 quarto render posts/2026-07-01-r-package-shiny-quarto
 quarto render posts/2026-07-06-shiny-great-docs
+quarto render posts/2026-07-13-gribouille-0-5
 
 # 2026-07-24-quarto-stop-duplicating
 # The post shows one demo source rendered to HTML, Typst, and reveal.js by the
@@ -81,5 +88,18 @@ quarto render posts/2026-07-06-shiny-great-docs
 # under `assets/output/`, so they are only rebuilt when the demo changes.
 (cd posts/2026-07-24-quarto-stop-duplicating/assets/_demo && quarto render)
 quarto render posts/2026-07-24-quarto-stop-duplicating
+
+quarto render posts/2026-07-28-gribouille-0-6
+quarto render posts/2026-08-17-quarto-clinical-report
+
+# `assets/_benchmark/run.py` is run by hand, because it reads a local Gribouille build.
+bash posts/2026-08-25-gribouille-0-7/assets/_polar/render.sh
+quarto render posts/2026-08-25-gribouille-0-7
+
+# `assets/capture/capture.sh` is run by hand, because it drives VS Code over AppleScript.
+quarto render posts/2026-09-07-quarto-wizard-3-3
+quarto render posts/2026-10-05-quarto-atelier-project-type
+quarto render posts/2026-10-22-keisen-0-1
+quarto render posts/2026-11-02-nacho-3-0
 
 quarto render
