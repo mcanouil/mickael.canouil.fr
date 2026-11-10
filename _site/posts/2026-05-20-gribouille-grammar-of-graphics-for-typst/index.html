@@ -192,6 +192,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <meta property="og:type" content="article">
+<meta property="og:url" content="https://mickael.canouil.fr/posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="../../assets/images/icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/images/apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
 
 
 <meta property="og:title" content="Gribouille: a Grammar of Graphics for Typst - mickael.canouil.fr">
@@ -585,11 +591,11 @@ clouds for the species and per-species summary labels.
 <section id="why-a-grammar-of-graphics-for-typst" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="why-a-grammar-of-graphics-for-typst"><span class="header-section-number">2</span> Why a grammar of graphics for Typst</h2>
 <p>Until now, producing a figure inside a Typst document meant taking a detour through another language. You would leave Typst to call out to <code>ggplot2</code>, <a href="https://matplotlib.org"><code>matplotlib</code></a>, or <a href="https://plotnine.org"><code>plotnine</code></a>, save a PNG or SVG, and import it back. That works, but it splits the toolchain in two: one font system on the page, another inside the figure; one colour palette in the report, another in the chart; one render pass that knows about the layout, another that does not.</p>
-<p><code>cetz</code> already gives Typst a robust low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing. That is exactly the gap Gribouille fills.</p>
+<p><code>cetz</code> already gives Typst a low-level drawing API, but the declarative layer that turns a dataset, a mapping, and a few layers into a publication-quality figure was missing. That is exactly the gap Gribouille fills.</p>
 <div class="highlight">
 <p><strong>One toolchain.</strong> Same fonts, same palette, same render pass, from data to PDF.</p>
 </div>
-<p>The pay-off is a single toolchain. Give a plot an <code>alt:</code> description and Gribouille wraps the result in a Typst <code>figure</code> element with <code>kind: "gribouille-plot"</code>, so you can attach show rules, captions, or cross-references in one place; with or without it, every plot shares the document’s fonts, palette, and geometry. The YAML front-matter of this very post wires its <code>background:</code> and <code>foreground:</code> to the site’s light and dark colours, and every figure below reacts automatically when you toggle the theme. Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.</p>
+<p>The pay-off is a single toolchain. Give a plot an <code>alt:</code> description and Gribouille wraps the result in a Typst <code>figure</code> element with <code>kind: "gribouille-plot"</code>, so you can attach show rules, captions, or cross-references in one place. Every plot shares the document’s fonts, palette, and geometry, whether or not you add that description. The YAML front-matter of this very post wires its <code>background:</code> and <code>foreground:</code> to the site’s light and dark colours, and every figure below reacts automatically when you toggle the theme. Compilation is deterministic, offline-friendly, and produces a PDF straight out of Typst with no Python or R runtime required.</p>
 </section>
 <section id="a-respectful-nod-to-ggplot2" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="a-respectful-nod-to-ggplot2"><span class="header-section-number">3</span> A respectful nod to ggplot2</h2>
@@ -602,10 +608,14 @@ clouds for the species and per-species summary labels.
 <p>Every plot you build composes the same pieces. <a href="https://m.canouil.dev/gribouille/reference/core/plot.html"><code>plot()</code></a> wraps a stack of layers, each sheet sitting on the one below, from data and mapping at the foundation up through theme and labels.</p>
 <div>
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-light.svg" class="img-fluid hero-art" style="display: block; margin-inline: auto;" alt="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/grammar-dark.svg" class="img-fluid hero-art" style="display: block; margin-inline: auto;" alt="A plot() container surrounding six stacked parallax sheets representing the grammar layers, from bottom to top: data plus aes(), layer (geom plus stat plus position), scale-*, coord-*, facet-*, and theme plus labs."></a></p>
+</div>
 </div>
 </div>
 <p>The post’s YAML points the <code>typst-render</code> extension at a one-line preamble file so every <code>{typst}</code> block has the library in scope:</p>
@@ -631,10 +641,14 @@ clouds for the species and per-species summary labels.
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-light.svg" class="img-fluid hero-art" alt="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-1-dark.svg" class="img-fluid hero-art" alt="Scatter of penguin body mass against flipper length, every point in the default theme ink colour, no legend."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -661,10 +675,14 @@ clouds for the species and per-species summary labels.
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-light.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2a-dark.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, points coloured by species (Adelie, Chinstrap, Gentoo) with a species legend on the right."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -687,10 +705,14 @@ clouds for the species and per-species summary labels.
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-light.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-2b-dark.svg" class="img-fluid hero-art" alt="Scatter of body mass against flipper length, monochrome with point glyphs distinguishing species: open circles for Adelie, triangles for Chinstrap, squares for Gentoo, with a species shape legend on the right."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -733,10 +755,14 @@ Note
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-light.svg" class="img-fluid hero-art" alt="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-3-dark.svg" class="img-fluid hero-art" alt="Per-species scatter coloured by species with one linear fit and confidence ribbon per group, and a species legend on the right."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -776,10 +802,14 @@ Note
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-light.svg" class="img-fluid hero-art" alt="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-13"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-4-dark.svg" class="img-fluid hero-art" alt="Same per-species scatter and linear fits as step 3, now using a colour-blind-friendly Okabe-Ito palette (blue, vermillion, bluish green)."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -833,10 +863,14 @@ Tip
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-light.svg" class="img-fluid hero-art" alt="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-5-dark.svg" class="img-fluid hero-art" alt="Three panels (Torgersen, Biscoe, Dream) arranged on a two-column grid, one per island, sharing colour and axis scales."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -926,10 +960,14 @@ Tip
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-16"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-light.svg" class="img-fluid hero-art" alt="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-17"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/step-6-dark.svg" class="img-fluid hero-art" alt="Polished faceted scatter on a minimal theme with bold title, a subtitle pairing the linear-fit formula with the three species names rendered in their respective colours, thousands-separated y ticks, title-cased axis labels, and the species legend tucked inside the empty bottom-right facet panel."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -963,10 +1001,14 @@ Tip
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-18"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-light.svg" class="img-fluid hero-art" alt="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-19"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/compose-dark.svg" class="img-fluid hero-art" alt="Two side-by-side scatter plots, the left of penguin body mass against flipper length and the right against bill length, points coloured by species (Adelie, Chinstrap, Gentoo), with a single shared species legend on the right of the pair."></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -1000,7 +1042,7 @@ Note
 </section>
 <section id="drive-gribouille-from-any-computation" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="drive-gribouille-from-any-computation"><span class="header-section-number">6</span> Drive Gribouille from any computation</h2>
-<p><code>Typst Render</code> 0.13.1 adds a small but powerful helper called <code>typst_define()</code>, available from both R and Python. It lets a code cell hand any value to every <code>{typst}</code> block in the document under a single Typst dictionary named <code>typst_define</code>. A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.</p>
+<p><code>Typst Render</code> 0.13.1 adds a small helper called <code>typst_define()</code>, available from both R and Python. It lets a code cell hand any value to every <code>{typst}</code> block in the document under a single Typst dictionary named <code>typst_define</code>. A scalar, a list, a dictionary, a NumPy array, a Polars DataFrame, anything JSON-serialisable, lands in Typst as the corresponding native value.</p>
 <div class="highlight">
 <p><strong>Compute anywhere, render in Typst.</strong> <code>typst_define()</code> is the bridge.</p>
 </div>
@@ -1030,7 +1072,7 @@ Note
 <p>The code cell below inlines the same bootstrap with <code>#| echo: true</code> so you can read it in context.</p>
 </div>
 </div>
-<div id="3cf60eb7" class="cell" data-execution_count="1">
+<div id="f3261793" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" data-filename="python"><pre class="sourceCode python cw-auto code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1156,10 +1198,14 @@ Note
 </div>
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="light-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-light.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-20"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-light.svg" class="img-fluid hero-art" alt="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."></a></p>
 </div>
+</div>
 <div class="dark-content">
+<div style="text-align: center;">
 <p><a href="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-dark.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-21"><img src="../../posts/2026-05-20-gribouille-grammar-of-graphics-for-typst/./assets/typst-render/polars-summary-dark.svg" class="img-fluid hero-art" alt="Bar chart of mean body mass per species (Adelie, Chinstrap, Gentoo), three coloured bars on a minimal theme with bold title, sentence-case subtitle 'Computed in Polars, drawn in Gribouille', and a species legend on the right."></a></p>
+</div>
 </div>
 </div>
 </div>
