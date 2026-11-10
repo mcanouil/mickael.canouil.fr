@@ -2,17 +2,19 @@
 
 set -euo pipefail
 
-rm -rf screenshots
-mkdir -p screenshots
+new_screenshots="$(mktemp -d)"
 npx -y decktape reveal \
 	--chrome-arg=--no-sandbox \
 	--chrome-arg=--disable-setuid-sandbox \
 	--fragments \
 	--screenshots \
 	--screenshots-format png \
-	--screenshots-directory screenshots \
+	--screenshots-directory "${new_screenshots}" \
 	--size "1280x640" \
-	_demo-tabset.html _demo-tabset-2.pdf && rm -f _demo-tabset-2.pdf
+	_demo-tabset.html _demo-tabset-2.pdf
+rm -f _demo-tabset-2.pdf
+rm -rf screenshots
+mv "${new_screenshots}" screenshots
 
 magick \
 	-delay 75 \
