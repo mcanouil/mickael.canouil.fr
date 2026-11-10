@@ -3,6 +3,7 @@
 set -euo pipefail
 
 new_screenshots="$(mktemp -d)"
+trap 'rm -rf "${new_screenshots}"' EXIT
 npx -y decktape reveal \
 	--chrome-arg=--no-sandbox \
 	--chrome-arg=--disable-setuid-sandbox \
@@ -15,6 +16,7 @@ npx -y decktape reveal \
 rm -f _demo-tabset-2.pdf
 rm -rf screenshots
 mv "${new_screenshots}" screenshots
+chmod 755 screenshots
 
 magick \
 	-delay 75 \
