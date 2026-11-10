@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
 new_screenshots="$(mktemp -d)"
 trap 'rm -rf "${new_screenshots}"' EXIT
 npx -y decktape reveal \
