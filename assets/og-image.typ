@@ -6,6 +6,7 @@
 // `--root .` lets the file reach the artwork under `_extensions/`.
 //
 // Colours come from `_extensions/mickaelcanouilfr/scss/_defaults.scss`.
+// The mark and the wordmark come from `assets/brand/build.sh`, run by `render.sh`.
 // The title is the existing outlined wordmark rather than live text, so the
 // card needs neither Dancing Script nor Alegreya SC to be installed.
 //
@@ -24,7 +25,7 @@
   #stack(
     dir: ttb,
     spacing: 26pt,
-    image("images/icon.svg", width: 100pt),
+    image("images/mark.svg", width: 150pt),
     image("/_extensions/mickaelcanouilfr/assets/images/logo-gold-path.svg", width: 560pt),
     line(length: 240pt, stroke: 1.5pt + gold),
     text(size: 36pt, style: "italic")[Biostatistician, Quarto wizard, and cinephile.],

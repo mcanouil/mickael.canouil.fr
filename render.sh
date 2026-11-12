@@ -10,21 +10,36 @@ render_pinned_post() {
 	(cd "$1" && rig --user proj sync && . .rvenv/bin/activate && quarto render .)
 }
 
-# Icon set and social card.
-# Every raster below is derived from `assets/images/icon.svg`, and the card
-# from `assets/og-image.typ`, so the committed binaries can always be rebuilt
-# from source. Needs `rsvg-convert` (librsvg), ImageMagick, and Typst.
+# Brand marks, icon set, and social card.
+# `assets/brand/build.sh` colours the editable sources in `assets/brand` with
+# the gold variant: the small icon, the large mark, and the outlined
+# wordmarks. The wordmarks keep the file names that the extension, the card,
+# and the README use. The ink wordmark also serves as the dark one.
+brand_build="$(mktemp -d)"
+assets/brand/build.sh assets/brand/gold.yml "${brand_build}"
+cp "${brand_build}/icon.svg" "${brand_build}/mark.svg" assets/images/
+logo_dir=_extensions/mickaelcanouilfr/assets/images
+cp "${brand_build}/logo-accent.svg" "${logo_dir}/logo-gold-path.svg"
+cp "${brand_build}/logo-ink.svg" "${logo_dir}/logo-ink-path.svg"
+cp "${brand_build}/logo-ink.svg" "${logo_dir}/logo-dark-path.svg"
+cp "${brand_build}/logo-paper.svg" "${logo_dir}/logo-light-path.svg"
+# Every raster below is derived from those SVG files, and the card from
+# `assets/og-image.typ`, so the committed binaries can always be rebuilt from
+# source. Needs `rsvg-convert` (librsvg), ImageMagick, and Typst.
+# `favicon.ico` uses the small icon, which stays legible at 16 and 32 px.
+# The other icons use the large mark.
 # The Apple touch icon is composited onto a larger opaque canvas rather than
 # scaled, so it carries the padding and the flat background that Apple asks
 # for, with no self-applied rounded corners. `-strip` drops the creation
 # timestamp ImageMagick would otherwise write, which made every run produce a
 # different file and show up as a spurious diff.
-rsvg-convert -w 192 -h 192 assets/images/icon.svg -o assets/images/icon-192.png
-rsvg-convert -w 512 -h 512 assets/images/icon.svg -o assets/images/icon-512.png
-rsvg-convert -w 160 -h 160 assets/images/icon.svg -o /tmp/mc-icon-160.png
-magick -size 180x180 xc:'#111827' /tmp/mc-icon-160.png -gravity center -composite -alpha off -strip assets/images/apple-touch-icon.png
-rsvg-convert -w 32 -h 32 assets/images/icon.svg -o /tmp/mc-icon-32.png
-magick /tmp/mc-icon-32.png -define icon:auto-resize=32 favicon.ico
+rsvg-convert -w 192 -h 192 assets/images/mark.svg -o assets/images/icon-192.png
+rsvg-convert -w 512 -h 512 assets/images/mark.svg -o assets/images/icon-512.png
+rsvg-convert -w 160 -h 160 assets/images/mark.svg -o "${brand_build}/mark-160.png"
+magick -size 180x180 xc:"$(yq -r '.light."ground-1"' assets/brand/gold.yml)" "${brand_build}/mark-160.png" -gravity center -composite -alpha off -strip assets/images/apple-touch-icon.png
+rsvg-convert -w 32 -h 32 assets/images/icon.svg -o "${brand_build}/icon-32.png"
+magick "${brand_build}/icon-32.png" -define icon:auto-resize=32 favicon.ico
+rm -rf "${brand_build}"
 # 1200pt by 630pt at 72 ppi is exactly the 1200x630 Open Graph expects.
 typst compile --root . assets/og-image.typ assets/images/og-image.png --ppi 72
 
