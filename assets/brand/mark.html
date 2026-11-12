@@ -1,0 +1,163 @@
+<!doctype html>
+<!--
+  Geometry source for the large MC mark, `mark.svg`.
+
+  MC is also Monte Carlo. The page places points on a Halton sequence
+  (quasi-Monte Carlo) over a 64 by 64 field. Points that fall in a C-shaped
+  ring get the `accent` role, points that fall in a script M get the `letter`
+  role, and three in ten of the other points stay as a faint `ghost` ground.
+
+  The M comes from the face named in the `font` query parameter, at weight
+  700. The default is Dancing Script. The face must be installed.
+  `assets/brand/build.sh` runs this page in a headless Chromium browser,
+  keeps the SVG that it writes into the body, and then sets the colours.
+
+  @license MIT
+  @copyright 2026 Mickaël Canouil
+  @author Mickaël Canouil
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MC mark generator</title>
+</head>
+<body>
+<script>
+const FONT_NAME = new URLSearchParams(location.search).get("font") || "Dancing Script";
+const FONT = `700 36px '${FONT_NAME}'`;
+
+function fontIsInstalled() {
+  const ctx = document.createElement("canvas").getContext("2d");
+  const sample = "MmWw@ilI";
+  return ["monospace", "serif"].some((fallback) => {
+    ctx.font = `700 36px ${fallback}`;
+    const plain = ctx.measureText(sample).width;
+    ctx.font = `700 36px '${FONT_NAME}', ${fallback}`;
+    return ctx.measureText(sample).width !== plain;
+  });
+}
+const SVG_COMMENT = `
+  Large MC mark for mickael.canouil.fr: a quasi-Monte Carlo monogram.
+  Points on a Halton sequence draw a C ring (accent) and a script M (letter)
+  over a faint ground (ghost).
+  Geometry: assets/brand/mark.html. Colours: assets/brand/build.sh.
+  @license MIT
+  @copyright 2026 Mickaël Canouil
+  @author Mickaël Canouil
+`;
+const DEFAULT_STYLE = `
+    .field { fill: #111827; }
+    .ghost { fill: #2c3341; }
+    .accent { fill: #b5830a; }
+    .letter { fill: #f5f5f4; }
+  `;
+
+const GROUND_POINTS = 900;
+const LETTER_POINTS = 900;
+const GROUND_KEEP = 0.3;
+const GROUND_RADIUS = 0.72;
+const LETTER_RADIUS = 0.95;
+
+function halton(index, base) {
+  let fraction = 1;
+  let result = 0;
+  while (index > 0) {
+    fraction /= base;
+    result += fraction * (index % base);
+    index = Math.floor(index / base);
+  }
+  return result;
+}
+
+function lcg(seed) {
+  let state = seed >>> 0;
+  return () => (state = (state * 1664525 + 1013904223) >>> 0) / 2 ** 32;
+}
+
+function scriptM() {
+  const scale = 4;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 64 * scale;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.font = FONT;
+  ctx.textAlign = "center";
+  ctx.lineWidth = 3;
+  ctx.lineJoin = "round";
+  ctx.fillText("M", 31.5, 45);
+  ctx.strokeText("M", 31.5, 45);
+  const alpha = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  return (x, y) => alpha[(Math.floor(y * scale) * canvas.width + Math.floor(x * scale)) * 4 + 3] > 100;
+}
+
+function inRing(x, y) {
+  const dx = x - 32;
+  const dy = y - 32;
+  const distance = Math.hypot(dx, dy);
+  const angle = Math.atan2(-dy, dx) * 180 / Math.PI;
+  return distance > 19 && distance < 28 && Math.abs(angle) > 42;
+}
+
+function inField(x, y) {
+  const pad = 2.5;
+  const radius = 14 - pad;
+  const low = pad + radius;
+  const high = 64 - pad - radius;
+  const cx = Math.min(Math.max(x, low), high);
+  const cy = Math.min(Math.max(y, low), high);
+  return Math.hypot(x - cx, y - cy) <= radius;
+}
+
+function point(index) {
+  return [3 + halton(index, 2) * 58, 3 + halton(index, 3) * 58];
+}
+
+function circle(x, y, r) {
+  return `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${r}"/>`;
+}
+
+function build() {
+  if (!fontIsInstalled()) {
+    document.body.innerHTML = `<p id="error">The face '${FONT_NAME}' is not installed.</p>`;
+    return;
+  }
+  const inM = scriptM();
+  const random = lcg(7);
+  const ground = [];
+  const ring = [];
+  const letter = [];
+
+  for (let i = 1; i <= GROUND_POINTS; i++) {
+    const [x, y] = point(i);
+    if (!inField(x, y) || inM(x, y) || inRing(x, y)) continue;
+    if (random() <= GROUND_KEEP) ground.push(circle(x, y, GROUND_RADIUS));
+  }
+  for (let i = 101; i < 101 + LETTER_POINTS; i++) {
+    const [x, y] = point(i);
+    if (inM(x, y)) letter.push(circle(x, y, LETTER_RADIUS));
+    else if (inRing(x, y)) ring.push(circle(x, y, LETTER_RADIUS));
+  }
+
+  document.body.innerHTML = [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="mark-title">`,
+    `<!--${SVG_COMMENT}-->`,
+    `<title id="mark-title">Mickaël Canouil</title>`,
+    `<style>${DEFAULT_STYLE}</style>`,
+    `<rect class="field" width="64" height="64" rx="14"/>`,
+    `<g class="ghost">
+${ground.join("\n")}
+</g>`,
+    `<g class="accent">
+${ring.join("\n")}
+</g>`,
+    `<g class="letter">
+${letter.join("\n")}
+</g>`,
+    `</svg>`,
+  ].join("\n");
+}
+
+document.fonts.load(FONT).then(build);
+</script>
+</body>
+</html>
