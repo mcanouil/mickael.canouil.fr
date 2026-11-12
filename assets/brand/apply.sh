@@ -92,6 +92,7 @@ fi
 assets/brand/build.sh "${variant}" "${built}"
 field="$(sed -n 's/^field=//p' "${built}/roles.env")"
 accent="$(sed -n 's/^accent=//p' "${built}/roles.env")"
+ghost="$(sed -n 's/^ghost=//p' "${built}/roles.env")"
 cp "${built}/icon.svg" "${built}/mark.svg" assets/images/
 cp "${built}"/logo-*.svg _extensions/mickaelcanouilfr/assets/images/
 
@@ -109,4 +110,4 @@ magick -size 180x180 xc:"${field}" "${brand_build}/mark-160.png" -gravity center
 rsvg-convert -w 32 -h 32 assets/images/icon.svg -o "${brand_build}/icon-32.png"
 magick "${brand_build}/icon-32.png" -define icon:auto-resize=32 favicon.ico
 # 1200pt by 630pt at 72 ppi is exactly the 1200x630 that Open Graph expects.
-typst compile --root . --input field="${field}" --input accent="${accent}" assets/og-image.typ assets/images/og-image.png --ppi 72
+typst compile --root . --input field="${field}" --input accent="${accent}" --input ghost="${ghost}" assets/og-image.typ assets/images/og-image.png --ppi 72
