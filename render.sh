@@ -10,36 +10,8 @@ render_pinned_post() {
 	(cd "$1" && rig --user proj sync && . .rvenv/bin/activate && quarto render .)
 }
 
-# Brand marks, icon set, and social card.
-# `assets/brand/build.sh` colours the editable sources in `assets/brand` with
-# the gold variant: the small icon, the large mark, and the outlined
-# wordmarks. It also writes `roles.env`, the colour of each role, which sets
-# the Apple touch icon background and the social card colours below.
-brand_build="$(mktemp -d)"
-trap 'rm -rf "${brand_build}"' EXIT
-assets/brand/build.sh assets/brand/gold.yml "${brand_build}"
-field="$(sed -n 's/^field=//p' "${brand_build}/roles.env")"
-accent="$(sed -n 's/^accent=//p' "${brand_build}/roles.env")"
-cp "${brand_build}/icon.svg" "${brand_build}/mark.svg" assets/images/
-cp "${brand_build}"/logo-*.svg _extensions/mickaelcanouilfr/assets/images/
-# Every raster below is derived from those SVG files, and the card from
-# `assets/og-image.typ`, so the committed binaries can always be rebuilt from
-# source. Needs `rsvg-convert` (librsvg), ImageMagick, and Typst.
-# `favicon.ico` uses the small icon, which stays legible at 16 and 32 px.
-# The other icons use the large mark.
-# The Apple touch icon is composited onto a larger opaque canvas rather than
-# scaled, so it carries the padding and the flat background that Apple asks
-# for, with no self-applied rounded corners. `-strip` drops the creation
-# timestamp ImageMagick would otherwise write, which made every run produce a
-# different file and show up as a spurious diff.
-rsvg-convert -w 192 -h 192 assets/images/mark.svg -o assets/images/icon-192.png
-rsvg-convert -w 512 -h 512 assets/images/mark.svg -o assets/images/icon-512.png
-rsvg-convert -w 160 -h 160 assets/images/mark.svg -o "${brand_build}/mark-160.png"
-magick -size 180x180 xc:"${field}" "${brand_build}/mark-160.png" -gravity center -composite -alpha off -strip assets/images/apple-touch-icon.png
-rsvg-convert -w 32 -h 32 assets/images/icon.svg -o "${brand_build}/icon-32.png"
-magick "${brand_build}/icon-32.png" -define icon:auto-resize=32 favicon.ico
-# 1200pt by 630pt at 72 ppi is exactly the 1200x630 Open Graph expects.
-typst compile --root . --input field="${field}" --input accent="${accent}" assets/og-image.typ assets/images/og-image.png --ppi 72
+# The icons, the wordmarks, and the social card come from `assets/brand/apply.sh`.
+# Run it after a change to the brand sources; this script does not.
 
 rig --user proj sync
 # shellcheck source=/dev/null

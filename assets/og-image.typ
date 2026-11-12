@@ -1,6 +1,6 @@
 // Source for `assets/images/og-image.png`, the 1200x630 social preview card.
 //
-// `render.sh` compiles it with the `field` and `accent` colours that
+// `assets/brand/apply.sh` compiles it with the `field` and `accent` colours that
 // `assets/brand/build.sh` resolves for the gold variant, passed as inputs:
 //   typst compile --root . --input field=#111827 --input accent=#b5830a \
 //     assets/og-image.typ assets/images/og-image.png --ppi 72
