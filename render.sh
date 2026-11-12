@@ -11,7 +11,8 @@ render_pinned_post() {
 }
 
 # The icons, the wordmarks, and the social card come from `assets/brand/apply.sh`.
-# Run it after a change to the brand sources; this script does not.
+# This script does not rebuild them: it only stops when they are out of date.
+assets/brand/apply.sh --check
 
 rig --user proj sync
 # shellcheck source=/dev/null

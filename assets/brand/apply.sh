@@ -2,9 +2,15 @@
 # Apply the gold variant of the brand to the site: the icons, the wordmarks,
 # and the social card.
 #
-# Usage: assets/brand/apply.sh
+# Usage: assets/brand/apply.sh [--check]
 #
-# Run it after a change to a file in `assets/brand`, then commit the results.
+# Run it after a change to a file in `assets/brand` or to the site palette,
+# then commit the results.
+# With `--check`, it builds into a temporary directory, compares the files
+# that build the same on every machine (`icon.svg` and the three wordmarks)
+# with the committed ones, lists the files that differ, and changes nothing.
+# `render.sh` runs the check, so a source change without a run of this script
+# stops the render.
 # `render.sh` does not run it: the large mark samples a font through a
 # Chromium canvas, so a browser or font update can move its points. Running
 # the build only on purpose keeps the committed files stable between renders.
@@ -23,6 +29,16 @@
 # @author Mickaël Canouil
 
 set -euo pipefail
+
+check=false
+case "${1:-}" in
+"") ;;
+--check) check=true ;;
+*)
+	echo "Usage: $0 [--check]" >&2
+	exit 64
+	;;
+esac
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 export CHROME_PATH="${CHROME_PATH:-${CHROMOTE_CHROME:-/Applications/Brave Browser.app/Contents/MacOS/Brave Browser}}"
@@ -56,6 +72,23 @@ dark:
 VARIANT
 
 built="${brand_build}/out"
+if [[ "${check}" == true ]]; then
+	assets/brand/build.sh "${variant}" "${built}" >/dev/null 2>&1
+	logo_dir=_extensions/mickaelcanouilfr/assets/images
+	stale=()
+	cmp -s "${built}/icon.svg" assets/images/icon.svg || stale+=(assets/images/icon.svg)
+	for logo in logo-accent.svg logo-ink.svg logo-paper.svg; do
+		cmp -s "${built}/${logo}" "${logo_dir}/${logo}" || stale+=("${logo_dir}/${logo}")
+	done
+	if ((${#stale[@]} > 0)); then
+		echo "Error: these brand files are out of date. Run assets/brand/apply.sh and commit the results:" >&2
+		printf '  %s\n' "${stale[@]}" >&2
+		exit 1
+	fi
+	echo "Brand files are up to date."
+	exit 0
+fi
+
 assets/brand/build.sh "${variant}" "${built}"
 field="$(sed -n 's/^field=//p' "${built}/roles.env")"
 accent="$(sed -n 's/^accent=//p' "${built}/roles.env")"
