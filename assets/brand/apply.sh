@@ -9,9 +9,11 @@
 # Chromium canvas, so a browser or font update can move its points. Running
 # the build only on purpose keeps the committed files stable between renders.
 #
-# `build.sh` colours the editable sources with `gold.yml` and writes
-# `roles.env`, the colour of each role. That file sets the Apple touch icon
-# background and the social card colours below.
+# The gold variant comes from the site palette in
+# `_extensions/mickaelcanouilfr/scss/_defaults.scss`, so a colour change there
+# reaches the brand at the next run. `build.sh` colours the editable sources
+# with it and writes `roles.env`, the colour of each role. That file sets the
+# Apple touch icon background and the social card colours below.
 # Every raster is derived from the built SVG files, and the card from
 # `assets/og-image.typ`. Needs what `build.sh` needs, plus `rsvg-convert`
 # (librsvg), ImageMagick, and Typst.
@@ -23,15 +25,42 @@
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
-export CHROME_PATH="${CHROME_PATH:-/Applications/Brave Browser.app/Contents/MacOS/Brave Browser}"
+export CHROME_PATH="${CHROME_PATH:-${CHROMOTE_CHROME:-/Applications/Brave Browser.app/Contents/MacOS/Brave Browser}}"
 
 brand_build="$(mktemp -d)"
 trap 'rm -rf "${brand_build}"' EXIT
-assets/brand/build.sh assets/brand/gold.yml "${brand_build}"
-field="$(sed -n 's/^field=//p' "${brand_build}/roles.env")"
-accent="$(sed -n 's/^accent=//p' "${brand_build}/roles.env")"
-cp "${brand_build}/icon.svg" "${brand_build}/mark.svg" assets/images/
-cp "${brand_build}"/logo-*.svg _extensions/mickaelcanouilfr/assets/images/
+
+scss=_extensions/mickaelcanouilfr/scss/_defaults.scss
+scss_colour() {
+	local value
+	value="$(sed -n "s/^\\\$mc-$1: *\(#[0-9a-fA-F]\{6\}\).*/\1/p" "${scss}")"
+	if [[ -z "${value}" ]]; then
+		echo "Error: '${scss}' does not set \$mc-$1 to a #rrggbb colour." >&2
+		exit 65
+	fi
+	printf '%s' "${value}"
+}
+paper="$(scss_colour paper)"
+ink="$(scss_colour ink)"
+accent="$(scss_colour accent)"
+ink_dark="$(scss_colour ink-dark)"
+variant="${brand_build}/gold.yml"
+cat >"${variant}" <<VARIANT
+light:
+  paper: "${paper}"
+  ink: "${ink}"
+  accent: "${accent}"
+  ground-1: "${ink}"
+dark:
+  ink: "${ink_dark}"
+VARIANT
+
+built="${brand_build}/out"
+assets/brand/build.sh "${variant}" "${built}"
+field="$(sed -n 's/^field=//p' "${built}/roles.env")"
+accent="$(sed -n 's/^accent=//p' "${built}/roles.env")"
+cp "${built}/icon.svg" "${built}/mark.svg" assets/images/
+cp "${built}"/logo-*.svg _extensions/mickaelcanouilfr/assets/images/
 
 # `favicon.ico` uses the small icon, which stays legible at 16 and 32 px.
 # The other icons use the large mark.
