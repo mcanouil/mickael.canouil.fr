@@ -7,7 +7,7 @@
 // The page is 1200pt by 630pt, so 72 ppi gives exactly 1200x630 pixels, and
 // `--root .` lets the file reach the artwork under `_extensions/`.
 //
-// The mark and the wordmark come from `assets/brand/build.sh` as well.
+// The small icon and the wordmark come from `assets/brand/build.sh` as well.
 // The subtitle colour is a muted gold that no preset token gives.
 // The title is the existing outlined wordmark rather than live text, so the
 // card needs neither Dancing Script nor Alegreya SC to be installed.
@@ -27,7 +27,7 @@
   #stack(
     dir: ttb,
     spacing: 26pt,
-    image("images/mark.svg", width: 150pt),
+    image("images/icon.svg", width: 150pt),
     image("/_extensions/mickaelcanouilfr/assets/images/logo-accent.svg", width: 560pt),
     line(length: 240pt, stroke: 1.5pt + gold),
     text(size: 36pt, style: "italic")[Biostatistician, Quarto wizard, and cinephile.],
