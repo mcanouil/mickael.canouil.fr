@@ -34,7 +34,8 @@
 #   mark.svg          large mark, the quasi-Monte Carlo MC;
 #   logo-accent.svg   wordmark in the accent role;
 #   logo-ink.svg      wordmark in the ink logo role, for light backgrounds;
-#   logo-paper.svg    wordmark in the paper logo role, for dark backgrounds.
+#   logo-paper.svg    wordmark in the paper logo role, for dark backgrounds;
+#   roles.env         the colour of each role, as `role=#rrggbb` lines.
 # The logos are outlined, so they need no font.
 #
 # The sources in this folder do not change: `icon.svg`, `mark.html`, and
@@ -69,16 +70,6 @@ fi
 
 read_colour() {
 	local value
-	value="$(yq -r ".${1}.\"${2}\"" "${variant}")"
-	if [[ ! "${value}" =~ ^#[0-9a-fA-F]{6}$ ]]; then
-		echo "Error: '${1}.${2}' in '${variant}' is '${value}', expected a #rrggbb colour." >&2
-		exit 65
-	fi
-	printf '%s' "${value,,}"
-}
-
-read_optional() {
-	local value
 	value="$(yq -r ".${1} // \"\"" "${variant}")"
 	if [[ -n "${value}" && ! "${value}" =~ ^#[0-9a-fA-F]{6}$ ]]; then
 		echo "Error: '${1}' in '${variant}' is '${value}', expected a #rrggbb colour." >&2
@@ -98,8 +89,13 @@ contrast() {
 		}
 		my ($a, $b) = (lum($ARGV[0]), lum($ARGV[1]));
 		($a, $b) = ($b, $a) if $b > $a;
-		printf "%.2f", ($a + 0.05) / ($b + 0.05);
+		printf "%d", 100 * ($a + 0.05) / ($b + 0.05);
 	' "$1" "$2"
+}
+
+# Contrast ratios are in hundredths: 300 is 3:1.
+ratio_text() {
+	printf '%d.%02d:1' $(($1 / 100)) $(($1 % 100))
 }
 
 # pick <role> <background> <minimum> <token>...
@@ -108,15 +104,15 @@ pick() {
 	local best="" best_token="" best_ratio="0"
 	shift 3
 	for token in "$@"; do
-		colour="$(read_optional "${token}")"
+		colour="$(read_colour "${token}")"
 		[[ -z "${colour}" ]] && continue
 		ratio="$(contrast "${colour}" "${background}")"
-		if perl -e 'exit(!($ARGV[0] >= $ARGV[1]))' "${ratio}" "${minimum}"; then
-			echo "  ${role}: ${token} ${colour}, ${ratio}:1 on ${background}" >&2
+		if ((ratio >= minimum)); then
+			echo "  ${role}: ${token} ${colour}, $(ratio_text "${ratio}") on ${background}" >&2
 			printf '%s' "${colour}"
 			return
 		fi
-		if perl -e 'exit(!($ARGV[0] > $ARGV[1]))' "${ratio}" "${best_ratio}"; then
+		if ((ratio > best_ratio)); then
 			best="${colour}" best_token="${token}" best_ratio="${ratio}"
 		fi
 	done
@@ -124,7 +120,7 @@ pick() {
 		echo "Error: '${variant}' sets none of these tokens for ${role}: $*." >&2
 		exit 65
 	fi
-	echo "  Warning: ${role}: no token reaches ${minimum}:1 on ${background}; using ${best_token} ${best}, ${best_ratio}:1." >&2
+	echo "  Warning: ${role}: no token reaches $(ratio_text "${minimum}") on ${background}; using ${best_token} ${best}, $(ratio_text "${best_ratio}")." >&2
 	printf '%s' "${best}"
 }
 
@@ -145,12 +141,16 @@ mix() {
 }
 
 echo "Colour roles for ${variant}:" >&2
-field="$(read_colour light ground-1)"
-letter="$(pick letter "${field}" 3 dark.ink light.on-ground-title)"
-accent="$(pick accent "${field}" 3 light.accent light.accent-high light.on-ground-accent)"
-accent_dark="$(pick accent-dark "${letter}" 3 light.accent light.accent-low light.accent-text)"
-ink="$(pick "ink logo" "#ffffff" 4.5 light.ink dark.paper light.ground-1)"
-paper="$(pick "paper logo" "${field}" 4.5 light.paper dark.ink light.on-ground-title)"
+field="$(read_colour light.ground-1)"
+if [[ -z "${field}" ]]; then
+	echo "Error: '${variant}' does not set light.ground-1." >&2
+	exit 65
+fi
+letter="$(pick letter "${field}" 300 dark.ink light.on-ground-title)"
+accent="$(pick accent "${field}" 300 light.accent light.accent-high light.on-ground-accent)"
+accent_dark="$(pick accent-dark "${letter}" 300 light.accent light.accent-low light.accent-text)"
+ink="$(pick "ink logo" "#ffffff" 450 light.ink dark.paper light.ground-1)"
+paper="$(pick "paper logo" "${field}" 450 light.paper dark.ink light.on-ground-title)"
 ghost="$(mix "${field}" "${letter}" 12)"
 script_font="$(read_font script "Dancing Script")"
 capitals_font="$(read_font capitals "Alegreya SC")"
@@ -186,8 +186,7 @@ font_query="$(perl -e '$_ = shift; s/([^A-Za-z0-9._~-])/sprintf("%%%02X", ord($1
 "${browser}" --headless=new --disable-gpu --virtual-time-budget=5000 \
 	--dump-dom "file://${work}/mark.html?font=${font_query}" 2>/dev/null >"${work}/mark-dom.html"
 if ! grep -q '<svg' "${work}/mark-dom.html"; then
-	echo "Error: the mark page wrote no SVG for the face '${script_font}'." >&2
-	perl -0777 -ne 'print "$1\n" if m{<p id="error">(.*?)</p>}s' "${work}/mark-dom.html" >&2
+	echo "Error: the mark page wrote no SVG. Check that Chromium can use the face '${script_font}'." >&2
 	exit 70
 fi
 perl -0777 -ne 'print "$1\n" if m{(<svg.*?</svg>)}s' "${work}/mark-dom.html" |
@@ -212,5 +211,15 @@ sed "s/#010203/${accent}/g" "${work}/logo-outlined.svg" >"${output}/logo-accent.
 sed "s/#010203/${ink}/g" "${work}/logo-outlined.svg" >"${output}/logo-ink.svg"
 sed "s/#010203/${paper}/g" "${work}/logo-outlined.svg" >"${output}/logo-paper.svg"
 
-echo "Wrote icon.svg, mark.svg, logo-accent.svg, logo-ink.svg, and logo-paper.svg to ${output}."
+cat >"${output}/roles.env" <<ROLES
+field=${field}
+letter=${letter}
+accent=${accent}
+accent_dark=${accent_dark}
+ink=${ink}
+paper=${paper}
+ghost=${ghost}
+ROLES
+
+echo "Wrote icon.svg, mark.svg, logo-accent.svg, logo-ink.svg, logo-paper.svg, and roles.env to ${output}."
 echo "Faces: script '${script_font}', capitals '${capitals_font}'."
