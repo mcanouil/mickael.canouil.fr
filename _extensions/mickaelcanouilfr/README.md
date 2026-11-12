@@ -75,7 +75,7 @@ _extensions/mickaelcanouilfr/
 │   ├── social-metadata.lua       og:type, og:url, icon and manifest links
 │   └── _modules/                 string, logging, metadata helpers
 └── assets/
-    ├── images/                   logo variants (light, dark, gold, ink)
+    ├── images/                   logo variants (accent, ink, paper), from assets/brand/apply.sh
     └── scripts/                  client-side JS hooks
         ├── categories-alphabetical.html
         ├── navbar-tooltips.html
