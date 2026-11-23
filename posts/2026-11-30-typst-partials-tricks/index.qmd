@@ -75,7 +75,8 @@ number-sections: true  # <3>
 ```
 
 1. Ask Typst for a tagged PDF that follows PDF/UA-1.
-   Typst stops with an error when something breaks the standard, so it guards every trick below.
+   Typst checks the PDF against the standard and tags it, and `pdfinfo` reports `Tagged: yes` for the final demo.
+   In my tests, an image with no alt text stops the build with the error `PDF/UA-1 error: missing alt text`.
 2. Load the partials in this order.
    Removing a line removes that trick.
 3. Number the headings through Quarto, which sets the numbering after the partials run.
@@ -192,3 +193,133 @@ Tagged PDFs rely on `table.header` to tell readers and screen readers which cell
 The stripes only help the eye, because the header carries the meaning and colour is never the only signal.
 
 :::
+
+## Captions {#captions}
+
+Make captions small and muted, with the label in bold, and put table captions above the table.
+
+```{.typst include="typst/partials/6-captions.typ" filename="partials/6-captions.typ"}
+```
+
+| Before | After |
+| --- | --- |
+| ![The first page with plain captions in body text size](assets/step5-p1.png){.lightbox group="typst-tricks"} | ![The first page with small muted captions and a bold Table 1 label](assets/step6-p1.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-note}
+
+## What I left out
+
+I first wrote a partial that justified the text and set the language.
+Quarto already justifies text, and it reads `lang` from the YAML, so that partial added nothing.
+Set `lang: en-GB` in the document and Typst uses it for hyphenation.
+
+:::
+
+## Title Block {#title-block}
+
+Replace the default title with a kicker, a title, a short rule, a subtitle and a date.
+
+```{.typst include="typst/partials/7-title-block.typ" filename="partials/7-title-block.typ"}
+```
+
+This one needs a second file, because Quarto decides what it passes to the title block in `typst-show.typ`.
+Here it is, loaded with `template-partials`.
+
+```{.typst include="typst/typst-show.typ" filename="typst-show.typ"}
+```
+
+| Before | After |
+| --- | --- |
+| ![The first page with a centred title, subtitle and date](assets/step6-p1.png){.lightbox group="typst-tricks"} | ![The first page with a small blue Finance kicker, a left-aligned title, a short blue rule, the subtitle and the date](assets/step7-p1.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-warning}
+
+## The only `typst-show.typ` override
+
+This file replaces Quarto's [default `typst-show.typ`](https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/typst/pandoc/quarto/typst-show.typ), so it drops what the default does: fonts, the table of contents, brand settings and more.
+Read the default before you copy mine, and keep what you need.
+
+`$title$` and `$kicker$` are Pandoc variables.
+Pandoc fills them from the YAML, and `kicker` is a custom field that I added to the document.
+My file does not pass the title to `article()`, which then sets the document title to nothing.
+So I set it below the `article()` call with `#set document(title: "$title$")`, and the PDF keeps its title for screen readers and for the running header.
+The short rule under the title is wrapped in `pdf.artifact()`, because it is decoration.
+
+:::
+
+## Page Stripes {#page-stripes}
+
+Echo the cover on every page with a thick and a thin stripe at the top, and a gradient band behind the footer.
+
+```{.typst include="typst/partials/8-page-stripes.typ" filename="partials/8-page-stripes.typ"}
+```
+
+| Before | After |
+| --- | --- |
+| ![The second page with a plain top and bottom edge](assets/step7-p2.png){.lightbox group="typst-tricks"} | ![The second page with two blue gradient stripes at the top and a dark blue gradient band behind the footer with a white page number](assets/step8-p2.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-note}
+
+## Decoration and contrast
+
+The `pdf.artifact()` call marks the stripes and the band as decoration, so a screen reader skips them.
+I removed `pdf.artifact()` from a copy of the decorative partials and rendered with `pdf-standard: ua-1`.
+Neither Typst nor Quarto reported an error, and the PDF still passed the check.
+So I did not see an error without it, but the artifact markup is what tells a screen reader to skip the shapes, so I keep it.
+
+The band is dark, so trick 2 holds a `footer-ink` state for the footer text colour, and this partial sets it to white.
+White on the lightest end of the gradient, which is the accent colour, is 5.67:1.
+Text on a band needs its contrast checked again.
+
+:::
+
+## Cover Page {#cover-page}
+
+Give the title block a page of its own, centred vertically, with no header or footer.
+
+```{.typst include="typst/partials/9-cover.typ" filename="partials/9-cover.typ"}
+```
+
+| Before | After |
+| --- | --- |
+| ![The first page with the title block above the first section and stripes at the top and bottom](assets/step8-p1.png){.lightbox group="typst-tricks"} | ![A cover page with only the kicker, title, subtitle and date, centred vertically on a white page](assets/step9-p1.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-note}
+
+## Why `cover-art` is a state
+
+A Typst closure captures the variables it uses when you define it.
+A later `#let` cannot change a function that already exists.
+A `state` is read when the page is built, so trick 10 can fill the slot after this partial has run.
+
+:::
+
+## Cover Decoration {#cover-decoration}
+
+Fill the cover slot with a gradient band at the bottom and two stripes at the top.
+
+```{.typst include="typst/partials/10-cover-decoration.typ" filename="partials/10-cover-decoration.typ"}
+```
+
+| Before | After |
+| --- | --- |
+| ![The cover page with only text on a white page](assets/step9-p1.png){.lightbox group="typst-tricks"} | ![The cover page with a thick and a thin gradient stripe at the top and a dark blue gradient band over the bottom third](assets/step10-p1.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-note}
+
+## No text in the art
+
+The decoration is only shapes and it sits behind the content.
+The title is dark ink on white, and the gradient band at the bottom holds nothing, so the cover text keeps its contrast.
+
+:::
+
+## Where to Go Next
+
+- To package partials like these in an extension, read my post on the [document dispatcher](/posts/2026-01-19-typst-document-dispatcher/index.qmd).
+- To build a Typst template with Lua and Typst working together, follow the tutorial in [Part 1](/posts/2026-02-27-typst-template-tutorial-part1/index.qmd) and in [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/index.qmd).
+- To see which partials you can replace, read the [custom Typst formats](https://quarto.org/docs/output-formats/typst-custom.html) page of the Quarto documentation.
+- To see a full example, look at [quarto-mcanouil](https://m.canouil.dev/quarto-mcanouil/).
+
+If you try these partials, I would like to hear how it goes.
+Questions are welcome in the [discussions](https://github.com/mcanouil/mickael.canouil.fr/discussions), and problems in the [issues](https://github.com/mcanouil/mickael.canouil.fr/issues).
