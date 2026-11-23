@@ -1,0 +1,84 @@
+---
+title: "Ten Small Typst Partials That Make a Quarto PDF Look Professional"
+description: |
+  Ten small Typst partials for Quarto PDFs, each in its own file that you can copy, edit or delete.
+  The demo builds with `pdf-standard: ua-1`, so each trick keeps the PDF accessible.
+date: "2026-11-30"
+categories: [quarto, typst, pdf, accessibility]
+image: featured.png
+image-alt: |
+  A placeholder description of the featured image, to be replaced when the image exists.
+---
+
+This post shows ten small Typst partials that change how a Quarto PDF looks.
+Each one is a separate file, so you can copy it, edit it or remove it without touching the others.
+
+![](featured.png){
+  .img-featured
+  .img-fluid
+  fig-align="center"
+  fig-alt='{{< meta image-alt >}}'
+  width="600px"
+}
+
+## How Partials Work
+
+Quarto builds a Typst PDF in two steps.
+First, it turns your document into a Typst source file.
+Then Typst compiles that file into the PDF.
+
+A partial is a file that Quarto pastes into that Typst source.
+It holds a few lines of Typst, such as a `set` rule or a `show` rule.
+Quarto offers two ways to load one.
+
+- `include-in-header` adds your file to the top of the Typst source, after Quarto's own setup.
+  Your rules then apply to the whole document.
+  The [Typst format page](https://quarto.org/docs/output-formats/typst.html) describes this option.
+- `template-partials` replaces one of Quarto's own partials with your file, under the same name.
+  The [custom Typst formats page](https://quarto.org/docs/output-formats/typst-custom.html) lists which partials you can replace.
+  The [default partials](https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto) are on GitHub, and they are the best place to read what you are replacing.
+
+Nine of the ten tricks use `include-in-header`.
+Only the title block needs `template-partials`.
+If you want to go further and package your partials as an extension, my post on the [document dispatcher](/posts/2026-01-19-typst-document-dispatcher/index.qmd) is the next step.
+
+::: {.callout-note}
+
+The demo needs Quarto 1.9 or newer, because `pdf-standard` arrived in that version.
+It also needs Typst 0.14 or newer, because `pdf.artifact()` arrived there.
+Quarto 1.9 ships a Typst that is new enough.
+
+:::
+
+## The Demo Project
+
+Here is the YAML of the demo, as it stands after the last trick.
+
+```{.yaml filename="_quarto.yml"}
+format:
+  typst:
+    pdf-standard: ua-1  # <1>
+    include-in-header:  # <2>
+      - partials/1-tokens.typ
+      - partials/2-header-footer.typ
+      - partials/3-headings.typ
+      - partials/4-code.typ
+      - partials/5-tables.typ
+      - partials/6-captions.typ
+      - partials/7-title-block.typ
+      - partials/8-page-stripes.typ
+      - partials/9-cover.typ
+      - partials/10-cover-decoration.typ
+    template-partials:
+      - typst-show.typ
+number-sections: true  # <3>
+```
+
+1. Ask Typst for a tagged PDF that follows PDF/UA-1.
+   Typst stops with an error when something breaks the standard, so it guards every trick below.
+2. Load the partials in this order.
+   Removing a line removes that trick.
+3. Number the headings through Quarto, which sets the numbering after the partials run.
+
+The demo and the script that builds it are in the post folder, under `typst/`.
+To build the PDF after each trick, run `typst/render-steps.sh` from that folder.
