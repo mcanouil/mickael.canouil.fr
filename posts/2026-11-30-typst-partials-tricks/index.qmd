@@ -41,23 +41,25 @@ Quarto offers two ways to load one.
   The [default partials](https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto) are on GitHub.
   They are the best place to read what you are replacing.
 
-Nine of the ten tricks use `include-in-header`.
-Only the title block needs `template-partials`.
+All ten tricks load through `include-in-header`.
+The title block also needs `template-partials`.
 If you want to go further and package your partials as an extension, my post on the [document dispatcher](/posts/2026-01-19-typst-document-dispatcher/index.qmd) is the next step.
-
-::: {.callout-note}
-
-The demo needs Quarto 1.9 or newer, because `pdf-standard` arrived in that version.
-It also needs Typst 0.14 or newer, because `pdf.artifact()` arrived there.
-Quarto 1.9 ships a Typst that is new enough.
-
-:::
 
 ## The Demo Project
 
-Here is the YAML of the demo, as it stands after the last trick.
+::: {.callout-note}
 
-```{.yaml filename="_quarto.yml"}
+I made the screenshots and ran every test in this post with Quarto 1.11.9, which ships Typst 0.15.1.
+The demo also builds with Quarto 1.10.19.
+I did not test older versions.
+The demo uses `pdf-standard` and `pdf.artifact()`, so it needs a recent Quarto and Typst 0.14 or newer.
+
+:::
+
+The demo has no `_quarto.yml`.
+Here is the front matter that `typst/render-steps.sh` gives each step, as it stands after the last trick.
+
+```{.yaml filename="front matter"}
 format:
   typst:
     pdf-standard: ua-1  # <1>
@@ -148,7 +150,8 @@ Colour the heading numbers and keep a heading from being stranded at the bottom 
 
 ## Real headings
 
-The partial restyles real headings, it does not fake them with big text, so the PDF keeps its heading structure.
+The partial restyles real headings.
+It does not fake them with big text, so the PDF keeps its heading structure.
 The numbers come from `number-sections: true`, because Quarto's `article()` sets the numbering after the partials run.
 The partial only styles the number.
 
@@ -173,6 +176,8 @@ Code that looks different from what you typed is hard to read.
 With only `ligatures: false`, Fira Code still drew `|>` as a triangle, so I also turn off the `calt` feature with `features: ("calt": 0)`.
 The symbols `!=`, `<-` and `>=` then show as typed.
 The `breakable: false` setting keeps a block on one page.
+Code text is `0.8em` of the body, which is 8.8 pt, so it is a little under 9 pt.
+You can enlarge it with `#show raw: set text(size: 9.5pt)`, and I use points there because an `em` value would apply to the already reduced size.
 
 :::
 
@@ -191,7 +196,8 @@ Give tables a filled header and light stripes.
 
 ## Header row
 
-The partial styles the header row, it does not replace it, so the table keeps its real header row.
+The partial styles the header row.
+It does not replace it, so the table keeps its real header row.
 Tagged PDFs rely on `table.header` to tell readers and screen readers which cells are headings.
 The stripes only help the eye, because the header carries the meaning and colour is never the only signal.
 
@@ -246,9 +252,10 @@ Read the default before you copy mine, and keep what you need.
 `$title$` and `$kicker$` are Pandoc variables.
 Pandoc fills them from the YAML, and `kicker` is a custom field that I added to the document.
 My file does not pass the title to `article()`, which then sets the document title to nothing.
-So I set it below the `article()` call with `#set document(title: "$title$")`.
+So I set it below the `article()` call with `#set document(title: [$title$])`.
 The PDF then keeps its title for screen readers and for the running header.
-The short rule under the title is wrapped in `pdf.artifact()`, because it is decoration.
+The short rule under the title is wrapped in `pdf.artifact()` to state that it is decoration.
+Typst already treats a line as an artifact, so the wrapper is optional here.
 
 :::
 
@@ -267,10 +274,12 @@ Echo the cover on every page with a thick and a thin stripe at the top, and a gr
 
 ## Decoration and contrast
 
-The `pdf.artifact()` call marks the stripes and the band as decoration, so a screen reader skips them.
+Screen readers should skip the stripes and the band.
+Typst already marks page backgrounds, headers and footers as artifacts, and it marks paths and shapes as artifacts too, but not their content.
 I removed `pdf.artifact()` from a copy of the decorative partials and rendered with `pdf-standard: ua-1`.
-Neither Typst nor Quarto reported an error, and the PDF still passed the check.
-So I did not see an error without it, but the artifact markup is what tells a screen reader to skip the shapes, so I keep it.
+Neither Typst nor Quarto reported an error, and veraPDF, which Quarto runs on the PDF, still passed it.
+So the experiment confirms it: the stripes, the band and the title rule are artifacts without the wrapper.
+I keep `pdf.artifact()` because it states the intent, and because content that Typst does not mark itself, such as a decorative image or text, needs it.
 
 The band is dark, so trick 2 holds a `footer-ink` state for the footer text colour, and this partial sets it to white.
 White on the lightest end of the gradient, which is the accent colour, is 5.67:1.

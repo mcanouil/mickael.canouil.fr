@@ -1,5 +1,5 @@
 // 10. Cover decoration: a gradient band at the bottom, two stripes at the top.
-// It is only decoration, so it never holds text and screen readers skip it.
+// It is only shapes and holds no text; the wrapper states that it is decoration.
 #let cover-gradient = gradient.linear(accent, accent.darken(55%), angle: 135deg)
 
 #cover-art.update(pdf.artifact({

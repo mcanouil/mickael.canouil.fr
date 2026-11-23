@@ -1,5 +1,5 @@
 // 8. Recurring decoration: stripes at the top, a gradient band behind the footer.
-// It is only decoration, so it is hidden from screen readers.
+// Typst already treats page backgrounds as artifacts; the wrapper states the intent.
 #let band-gradient = gradient.linear(accent, accent.darken(55%), angle: 135deg)
 #footer-ink.update(white)
 

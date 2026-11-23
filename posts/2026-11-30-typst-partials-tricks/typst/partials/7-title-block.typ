@@ -1,7 +1,7 @@
 // 7. Title block: kicker, title, short rule, subtitle, date.
 #let title-block(title: none, kicker: none, subtitle: none, date: none) = {
   if kicker != none {
-    text(size: 0.75em, weight: "bold", tracking: 0.14em, fill: accent, upper(kicker))
+    text(size: 0.85em, weight: "bold", tracking: 0.14em, fill: accent, upper(kicker))
     v(0.4em)
   }
   text(font: font-heading, size: 2em, weight: "bold", title)
