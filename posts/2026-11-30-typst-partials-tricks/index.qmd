@@ -38,7 +38,8 @@ Quarto offers two ways to load one.
   The [Typst format page](https://quarto.org/docs/output-formats/typst.html) describes this option.
 - `template-partials` replaces one of Quarto's own partials with your file, under the same name.
   The [custom Typst formats page](https://quarto.org/docs/output-formats/typst-custom.html) lists which partials you can replace.
-  The [default partials](https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto) are on GitHub, and they are the best place to read what you are replacing.
+  The [default partials](https://github.com/quarto-dev/quarto-cli/tree/main/src/resources/formats/typst/pandoc/quarto) are on GitHub.
+  They are the best place to read what you are replacing.
 
 Nine of the ten tricks use `include-in-header`.
 Only the title block needs `template-partials`.
@@ -238,13 +239,15 @@ Here it is, loaded with `template-partials`.
 
 ## The only `typst-show.typ` override
 
-This file replaces Quarto's [default `typst-show.typ`](https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/typst/pandoc/quarto/typst-show.typ), so it drops what the default does: fonts, the table of contents, brand settings and more.
+This file replaces Quarto's [default `typst-show.typ`](https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/formats/typst/pandoc/quarto/typst-show.typ), so it drops what the default does.
+That includes fonts, the table of contents and brand settings.
 Read the default before you copy mine, and keep what you need.
 
 `$title$` and `$kicker$` are Pandoc variables.
 Pandoc fills them from the YAML, and `kicker` is a custom field that I added to the document.
 My file does not pass the title to `article()`, which then sets the document title to nothing.
-So I set it below the `article()` call with `#set document(title: "$title$")`, and the PDF keeps its title for screen readers and for the running header.
+So I set it below the `article()` call with `#set document(title: "$title$")`.
+The PDF then keeps its title for screen readers and for the running header.
 The short rule under the title is wrapped in `pdf.artifact()`, because it is decoration.
 
 :::
