@@ -341,7 +341,6 @@ local function create_platform_link(text, uri, platform_name)
       local css_path = quarto.utils.resolve_path("gitlink.css")
       html_mod.ensure_html_dependency({
         name = 'quarto-gitlink',
-        version = '1.0.0',
         stylesheets = { css_path }
       })
 

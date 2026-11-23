@@ -46,9 +46,7 @@ local ATTRIBUTE_PREFIX = 'code-window-'
 --- could not be read, which is a state this extension renders through rather
 --- than stopping for. Everywhere else _schema.yml decides these seven, so the
 --- values below are a fallback and not a second place to change one of them.
---- The hotfix defaults are a different story, and are still kept by hand in
---- HOTFIX_DEFAULTS: they are nested in the schema and read on their own path,
---- so changing one in _schema.yml alone still changes nothing.
+--- HOTFIX_DEFAULTS, below, is the same kind of fallback for the hot-fixes.
 --- All seven stay listed, because the second case has nothing else to read
 --- from, and an option added to the schema needs an entry here as well or it
 --- has no default at all on a format the extension does not act on.
@@ -74,6 +72,9 @@ local VALID_COLLAPSE = {
   ['open'] = 'open',
 }
 
+--- The hot-fixes the extension reads, with their fallback defaults for the
+--- same two cases as FALLBACK_DEFAULTS. Everywhere else the schema builds the
+--- "hotfix" object from the defaults of its properties, and its value decides.
 local HOTFIX_DEFAULTS = {
   ['code-annotations'] = true,
   ['skylighting'] = true,
@@ -113,6 +114,14 @@ local function is_unnamed_cell_output(block)
   return cell_output.is_marked(block) and str.is_empty(block.attributes['filename'])
 end
 
+--- Check whether a block holds a chapter's front matter, which Quarto writes
+--- in a book rendered to one file and later replaces with the title block.
+--- @param block pandoc.CodeBlock Code block element
+--- @return boolean
+local function is_quarto_block(block)
+  return block.classes:includes('quarto-title-block')
+end
+
 -- ============================================================================
 -- BLOCK-LEVEL STYLE OVERRIDE
 -- ============================================================================
@@ -128,6 +137,39 @@ local function stringify_bool(value)
     return value and 'true' or 'false'
   end
   return value
+end
+
+--- Read one hot-fix value: a boolean, or a map with "enabled" and
+--- "quarto-version" keys, where a version at or below the running Quarto
+--- turns the hot-fix off. The value is document metadata or a schema
+--- default, so it may be a Pandoc value or a plain Lua one.
+--- @param entry any The hot-fix value
+--- @return boolean enabled
+local function read_hotfix(entry)
+  local function as_string(value)
+    if type(value) == 'boolean' then
+      return value and 'true' or 'false'
+    end
+    return pandoc.utils.stringify(value)
+  end
+  if pandoc.utils.type(entry) ~= 'table' then
+    return as_string(entry) == 'true'
+  end
+  local enabled = true
+  if entry['enabled'] ~= nil then
+    enabled = as_string(entry['enabled']) == 'true'
+  end
+  local ver = entry['quarto-version']
+  if ver ~= nil then
+    ver = as_string(ver)
+    if ver ~= '' then
+      local ok, threshold = pcall(pandoc.types.Version, ver)
+      if ok and quarto.version >= threshold then
+        enabled = false
+      end
+    end
+  end
+  return enabled
 end
 
 --- Take the attributes an author can write off a block the filter processes,
@@ -324,10 +366,32 @@ end
 -- TYPST FUNCTION DEFINITION
 -- ============================================================================
 
---- Typst colour helpers for adaptive theme support.
+--- Typst colour helpers for adaptive theme support, and the theme state.
 --- Always injected so the code-window function can derive border, surface,
 --- muted, and label colours from the page background at render time.
+--- A template sets state("code-window-theme") to replace any derived value;
+--- the state is keyed by name, so the template needs none of these helpers.
 local TYPST_COLOUR_HELPERS = [==[
+// code-window: theme tokens that a template sets before the body
+#let _cw-theme = state("code-window-theme", (:))
+// the colour keys (border, surface, label, muted) derive from the page fill
+#let _cw-theme-defaults = (
+  radius: 8pt,
+  stroke: auto,
+  stroke-thickness: 1pt,
+  stroke-dash: none,
+  fill: auto,
+  title-inset: (x: 1em, y: 0.6em),
+  body-inset: 8pt,
+  traffic-light-size: 0.85em,
+  traffic-light-gap: 0.425em,
+  traffic-light-colours: (rgb("#ff5f56"), rgb("#ffbd2e"), rgb("#27c93f")),
+)
+// the inset of a code block: the theme's body-inset inside a window
+#let _cw-body-inset = state("cw-body-inset", _cw-theme-defaults.body-inset)
+// whether a code block sits in a window, where the window draws the only edges
+#let _cw-in-window = state("cw-in-window", false)
+
 // code-window: adaptive colour helpers (derive UI tones from page background)
 #let _cw-page-bg() = {
   let f = page.fill
@@ -421,8 +485,9 @@ local TYPST_CONTENT_PLAIN = [==[
 
 --- Build the complete Typst code-window function definition.
 --- @param has_hotfixes boolean Whether at least one hot-fix is active
+--- @param has_own_wrapper boolean Whether the document defines the wrapper itself
 --- @return string Typst function definition(s)
-local function build_typst_function_def(has_hotfixes)
+local function build_typst_function_def(has_hotfixes, has_own_wrapper)
   local content_block = has_hotfixes
       and TYPST_CONTENT_WITH_ANNOTATIONS
       or TYPST_CONTENT_PLAIN
@@ -441,10 +506,29 @@ local function build_typst_function_def(has_hotfixes)
   context {
   let page-bg = _cw-page-bg()
   let fg = _cw-fg(page-bg)
-  let border-colour = color.mix((fg, 15%%), (page-bg, 85%%))
-  let surface-fill = color.mix((fg, 5%%), (page-bg, 95%%))
-  let muted-colour = color.mix((fg, 50%%), (page-bg, 50%%))
-  let label-colour = color.mix((fg, 65%%), (page-bg, 35%%))
+  let defaults = _cw-theme-defaults + (
+    border: color.mix((fg, 15%%), (page-bg, 85%%)),
+    surface: color.mix((fg, 5%%), (page-bg, 95%%)),
+    label: color.mix((fg, 65%%), (page-bg, 35%%)),
+    muted: color.mix((fg, 50%%), (page-bg, 50%%)),
+  )
+  let theme = _cw-theme.get()
+  for key in theme.keys() {
+    if key not in defaults {
+      panic("code-window: unknown key \"" + key + "\" in state(\"code-window-theme\"). "
+        + "Known keys: " + defaults.keys().join(", ") + ".")
+    }
+  }
+  let theme = defaults + theme
+  let border-colour = theme.border
+  let muted-colour = theme.muted
+  let label-colour = theme.label
+  let window-stroke = (
+    paint: border-colour,
+    thickness: theme.stroke-thickness,
+    dash: theme.stroke-dash,
+  )
+  let frame-stroke = if theme.stroke == auto { window-stroke } else { theme.stroke }
 
   let filename-label = if filename != none {
     text(
@@ -470,10 +554,8 @@ local function build_typst_function_def(has_hotfixes)
     inset: (right: 0.5em),
     stack(
       dir: ltr,
-      spacing: 0.425em,
-      circle(radius: 0.425em, fill: rgb("#ff5f56"), stroke: none),
-      circle(radius: 0.425em, fill: rgb("#ffbd2e"), stroke: none),
-      circle(radius: 0.425em, fill: rgb("#27c93f"), stroke: none),
+      spacing: theme.traffic-light-gap,
+      ..theme.traffic-light-colours.map(c => circle(radius: theme.traffic-light-size / 2, fill: c, stroke: none)),
     ),
   )
 
@@ -528,41 +610,46 @@ local function build_typst_function_def(has_hotfixes)
 
   block(
     width: 100%%,
-    stroke: 1pt + border-colour,
-    radius: 8pt,
+    stroke: frame-stroke,
+    radius: theme.radius,
     clip: true,
     {
       block(
         width: 100%%,
-        fill: surface-fill,
-        inset: (x: 1em, y: 0.6em),
+        fill: theme.surface,
+        inset: theme.title-inset,
         below: 0pt,
         radius: 0pt,
-        stroke: (bottom: 1pt + border-colour),
+        stroke: (bottom: window-stroke),
         sticky: true,
         title-bar,
       )
       // Strip code block chrome so content fills flush against the window body.
-      // set block() provides defaults for Skylighting blocks (explicit fill preserved).
+      // set block() provides defaults for Skylighting blocks (explicit fill preserved);
+      // the Skylighting override reads cw-in-window to drop its own stroke and radius.
       // show raw overrides the document-level raw block styling (fill, radius).
       {
         set block(
           width: 100%%,
-          inset: 8pt,
+          inset: theme.body-inset,
           radius: 0pt,
           stroke: none,
           above: 0pt,
           below: 0pt,
         )
         show raw.where(block: true): set block(
-          fill: none,
+          fill: if theme.fill == auto { none } else { theme.fill },
           width: 100%%,
           radius: 0pt,
           stroke: none,
           above: 0pt,
           below: 0pt,
         )
-%s      }
+        _cw-body-inset.update(theme.body-inset)
+        _cw-in-window.update(true)
+%s        _cw-body-inset.update(_cw-theme-defaults.body-inset)
+        _cw-in-window.update(false)
+      }
     },
   )
   }
@@ -570,8 +657,13 @@ local function build_typst_function_def(has_hotfixes)
 ]==], content_block)
 
   local result = TYPST_COLOUR_HELPERS
-  if has_hotfixes then
+  -- A document's own wrapper calls the annotation helper to show annotations,
+  -- so the helper is written for it whatever the hot-fixes say.
+  if has_hotfixes or has_own_wrapper then
     result = result .. TYPST_ANNOTATION_DEF
+  end
+  if has_own_wrapper then
+    return result
   end
   return result .. fn_def
 end
@@ -658,14 +750,15 @@ end
 --- Process CodeBlock for HTML/Reveal.js formats.
 --- Explicit-filename blocks are returned for Quarto to wrap; a marker class
 --- is added when a block-level style override is present.
---- Auto-filename blocks are wrapped directly with the style class.
+--- Auto-filename blocks are returned inside the window node Quarto builds for
+--- an explicit filename, so the title bar is in the rendered page.
 --- The block reaches here with its code-window attributes already taken off
 --- by take_block_attributes, so every value below is read from the resolved
 --- table and the block carries none of them onward.
 --- @param block pandoc.CodeBlock Code block element
 --- @param resolved table<string, any> This block's attributes, resolved against the schema
 --- @param auto_label string|nil Label written by the language module, if any
---- @return pandoc.Div|pandoc.CodeBlock Wrapped block or original
+--- @return pandoc.Block DecoratedCodeBlock or original block
 local function process_html(block, resolved, auto_label)
   local overrides = read_window_overrides(block, resolved)
 
@@ -700,7 +793,9 @@ local function process_html(block, resolved, auto_label)
     end
   end
 
-  if explicit_filename and explicit_filename ~= '' then
+  -- Quarto builds a window for any filename attribute, an empty one included,
+  -- so a block that carries one is already inside a window.
+  if explicit_filename ~= nil then
     -- Let Quarto create the .code-with-filename wrapper, and mark the block so
     -- the injected script can promote a block-level override onto that wrapper.
     mark()
@@ -712,23 +807,28 @@ local function process_html(block, resolved, auto_label)
   end
 
   -- Blocks with a language of their own are labelled with its class.
-  -- Set the filename attribute so Quarto creates its own .code-with-filename
-  -- wrapper. This preserves the CodeBlock+OrderedList sibling structure
-  -- needed by Quarto's code-annotations processor.
-  block.attributes['filename'] = auto_label or block.classes[1]
+  -- Quarto turns a filename into its window node while it reads the document,
+  -- before this filter runs, so a filename set here would come too late. The
+  -- filter builds the same node instead. Quarto then renders the title bar as
+  -- for an explicit filename, and its code-annotations processor still finds
+  -- the CodeBlock and the OrderedList side by side. The cw-auto class tells the
+  -- post-render pass which windows hold a derived name. The filename
+  -- attribute stays as well, so the page carries data-filename like a block
+  -- with an explicit name.
+  local label = auto_label or block.classes[1]
+  block.attributes['filename'] = label
   table.insert(block.classes, 'cw-auto')
   mark()
 
-  return block
+  return quarto.DecoratedCodeBlock({ filename = label, code_block = block })
 end
 
 -- ============================================================================
 -- FILTER HANDLERS
 -- ============================================================================
 
---- Generate a JS snippet that builds .code-with-filename wrappers for
---- auto-filename blocks (marked with cw-auto at pre-quarto), applies the
---- configured default style class to all .code-with-filename wrappers,
+--- Generate a JS snippet that applies the configured default style class to
+--- all .code-with-filename wrappers,
 --- promotes block-level cw-style-* / cw-collapse-* marker classes, inserts
 --- a highlighted-lines chip when data-code-window-lines-label is set on the inner
 --- pre, and wraps collapsible windows in a <details> element where the
@@ -741,25 +841,6 @@ local function make_style_js(default_style, default_collapse)
   return string.format([=[
 document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=%s;
-  document.querySelectorAll("pre.cw-auto").forEach(function(pre){
-    var fn=pre.closest("[data-filename]");
-    if(!fn)return;
-    var name=fn.getAttribute("data-filename");
-    if(!name)return;
-    var scaffold=pre.closest(".code-copy-outer-scaffold")||pre.closest(".sourceCode");
-    if(!scaffold)return;
-    var w=document.createElement("div");
-    w.className="code-with-filename code-window-auto";
-    var tb=document.createElement("div");
-    tb.className="code-with-filename-file";
-    var tp=document.createElement("pre");
-    var ts=document.createElement("strong");
-    ts.textContent=name;
-    tp.appendChild(ts);tb.appendChild(tp);
-    scaffold.parentNode.insertBefore(w,scaffold);
-    w.appendChild(tb);w.appendChild(scaffold);
-    pre.classList.remove("cw-auto");
-  });
   function findMarkerSource(el){
     return el.querySelector('pre[class*="cw-style-"],pre[class*="cw-collapse-"],pre[data-code-window-lines-label]')
       ||el.querySelector('[class*="cw-style-"],[class*="cw-collapse-"],[data-code-window-lines-label]');
@@ -878,35 +959,22 @@ function Meta(meta)
       '"skylighting-fix" is deprecated. Use "hotfix: { skylighting: true/false }" instead.')
   end
 
-  -- Parse hotfix options with per-hotfix version-based auto-disable.
-  -- Each hotfix value can be:
-  --   boolean/string: true/false to enable/disable
-  --   map: { enabled: true/false, quarto-version: "x.y.z" }
+  -- Each hot-fix is on or off, and the schema default comes in the same two
+  -- forms as a document value, so both go through read_hotfix.
+  local schema_hotfix = schema_defaults['hotfix']
+  if type(schema_hotfix) ~= 'table' then
+    schema_hotfix = {}
+  end
   local hotfix = {}
-  for key, default in pairs(HOTFIX_DEFAULTS) do
+  for key, fallback in pairs(HOTFIX_DEFAULTS) do
     local entry = hotfix_meta and hotfix_meta[key]
-    if entry ~= nil and pandoc.utils.type(entry) == 'table' then
-      -- Map form: { enabled: bool, quarto-version: "x.y.z" }
-      local enabled = true
-      if entry['enabled'] ~= nil then
-        enabled = pandoc.utils.stringify(entry['enabled']) == 'true'
-      end
-      local ver = entry['quarto-version']
-      if ver then
-        ver = pandoc.utils.stringify(ver)
-        if ver ~= '' then
-          local ok, threshold = pcall(pandoc.types.Version, ver)
-          if ok and quarto.version >= threshold then
-            enabled = false
-          end
-        end
-      end
-      hotfix[key] = enabled
-    elseif entry ~= nil then
-      -- Simple boolean/string form
-      hotfix[key] = pandoc.utils.stringify(entry) == 'true'
+    if entry == nil then
+      entry = schema_hotfix[key]
+    end
+    if entry == nil then
+      hotfix[key] = fallback
     else
-      hotfix[key] = default
+      hotfix[key] = read_hotfix(entry)
     end
   end
 
@@ -937,12 +1005,10 @@ function Meta(meta)
   if CURRENT_FORMAT == 'html' and CONFIG.enabled then
     html_mod.ensure_html_dependency({
       name = EXTENSION_NAME,
-      version = '0.1.0',
       stylesheets = { 'style.css' },
     })
     html_mod.ensure_html_dependency({
       name = EXTENSION_NAME .. '-style-init',
-      version = '0.1.0',
       head = '<script>' .. make_style_js(CONFIG.style, CONFIG.collapse) .. '</script>',
     })
   end
@@ -972,6 +1038,10 @@ end
 --- that rather than skipping validation for the same kind of block, so the
 --- same document reports the same finding in both formats.
 function CodeBlock(block)
+  if is_quarto_block(block) then
+    return nil
+  end
+
   -- The Typst path reads the marker in the Pandoc filter, which runs first, so
   -- this pass is where it is removed for every format.
   local is_plain_output = is_unnamed_cell_output(block)
@@ -1036,7 +1106,9 @@ local function resolve_window_params(block, resolved, auto_label)
   local filename = block.attributes['filename']
   local is_auto = false
 
-  if (not filename or filename == '') and not overrides.no_auto_filename then
+  -- An empty filename is a filename, as on the HTML path: the window keeps
+  -- an empty title rather than taking a derived label.
+  if filename == nil and not overrides.no_auto_filename then
     -- A label asks for a window whatever auto-filename says.
     if auto_label then
       filename = auto_label
@@ -1058,6 +1130,10 @@ end
 --- @return boolean consumed_next Whether the next block was consumed
 --- @return integer|nil annotation_block_id Block ID if annotations were found (for parent propagation)
 local function process_typst_block(block, next_block)
+  if is_quarto_block(block) then
+    return { block }, false, nil
+  end
+
   -- Check this block's own attributes against the CodeBlock group of the
   -- schema before anything below reads or rewrites them, in either branch.
   local resolved, auto_label = resolve_and_take(block)
@@ -1070,7 +1146,7 @@ local function process_typst_block(block, next_block)
 
   local filename, is_auto, block_style, lines_label =
     resolve_window_params(block, resolved, auto_label)
-  local has_window = filename and filename ~= ''
+  local has_window = filename ~= nil
   local effective_style = block_style or CONFIG.style
 
   -- Resolve annotations if enabled and the code-annotations hot-fix is active.
@@ -1165,7 +1241,7 @@ local function get_decorated_codeblock_filename(div)
   if not custom_id then return nil end
   if not (_quarto and _quarto.ast and _quarto.ast.custom_node_data) then return nil end
   local entry = _quarto.ast.custom_node_data[custom_id]
-  if type(entry) == 'table' and entry.filename and entry.filename ~= '' then
+  if type(entry) == 'table' and type(entry.filename) == 'string' then
     return entry.filename
   end
   return nil
@@ -1336,17 +1412,22 @@ function Pandoc(doc)
   -- Process code blocks and annotations throughout the document tree.
   doc.blocks = process_typst_blocks(doc.blocks)
 
-  -- Guard: check if the function definition is already present.
-  local fn_pattern = '#let ' .. CONFIG.typst_wrapper
+  -- A document that defines the wrapper itself keeps its definition, and
+  -- still gets the helpers that the hot-fixes call. The wrapper is either a
+  -- function, "#let name(", or a closure, "#let name =". A longer name such as
+  -- "#let name-circled-number(" is a helper, not the wrapper.
+  local fn_pattern = '#let ' .. CONFIG.typst_wrapper:gsub('%p', '%%%0') .. '%s*[(=]'
+  local has_own_wrapper = false
   for _, blk in ipairs(doc.blocks) do
     if blk.t == 'RawBlock' and blk.format == 'typst'
-        and blk.text:find(fn_pattern, 1, true) then
-      return doc
+        and blk.text:find(fn_pattern) then
+      has_own_wrapper = true
+      break
     end
   end
 
   local has_hotfixes = CONFIG.hotfix_code_annotations or CONFIG.hotfix_skylighting
-  local fn_def = build_typst_function_def(has_hotfixes)
+  local fn_def = build_typst_function_def(has_hotfixes, has_own_wrapper)
   if CONFIG.typst_wrapper ~= 'code-window' then
     fn_def = fn_def:gsub('code%-window%-annote%-colour', CONFIG.typst_wrapper .. '-annote-colour')
     fn_def = fn_def:gsub('code%-window%-circled%-number', CONFIG.typst_wrapper .. '-circled-number')
@@ -1385,4 +1466,5 @@ return {
   CodeBlock = CodeBlock,
   CONFIG = function() return CONFIG end,
   draws_chrome = draws_chrome,
+  is_quarto_block = is_quarto_block,
 }

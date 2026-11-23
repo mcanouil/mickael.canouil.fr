@@ -73,32 +73,29 @@ end
 --- "auto-filename" belongs in the same question, because it is the reader
 --- itself: with no derived name to build, both window paths return before they
 --- read the label, so the pass would rewrite a class for nobody again.
---- Every question this asks is about the render, not about one block. A block
---- can still draw no chrome inside a render that does, through
---- "code-window-no-auto-filename" or "code-window-enabled", and its class is
---- rewritten with no reader either. Answering that per block means relabelling
---- where the name is built, which is a change to the two window paths rather
---- than to this gate.
+--- A block can also draw no title inside a render that does, through
+--- "code-window-no-auto-filename" or "code-window-enabled". Nothing reads its
+--- label either, so it is left alone whatever "auto-filename" says. A block
+--- with a filename of its own still gets a title, so it still takes the pass.
 --- A block that carries "code-window-auto-label" asks for a window by itself,
 --- so it takes the pass whatever "auto-filename" says. Without it, a block in
---- a language Pandoc cannot highlight would get no wrapper to frame. Such a
---- block that also refuses the window has no reader for the label, so it is
---- left alone here.
+--- a language Pandoc cannot highlight would get no wrapper to frame.
 --- @param block pandoc.CodeBlock
 --- @return pandoc.CodeBlock|nil Relabelled block, or nil when the pass is skipped
 local function normalise_language(block)
-  if not code_window.draws_chrome() then
+  if not code_window.draws_chrome() or code_window.is_quarto_block(block) then
     return nil
   end
-  if not code_window.CONFIG().auto_filename then
-    -- Lowercased to match the schema's boolean coercion. Resolving through the
-    -- schema check here would report each of its warnings twice per block.
-    local enabled = (block.attributes['code-window-enabled'] or ''):lower()
-    local no_auto_filename = (block.attributes['code-window-no-auto-filename'] or ''):lower()
-    local refuses_window = enabled == 'false' or no_auto_filename == 'true'
-    if not language.auto_label(block) or refuses_window then
-      return nil
-    end
+  -- Lowercased to match the schema's boolean coercion. Resolving through the
+  -- schema check here would report each of its warnings twice per block.
+  local enabled = (block.attributes['code-window-enabled'] or ''):lower()
+  local no_auto_filename = (block.attributes['code-window-no-auto-filename'] or ''):lower()
+  local refuses_derived_name = no_auto_filename == 'true' and block.attributes['filename'] == nil
+  if enabled == 'false' or refuses_derived_name then
+    return nil
+  end
+  if not code_window.CONFIG().auto_filename and not language.auto_label(block) then
+    return nil
   end
   return language.CodeBlock(block)
 end

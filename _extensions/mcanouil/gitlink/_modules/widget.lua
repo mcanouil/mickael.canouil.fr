@@ -13,9 +13,6 @@ local str = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/string
 local log = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/logging.lua'):gsub('%.lua$', ''))
 local html_mod = require(quarto.utils.resolve_path('_vendor/quarto-lua-modules/html.lua'):gsub('%.lua$', ''))
 
---- @type string Version used for the injected HTML dependency
-local WIDGET_DEPENDENCY_VERSION = '1.9.0'
-
 --- @type string The href of a navigation item that widget.js replaces
 local WIDGET_PLACEHOLDER = '#gitlink-widget'
 
@@ -350,11 +347,20 @@ local function build_config(spec)
   append_default_link(main_group, toggles, 'discussions', false,
     platform_link(paths, 'discussions', 'Discussions', 'discussion', context))
 
+  local api = platform_widget.api
+  local has_api = api ~= nil and not str.is_empty(api.endpoint)
+
+  -- With an API, widget.js shows the fetched count on the star and fork items.
+  local star_link = platform_link(paths, 'star', 'Add a Star', 'star', context)
+  local fork_link = platform_link(paths, 'fork', 'Create a Fork', 'fork', context)
+  if has_api then
+    if star_link then star_link.stat = 'stars' end
+    if fork_link then fork_link.stat = 'forks' end
+  end
+
   local action_group = {}
-  append_default_link(action_group, toggles, 'star', true,
-    platform_link(paths, 'star', 'Add a Star', 'star', context))
-  append_default_link(action_group, toggles, 'fork', true,
-    platform_link(paths, 'fork', 'Create a Fork', 'fork', context))
+  append_default_link(action_group, toggles, 'star', true, star_link)
+  append_default_link(action_group, toggles, 'fork', true, fork_link)
 
   local extra_group = resolve_extra_links(widget_meta['extra-links'], repo_url, spec.extension_name)
 
@@ -388,8 +394,7 @@ local function build_config(spec)
     links = join_link_groups({ main_group, action_group, extra_group }),
   }
 
-  local api = platform_widget.api
-  if api and not str.is_empty(api.endpoint) then
+  if has_api then
     -- Platform headers are "Name: value" strings in the YAML (map keys would
     -- be case-mangled); parse them here so widget.js gets a ready object.
     local headers = {}
@@ -462,7 +467,6 @@ function widget_module.setup(spec)
 
   html_mod.ensure_html_dependency({
     name = 'quarto-gitlink-widget',
-    version = WIDGET_DEPENDENCY_VERSION,
     scripts = { quarto.utils.resolve_path('widget.js') },
     stylesheets = stylesheets,
   })

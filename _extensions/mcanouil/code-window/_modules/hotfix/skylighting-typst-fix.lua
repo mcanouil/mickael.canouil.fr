@@ -39,13 +39,15 @@ local function build_skylighting_override()
   start: 1,
   sourcelines,
 ) = {
-  let bgcolor = if fill != none { fill } else { rgb("%s") }
   let has-gutter = start + sourcelines.len() > 999
 
   context {
+    let theme-fill = (_cw-theme-defaults + _cw-theme.get()).fill
+    let bgcolor = if theme-fill != auto { theme-fill } else if fill != none { fill } else { rgb("%s") }
     let _page-bg = _cw-page-bg()
     let _fg = _cw-fg(_page-bg)
     let _border-colour = color.mix((_fg, 15%%), (_page-bg, 85%%))
+    let in-window = _cw-in-window.get()
     let annot-data = _cw-annotations.get()
     let blocks = []
     let lnum = start - 1
@@ -95,9 +97,9 @@ local function build_skylighting_override()
     block(
       fill: bgcolor,
       width: 100%%,
-      inset: 8pt,
-      radius: 2pt,
-      stroke: 0.5pt + _border-colour,
+      inset: _cw-body-inset.get(),
+      radius: if in-window { 0pt } else { 2pt },
+      stroke: if in-window { none } else { 0.5pt + _border-colour },
       blocks,
     )
   }
