@@ -457,9 +457,42 @@ I tested the partials in a book made with `quarto create project book`, with Qua
 | Page Stripes | Works on every page, cover included. Load the footer partial before it, because that one holds the `footer-ink` state. Without it, the build stops with `unknown variable: footer-ink`. |
 | Title Block, Cover Page, Cover Decoration | Do not use them. They replace `typst-show.typ`, which holds the setup of orange-book, and the book then renders as a single page. |
 
+The tricks style the pages of a book, but not its cover.
+Four routes reach the cover, from the lightest to the heaviest.
+
+### Change the Cover with a Brand File {#book-brand}
+
 The supported way to change the cover is a [brand file](https://quarto.org/docs/authoring/brand.html), written in the [brand.yml](https://posit-dev.github.io/brand-yml/) format.
 The extension passes `color.primary` as the main colour, and the title box uses it lightened by 70%.
 It also passes `logo.medium`, which the package puts at the top of the cover, 3 cm wide.
+
+### Decorate the Cover Page {#book-decorate}
+
+The tricks cannot reach the cover, because orange-book draws it as the first page.
+The decoration has to target that page.
+This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.
+It overrides nothing, so it is the lighter option.
+
+```{.typst include="typst/book-cover.typ" filename="book-cover.typ"}
+```
+
+Load it after `1-tokens.typ`, because it reads `accent` from there.
+
+| Before | After |
+| :---: | :---: |
+| ![The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page](assets/book-before-p1.png){.lightbox group="typst-tricks" width="237px"} | ![The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom](assets/book-after-p1.png){.lightbox group="typst-tricks" width="237px"} |
+
+::: {.callout-note}
+
+## Accessibility: Check the cover contrast
+
+The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast.
+If you move the band under the box, check the contrast again, as for any text on a band.
+
+:::
+
+### Add Cover Options with a `typst-show.typ` Override {#book-override}
+
 The package has other cover options, such as `cover`, `cover-background` and `copyright`, but the extension does not read them from the YAML.
 I proposed a `cover` key for them in a [pull request](https://github.com/quarto-ext/orange-book/pull/7).
 The wider request, to expose more options of the package in the YAML, is [quarto-cli issue 14270](https://github.com/quarto-dev/quarto-cli/issues/14270).
@@ -513,30 +546,9 @@ This is the file of Quarto 1.11.9 with the lines above added.
 
 :::
 
-The cover is the one thing you cannot reach with those partials.
-orange-book draws it as the first page, so the decoration has to target that page.
-This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.
-It overrides nothing, so it is the lighter option.
+### Write Your Own Format {#book-format}
 
-```{.typst include="typst/book-cover.typ" filename="book-cover.typ"}
-```
-
-Load it after `1-tokens.typ`, because it reads `accent` from there.
-
-| Before | After |
-| :---: | :---: |
-| ![The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page](assets/book-before-p1.png){.lightbox group="typst-tricks" width="237px"} | ![The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom](assets/book-after-p1.png){.lightbox group="typst-tricks" width="237px"} |
-
-::: {.callout-note}
-
-## Accessibility: Check the cover contrast
-
-The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast.
-If you move the band under the box, check the contrast again, as for any text on a band.
-
-:::
-
-If the book needs more than that, write your own Typst format and use it for books.
+When the book needs more, write your own Typst format and use it for books.
 My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them.
 It is described in [A Clinical Study Report in Quarto, End to End](/posts/2026-08-17-quarto-clinical-report/index.qmd).
 
