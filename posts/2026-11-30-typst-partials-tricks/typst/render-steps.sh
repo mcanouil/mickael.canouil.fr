@@ -41,7 +41,7 @@ for ((step = 0; step <= last; step++)); do
 	rm -f "${assets}/step${step}-p"*.png
 	pdftoppm -r 80 -png "_steps/step${step}.pdf" "${assets}/step${step}-p"
 	for png in "${assets}/step${step}-p-"*.png; do
-		mv "${png}" "${png/-p-/-p}"
+		mv "${png}" "${assets}/step${step}-p${png##*-p-}"
 	done
 	echo "step ${step}: $(pdfinfo "_steps/step${step}.pdf" | awk '/^Pages:/ { print $2 }') pages"
 done
