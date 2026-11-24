@@ -35,14 +35,11 @@ for ((step = 0; step <= last; step++)); do
 		echo "${body}"
 	} >"${src}"
 
-	quarto render "${src}" --to typst --quiet
+	quarto render "${src}" --to typst -M keep-typ:true --quiet
 	mv "_step-${step}.pdf" "_steps/step${step}.pdf"
-	rm -f "${src}" "_step-${step}.typ"
 	rm -f "${assets}/step${step}-p"*.png
-	pdftoppm -r 80 -png "_steps/step${step}.pdf" "${assets}/step${step}-p"
-	for png in "${assets}/step${step}-p-"*.png; do
-		mv "${png}" "${assets}/step${step}-p${png##*-p-}"
-	done
+	quarto typst compile "_step-${step}.typ" "${assets}/step${step}-p{p}.png" --ppi 80
+	rm -f "${src}" "_step-${step}.typ"
 	echo "step ${step}: $(pdfinfo "_steps/step${step}.pdf" | awk '/^Pages:/ { print $2 }') pages"
 done
 

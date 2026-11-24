@@ -1,9 +1,8 @@
 // Source for featured.png, the social card of the post.
 // The cover and a body page of the demo report, next to the title.
-// The pages are `assets/_featured-1.png` and `assets/_featured-2.png`:
-//   pdftoppm -r 150 -png -f 1 -l 2 typst/_steps/step10.pdf assets/_featured
-// Then, from the post directory:
-//   typst compile featured.typ featured.png --ppi 300
+// The pages are pages 1 and 2 of `typst/_steps/step10.pdf`.
+// Run `typst/render-steps.sh` first, then from the post directory:
+//   quarto typst compile featured.typ featured.png --ppi 300
 
 #let ink = rgb("#111827")
 #let gold = rgb("#b5830a")
@@ -13,13 +12,14 @@
 #set page(width: 8in, height: 4.2in, margin: 0pt, fill: paper)
 #set text(font: ("Source Sans 3", "Inter"), fill: ink)
 
-#let sheet(path, dx, dy, angle) = place(
+#let sheet(page-number, dx, dy, angle) = place(
   top + left,
   dx: dx,
   dy: dy,
   rotate(angle, origin: top + left, box(
+    fill: white,
     stroke: 0.6pt + rgb("#d1d5db"),
-    image(path, width: 2.2in, alt: ""),
+    image("typst/_steps/step10.pdf", page: page-number, width: 2.2in, alt: ""),
   )),
 )
 
@@ -31,5 +31,5 @@
   #text(size: 11pt, fill: muted)[One file per trick. Copy it, change it or delete it.]
 ])
 
-#sheet("assets/_featured-1.png", 4.2in, 0.55in, -4deg)
-#sheet("assets/_featured-2.png", 5.5in, 0.85in, 3deg)
+#sheet(1, 4.2in, 0.55in, -4deg)
+#sheet(2, 5.5in, 0.85in, 3deg)
