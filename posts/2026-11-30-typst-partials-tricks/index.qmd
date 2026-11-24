@@ -21,6 +21,7 @@ This post shows ten of them as small partials.
 Each one is a separate file, so you can copy it and edit it without touching the others.
 A few build on an earlier one, and the demo section says which.
 They work on any Quarto Typst document, and [one section](#book) covers what changes in a book.
+A callout titled "Accessibility" explains how the trick keeps the PDF accessible, and the other callouts cover other details.
 
 ![](featured.png){
   .img-featured
@@ -107,6 +108,45 @@ The heading numbers come from `number-sections: true` in the front matter of `_r
 The demo and the script that builds it are [in the post folder on GitHub](https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst).
 To build the PDF after each trick, run `typst/render-steps.sh` from that folder.
 
+## Two Ways to Load a Partial {#loading}
+
+The demo uses `include-in-header`, but Quarto offers a second way.
+You list your own files under `template-partials`, and you call each one from a partial that you override, with `$name.typ()$`.
+It is the way that [quarto-mcanouil](https://m.canouil.dev/quarto-mcanouil/) loads the files of its library.
+
+```{.yaml filename="front matter"}
+format:
+  typst:
+    template-partials:
+      - typst-show.typ
+      - partials/1-tokens.typ
+      - partials/2-header-footer.typ
+      - partials/3-headings.typ
+```
+
+```{.typst include="typst/typst-show-partials.typ" filename="typst-show.typ"}
+```
+
+I tested this with the first three partials, and the PDF came out tagged.
+Put each call on its own line and leave a blank line between two calls.
+Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.
+
+| | `include-in-header` | `template-partials` |
+| --- | --- | --- |
+| Setup | One line of YAML per file. | One line of YAML per file, plus one `$name.typ()$` call in a partial that you override. |
+| Where the file lands | After Quarto's own Typst setup and before `page.typ` and `typst-show.typ`. | Where you call it. |
+| Pandoc variables | No. The file is pasted as it is, and `$kicker$` stays as text. | Yes. `$title$` or `$if(kicker)$` work, so a partial can read the YAML. |
+| What it replaces | Nothing. | The default partial that you override, here `typst-show.typ`. |
+| In a book | Works, as the book section shows. | Overriding `typst-show.typ` removes the setup of orange-book. |
+| In an extension | The user has to list the files. | The extension lists them once, and the format gets them with it. |
+
+I tested the variable row by putting `$kicker$` in each kind of file.
+The partial printed the value of `kicker` in the header, and the `include-in-header` file kept the literal text.
+
+My rule is simple.
+Use `include-in-header` for small tweaks that do not read the metadata, because nothing else changes.
+Use `template-partials` when a partial needs the YAML, or when you package the partials in a format extension.
+
 ## Tokens {#tokens}
 
 Keep every colour and font in one place, so changing a value changes the whole document.
@@ -120,7 +160,7 @@ Keep every colour and font in one place, so changing a value changes the whole d
 
 ::: {.callout-note}
 
-## Contrast
+## Accessibility: Contrast
 
 I computed the [WCAG 2.x](https://www.w3.org/TR/WCAG21/#contrast-minimum) contrast ratios of these colours with a short script.
 
@@ -146,10 +186,11 @@ Add a quiet running header and a page number in the form `n / total`.
 
 ::: {.callout-note}
 
-## Size and context
+## Accessibility: Size and context
 
 The text is `0.85em` of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt.
 The page counter needs `context`, because its value is only known once Typst lays out the page.
+The right slot of the header says `Finance`, which is the label of the demo, so replace it with your own.
 
 :::
 
@@ -166,7 +207,7 @@ Colour the heading numbers and keep a heading from being stranded at the bottom 
 
 ::: {.callout-note}
 
-## Real headings
+## Accessibility: Real headings
 
 The partial restyles real headings.
 It does not fake them with big text, so the PDF keeps its heading structure.
@@ -188,7 +229,7 @@ Show code in a calm light block that never splits across pages and never turns c
 
 ::: {.callout-note}
 
-## Ligatures and page breaks
+## Accessibility: Ligatures and page breaks
 
 Code that looks different from what you typed is hard to read.
 With only `ligatures: false`, Fira Code still drew `|>` as a triangle, so I also turn off the `calt` feature with `features: ("calt": 0)`.
@@ -212,7 +253,7 @@ Give tables a filled header and light stripes.
 
 ::: {.callout-note}
 
-## Header row
+## Accessibility: Header row
 
 The partial styles the header row.
 It does not replace it, so the table keeps its real header row.
@@ -290,7 +331,7 @@ Echo the cover on every page with a thick and a thin stripe at the top, and a gr
 
 ::: {.callout-note}
 
-## Decoration and contrast
+## Accessibility: Decoration and contrast
 
 Screen readers should skip the stripes and the band.
 Typst already marks page backgrounds, headers and footers as [artifacts](https://typst.app/docs/reference/pdf/artifact/), and it marks paths and shapes as artifacts too.
@@ -340,7 +381,7 @@ Fill the cover slot with a gradient band at the bottom and two stripes at the to
 
 ::: {.callout-note}
 
-## No text in the art
+## Accessibility: No text in the art
 
 The decoration is only shapes and it sits behind the content.
 The title is dark ink on white, and the gradient band at the bottom holds nothing, so the cover text keeps its contrast.
@@ -381,7 +422,7 @@ Load it after `1-tokens.typ`, because it reads `accent` from there.
 
 ::: {.callout-note}
 
-## Check the cover contrast
+## Accessibility: Check the cover contrast
 
 The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast.
 If you move the band under the box, check the contrast again, as for any text on a band.

@@ -1,4 +1,4 @@
-// 2. Header and footer: three slots, page number as "n / total".
+// 2. Header and footer: three slots, page number as "n / total". Replace `Finance` with your own label.
 // `footer-ink` is a slot for the footer text colour, so a band can change it.
 #let footer-ink = state("footer-ink", muted)
 
