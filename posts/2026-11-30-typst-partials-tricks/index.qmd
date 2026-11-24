@@ -13,7 +13,8 @@ image-alt: |
 ---
 
 A few weeks ago, I saw someone ask for resources to customise the cover page of a Quarto Typst book.
-Since Quarto 1.9, a Typst book uses the orange-book template by default, so the question is a fair one.
+Since Quarto 1.9, a Typst book uses the [orange-book](https://github.com/quarto-ext/orange-book) template by default, as the [1.9 changelog](https://quarto.org/docs/download/changelog/1.9/) says.
+So the question is a fair one.
 I use a handful of Typst tricks in my Quarto Typst format extensions, so I thought I would share them.
 
 This post shows ten of them as small partials.
@@ -58,7 +59,10 @@ If you want to go further and package your partials as an extension, my post on 
 I made the screenshots and ran every test in this post with Quarto 1.11.9, which ships Typst 0.15.1.
 The demo also builds with Quarto 1.10.19.
 I did not test older versions.
-The demo uses `pdf-standard` and `pdf.artifact()`, so it needs a recent Quarto and Typst 0.14 or newer.
+The demo uses `pdf-standard` and `pdf.artifact()`.
+The [Quarto 1.9 changelog](https://quarto.org/docs/download/changelog/1.9/) lists the `pdf-standard` option and says that Quarto 1.9 ships Typst 0.14.2.
+The [Typst 0.14 changelog](https://typst.app/docs/changelog/0.14.0/) lists `pdf.artifact()` and PDF/UA-1 export.
+So the demo needs Quarto 1.9 or newer.
 
 :::
 
@@ -85,7 +89,8 @@ format:
       - typst-show.typ
 ```
 
-1. Ask Typst for a tagged PDF that follows PDF/UA-1.
+1. Ask Typst for a tagged PDF that follows PDF/UA-1, with the [`pdf-standard` option](https://quarto.org/docs/reference/formats/typst.html).
+   The [Typst accessibility guide](https://typst.app/docs/guides/accessibility/) explains what the standard asks for.
    Typst checks the PDF against the standard and tags it, and `pdfinfo` reports `Tagged: yes` for the final demo.
    In my tests, an image with no alt text stops the build with the error `PDF/UA-1 error: missing alt text`.
 2. Load the partials in this order.
@@ -117,7 +122,7 @@ Keep every colour and font in one place, so changing a value changes the whole d
 
 ## Contrast
 
-I computed the WCAG 2.x contrast ratios of these colours with a short script.
+I computed the [WCAG 2.x](https://www.w3.org/TR/WCAG21/#contrast-minimum) contrast ratios of these colours with a short script.
 
 - Ink on white is 14.76:1.
 - Accent on white is 5.67:1, and so is white on accent.
@@ -288,10 +293,10 @@ Echo the cover on every page with a thick and a thin stripe at the top, and a gr
 ## Decoration and contrast
 
 Screen readers should skip the stripes and the band.
-Typst already marks page backgrounds, headers and footers as artifacts, and it marks paths and shapes as artifacts too, but not their content.
+Typst already marks page backgrounds, headers and footers as [artifacts](https://typst.app/docs/reference/pdf/artifact/), and it marks paths and shapes as artifacts too.
 I removed `pdf.artifact()` from a copy of the decorative partials and rendered with `pdf-standard: ua-1`.
-Neither Typst nor Quarto reported an error, and veraPDF still passed it.
-Quarto runs veraPDF on the PDF when you have installed it with `quarto install verapdf`.
+Neither Typst nor Quarto reported an error, and [veraPDF](https://verapdf.org/) still passed it.
+Quarto runs veraPDF on the PDF when you have installed it with `quarto install verapdf`, as the [1.9 changelog](https://quarto.org/docs/download/changelog/1.9/) describes.
 So the experiment confirms it: the stripes, the band and the title rule are artifacts without the wrapper.
 I keep `pdf.artifact()` because it states the intent, and because content that Typst does not mark itself, such as a decorative image or text, needs it.
 
@@ -344,8 +349,9 @@ The title is dark ink on white, and the gradient band at the bottom holds nothin
 
 ## Using the Tricks in a Quarto Book {#book}
 
-A Quarto book project with `format: typst` uses the [orange-book](https://typst.app/universe/package/orange-book) template.
-It draws the cover and the chapter headings itself, and its own `typst-show.typ` sets it up.
+A Quarto book project with `format: typst` uses the [orange-book extension](https://github.com/quarto-ext/orange-book), which Quarto bundles since 1.9.
+It wraps the [orange-book Typst package](https://typst.app/universe/package/orange-book) by Flavio Barisi, which is based on [his original template](https://github.com/flavio20002/typst-orange-template).
+The package draws the cover and the chapter headings itself, and the [`typst-show.typ` of the extension](https://github.com/quarto-ext/orange-book/blob/main/_extensions/orange-book/typst-show.typ) sets it up.
 I tested the partials in a book made with `quarto create project book`, with Quarto 1.11.9 and orange-book 0.7.1, and `pdf-standard: ua-1` still gave a tagged PDF.
 
 | Trick | In a book |
@@ -354,6 +360,11 @@ I tested the partials in a book made with `quarto create project book`, with Qua
 | Header and Footer | The footer works. The orange-book header stays, because the template sets it after your partial. |
 | Page Stripes | Works on every page, cover included. Load the footer partial before it, because that one holds the `footer-ink` state. Without it, the build stops with `unknown variable: footer-ink`. |
 | Title Block, Cover Page, Cover Decoration | Do not use them. They replace `typst-show.typ`, which holds the setup of orange-book, and the book then renders as a single page. |
+
+The supported way to change the cover is a [brand file](https://quarto.org/docs/authoring/brand.html), written in the [brand.yml](https://posit-dev.github.io/brand-yml/) format.
+The extension passes `color.primary` as the main colour, and the title box uses it lightened by 70%.
+It also passes `logo.medium`, which the package puts at the top of the cover, 3 cm wide.
+The package has other cover options, such as `cover`, `cover-background` and `copyright`, but the extension does not read them from the YAML.
 
 The cover is the one thing you cannot reach with those partials.
 orange-book draws it as the first page, so the decoration has to target that page.
