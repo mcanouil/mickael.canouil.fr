@@ -105,9 +105,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-47ddeb68be0f8543b8416a52a9eb1e92.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9131a1f067e56879226ccccca751af50.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-0378d7181aee4e9d50d48989f15ba4e9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9131a1f067e56879226ccccca751af50.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-c56c6e20a9b30948941be4ad7e57e89a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-e76fd9b010d64ebeb345f3fc2aa15c97.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-c56c6e20a9b30948941be4ad7e57e89a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <link href="../../site_libs/quarto-contrib/code-window-1.10.1/style.css" rel="stylesheet">
 <script>document.addEventListener("DOMContentLoaded",function(){
   var DEFAULT_COLLAPSE=null;
@@ -601,20 +601,24 @@ Note
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Ask Typst for a tagged PDF that follows PDF/UA-1, with the <a href="https://quarto.org/docs/reference/formats/typst.html"><code>pdf-standard</code> option</a>. The <a href="https://typst.app/docs/guides/accessibility/">Typst accessibility guide</a> explains what the standard asks for. Typst checks the PDF against the standard and tags it, and <code>pdfinfo</code> reports <code>Tagged: yes</code> for the final demo. In my tests, an image with no alt text stops the build with the error <code>PDF/UA-1 error: missing alt text</code>.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Ask Typst for a tagged PDF that follows PDF/UA-1, with the <a href="https://quarto.org/docs/reference/formats/typst.html"><code>pdf-standard</code> option</a>. The <a href="https://typst.app/docs/guides/accessibility/">Typst accessibility guide</a> explains what the standard asks for. Typst checks the PDF against the standard and tags it, and <code>pdfinfo</code> reports <code>Tagged: yes</code> for the final demo. For example, an image with no alt text stops the build with the error <code>PDF/UA-1 error: missing alt text</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
 <span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick, unless a later partial needs it.</span>
 </dd>
 </dl>
-<p>Some partials need an earlier one.</p>
-<ul>
-<li>Every partial after the first reads the colours and fonts of <code>1-tokens.typ</code>.</li>
-<li><code>8-page-stripes.typ</code> needs <code>2-header-footer.typ</code>, and <code>10-cover-decoration.typ</code> needs <code>9-cover.typ</code>.</li>
-<li><code>9-cover.typ</code> and <code>typst-show.typ</code> need <code>7-title-block.typ</code>.</li>
-<li>The others, such as <code>3-headings.typ</code> and <code>4-code.typ</code>, need only the first partial.</li>
-</ul>
+<p>Some partials need an earlier one. In the diagram, an arrow points from a partial to the one it needs.</p>
+<div id="fig-partials-tree" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-partials-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p><a href="../../posts/2026-11-30-typst-partials-tricks/./assets/typst-render/partials-tree.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: The partials that need an earlier partial."><img src="../../posts/2026-11-30-typst-partials-tricks/./assets/typst-render/partials-tree.svg" class="img-fluid figure-img" alt="Dependency diagram. Tokens is needed by every other partial. Page stripes needs header and footer. Cover needs the title block, and cover decoration needs the cover. The typst-show file needs the title block."></a></p>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-partials-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The partials that need an earlier partial.
+</figcaption>
+</figure>
+</div>
 <p>The heading numbers come from <code>number-sections: true</code> in the front matter of <code>_report.qmd</code>, because Quarto sets the numbering after the partials run. The report, the ten partials and <code>typst-show.typ</code> are <a href="https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst">in the post folder on GitHub</a>.</p>
 </section>
 <section id="loading" class="level2" data-number="3">
@@ -649,7 +653,7 @@ Note
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  doc,</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>I tested this with the first three partials, and the PDF came out tagged. Put each call on its own line and leave a blank line between two calls. Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.</p>
+<p>Put each call on its own line and leave a blank line between two calls. Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -694,14 +698,30 @@ Note
 <td>The user has to list the files.</td>
 <td>The extension lists them once, and the format gets them with it.</td>
 </tr>
+<tr class="odd">
+<td>Upkeep</td>
+<td>None. Quarto’s own partials keep working.</td>
+<td>You own the partial that you override. Compare it with Quarto’s default at every release, or you can miss its fixes and new features.</td>
+</tr>
 </tbody>
 </table>
-<p>I tested the variable row by putting <code>$kicker$</code> in each kind of file. The partial printed the value of <code>kicker</code> in the header, and the <code>include-in-header</code> file kept the literal text.</p>
-<p>My rule is simple. Use <code>include-in-header</code> for small tweaks that do not read the metadata, because nothing else changes. Use <code>template-partials</code> when a partial needs the YAML, or when you package the partials in a format extension.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Decision
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Start with <code>include-in-header</code>, because it replaces nothing. Switch to <code>template-partials</code> when a partial must read the YAML, or when you ship the partials with a format extension. Every Quarto partial that you override becomes yours to maintain, so keep those overrides few and small.</p>
+</div>
+</div>
 </section>
 <section id="tokens" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="tokens"><span class="header-section-number">4</span> Tokens</h2>
-<p>Keep every colour and font in one place, so changing a value changes the whole document.</p>
+<p>Keep every colour and font in one place, so changing a value changes the whole document. This principle holds in every programming language, from CSS variables to constants in R, so it applies to Typst too.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/1-tokens.typ</strong></pre>
@@ -756,6 +776,7 @@ Note
 <li>Muted on white is 6.18:1, and muted on the tint is 5.54:1.</li>
 </ul>
 <p>Body text needs at least 4.5:1, so every pair passes. Links are underlined, so they do not rely on colour alone.</p>
+<p>To compute a ratio, use the <a href="https://webaim.org/resources/contrastchecker/">WebAIM contrast checker</a> or the <a href="https://www.tpgi.com/color-contrast-checker/">Colour Contrast Analyser</a> from TPGi. To pick a palette that stays readable for colour-blind people, try <a href="https://colorbrewer2.org/">ColorBrewer</a> and <a href="https://projects.susielu.com/viz-palette">Viz Palette</a>. The <a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html">WCAG explanation of contrast</a> gives the thresholds.</p>
 </div>
 </div>
 </section>
@@ -766,27 +787,36 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/2-header-footer.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="partials/2-header-footer.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Header and footer: three slots, page number as "n / total". Replace `Finance` with your own label.</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">// `footer-ink` is a slot for the footer text colour, so a band can change it.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">footer-ink</span> <span class="op">=</span> state<span class="op">(</span><span class="st">"footer-ink"</span><span class="op">,</span> muted<span class="op">)</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">slots</span><span class="op">(</span>start<span class="op">,</span> middle<span class="op">,</span> end<span class="op">)</span> <span class="op">=</span> grid<span class="op">(</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  columns<span class="op">:</span> <span class="op">(</span><span class="fl">1fr</span><span class="op">,</span> <span class="bu">auto</span><span class="op">,</span> <span class="fl">1fr</span><span class="op">),</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  align<span class="op">:</span> <span class="op">(</span>left<span class="op">,</span> center<span class="op">,</span> right<span class="op">),</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  start<span class="op">,</span> middle<span class="op">,</span> end<span class="op">,</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  header<span class="op">:</span> context <span class="cf">if</span> counter<span class="op">(</span>page<span class="op">).</span>get<span class="op">().</span>first<span class="op">()</span> <span class="op">&gt;</span> <span class="dv">1</span> <span class="op">{</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">)</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    slots<span class="op">([</span><span class="kw">#</span>document<span class="op">.</span>title<span class="op">],</span> <span class="op">[],</span> <span class="op">[</span>Finance<span class="op">])</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  footer<span class="op">:</span> context <span class="op">{</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> footer-ink<span class="op">.</span>get<span class="op">())</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    slots<span class="op">([],</span> <span class="op">[],</span> <span class="op">[</span><span class="kw">#</span>counter<span class="op">(</span>page<span class="op">).</span>display<span class="op">(</span><span class="st">"1 / 1"</span><span class="op">,</span> both<span class="op">:</span> <span class="bu">true</span><span class="op">)])</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="partials/2-header-footer.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. Header and footer: three slots, page number as "n / total".</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-2" class="code-annotation-target"><a href="#annotated-cell-5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">footer-ink</span> <span class="op">=</span> state<span class="op">(</span><span class="st">"footer-ink"</span><span class="op">,</span> muted<span class="op">)</span></span>
+<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">slots</span><span class="op">(</span>start<span class="op">,</span> middle<span class="op">,</span> end<span class="op">)</span> <span class="op">=</span> grid<span class="op">(</span></span>
+<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5" aria-hidden="true" tabindex="-1"></a>  columns<span class="op">:</span> <span class="op">(</span><span class="fl">1fr</span><span class="op">,</span> <span class="bu">auto</span><span class="op">,</span> <span class="fl">1fr</span><span class="op">),</span></span>
+<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6" aria-hidden="true" tabindex="-1"></a>  align<span class="op">:</span> <span class="op">(</span>left<span class="op">,</span> center<span class="op">,</span> right<span class="op">),</span></span>
+<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7" aria-hidden="true" tabindex="-1"></a>  start<span class="op">,</span> middle<span class="op">,</span> end<span class="op">,</span></span>
+<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span></span>
+<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11" aria-hidden="true" tabindex="-1"></a>  header<span class="op">:</span> context <span class="cf">if</span> counter<span class="op">(</span>page<span class="op">).</span>get<span class="op">().</span>first<span class="op">()</span> <span class="op">&gt;</span> <span class="dv">1</span> <span class="op">{</span></span>
+<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">)</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-13" class="code-annotation-target"><a href="#annotated-cell-5-13" aria-hidden="true" tabindex="-1"></a>    slots<span class="op">([</span><span class="kw">#</span>document<span class="op">.</span>title<span class="op">],</span> <span class="op">[],</span> <span class="op">[</span>Finance<span class="op">])</span></span>
+<span id="annotated-cell-5-14"><a href="#annotated-cell-5-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15" aria-hidden="true" tabindex="-1"></a>  footer<span class="op">:</span> context <span class="op">{</span></span>
+<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16" aria-hidden="true" tabindex="-1"></a>    <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> footer-ink<span class="op">.</span>get<span class="op">())</span></span>
+<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17" aria-hidden="true" tabindex="-1"></a>    slots<span class="op">([],</span> <span class="op">[],</span> <span class="op">[</span><span class="kw">#</span>counter<span class="op">(</span>page<span class="op">).</span>display<span class="op">(</span><span class="st">"1 / 1"</span><span class="op">,</span> both<span class="op">:</span> <span class="bu">true</span><span class="op">)])</span></span>
+<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="annotated-cell-5-19"><a href="#annotated-cell-5-19" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="2" data-code-annotation="1">A slot for the footer text colour, so that <a href="#page-stripes">Page Stripes</a> can turn it white on a dark band.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="2"><code>Finance</code> is the label of the demo. If you load this partial with <code>template-partials</code>, as in <a href="#loading">Two Ways to Load a Partial</a>, write <code>[$kicker$]</code> and the label comes from the <code>kicker</code> key of the YAML.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -815,7 +845,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The text is <code>0.85em</code> of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt. The page counter needs <code>context</code>, because its value is only known once Typst lays out the page. The right slot of the header says <code>Finance</code>, which is the label of the demo, so replace it with your own.</p>
+<p>The text is <code>0.85em</code> of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt. The page counter needs <code>context</code>, because its value is only known once Typst lays out the page.</p>
 </div>
 </div>
 </section>
@@ -826,14 +856,14 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/3-headings.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="partials/3-headings.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Headings: coloured numbers, never stranded at the bottom of a page.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> heading<span class="op">:</span> it =&gt; block(sticky: true, above: 1.6em, below: 0.8em)[</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span><span class="cf">if</span> it<span class="op">.</span>numbering <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>fill<span class="op">:</span> accent<span class="op">,</span> counter<span class="op">(</span>heading<span class="op">).</span>display<span class="op">(</span>it<span class="op">.</span>numbering<span class="op">))</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    h<span class="op">(</span><span class="fl">0.5em</span><span class="op">)</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>it<span class="op">.</span>body</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="partials/3-headings.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. Headings: coloured numbers, never stranded at the bottom of a page.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> heading<span class="op">:</span> it =&gt; block(sticky: true, above: 1.6em, below: 0.8em)[</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span><span class="cf">if</span> it<span class="op">.</span>numbering <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>fill<span class="op">:</span> accent<span class="op">,</span> counter<span class="op">(</span>heading<span class="op">).</span>display<span class="op">(</span>it<span class="op">.</span>numbering<span class="op">))</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    h<span class="op">(</span><span class="fl">0.5em</span><span class="op">)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">#</span>it<span class="op">.</span>body</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -874,11 +904,11 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/4-code.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="partials/4-code.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Code: no ligatures, no page break inside a block, light background.</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> raw<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>ligatures<span class="op">:</span> <span class="bu">false</span><span class="op">,</span> features<span class="op">:</span> <span class="op">(</span><span class="st">"calt"</span>: <span class="dv">0</span><span class="op">))</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> raw<span class="op">.</span>where<span class="op">(</span>block<span class="op">:</span> <span class="bu">true</span><span class="op">):</span> <span class="kw">set</span> <span class="va">block</span><span class="op">(</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> tint<span class="op">,</span> inset<span class="op">:</span> <span class="fl">0.8em</span><span class="op">,</span> radius<span class="op">:</span> <span class="fl">4pt</span><span class="op">,</span> breakable<span class="op">:</span> <span class="bu">false</span><span class="op">,</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="partials/4-code.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. Code: no ligatures, no page break inside a block, light background.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> raw<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>ligatures<span class="op">:</span> <span class="bu">false</span><span class="op">,</span> features<span class="op">:</span> <span class="op">(</span><span class="st">"calt"</span>: <span class="dv">0</span><span class="op">))</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> raw<span class="op">.</span>where<span class="op">(</span>block<span class="op">:</span> <span class="bu">true</span><span class="op">):</span> <span class="kw">set</span> <span class="va">block</span><span class="op">(</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> fill<span class="op">:</span> tint<span class="op">,</span> inset<span class="op">:</span> <span class="fl">0.8em</span><span class="op">,</span> radius<span class="op">:</span> <span class="fl">4pt</span><span class="op">,</span> breakable<span class="op">:</span> <span class="bu">false</span><span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -908,25 +938,25 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Code that looks different from what you typed is hard to read. With only <code>ligatures: false</code>, Fira Code still drew <code>|&gt;</code> as a triangle, so I also turn off the <code>calt</code> feature with <code>features: ("calt": 0)</code>. The symbols <code>!=</code>, <code>&lt;-</code> and <code>&gt;=</code> then show as typed. The <code>breakable: false</code> setting keeps a block on one page. Code text is <code>0.8em</code> of the body, which is 8.8 pt, so it is a little under 9 pt. You can enlarge it with <code>#show raw: set text(size: 9.5pt)</code>, and I use points there because an <code>em</code> value would apply to the already reduced size.</p>
+<p>Code that looks different from what you typed is hard to read. With only <code>ligatures: false</code>, Fira Code still drew <code>|&gt;</code> as a triangle, so I also turn off the <code>calt</code> feature with <code>features: ("calt": 0)</code>. The symbols <code>!=</code>, <code>&lt;-</code> and <code>&gt;=</code> then show as typed. The <code>breakable: false</code> setting keeps a block on one page. This matters most in teaching materials, where learners must see exactly the characters they have to type. Code text is <code>0.8em</code> of the body, which is 8.8 pt, so it is a little under 9 pt. You can enlarge it with <code>#show raw: set text(size: 9.5pt)</code>, and I use points there because an <code>em</code> value would apply to the already reduced size.</p>
 </div>
 </div>
 </section>
 <section id="tables" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="tables"><span class="header-section-number">8</span> Tables</h2>
-<p>Give tables a filled header and light stripes.</p>
+<p>Give tables a filled header and light stripes. These rules are plain Typst and need no library such as <code>gt</code> or <code>great_tables</code>, so every table gets the style, including a simple Markdown table in Quarto, and not only the tables that R or Python produce. My post on <a href="../../posts/2026-04-15-quarto-brand-figures-tables/index.html">branded figures and tables</a> covers those libraries.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/5-tables.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="partials/5-tables.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. Tables: filled header, zebra stripes.</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">table</span><span class="op">(</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  fill<span class="op">:</span> <span class="op">(</span>_<span class="op">,</span> y<span class="op">)</span> <span class="op">=&gt;</span> <span class="cf">if</span> y <span class="op">==</span> <span class="dv">0</span> <span class="op">{</span> accent <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> calc<span class="op">.</span>odd<span class="op">(</span>y<span class="op">)</span> <span class="op">{</span> tint <span class="op">},</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  stroke<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  inset<span class="op">:</span> <span class="fl">0.6em</span><span class="op">,</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> table<span class="op">.</span>cell<span class="op">.</span>where<span class="op">(</span>y<span class="op">:</span> <span class="dv">0</span><span class="op">):</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>fill<span class="op">:</span> white<span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">)</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> table<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.9em</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="partials/5-tables.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. Tables: filled header, zebra stripes.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">table</span><span class="op">(</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  fill<span class="op">:</span> <span class="op">(</span>_<span class="op">,</span> y<span class="op">)</span> <span class="op">=&gt;</span> <span class="cf">if</span> y <span class="op">==</span> <span class="dv">0</span> <span class="op">{</span> accent <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> calc<span class="op">.</span>odd<span class="op">(</span>y<span class="op">)</span> <span class="op">{</span> tint <span class="op">},</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  stroke<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  inset<span class="op">:</span> <span class="fl">0.6em</span><span class="op">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> table<span class="op">.</span>cell<span class="op">.</span>where<span class="op">(</span>y<span class="op">:</span> <span class="dv">0</span><span class="op">):</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>fill<span class="op">:</span> white<span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">)</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> table<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.9em</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -962,20 +992,20 @@ Note
 </section>
 <section id="captions" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="captions"><span class="header-section-number">9</span> Captions</h2>
-<p>Make captions small and muted, with the label in bold.</p>
+<p>Make captions small and muted, with the label in bold. This one is a matter of taste. I find it easier to read when “Table 1” and the caption text look different, so the label stays bold and the caption is smaller and muted.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/6-captions.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/6-captions.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 6. Captions: small, muted, with the label in bold when the figure is numbered.</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> figure<span class="op">.</span>caption<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">)</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> figure<span class="op">.</span>caption<span class="op">:</span> it =&gt; {</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  if it.numbering != none and it.supplement != none {</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    strong(it.supplement + [ ] + context it.counter.display(it.numbering))</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    [. ]</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  it.body</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="partials/6-captions.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 6. Captions: small, muted, with the label in bold when the figure is numbered.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> figure<span class="op">.</span>caption<span class="op">:</span> <span class="kw">set</span> <span class="va">text</span><span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span> figure<span class="op">.</span>caption<span class="op">:</span> it =&gt; {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  if it.numbering != none and it.supplement != none {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    strong(it.supplement + [ ] + context it.counter.display(it.numbering))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    [. ]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  it.body</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -1016,38 +1046,38 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/7-title-block.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="partials/7-title-block.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 7. Title block: kicker, title, short rule, subtitle, date.</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">title-block</span><span class="op">(</span>title<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> kicker<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> subtitle<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> date<span class="op">:</span> <span class="bu">none</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> kicker <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> tracking<span class="op">:</span> <span class="fl">0.14em</span><span class="op">,</span> fill<span class="op">:</span> accent<span class="op">,</span> upper<span class="op">(</span>kicker<span class="op">))</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    v<span class="op">(</span><span class="fl">0.4em</span><span class="op">)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  text<span class="op">(</span>font<span class="op">:</span> font-heading<span class="op">,</span> size<span class="op">:</span> <span class="fl">2em</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> title<span class="op">)</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  v<span class="op">(</span><span class="fl">0.4em</span><span class="op">)</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">(</span>line<span class="op">(</span>length<span class="op">:</span> <span class="fl">3em</span><span class="op">,</span> stroke<span class="op">:</span> <span class="fl">2.5pt</span> <span class="op">+</span> accent<span class="op">))</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> subtitle <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> text<span class="op">(</span>size<span class="op">:</span> <span class="fl">1.15em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">,</span> subtitle<span class="op">)</span>; v<span class="op">(</span><span class="fl">0.2em</span><span class="op">)</span> <span class="op">}</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> date <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">,</span> date<span class="op">)</span> <span class="op">}</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  v<span class="op">(</span><span class="fl">1.5em</span><span class="op">)</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/7-title-block.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 7. Title block: kicker, title, short rule, subtitle, date.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">title-block</span><span class="op">(</span>title<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> kicker<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> subtitle<span class="op">:</span> <span class="bu">none</span><span class="op">,</span> date<span class="op">:</span> <span class="bu">none</span><span class="op">)</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> kicker <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> tracking<span class="op">:</span> <span class="fl">0.14em</span><span class="op">,</span> fill<span class="op">:</span> accent<span class="op">,</span> upper<span class="op">(</span>kicker<span class="op">))</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    v<span class="op">(</span><span class="fl">0.4em</span><span class="op">)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  text<span class="op">(</span>font<span class="op">:</span> font-heading<span class="op">,</span> size<span class="op">:</span> <span class="fl">2em</span><span class="op">,</span> weight<span class="op">:</span> <span class="st">"bold"</span><span class="op">,</span> title<span class="op">)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  v<span class="op">(</span><span class="fl">0.4em</span><span class="op">)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">(</span>line<span class="op">(</span>length<span class="op">:</span> <span class="fl">3em</span><span class="op">,</span> stroke<span class="op">:</span> <span class="fl">2.5pt</span> <span class="op">+</span> accent<span class="op">))</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> subtitle <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> text<span class="op">(</span>size<span class="op">:</span> <span class="fl">1.15em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">,</span> subtitle<span class="op">)</span>; v<span class="op">(</span><span class="fl">0.2em</span><span class="op">)</span> <span class="op">}</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> date <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> text<span class="op">(</span>size<span class="op">:</span> <span class="fl">0.85em</span><span class="op">,</span> fill<span class="op">:</span> muted<span class="op">,</span> date<span class="op">)</span> <span class="op">}</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  v<span class="op">(</span><span class="fl">1.5em</span><span class="op">)</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This one needs a second file, because Quarto decides what it passes to the title block in <code>typst-show.typ</code>. Quarto loads that file with <code>template-partials</code>.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>typst-show.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> doc =&gt; article(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  lang: "<span class="ss">$if(lang)$$lang$$else$</span>en<span class="ss">$endif$</span>",</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(region)$</span>  region: "<span class="ss">$region$</span>",</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span>  sectionnumbering: <span class="ss">$if(section-numbering)$</span>"<span class="ss">$section-numbering$</span>"<span class="ss">$else$</span>none<span class="ss">$endif$</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  doc,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">document</span><span class="op">(</span>title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">])</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>title-block<span class="op">(</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(kicker)$</span>  kicker<span class="op">:</span> <span class="op">[</span><span class="ss">$kicker$</span><span class="op">],</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$$if(subtitle)$</span>  subtitle<span class="op">:</span> <span class="op">[</span><span class="ss">$subtitle$</span><span class="op">],</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$$if(date)$</span>  date<span class="op">:</span> <span class="op">[</span><span class="ss">$date$</span><span class="op">],</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> doc =&gt; article(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  lang: "<span class="ss">$if(lang)$$lang$$else$</span>en<span class="ss">$endif$</span>",</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(region)$</span>  region: "<span class="ss">$region$</span>",</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span>  sectionnumbering: <span class="ss">$if(section-numbering)$</span>"<span class="ss">$section-numbering$</span>"<span class="ss">$else$</span>none<span class="ss">$endif$</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  doc,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">document</span><span class="op">(</span>title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">])</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>title-block<span class="op">(</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(kicker)$</span>  kicker<span class="op">:</span> <span class="op">[</span><span class="ss">$kicker$</span><span class="op">],</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$$if(subtitle)$</span>  subtitle<span class="op">:</span> <span class="op">[</span><span class="ss">$subtitle$</span><span class="op">],</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$$if(date)$</span>  date<span class="op">:</span> <span class="op">[</span><span class="ss">$date$</span><span class="op">],</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -1084,22 +1114,27 @@ Note
 </section>
 <section id="page-stripes" class="level2" data-number="11">
 <h2 data-number="11" class="anchored" data-anchor-id="page-stripes"><span class="header-section-number">11</span> Page Stripes</h2>
-<p>Echo the cover on every page with a thick and a thin stripe at the top, and a gradient band behind the footer.</p>
+<p>The decoration of this demo is a thick and a thin stripe at the top and a gradient band at the bottom, all in the accent colour. This trick puts them on every page, with the band behind the footer. The <a href="#cover-page">cover</a> reuses the same style later in the post.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/8-page-stripes.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="partials/8-page-stripes.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 8. Recurring decoration: stripes at the top, a gradient band behind the footer.</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">// Typst already treats page backgrounds as artifacts; the wrapper states the intent.</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band-gradient</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>footer-ink<span class="op">.</span>update<span class="op">(</span>white<span class="op">)</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> pdf<span class="op">.</span>artifact<span class="op">({</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">8mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">4mm</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">14mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">1mm</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">1.25in</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="op">}))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-12" data-filename="partials/8-page-stripes.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-12-1"><a href="#annotated-cell-12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 8. Recurring decoration: stripes at the top, a gradient band behind the footer.</span></span>
+<span id="annotated-cell-12-2"><a href="#annotated-cell-12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band-gradient</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-12" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-12-3" class="code-annotation-target"><a href="#annotated-cell-12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>footer-ink<span class="op">.</span>update<span class="op">(</span>white<span class="op">)</span></span>
+<span id="annotated-cell-12-4"><a href="#annotated-cell-12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-12-5"><a href="#annotated-cell-12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> pdf<span class="op">.</span>artifact<span class="op">({</span></span>
+<span id="annotated-cell-12-6"><a href="#annotated-cell-12-6" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">8mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">4mm</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-12-7"><a href="#annotated-cell-12-7" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">14mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">1mm</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-12-8"><a href="#annotated-cell-12-8" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">1.25in</span><span class="op">,</span> fill<span class="op">:</span> band-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-12-9"><a href="#annotated-cell-12-9" aria-hidden="true" tabindex="-1"></a><span class="op">}))</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-12" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-12" data-code-lines="3" data-code-annotation="1">Turns the footer text white, through the slot of <a href="#header-footer">Header and Footer</a>.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1128,8 +1163,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Screen readers should skip the stripes and the band. Typst already marks page backgrounds, headers and footers as <a href="https://typst.app/docs/reference/pdf/artifact/">artifacts</a>, and it marks paths and shapes as artifacts too. I removed <code>pdf.artifact()</code> from a copy of the decorative partials and rendered with <code>pdf-standard: ua-1</code>. Neither Typst nor Quarto reported an error, and <a href="https://verapdf.org/">veraPDF</a> still passed it. Quarto runs veraPDF on the PDF when you have installed it with <code>quarto install verapdf</code>, as the <a href="https://quarto.org/docs/download/changelog/1.9/">1.9 changelog</a> describes. So the experiment confirms it: the stripes, the band and the title rule are artifacts without the wrapper. I keep <code>pdf.artifact()</code> because it states the intent, and because content that Typst does not mark itself, such as a decorative image or text, needs it.</p>
-<p>The band is dark, so trick 2 holds a <code>footer-ink</code> state for the footer text colour, and this partial sets it to white. White on the lightest end of the gradient, which is the accent colour, is 5.67:1. Text on a band needs its contrast checked again.</p>
+<p>Screen readers should skip decoration. Typst already marks page backgrounds and shapes as <a href="https://typst.app/docs/reference/pdf/artifact/">artifacts</a>, so it skips the stripes and the band. I still wrap them in <code>pdf.artifact()</code> to say so. The band is dark, so the footer text turns white, which is 5.67:1 on the lightest end of the gradient. Text on a band needs its contrast checked again.</p>
 </div>
 </div>
 </section>
@@ -1140,20 +1174,25 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/9-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="partials/9-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 9. Cover page: the title block gets a page of its own.</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">// `cover-art` is a slot for decoration, empty until trick 10 fills it.</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cover-art</span> <span class="op">=</span> state<span class="op">(</span><span class="st">"cover-art"</span><span class="op">,</span> <span class="bu">none</span><span class="op">)</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">title-block</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">block-on-page</span> <span class="op">=</span> title-block</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>..args<span class="op">)</span> <span class="op">=&gt;</span> page<span class="op">(</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    header<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    footer<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    background<span class="op">:</span> context cover-art<span class="op">.</span>get<span class="op">(),</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    align<span class="op">(</span>horizon<span class="op">,</span> block-on-page<span class="op">(</span>..args<span class="op">)),</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-13" data-filename="partials/9-cover.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-13-1"><a href="#annotated-cell-13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 9. Cover page: the title block gets a page of its own.</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-13-2" class="code-annotation-target"><a href="#annotated-cell-13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cover-art</span> <span class="op">=</span> state<span class="op">(</span><span class="st">"cover-art"</span><span class="op">,</span> <span class="bu">none</span><span class="op">)</span></span>
+<span id="annotated-cell-13-3"><a href="#annotated-cell-13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-13-4"><a href="#annotated-cell-13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">title-block</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="annotated-cell-13-5"><a href="#annotated-cell-13-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> <span class="va">block-on-page</span> <span class="op">=</span> title-block</span>
+<span id="annotated-cell-13-6"><a href="#annotated-cell-13-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>..args<span class="op">)</span> <span class="op">=&gt;</span> page<span class="op">(</span></span>
+<span id="annotated-cell-13-7"><a href="#annotated-cell-13-7" aria-hidden="true" tabindex="-1"></a>    header<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="annotated-cell-13-8"><a href="#annotated-cell-13-8" aria-hidden="true" tabindex="-1"></a>    footer<span class="op">:</span> <span class="bu">none</span><span class="op">,</span></span>
+<span id="annotated-cell-13-9"><a href="#annotated-cell-13-9" aria-hidden="true" tabindex="-1"></a>    background<span class="op">:</span> context cover-art<span class="op">.</span>get<span class="op">(),</span></span>
+<span id="annotated-cell-13-10"><a href="#annotated-cell-13-10" aria-hidden="true" tabindex="-1"></a>    align<span class="op">(</span>horizon<span class="op">,</span> block-on-page<span class="op">(</span>..args<span class="op">)),</span></span>
+<span id="annotated-cell-13-11"><a href="#annotated-cell-13-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span>
+<span id="annotated-cell-13-12"><a href="#annotated-cell-13-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-13" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-13" data-code-lines="2" data-code-annotation="1">A slot for the cover decoration. It stays empty until <a href="#cover-decoration">Cover Decoration</a> fills it.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1182,7 +1221,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A Typst closure captures the variables it uses when you define it. A later <code>#let</code> cannot change a function that already exists. A <code>state</code> is read when the page is built, so trick 10 can fill the slot after this partial has run.</p>
+<p>A Typst closure captures the variables it uses when you define it. A later <code>#let</code> cannot change a function that already exists. A <code>state</code> is read when the page is built, so <a href="#cover-decoration">Cover Decoration</a> can fill the slot after this partial has run.</p>
 </div>
 </div>
 </section>
@@ -1193,16 +1232,21 @@ Note
 <div class="code-with-filename-file">
 <pre><strong>partials/10-cover-decoration.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="partials/10-cover-decoration.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 10. Cover decoration: a gradient band at the bottom, two stripes at the top.</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">// It is only shapes and holds no text; the wrapper states that it is decoration.</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cover-gradient</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>cover-art<span class="op">.</span>update<span class="op">(</span>pdf<span class="op">.</span>artifact<span class="op">({</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="op">}))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-14" data-filename="partials/10-cover-decoration.typ"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-14-1"><a href="#annotated-cell-14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 10. Cover decoration: a gradient band at the bottom, two stripes at the top.</span></span>
+<span id="annotated-cell-14-2"><a href="#annotated-cell-14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">cover-gradient</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
+<span id="annotated-cell-14-3"><a href="#annotated-cell-14-3" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-14-4" class="code-annotation-target"><a href="#annotated-cell-14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span>cover-art<span class="op">.</span>update<span class="op">(</span>pdf<span class="op">.</span>artifact<span class="op">({</span></span>
+<span id="annotated-cell-14-5"><a href="#annotated-cell-14-5" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-14-6"><a href="#annotated-cell-14-6" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-14-7"><a href="#annotated-cell-14-7" aria-hidden="true" tabindex="-1"></a>  place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> cover-gradient<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="annotated-cell-14-8"><a href="#annotated-cell-14-8" aria-hidden="true" tabindex="-1"></a><span class="op">}))</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-14" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-14" data-code-lines="4" data-code-annotation="1">Fills the slot of <a href="#cover-page">Cover Page</a>.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1268,21 +1312,21 @@ Note
 </tr>
 </tbody>
 </table>
-<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML.</p>
-<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.</p>
+<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. To reach them, you would override the <code>typst-show.typ</code> of the extension, and then you maintain that copy at every Quarto release.</p>
+<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>book-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-filename="book-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> context <span class="cf">if</span> here<span class="op">().</span>page<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span> <span class="op">{</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">({</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="book-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> context <span class="cf">if</span> here<span class="op">().</span>page<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span> <span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">({</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Load it after <code>1-tokens.typ</code>, because it reads <code>accent</code> from there.</p>
 <table class="caption-top table">
@@ -1316,6 +1360,7 @@ Note
 <p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
 </div>
 </div>
+<p>If the book needs more than that, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
 </section>
 <section id="where-to-go-next" class="level2" data-number="15">
 <h2 data-number="15" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">15</span> Where to Go Next</h2>
@@ -1328,7 +1373,7 @@ Note
 <li>To see which partials you can replace, read the <a href="https://quarto.org/docs/output-formats/typst-custom.html">custom Typst formats</a> page of the Quarto documentation.</li>
 <li>To see a full example, look at <a href="https://m.canouil.dev/quarto-mcanouil/">quarto-mcanouil</a>.</li>
 </ul>
-<p>If you try these partials, I would like to hear how it goes. Questions are welcome in the <a href="https://github.com/mcanouil/mickael.canouil.fr/discussions">discussions</a>, and problems in the <a href="https://github.com/mcanouil/mickael.canouil.fr/issues">issues</a>.</p>
+<p>If you try these partials, I would like to hear how it goes. Drop a comment in the form below.</p>
 
 
 </section>

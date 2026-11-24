@@ -204,20 +204,24 @@ font-style: inherit;">typst-show.typ</span></span><div class="code-annotation-gu
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Ask Typst for a tagged PDF that follows PDF/UA-1, with the <a href="https://quarto.org/docs/reference/formats/typst.html"><code>pdf-standard</code> option</a>. The <a href="https://typst.app/docs/guides/accessibility/">Typst accessibility guide</a> explains what the standard asks for. Typst checks the PDF against the standard and tags it, and <code>pdfinfo</code> reports <code>Tagged: yes</code> for the final demo. In my tests, an image with no alt text stops the build with the error <code>PDF/UA-1 error: missing alt text</code>.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="3" data-code-annotation="1">Ask Typst for a tagged PDF that follows PDF/UA-1, with the <a href="https://quarto.org/docs/reference/formats/typst.html"><code>pdf-standard</code> option</a>. The <a href="https://typst.app/docs/guides/accessibility/">Typst accessibility guide</a> explains what the standard asks for. Typst checks the PDF against the standard and tags it, and <code>pdfinfo</code> reports <code>Tagged: yes</code> for the final demo. For example, an image with no alt text stops the build with the error <code>PDF/UA-1 error: missing alt text</code>.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
 <span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick, unless a later partial needs it.</span>
 </dd>
 </dl>
-<p>Some partials need an earlier one.</p>
-<ul>
-<li>Every partial after the first reads the colours and fonts of <code>1-tokens.typ</code>.</li>
-<li><code>8-page-stripes.typ</code> needs <code>2-header-footer.typ</code>, and <code>10-cover-decoration.typ</code> needs <code>9-cover.typ</code>.</li>
-<li><code>9-cover.typ</code> and <code>typst-show.typ</code> need <code>7-title-block.typ</code>.</li>
-<li>The others, such as <code>3-headings.typ</code> and <code>4-code.typ</code>, need only the first partial.</li>
-</ul>
+<p>Some partials need an earlier one. In the diagram, an arrow points from a partial to the one it needs.</p>
+<div id="fig-partials-tree" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-partials-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p><a href="../../posts/2026-11-30-typst-partials-tricks/./assets/typst-render/partials-tree.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;1: The partials that need an earlier partial."><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/assets/typst-render/partials-tree.svg" class="img-fluid figure-img" alt="Dependency diagram. Tokens is needed by every other partial. Page stripes needs header and footer. Cover needs the title block, and cover decoration needs the cover. The typst-show file needs the title block."></a></p>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-partials-tree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The partials that need an earlier partial.
+</figcaption>
+</figure>
+</div>
 <p>The heading numbers come from <code>number-sections: true</code> in the front matter of <code>_report.qmd</code>, because Quarto sets the numbering after the partials run. The report, the ten partials and <code>typst-show.typ</code> are <a href="https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst">in the post folder on GitHub</a>.</p>
 </section>
 <section id="loading" class="level2" data-number="3">
@@ -312,7 +316,7 @@ font-style: inherit;">$title$</span>],</span>
 <span id="cb2-11">  doc,</span>
 <span id="cb2-12">)</span></code></pre></div></div>
 </div>
-<p>I tested this with the first three partials, and the PDF came out tagged. Put each call on its own line and leave a blank line between two calls. Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.</p>
+<p>Put each call on its own line and leave a blank line between two calls. Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -357,14 +361,30 @@ font-style: inherit;">$title$</span>],</span>
 <td>The user has to list the files.</td>
 <td>The extension lists them once, and the format gets them with it.</td>
 </tr>
+<tr class="odd">
+<td>Upkeep</td>
+<td>None. Quarto’s own partials keep working.</td>
+<td>You own the partial that you override. Compare it with Quarto’s default at every release, or you can miss its fixes and new features.</td>
+</tr>
 </tbody>
 </table>
-<p>I tested the variable row by putting <code>$kicker$</code> in each kind of file. The partial printed the value of <code>kicker</code> in the header, and the <code>include-in-header</code> file kept the literal text.</p>
-<p>My rule is simple. Use <code>include-in-header</code> for small tweaks that do not read the metadata, because nothing else changes. Use <code>template-partials</code> when a partial needs the YAML, or when you package the partials in a format extension.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Decision
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Start with <code>include-in-header</code>, because it replaces nothing. Switch to <code>template-partials</code> when a partial must read the YAML, or when you ship the partials with a format extension. Every Quarto partial that you override becomes yours to maintain, so keep those overrides few and small.</p>
+</div>
+</div>
 </section>
 <section id="tokens" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="tokens"><span class="header-section-number">4</span> Tokens</h2>
-<p>Keep every colour and font in one place, so changing a value changes the whole document.</p>
+<p>Keep every colour and font in one place, so changing a value changes the whole document. This principle holds in every programming language, from CSS variables to constants in R, so it applies to Typst too.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/1-tokens.typ</strong></pre>
@@ -592,6 +612,7 @@ font-style: inherit;">:</span> underline</span></code></pre></div></div>
 <li>Muted on white is 6.18:1, and muted on the tint is 5.54:1.</li>
 </ul>
 <p>Body text needs at least 4.5:1, so every pair passes. Links are underlined, so they do not rely on colour alone.</p>
+<p>To compute a ratio, use the <a href="https://webaim.org/resources/contrastchecker/">WebAIM contrast checker</a> or the <a href="https://www.tpgi.com/color-contrast-checker/">Colour Contrast Analyser</a> from TPGi. To pick a palette that stays readable for colour-blind people, try <a href="https://colorbrewer2.org/">ColorBrewer</a> and <a href="https://projects.susielu.com/viz-palette">Viz Palette</a>. The <a href="https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html">WCAG explanation of contrast</a> gives the thresholds.</p>
 </div>
 </div>
 </section>
@@ -602,13 +623,10 @@ font-style: inherit;">:</span> underline</span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>partials/2-header-footer.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="partials/2-header-footer.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-5" data-filename="partials/2-header-footer.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-5-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">// 2. Header and footer: three slots, page number as "n / total". Replace `Finance` with your own label.</span></span>
-<span id="cb4-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// `footer-ink` is a slot for the footer text colour, so a band can change it.</span></span>
-<span id="cb4-3"><span class="kw" style="color: #003B4F;
+font-style: inherit;">// 2. Header and footer: three slots, page number as "n / total".</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-5-2" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -624,8 +642,8 @@ background-color: null;
 font-style: inherit;">,</span> muted<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-4"></span>
-<span id="cb4-5"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-3"></span>
+<span id="annotated-cell-5-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -643,7 +661,7 @@ background-color: null;
 font-style: inherit;">=</span> grid<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb4-6">  columns<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-5">  columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -660,7 +678,7 @@ background-color: null;
 font-style: inherit;">1fr</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb4-7">  align<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-6">  align<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -671,18 +689,18 @@ background-color: null;
 font-style: inherit;">,</span> right<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">),</span></span>
-<span id="cb4-8">  start<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-7">  start<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span> middle<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span> end<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb4-9"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-8"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-10"></span>
-<span id="cb4-11"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-9"></span>
+<span id="annotated-cell-5-10"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -690,7 +708,7 @@ background-color: null;
 font-style: inherit;">page</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb4-12">  header<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-11">  header<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> context <span class="cf" style="color: #003B4F;
 background-color: null;
@@ -710,7 +728,7 @@ background-color: null;
 font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb4-13">    <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-12">    <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">set</span> <span class="va" style="color: #111111;
@@ -728,7 +746,7 @@ background-color: null;
 font-style: inherit;">:</span> muted<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb4-14">    slots<span class="op" style="color: #5E5E5E;
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-5-13" class="code-annotation-target">    slots<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">([</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -744,15 +762,15 @@ background-color: null;
 font-style: inherit;">[</span>Finance<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">])</span></span>
-<span id="cb4-15">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-14">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">},</span></span>
-<span id="cb4-16">  footer<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-15">  footer<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> context <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb4-17">    <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-5-16">    <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">set</span> <span class="va" style="color: #111111;
@@ -772,7 +790,7 @@ background-color: null;
 font-style: inherit;">.</span>get<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">())</span></span>
-<span id="cb4-18">    slots<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-17">    slots<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">([],</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -798,13 +816,23 @@ background-color: null;
 font-style: inherit;">true</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)])</span></span>
-<span id="cb4-19">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-18">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">},</span></span>
-<span id="cb4-20"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-5-19"><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">)</span></span></code></pre></div></div>
+font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="2" data-code-annotation="1">A slot for the footer text colour, so that Page Stripes can turn it white on a dark band.</span>
+</dd>
+<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-5" data-code-lines="13" data-code-annotation="2"><code>Finance</code> is the label of the demo. If you load this partial with <code>template-partials</code>, as in Two Ways to Load a Partial, write <code>[$kicker$]</code> and the label comes from the <code>kicker</code> key of the YAML.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -833,7 +861,7 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The text is <code>0.85em</code> of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt. The page counter needs <code>context</code>, because its value is only known once Typst lays out the page. The right slot of the header says <code>Finance</code>, which is the label of the demo, so replace it with your own.</p>
+<p>The text is <code>0.85em</code> of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt. The page counter needs <code>context</code>, because its value is only known once Typst lays out the page.</p>
 </div>
 </div>
 </section>
@@ -844,16 +872,16 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>partials/3-headings.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="partials/3-headings.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-filename="partials/3-headings.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 3. Headings: coloured numbers, never stranded at the bottom of a page.</span></span>
-<span id="cb5-2"><span class="kw" style="color: #003B4F;
+<span id="cb4-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> heading<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> it =&gt; block(sticky: true, above: 1.6em, below: 0.8em)[</span>
-<span id="cb5-3">  <span class="kw" style="color: #003B4F;
+<span id="cb4-3">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span><span class="cf" style="color: #003B4F;
@@ -868,7 +896,7 @@ background-color: null;
 font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb5-4">    text<span class="op" style="color: #5E5E5E;
+<span id="cb4-4">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>fill<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -885,23 +913,23 @@ background-color: null;
 font-style: inherit;">.</span>numbering<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb5-5">    h<span class="op" style="color: #5E5E5E;
+<span id="cb4-5">    h<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.5em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb5-6">  <span class="op" style="color: #5E5E5E;
+<span id="cb4-6">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb5-7">  <span class="kw" style="color: #003B4F;
+<span id="cb4-7">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>it<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>body</span>
-<span id="cb5-8">]</span></code></pre></div></div>
+<span id="cb4-8">]</span></code></pre></div></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -942,10 +970,10 @@ font-style: inherit;">.</span>body</span>
 <div class="code-with-filename-file">
 <pre><strong>partials/4-code.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="partials/4-code.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-filename="partials/4-code.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 4. Code: no ligatures, no page break inside a block, light background.</span></span>
-<span id="cb6-2"><span class="kw" style="color: #003B4F;
+<span id="cb5-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> raw<span class="op" style="color: #5E5E5E;
@@ -974,7 +1002,7 @@ background-color: null;
 font-style: inherit;">0</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb6-3"><span class="kw" style="color: #003B4F;
+<span id="cb5-3"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> raw<span class="op" style="color: #5E5E5E;
@@ -995,7 +1023,7 @@ background-color: null;
 font-style: inherit;">block</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb6-4">  width<span class="op" style="color: #5E5E5E;
+<span id="cb5-4">  width<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
@@ -1024,7 +1052,7 @@ background-color: null;
 font-style: inherit;">false</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb6-5"><span class="op" style="color: #5E5E5E;
+<span id="cb5-5"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
@@ -1056,21 +1084,21 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Code that looks different from what you typed is hard to read. With only <code>ligatures: false</code>, Fira Code still drew <code>|&gt;</code> as a triangle, so I also turn off the <code>calt</code> feature with <code>features: ("calt": 0)</code>. The symbols <code>!=</code>, <code>&lt;-</code> and <code>&gt;=</code> then show as typed. The <code>breakable: false</code> setting keeps a block on one page. Code text is <code>0.8em</code> of the body, which is 8.8 pt, so it is a little under 9 pt. You can enlarge it with <code>#show raw: set text(size: 9.5pt)</code>, and I use points there because an <code>em</code> value would apply to the already reduced size.</p>
+<p>Code that looks different from what you typed is hard to read. With only <code>ligatures: false</code>, Fira Code still drew <code>|&gt;</code> as a triangle, so I also turn off the <code>calt</code> feature with <code>features: ("calt": 0)</code>. The symbols <code>!=</code>, <code>&lt;-</code> and <code>&gt;=</code> then show as typed. The <code>breakable: false</code> setting keeps a block on one page. This matters most in teaching materials, where learners must see exactly the characters they have to type. Code text is <code>0.8em</code> of the body, which is 8.8 pt, so it is a little under 9 pt. You can enlarge it with <code>#show raw: set text(size: 9.5pt)</code>, and I use points there because an <code>em</code> value would apply to the already reduced size.</p>
 </div>
 </div>
 </section>
 <section id="tables" class="level2" data-number="8">
 <h2 data-number="8" class="anchored" data-anchor-id="tables"><span class="header-section-number">8</span> Tables</h2>
-<p>Give tables a filled header and light stripes.</p>
+<p>Give tables a filled header and light stripes. These rules are plain Typst and need no library such as <code>gt</code> or <code>great_tables</code>, so every table gets the style, including a simple Markdown table in Quarto, and not only the tables that R or Python produce. My post on <a href="../../posts/2026-04-15-quarto-brand-figures-tables/index.html">branded figures and tables</a> covers those libraries.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/5-tables.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="partials/5-tables.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="partials/5-tables.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 5. Tables: filled header, zebra stripes.</span></span>
-<span id="cb7-2"><span class="kw" style="color: #003B4F;
+<span id="cb6-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -1078,7 +1106,7 @@ background-color: null;
 font-style: inherit;">table</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb7-3">  fill<span class="op" style="color: #5E5E5E;
+<span id="cb6-3">  fill<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1116,24 +1144,24 @@ background-color: null;
 font-style: inherit;">{</span> tint <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">},</span></span>
-<span id="cb7-4">  stroke<span class="op" style="color: #5E5E5E;
+<span id="cb6-4">  stroke<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb7-5">  inset<span class="op" style="color: #5E5E5E;
+<span id="cb6-5">  inset<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.6em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb7-6"><span class="op" style="color: #5E5E5E;
+<span id="cb6-6"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb7-7"><span class="kw" style="color: #003B4F;
+<span id="cb6-7"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> table<span class="op" style="color: #5E5E5E;
@@ -1166,7 +1194,7 @@ background-color: null;
 font-style: inherit;">"bold"</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb7-8"><span class="kw" style="color: #003B4F;
+<span id="cb6-8"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> table<span class="op" style="color: #5E5E5E;
@@ -1220,15 +1248,15 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="captions" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="captions"><span class="header-section-number">9</span> Captions</h2>
-<p>Make captions small and muted, with the label in bold.</p>
+<p>Make captions small and muted, with the label in bold. This one is a matter of taste. I find it easier to read when “Table 1” and the caption text look different, so the label stays bold and the caption is smaller and muted.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/6-captions.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/6-captions.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-filename="partials/6-captions.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 6. Captions: small, muted, with the label in bold when the figure is numbered.</span></span>
-<span id="cb8-2"><span class="kw" style="color: #003B4F;
+<span id="cb7-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> figure<span class="op" style="color: #5E5E5E;
@@ -1253,7 +1281,7 @@ background-color: null;
 font-style: inherit;">:</span> muted<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb8-3"><span class="kw" style="color: #003B4F;
+<span id="cb7-3"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span> figure<span class="op" style="color: #5E5E5E;
@@ -1261,12 +1289,12 @@ background-color: null;
 font-style: inherit;">.</span>caption<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> it =&gt; {</span>
-<span id="cb8-4">  if it.numbering != none and it.supplement != none {</span>
-<span id="cb8-5">    strong(it.supplement + [ ] + context it.counter.display(it.numbering))</span>
-<span id="cb8-6">    [. ]</span>
-<span id="cb8-7">  }</span>
-<span id="cb8-8">  it.body</span>
-<span id="cb8-9">}</span></code></pre></div></div>
+<span id="cb7-4">  if it.numbering != none and it.supplement != none {</span>
+<span id="cb7-5">    strong(it.supplement + [ ] + context it.counter.display(it.numbering))</span>
+<span id="cb7-6">    [. ]</span>
+<span id="cb7-7">  }</span>
+<span id="cb7-8">  it.body</span>
+<span id="cb7-9">}</span></code></pre></div></div>
 </div>
 <table class="caption-top table">
 <colgroup>
@@ -1307,10 +1335,10 @@ font-style: inherit;">:</span> it =&gt; {</span>
 <div class="code-with-filename-file">
 <pre><strong>partials/7-title-block.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="partials/7-title-block.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-filename="partials/7-title-block.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 7. Title block: kicker, title, short rule, subtitle, date.</span></span>
-<span id="cb9-2"><span class="kw" style="color: #003B4F;
+<span id="cb8-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -1346,7 +1374,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb9-3">  <span class="cf" style="color: #003B4F;
+<span id="cb8-3">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> kicker <span class="op" style="color: #5E5E5E;
@@ -1356,7 +1384,7 @@ background-color: null;
 font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb9-4">    text<span class="op" style="color: #5E5E5E;
+<span id="cb8-4">    text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>size<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1385,17 +1413,17 @@ background-color: null;
 font-style: inherit;">(</span>kicker<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb9-5">    v<span class="op" style="color: #5E5E5E;
+<span id="cb8-5">    v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.4em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb9-6">  <span class="op" style="color: #5E5E5E;
+<span id="cb8-6">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb9-7">  text<span class="op" style="color: #5E5E5E;
+<span id="cb8-7">  text<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>font<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1416,14 +1444,14 @@ background-color: null;
 font-style: inherit;">,</span> title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb9-8">  v<span class="op" style="color: #5E5E5E;
+<span id="cb8-8">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.4em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb9-9">  pdf<span class="op" style="color: #5E5E5E;
+<span id="cb8-9">  pdf<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1444,7 +1472,7 @@ background-color: null;
 font-style: inherit;">+</span> accent<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb9-10">  <span class="cf" style="color: #003B4F;
+<span id="cb8-10">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> subtitle <span class="op" style="color: #5E5E5E;
@@ -1476,7 +1504,7 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb9-11">  <span class="cf" style="color: #003B4F;
+<span id="cb8-11">  <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">if</span> date <span class="op" style="color: #5E5E5E;
@@ -1502,14 +1530,14 @@ background-color: null;
 font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span>
-<span id="cb9-12">  v<span class="op" style="color: #5E5E5E;
+<span id="cb8-12">  v<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1.5em</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb9-13"><span class="op" style="color: #5E5E5E;
+<span id="cb8-13"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">}</span></span></code></pre></div></div>
 </div>
@@ -1518,23 +1546,23 @@ font-style: inherit;">}</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>typst-show.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><span class="kw" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb9-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> doc =&gt; article(</span>
-<span id="cb10-2">  lang: "<span class="ss" style="color: #20794D;
+<span id="cb9-2">  lang: "<span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$if(lang)$$lang$$else$</span>en<span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$</span>",</span>
-<span id="cb10-3"><span class="ss" style="color: #20794D;
+<span id="cb9-3"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$if(region)$</span>  region: "<span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$region$</span>",</span>
-<span id="cb10-4"><span class="ss" style="color: #20794D;
+<span id="cb9-4"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$</span>  sectionnumbering: <span class="ss" style="color: #20794D;
 background-color: null;
@@ -1545,9 +1573,9 @@ background-color: null;
 font-style: inherit;">$else$</span>none<span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$</span>,</span>
-<span id="cb10-5">  doc,</span>
-<span id="cb10-6">)</span>
-<span id="cb10-7"><span class="kw" style="color: #003B4F;
+<span id="cb9-5">  doc,</span>
+<span id="cb9-6">)</span>
+<span id="cb9-7"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -1563,13 +1591,13 @@ background-color: null;
 font-style: inherit;">$title$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">])</span></span>
-<span id="cb10-8"><span class="kw" style="color: #003B4F;
+<span id="cb9-8"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>title-block<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb10-9">  title<span class="op" style="color: #5E5E5E;
+<span id="cb9-9">  title<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1578,7 +1606,7 @@ background-color: null;
 font-style: inherit;">$title$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">],</span></span>
-<span id="cb10-10"><span class="ss" style="color: #20794D;
+<span id="cb9-10"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$if(kicker)$</span>  kicker<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1589,7 +1617,7 @@ background-color: null;
 font-style: inherit;">$kicker$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">],</span></span>
-<span id="cb10-11"><span class="ss" style="color: #20794D;
+<span id="cb9-11"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$$if(subtitle)$</span>  subtitle<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1600,7 +1628,7 @@ background-color: null;
 font-style: inherit;">$subtitle$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">],</span></span>
-<span id="cb10-12"><span class="ss" style="color: #20794D;
+<span id="cb9-12"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$$if(date)$</span>  date<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1611,7 +1639,7 @@ background-color: null;
 font-style: inherit;">$date$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">],</span></span>
-<span id="cb10-13"><span class="ss" style="color: #20794D;
+<span id="cb9-13"><span class="ss" style="color: #20794D;
 background-color: null;
 font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1652,18 +1680,15 @@ font-style: inherit;">)</span></span></code></pre></div></div>
 </section>
 <section id="page-stripes" class="level2" data-number="11">
 <h2 data-number="11" class="anchored" data-anchor-id="page-stripes"><span class="header-section-number">11</span> Page Stripes</h2>
-<p>Echo the cover on every page with a thick and a thin stripe at the top, and a gradient band behind the footer.</p>
+<p>The decoration of this demo is a thick and a thin stripe at the top and a gradient band at the bottom, all in the accent colour. This trick puts them on every page, with the band behind the footer. The cover reuses the same style later in the post.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>partials/8-page-stripes.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="partials/8-page-stripes.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-12" data-filename="partials/8-page-stripes.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-12-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 8. Recurring decoration: stripes at the top, a gradient band behind the footer.</span></span>
-<span id="cb11-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Typst already treats page backgrounds as artifacts; the wrapper states the intent.</span></span>
-<span id="cb11-3"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-12-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -1691,7 +1716,7 @@ background-color: null;
 font-style: inherit;">135</span>deg<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb11-4"><span class="kw" style="color: #003B4F;
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-12" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-12-3" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>footer-ink<span class="op" style="color: #5E5E5E;
@@ -1701,8 +1726,8 @@ background-color: null;
 font-style: inherit;">(</span>white<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb11-5"></span>
-<span id="cb11-6"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-12-4"></span>
+<span id="annotated-cell-12-5"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -1716,7 +1741,7 @@ background-color: null;
 font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">({</span></span>
-<span id="cb11-7">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-12-6">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1751,7 +1776,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb11-8">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-12-7">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1786,7 +1811,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb11-9">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-12-8">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>bottom<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1815,10 +1840,16 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb11-10"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-12-9"><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">}))</span></span></code></pre></div></div>
+font-style: inherit;">}))</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-12" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-12" data-code-lines="3" data-code-annotation="1">Turns the footer text white, through the slot of Header and Footer.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1847,8 +1878,7 @@ font-style: inherit;">}))</span></span></code></pre></div></div>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Screen readers should skip the stripes and the band. Typst already marks page backgrounds, headers and footers as <a href="https://typst.app/docs/reference/pdf/artifact/">artifacts</a>, and it marks paths and shapes as artifacts too. I removed <code>pdf.artifact()</code> from a copy of the decorative partials and rendered with <code>pdf-standard: ua-1</code>. Neither Typst nor Quarto reported an error, and <a href="https://verapdf.org/">veraPDF</a> still passed it. Quarto runs veraPDF on the PDF when you have installed it with <code>quarto install verapdf</code>, as the <a href="https://quarto.org/docs/download/changelog/1.9/">1.9 changelog</a> describes. So the experiment confirms it: the stripes, the band and the title rule are artifacts without the wrapper. I keep <code>pdf.artifact()</code> because it states the intent, and because content that Typst does not mark itself, such as a decorative image or text, needs it.</p>
-<p>The band is dark, so trick 2 holds a <code>footer-ink</code> state for the footer text colour, and this partial sets it to white. White on the lightest end of the gradient, which is the accent colour, is 5.67:1. Text on a band needs its contrast checked again.</p>
+<p>Screen readers should skip decoration. Typst already marks page backgrounds and shapes as <a href="https://typst.app/docs/reference/pdf/artifact/">artifacts</a>, so it skips the stripes and the band. I still wrap them in <code>pdf.artifact()</code> to say so. The band is dark, so the footer text turns white, which is 5.67:1 on the lightest end of the gradient. Text on a band needs its contrast checked again.</p>
 </div>
 </div>
 </section>
@@ -1859,13 +1889,10 @@ font-style: inherit;">}))</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>partials/9-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="partials/9-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-13" data-filename="partials/9-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-13-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 9. Cover page: the title block gets a page of its own.</span></span>
-<span id="cb12-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// `cover-art` is a slot for decoration, empty until trick 10 fills it.</span></span>
-<span id="cb12-3"><span class="kw" style="color: #003B4F;
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-13" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-13-2" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -1883,8 +1910,8 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb12-4"></span>
-<span id="cb12-5"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-13-3"></span>
+<span id="annotated-cell-13-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -1894,7 +1921,7 @@ background-color: null;
 font-style: inherit;">=</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb12-6">  <span class="kw" style="color: #003B4F;
+<span id="annotated-cell-13-5">  <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">let</span> <span class="va" style="color: #111111;
@@ -1902,7 +1929,7 @@ background-color: null;
 font-style: inherit;">block-on-page</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> title-block</span>
-<span id="cb12-7">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-6">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1911,28 +1938,28 @@ background-color: null;
 font-style: inherit;">=&gt;</span> page<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span></span>
-<span id="cb12-8">    header<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-7">    header<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb12-9">    footer<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-8">    footer<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">,</span></span>
-<span id="cb12-10">    background<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-9">    background<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span> context cover-art<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>get<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(),</span></span>
-<span id="cb12-11">    align<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-10">    align<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>horizon<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1941,13 +1968,19 @@ background-color: null;
 font-style: inherit;">(</span>..args<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)),</span></span>
-<span id="cb12-12">  <span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-11">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb12-13"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-13-12"><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">}</span></span></code></pre></div></div>
+font-style: inherit;">}</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-13" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-13" data-code-lines="2" data-code-annotation="1">A slot for the cover decoration. It stays empty until Cover Decoration fills it.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1976,7 +2009,7 @@ font-style: inherit;">}</span></span></code></pre></div></div>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A Typst closure captures the variables it uses when you define it. A later <code>#let</code> cannot change a function that already exists. A <code>state</code> is read when the page is built, so trick 10 can fill the slot after this partial has run.</p>
+<p>A Typst closure captures the variables it uses when you define it. A later <code>#let</code> cannot change a function that already exists. A <code>state</code> is read when the page is built, so Cover Decoration can fill the slot after this partial has run.</p>
 </div>
 </div>
 </section>
@@ -1987,13 +2020,10 @@ font-style: inherit;">}</span></span></code></pre></div></div>
 <div class="code-with-filename-file">
 <pre><strong>partials/10-cover-decoration.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="partials/10-cover-decoration.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-14" data-filename="partials/10-cover-decoration.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-annotation-code code-with-copy code-annotated"><code class="sourceCode typst"><span id="annotated-cell-14-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// 10. Cover decoration: a gradient band at the bottom, two stripes at the top.</span></span>
-<span id="cb13-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// It is only shapes and holds no text; the wrapper states that it is decoration.</span></span>
-<span id="cb13-3"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-14-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -2021,8 +2051,8 @@ background-color: null;
 font-style: inherit;">135</span>deg<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb13-4"></span>
-<span id="cb13-5"><span class="kw" style="color: #003B4F;
+<span id="annotated-cell-14-3"></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-14" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-14-4" class="code-annotation-target"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#</span>cover-art<span class="op" style="color: #5E5E5E;
@@ -2034,7 +2064,7 @@ background-color: null;
 font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">({</span></span>
-<span id="cb13-6">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-14-5">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>bottom<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2063,7 +2093,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-7">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-14-6">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2098,7 +2128,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-8">  place<span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-14-7">  place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2133,10 +2163,16 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-9"><span class="op" style="color: #5E5E5E;
+<span id="annotated-cell-14-8"><span class="op" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">}))</span></span></code></pre></div></div>
+font-style: inherit;">}))</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-14" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-14" data-code-lines="4" data-code-annotation="1">Fills the slot of Cover Page.</span>
+</dd>
+</dl>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -2202,16 +2238,16 @@ font-style: inherit;">}))</span></span></code></pre></div></div>
 </tr>
 </tbody>
 </table>
-<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML.</p>
-<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.</p>
+<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. To reach them, you would override the <code>typst-show.typ</code> of the extension, and then you maintain that copy at every Quarto release.</p>
+<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>book-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14" data-filename="book-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb14-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="book-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
-<span id="cb14-2"><span class="kw" style="color: #003B4F;
+<span id="cb10-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -2239,7 +2275,7 @@ background-color: null;
 font-style: inherit;">135</span>deg<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb14-3"><span class="kw" style="color: #003B4F;
+<span id="cb10-3"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -2262,12 +2298,12 @@ background-color: null;
 font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb14-4">  pdf<span class="op" style="color: #5E5E5E;
+<span id="cb10-4">  pdf<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">({</span></span>
-<span id="cb14-5">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-5">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>bottom<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2296,7 +2332,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb14-6">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-6">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2331,7 +2367,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb14-7">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-7">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2366,10 +2402,10 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb14-8">  <span class="op" style="color: #5E5E5E;
+<span id="cb10-8">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span>
-<span id="cb14-9"><span class="op" style="color: #5E5E5E;
+<span id="cb10-9"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 </div>
@@ -2405,6 +2441,7 @@ font-style: inherit;">})</span></span></code></pre></div></div>
 <p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
 </div>
 </div>
+<p>If the book needs more than that, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
 </section>
 <section id="where-to-go-next" class="level2" data-number="15">
 <h2 data-number="15" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">15</span> Where to Go Next</h2>
@@ -2417,7 +2454,7 @@ font-style: inherit;">})</span></span></code></pre></div></div>
 <li>To see which partials you can replace, read the <a href="https://quarto.org/docs/output-formats/typst-custom.html">custom Typst formats</a> page of the Quarto documentation.</li>
 <li>To see a full example, look at <a href="https://m.canouil.dev/quarto-mcanouil/">quarto-mcanouil</a>.</li>
 </ul>
-<p>If you try these partials, I would like to hear how it goes. Questions are welcome in the <a href="https://github.com/mcanouil/mickael.canouil.fr/discussions">discussions</a>, and problems in the <a href="https://github.com/mcanouil/mickael.canouil.fr/issues">issues</a>.</p>
+<p>If you try these partials, I would like to hear how it goes. Drop a comment in the form below.</p>
 
 
 </section>
@@ -2725,7 +2762,7 @@ in R card holding an R script.
 </section>
 <section id="responsiveness" class="level3">
 <h3 class="anchored" data-anchor-id="responsiveness">Responsiveness</h3>
-<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
+<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
 <ul>
 <li>Importing: reading the RCC files no longer freezes the page, and the line under <strong>Import</strong> shows the current stage.</li>
 <li>Reporting: the Export page renders the HTML or PDF report in the background.</li>
@@ -4353,7 +4390,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-glightbox="description: .lightbox-desc-10;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-10;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
 </div>
 </div>
 </div>
@@ -4365,7 +4402,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-glightbox="description: .lightbox-desc-11;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-11;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
 </div>
 </div>
 </div>
@@ -4377,7 +4414,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-glightbox="description: .lightbox-desc-12;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-12;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
 </div>
 </div>
 </div>
@@ -4391,7 +4428,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-glightbox="description: .lightbox-desc-13;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-13;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -4403,7 +4440,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-glightbox="description: .lightbox-desc-14;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-14;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
 </div>
 </div>
 </div>
@@ -4415,7 +4452,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-glightbox="description: .lightbox-desc-15;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-15;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
 </div>
 </div>
 </div>
@@ -4429,7 +4466,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-glightbox="description: .lightbox-desc-16;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-16;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -4441,7 +4478,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-glightbox="description: .lightbox-desc-17;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-17;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
 </div>
 </div>
 </div>
@@ -4453,7 +4490,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-glightbox="description: .lightbox-desc-18;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-18;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
 </div>
 </div>
 </div>
@@ -4471,7 +4508,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-glightbox="description: .lightbox-desc-19;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-19;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
 </div>
 </div>
 </div>
@@ -4483,7 +4520,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-glightbox="description: .lightbox-desc-20;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-20;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
 </div>
 </div>
 </div>
@@ -4495,7 +4532,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-glightbox="description: .lightbox-desc-21;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-21;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
 </div>
 </div>
 </div>
@@ -4507,7 +4544,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-glightbox="description: .lightbox-desc-22;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-22;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
 </div>
 </div>
 </div>
@@ -8246,7 +8283,7 @@ font-style: inherit;">]</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform" title="GitHub">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -10058,12 +10095,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -10766,7 +10803,7 @@ Warning
 <div class="callout-body-container callout-body">
 <p>Three things caught me out while writing real modules with these filters.</p>
 <ul>
-<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>). Put it on an inner div instead.</li>
+<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>). Put it on an inner div instead.</li>
 <li><code>cascade</code> does not hoist a <code>---</code> that sits inside a <code>.panel-tabset</code> div, so a slide break there is left alone rather than split into a continuation slide.</li>
 <li>The first child of a section heading should be a heading, not prose. Otherwise <code>cascade</code> reads the slide level wrongly and repeats the wrong heading on the continuation slides.</li>
 </ul>
