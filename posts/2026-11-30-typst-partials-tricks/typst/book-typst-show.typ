@@ -18,7 +18,10 @@ $if(lang)$
 $endif$
   main-color: brand-color.at("primary", default: blue),
 $if(cover.background)$
-  cover-background: brand-color.at("$cover.background$"),
+  cover-background: {
+    let name = "$cover.background$"
+    if name == "none" { none } else { brand-color.at(name) }
+  },
 $endif$
 $if(cover.image)$
   cover: image("$cover.image$"$if(cover.alt)$, alt: "$cover.alt$"$endif$),
