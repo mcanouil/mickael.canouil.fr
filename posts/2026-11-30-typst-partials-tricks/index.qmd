@@ -462,7 +462,47 @@ The extension passes `color.primary` as the main colour, and the title box uses 
 It also passes `logo.medium`, which the package puts at the top of the cover, 3 cm wide.
 The package has other cover options, such as `cover`, `cover-background` and `copyright`, but the extension does not read them from the YAML.
 I proposed a `cover` key for them in a [pull request](https://github.com/quarto-ext/orange-book/pull/7).
-Until it is merged, you would override the `typst-show.typ` of the extension, and then you maintain that copy at every Quarto release.
+Until it is merged, you can add the keys yourself.
+Copy the `typst-show.typ` of the extension, add these lines after its `main-color` line, and list the file under `template-partials`.
+You then maintain that copy at every Quarto release.
+
+```{.typst filename="added to typst-show.typ"}
+$if(cover.background)$
+  cover-background: brand-color.at("$cover.background$"),
+$endif$
+$if(cover.image)$
+  cover: image("$cover.image$"$if(cover.alt)$, alt: "$cover.alt$"$endif$),
+$endif$
+$if(cover.copyright)$
+  copyright: [$cover.copyright$],
+$endif$
+```
+
+```{.yaml filename="_quarto.yml"}
+format:
+  typst:
+    template-partials:
+      - typst-show.typ
+    cover:
+      background: secondary
+      image: cover.png
+      alt: A description of the image.
+      copyright: Copyright 2026 Jane Smith.
+```
+
+`background` is the name of a colour of the brand file, because Pandoc escapes the `#` of a hex value.
+Without `alt`, `pdf-standard: ua-1` stops the build, so the image always has a description.
+
+::: {.callout-note collapse="true"}
+
+## The full `typst-show.typ`
+
+This is the file of Quarto 1.11.9 with the lines above added.
+
+```{.typst include="typst/book-typst-show.typ" filename="typst-show.typ"}
+```
+
+:::
 
 The cover is the one thing you cannot reach with those partials.
 orange-book draws it as the first page, so the decoration has to target that page.
