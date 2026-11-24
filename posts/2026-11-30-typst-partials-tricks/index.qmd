@@ -12,8 +12,13 @@ image-alt: |
   On the right, two pages of a demo report: a cover with blue gradient stripes at the top and a gradient band at the bottom, and a body page with the same stripes, numbered headings, a striped table and a footer band.
 ---
 
-This post shows ten small Typst partials that change how a Quarto PDF looks.
+A few weeks ago, I saw someone ask for resources to customise the cover page of a Quarto Typst book.
+Since Quarto 1.9, a Typst book uses the orange-book template by default, so the question is a fair one.
+I use a handful of Typst tricks in my Quarto Typst format extensions, so I thought I would share them.
+
+This post shows ten of them as small partials.
 Each one is a separate file, so you can copy it, edit it or remove it without touching the others.
+They work on any Quarto Typst document, and [one section](#book) covers what changes in a book.
 
 ![](featured.png){
   .img-featured
@@ -326,6 +331,41 @@ Fill the cover slot with a gradient band at the bottom and two stripes at the to
 
 The decoration is only shapes and it sits behind the content.
 The title is dark ink on white, and the gradient band at the bottom holds nothing, so the cover text keeps its contrast.
+
+:::
+
+## Using the Tricks in a Quarto Book {#book}
+
+A Quarto book project with `format: typst` uses the [orange-book](https://typst.app/universe/package/orange-book) template.
+It draws the cover and the chapter headings itself, and its own `typst-show.typ` sets it up.
+I tested the partials in a book made with `quarto create project book`, with Quarto 1.11.9 and orange-book 0.7.1, and `pdf-standard: ua-1` still gave a tagged PDF.
+
+| Trick | In a book |
+| --- | --- |
+| Tokens, Headings, Code, Tables, Captions | Work as in a document, and the caption number follows the chapter, as in "Table 1.1". |
+| Header and Footer | The footer works. The orange-book header stays, because the template sets it after your partial. |
+| Page Stripes | Works on every page, cover included. Load the footer partial before it, because that one holds the `footer-ink` state. Without it, the build stops with `unknown variable: footer-ink`. |
+| Title Block, Cover Page, Cover Decoration | Do not use them. They replace `typst-show.typ`, which holds the setup of orange-book, and the book then renders as a single page. |
+
+The cover is the one thing you cannot reach with those partials.
+orange-book draws it as the first page, so the decoration has to target that page.
+This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.
+
+```{.typst include="typst/book-cover.typ" filename="book-cover.typ"}
+```
+
+Load it after `1-tokens.typ`, because it reads `accent` from there.
+
+| Before | After |
+| --- | --- |
+| ![The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page](assets/book-before-p1.png){.lightbox group="typst-tricks"} | ![The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom](assets/book-after-p1.png){.lightbox group="typst-tricks"} |
+
+::: {.callout-note}
+
+## Check the cover contrast
+
+The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast.
+If you move the band under the box, check the contrast again, as for any text on a band.
 
 :::
 
