@@ -1,0 +1,79 @@
+---
+title: "Quarterly report"
+subtitle: "Revenue by region"
+kicker: "Finance"
+date: "2026-11-30"
+date-format: "D MMMM YYYY"
+lang: en-GB
+region: GB
+number-sections: true
+---
+
+## Overview
+
+Revenue grew in every region this quarter.
+Hyphenation and justified text make longer paragraphs look even, especially in internationalisation-heavy documents such as this one, where words get long.
+See @tbl-rev and the [methodology note](https://quarto.org/docs/output-formats/typst.html) for details.
+
+The growth came from three sources: new customers in the east, higher renewal rates in the north, and a smaller number of discounts across the whole portfolio.
+The west grew the least, mostly because two large contracts moved to the next quarter.
+
+## Results
+
+### By region
+
+| Region | Revenue | Change |
+|--------|--------:|-------:|
+| North  | 1,240   | +12%   |
+| South  | 980     | +8%    |
+| East   | 1,105   | +15%   |
+| West   | 760     | +3%    |
+
+: Revenue by region, in thousands. {#tbl-rev}
+
+### By quarter
+
+Each region reports its revenue at the end of the quarter.
+The totals below add the four regions and compare them with the same quarter a year earlier.
+
+| Quarter | Revenue | Change |
+|---------|--------:|-------:|
+| Q1      | 3,610   | +6%    |
+| Q2      | 3,840   | +7%    |
+| Q3      | 4,020   | +9%    |
+| Q4      | 4,085   | +10%   |
+
+: Revenue by quarter, in thousands. {#tbl-quarter}
+
+The trend is steady, and the last two quarters grew faster than the first two.
+We expect the same pattern next year, provided the large contracts in the west close on time.
+
+## Method
+
+The summary uses a short pipeline:
+
+```r
+sales |>
+  dplyr::filter(year == 2026) |>
+  dplyr::summarise(total = sum(revenue)) -> totals
+x <- totals$total != 0
+```
+
+The figures come from the finance ledger and are checked against the invoices each month.
+Regions with fewer than ten invoices are merged with their neighbour before the change is computed.
+
+### Checks
+
+A second block shows how the change is computed from two totals.
+
+```r
+change <- function(now, before) {
+  (now - before) / before
+}
+change(4085, 3714) >= 0.1
+```
+
+## Next steps
+
+The team will review the west contracts in January and report the result in the next quarterly report.
+Questions about the method go to the finance team.
