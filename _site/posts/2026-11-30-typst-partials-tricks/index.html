@@ -525,7 +525,13 @@ On the right, two pages of a demo report: a cover with blue gradient stripes at 
   <li><a href="#page-stripes" id="toc-page-stripes" class="nav-link" data-scroll-target="#page-stripes"><span class="header-section-number">11</span> Page Stripes</a></li>
   <li><a href="#cover-page" id="toc-cover-page" class="nav-link" data-scroll-target="#cover-page"><span class="header-section-number">12</span> Cover Page</a></li>
   <li><a href="#cover-decoration" id="toc-cover-decoration" class="nav-link" data-scroll-target="#cover-decoration"><span class="header-section-number">13</span> Cover Decoration</a></li>
-  <li><a href="#book" id="toc-book" class="nav-link" data-scroll-target="#book"><span class="header-section-number">14</span> Using the Tricks in a Quarto Book</a></li>
+  <li><a href="#book" id="toc-book" class="nav-link" data-scroll-target="#book"><span class="header-section-number">14</span> Using the Tricks in a Quarto Book</a>
+  <ul class="collapse">
+  <li><a href="#book-brand" id="toc-book-brand" class="nav-link" data-scroll-target="#book-brand"><span class="header-section-number">14.1</span> Change the Cover with a Brand File</a></li>
+  <li><a href="#book-decorate" id="toc-book-decorate" class="nav-link" data-scroll-target="#book-decorate"><span class="header-section-number">14.2</span> Decorate the Cover Page</a></li>
+  <li><a href="#book-override" id="toc-book-override" class="nav-link" data-scroll-target="#book-override"><span class="header-section-number">14.3</span> Add Cover Options with a <code>typst-show.typ</code> Override</a></li>
+  <li><a href="#book-format" id="toc-book-format" class="nav-link" data-scroll-target="#book-format"><span class="header-section-number">14.4</span> Write Your Own Format</a></li>
+  </ul></li>
   <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next"><span class="header-section-number">15</span> Where to Go Next</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-11-30-typst-partials-tricks/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -1312,173 +1318,27 @@ Figure&nbsp;1: The partials that need an earlier partial.
 </tr>
 </tbody>
 </table>
-<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. I proposed a <code>cover</code> key for them in a <a href="https://github.com/quarto-ext/orange-book/pull/7">pull request</a>. The wider request, to expose more options of the package in the YAML, is <a href="https://github.com/quarto-dev/quarto-cli/issues/14270">quarto-cli issue 14270</a>. Until it is merged, you can add the keys yourself. Copy the <code>typst-show.typ</code> of the extension, add these lines after its <code>main-color</code> line, and list the file under <code>template-partials</code>. You then maintain that copy at every Quarto release.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>added to typst-show.typ</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="added to typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.background)$</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  cover-background: {</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    let name = "<span class="ss">$cover.background$</span>"</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    if name == "none" { none } else { brand-color.at(name) }</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.image)$</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  cover: image("<span class="ss">$cover.image$</span>"<span class="ss">$if(cover.alt)$</span>, alt: "<span class="ss">$cover.alt$</span>"<span class="ss">$endif$</span>),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.copyright)$</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  copyright: [<span class="ss">$cover.copyright$</span>],</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>_quarto.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="_quarto.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">typst</span><span class="kw">:</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">template-partials</span><span class="kw">:</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">typst-show.typ</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cover</span><span class="kw">:</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">background</span><span class="kw">:</span><span class="at"> secondary</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">image</span><span class="kw">:</span><span class="at"> cover.png</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">alt</span><span class="kw">:</span><span class="at"> A description of the image.</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">copyright</span><span class="kw">:</span><span class="at"> Copyright 2026 Jane Smith.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><code>background</code> is the name of a colour of the brand file, because Pandoc escapes the <code>#</code> of a hex value. The name <code>none</code> drops the light box behind the title, which suits a cover that you decorate yourself. Without <code>alt</code>, <code>pdf-standard: ua-1</code> stops the build, so the image always has a description.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/book-nobox-p1.png" class="lightbox" data-gallery="typst-tricks" title="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"><img src="assets/book-nobox-p1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="237" alt="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"></a></p>
-</figure>
-</div>
-<figcaption>A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom</figcaption>
-</figure>
-</div>
-<p>This cover combines <code>background: none</code> with <code>book-cover.typ</code>.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The full <code>typst-show.typ</code>
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>This is the file of Quarto 1.11.9 with the lines above added.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>typst-show.typ</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span><span class="im">import</span> <span class="st">"@preview/orange-book:0.7.1"</span><span class="op">:</span> book<span class="op">,</span> part<span class="op">,</span> chapter<span class="op">,</span> appendices</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> book<span class="op">.</span>with<span class="op">(</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(title)$</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(subtitle)$</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  subtitle<span class="op">:</span> <span class="op">[</span><span class="ss">$subtitle$</span><span class="op">],</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(by-author)$</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  author<span class="op">:</span> <span class="st">"$for(by-author)$$it.name.literal$$sep$, $endfor$"</span><span class="op">,</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(date)$</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="st">"$date$"</span><span class="op">,</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lang)$</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  lang<span class="op">:</span> <span class="st">"$lang$"</span><span class="op">,</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  main-color<span class="op">:</span> brand-color<span class="op">.</span>at<span class="op">(</span><span class="st">"primary"</span><span class="op">,</span> default<span class="op">:</span> blue<span class="op">),</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.background)$</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  cover-background<span class="op">:</span> <span class="op">{</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="va">name</span> <span class="op">=</span> <span class="st">"$cover.background$"</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="op">==</span> <span class="st">"none"</span> <span class="op">{</span> <span class="bu">none</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> brand-color<span class="op">.</span>at<span class="op">(</span>name<span class="op">)</span> <span class="op">}</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.image)$</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  cover<span class="op">:</span> image<span class="op">(</span><span class="st">"$cover.image$"</span><span class="ss">$if(cover.alt)$</span><span class="op">,</span> alt<span class="op">:</span> <span class="st">"$cover.alt$"</span><span class="ss">$endif$</span><span class="op">),</span></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.copyright)$</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  copyright<span class="op">:</span> <span class="op">[</span><span class="ss">$cover.copyright$</span><span class="op">],</span></span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  logo<span class="op">:</span> <span class="op">{</span></span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="va">logo-info</span> <span class="op">=</span> brand-logo<span class="op">.</span>at<span class="op">(</span><span class="st">"medium"</span><span class="op">,</span> default<span class="op">:</span> <span class="bu">none</span><span class="op">)</span></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> logo-info <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> image<span class="op">(</span>logo-info<span class="op">.</span>path<span class="op">,</span> alt<span class="op">:</span> logo-info<span class="op">.</span>at<span class="op">(</span><span class="st">"alt"</span><span class="op">,</span> default<span class="op">:</span> <span class="bu">none</span><span class="op">))</span> <span class="op">}</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(toc-depth)$</span></span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>  outline-depth<span class="op">:</span> <span class="ss">$toc-depth$</span><span class="op">,</span></span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lof)$</span></span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(crossref.lof-title)$</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  list-of-figure-title<span class="op">:</span> <span class="st">"$crossref.lof-title$"</span><span class="op">,</span></span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="ss">$else$</span></span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-lof-title)$</span></span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  list-of-figure-title<span class="op">:</span> <span class="st">"$quarto.language.crossref-lof-title$"</span><span class="op">,</span></span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lot)$</span></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(crossref.lot-title)$</span></span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  list-of-table-title<span class="op">:</span> <span class="st">"$crossref.lot-title$"</span><span class="op">,</span></span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="ss">$else$</span></span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-lot-title)$</span></span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  list-of-table-title<span class="op">:</span> <span class="st">"$quarto.language.crossref-lot-title$"</span><span class="op">,</span></span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-ch-prefix)$</span></span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>  supplement-chapter<span class="op">:</span> <span class="st">"$quarto.language.crossref-ch-prefix$"</span><span class="op">,</span></span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(margin-geometry)$</span></span>
-<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>  padded-heading-number<span class="op">:</span> <span class="bu">false</span><span class="op">,</span></span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
-<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
-<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(margin-geometry)$</span></span>
-<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="co">// Configure marginalia page geometry for book context</span></span>
-<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="co">// Geometry computed by Quarto's meta.lua filter (typstGeometryFromPaperWidth)</span></span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a><span class="co">// IMPORTANT: This must come AFTER book.with() to override the book format's margin settings</span></span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span><span class="im">import</span> <span class="st">"@preview/marginalia:0.3.1"</span> as marginalia</span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> marginalia<span class="op">.</span>setup<span class="op">.</span>with<span class="op">(</span></span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>  inner<span class="op">:</span> <span class="op">(</span></span>
-<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>    far: <span class="ss">$margin-geometry.inner.far$</span><span class="op">,</span></span>
-<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>    width: <span class="ss">$margin-geometry.inner.width$</span><span class="op">,</span></span>
-<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>    sep: <span class="ss">$margin-geometry.inner.separation$</span><span class="op">,</span></span>
-<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
-<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>  outer<span class="op">:</span> <span class="op">(</span></span>
-<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>    far: <span class="ss">$margin-geometry.outer.far$</span><span class="op">,</span></span>
-<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>    width: <span class="ss">$margin-geometry.outer.width$</span><span class="op">,</span></span>
-<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a>    sep: <span class="ss">$margin-geometry.outer.separation$</span><span class="op">,</span></span>
-<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
-<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>  top<span class="op">:</span> <span class="ss">$if(margin.top)$$margin.top$$else$</span><span class="fl">1.25in</span><span class="ss">$endif$</span><span class="op">,</span></span>
-<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a>  bottom<span class="op">:</span> <span class="ss">$if(margin.bottom)$$margin.bottom$$else$</span><span class="fl">1.25in</span><span class="ss">$endif$</span><span class="op">,</span></span>
-<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a>  <span class="co">// CRITICAL: Enable book mode for recto/verso awareness</span></span>
-<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a>  book<span class="op">:</span> <span class="bu">true</span><span class="op">,</span></span>
-<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a>  clearance<span class="op">:</span> <span class="ss">$margin-geometry.clearance$</span><span class="op">,</span></span>
-<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
-<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
-</div>
-</div>
-<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
+<p>The tricks style the pages of a book, but not its cover. Four routes reach the cover, from the lightest to the heaviest.</p>
+<section id="book-brand" class="level3" data-number="14.1">
+<h3 data-number="14.1" class="anchored" data-anchor-id="book-brand"><span class="header-section-number">14.1</span> Change the Cover with a Brand File</h3>
+<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide.</p>
+</section>
+<section id="book-decorate" class="level3" data-number="14.2">
+<h3 data-number="14.2" class="anchored" data-anchor-id="book-decorate"><span class="header-section-number">14.2</span> Decorate the Cover Page</h3>
+<p>The tricks cannot reach the cover, because orange-book draws it as the first page. The decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>book-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="book-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> context <span class="cf">if</span> here<span class="op">().</span>page<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span> <span class="op">{</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">({</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="book-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> context <span class="cf">if</span> here<span class="op">().</span>page<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span> <span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">({</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Load it after <code>1-tokens.typ</code>, because it reads <code>accent</code> from there.</p>
 <table class="caption-top table">
@@ -1512,7 +1372,167 @@ Figure&nbsp;1: The partials that need an earlier partial.
 <p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
 </div>
 </div>
-<p>If the book needs more than that, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
+</section>
+<section id="book-override" class="level3" data-number="14.3">
+<h3 data-number="14.3" class="anchored" data-anchor-id="book-override"><span class="header-section-number">14.3</span> Add Cover Options with a <code>typst-show.typ</code> Override</h3>
+<p>The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. I proposed a <code>cover</code> key for them in a <a href="https://github.com/quarto-ext/orange-book/pull/7">pull request</a>. The wider request, to expose more options of the package in the YAML, is <a href="https://github.com/quarto-dev/quarto-cli/issues/14270">quarto-cli issue 14270</a>. Until it is merged, you can add the keys yourself. Copy the <code>typst-show.typ</code> of the extension, add these lines after its <code>main-color</code> line, and list the file under <code>template-partials</code>. You then maintain that copy at every Quarto release.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>added to typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="added to typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.background)$</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  cover-background: {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    let name = "<span class="ss">$cover.background$</span>"</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    if name == "none" { none } else { brand-color.at(name) }</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.image)$</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  cover: image("<span class="ss">$cover.image$</span>"<span class="ss">$if(cover.alt)$</span>, alt: "<span class="ss">$cover.alt$</span>"<span class="ss">$endif$</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.copyright)$</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  copyright: [<span class="ss">$cover.copyright$</span>],</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="_quarto.yml"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">typst</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">template-partials</span><span class="kw">:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">typst-show.typ</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cover</span><span class="kw">:</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">background</span><span class="kw">:</span><span class="at"> secondary</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">image</span><span class="kw">:</span><span class="at"> cover.png</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">alt</span><span class="kw">:</span><span class="at"> A description of the image.</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">copyright</span><span class="kw">:</span><span class="at"> Copyright 2026 Jane Smith.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>background</code> is the name of a colour of the brand file, because Pandoc escapes the <code>#</code> of a hex value. The name <code>none</code> drops the light box behind the title, which suits a cover that you decorate yourself. Without <code>alt</code>, <code>pdf-standard: ua-1</code> stops the build, so the image always has a description.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/book-nobox-p1.png" class="lightbox" data-gallery="typst-tricks" title="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"><img src="assets/book-nobox-p1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="237" alt="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"></a></p>
+</figure>
+</div>
+<figcaption>A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom</figcaption>
+</figure>
+</div>
+<p>This cover combines <code>background: none</code> with <code>book-cover.typ</code>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The full <code>typst-show.typ</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is the file of Quarto 1.11.9 with the lines above added.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="typst-show.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span><span class="im">import</span> <span class="st">"@preview/orange-book:0.7.1"</span><span class="op">:</span> book<span class="op">,</span> part<span class="op">,</span> chapter<span class="op">,</span> appendices</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> book<span class="op">.</span>with<span class="op">(</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(title)$</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  title<span class="op">:</span> <span class="op">[</span><span class="ss">$title$</span><span class="op">],</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(subtitle)$</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  subtitle<span class="op">:</span> <span class="op">[</span><span class="ss">$subtitle$</span><span class="op">],</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(by-author)$</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  author<span class="op">:</span> <span class="st">"$for(by-author)$$it.name.literal$$sep$, $endfor$"</span><span class="op">,</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(date)$</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  date<span class="op">:</span> <span class="st">"$date$"</span><span class="op">,</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lang)$</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  lang<span class="op">:</span> <span class="st">"$lang$"</span><span class="op">,</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  main-color<span class="op">:</span> brand-color<span class="op">.</span>at<span class="op">(</span><span class="st">"primary"</span><span class="op">,</span> default<span class="op">:</span> blue<span class="op">),</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.background)$</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  cover-background<span class="op">:</span> <span class="op">{</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="va">name</span> <span class="op">=</span> <span class="st">"$cover.background$"</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> name <span class="op">==</span> <span class="st">"none"</span> <span class="op">{</span> <span class="bu">none</span> <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span> brand-color<span class="op">.</span>at<span class="op">(</span>name<span class="op">)</span> <span class="op">}</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.image)$</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  cover<span class="op">:</span> image<span class="op">(</span><span class="st">"$cover.image$"</span><span class="ss">$if(cover.alt)$</span><span class="op">,</span> alt<span class="op">:</span> <span class="st">"$cover.alt$"</span><span class="ss">$endif$</span><span class="op">),</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(cover.copyright)$</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  copyright<span class="op">:</span> <span class="op">[</span><span class="ss">$cover.copyright$</span><span class="op">],</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  logo<span class="op">:</span> <span class="op">{</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="va">logo-info</span> <span class="op">=</span> brand-logo<span class="op">.</span>at<span class="op">(</span><span class="st">"medium"</span><span class="op">,</span> default<span class="op">:</span> <span class="bu">none</span><span class="op">)</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> logo-info <span class="op">!=</span> <span class="bu">none</span> <span class="op">{</span> image<span class="op">(</span>logo-info<span class="op">.</span>path<span class="op">,</span> alt<span class="op">:</span> logo-info<span class="op">.</span>at<span class="op">(</span><span class="st">"alt"</span><span class="op">,</span> default<span class="op">:</span> <span class="bu">none</span><span class="op">))</span> <span class="op">}</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(toc-depth)$</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  outline-depth<span class="op">:</span> <span class="ss">$toc-depth$</span><span class="op">,</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lof)$</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(crossref.lof-title)$</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>  list-of-figure-title<span class="op">:</span> <span class="st">"$crossref.lof-title$"</span><span class="op">,</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="ss">$else$</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-lof-title)$</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>  list-of-figure-title<span class="op">:</span> <span class="st">"$quarto.language.crossref-lof-title$"</span><span class="op">,</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(lot)$</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(crossref.lot-title)$</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>  list-of-table-title<span class="op">:</span> <span class="st">"$crossref.lot-title$"</span><span class="op">,</span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="ss">$else$</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-lot-title)$</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>  list-of-table-title<span class="op">:</span> <span class="st">"$quarto.language.crossref-lot-title$"</span><span class="op">,</span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(quarto.language.crossref-ch-prefix)$</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>  supplement-chapter<span class="op">:</span> <span class="st">"$quarto.language.crossref-ch-prefix$"</span><span class="op">,</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(margin-geometry)$</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a>  padded-heading-number<span class="op">:</span> <span class="bu">false</span><span class="op">,</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="ss">$if(margin-geometry)$</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="co">// Configure marginalia page geometry for book context</span></span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="co">// Geometry computed by Quarto's meta.lua filter (typstGeometryFromPaperWidth)</span></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a><span class="co">// IMPORTANT: This must come AFTER book.with() to override the book format's margin settings</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="kw">#</span><span class="im">import</span> <span class="st">"@preview/marginalia:0.3.1"</span> as marginalia</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="kw">#show</span><span class="op">:</span> marginalia<span class="op">.</span>setup<span class="op">.</span>with<span class="op">(</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>  inner<span class="op">:</span> <span class="op">(</span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>    far: <span class="ss">$margin-geometry.inner.far$</span><span class="op">,</span></span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a>    width: <span class="ss">$margin-geometry.inner.width$</span><span class="op">,</span></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a>    sep: <span class="ss">$margin-geometry.inner.separation$</span><span class="op">,</span></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>  outer<span class="op">:</span> <span class="op">(</span></span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>    far: <span class="ss">$margin-geometry.outer.far$</span><span class="op">,</span></span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a>    width: <span class="ss">$margin-geometry.outer.width$</span><span class="op">,</span></span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>    sep: <span class="ss">$margin-geometry.outer.separation$</span><span class="op">,</span></span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>  <span class="op">),</span></span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a>  top<span class="op">:</span> <span class="ss">$if(margin.top)$$margin.top$$else$</span><span class="fl">1.25in</span><span class="ss">$endif$</span><span class="op">,</span></span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>  bottom<span class="op">:</span> <span class="ss">$if(margin.bottom)$$margin.bottom$$else$</span><span class="fl">1.25in</span><span class="ss">$endif$</span><span class="op">,</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a>  <span class="co">// CRITICAL: Enable book mode for recto/verso awareness</span></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a>  book<span class="op">:</span> <span class="bu">true</span><span class="op">,</span></span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>  clearance<span class="op">:</span> <span class="ss">$margin-geometry.clearance$</span><span class="op">,</span></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a><span class="ss">$endif$</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="book-format" class="level3" data-number="14.4">
+<h3 data-number="14.4" class="anchored" data-anchor-id="book-format"><span class="header-section-number">14.4</span> Write Your Own Format</h3>
+<p>When the book needs more, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
+</section>
 </section>
 <section id="where-to-go-next" class="level2" data-number="15">
 <h2 data-number="15" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">15</span> Where to Go Next</h2>

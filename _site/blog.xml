@@ -2238,676 +2238,22 @@ font-style: inherit;">}))</span></span><div class="code-annotation-gutter-bg"></
 </tr>
 </tbody>
 </table>
-<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide. The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. I proposed a <code>cover</code> key for them in a <a href="https://github.com/quarto-ext/orange-book/pull/7">pull request</a>. The wider request, to expose more options of the package in the YAML, is <a href="https://github.com/quarto-dev/quarto-cli/issues/14270">quarto-cli issue 14270</a>. Until it is merged, you can add the keys yourself. Copy the <code>typst-show.typ</code> of the extension, add these lines after its <code>main-color</code> line, and list the file under <code>template-partials</code>. You then maintain that copy at every Quarto release.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>added to typst-show.typ</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="added to typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.background)$</span></span>
-<span id="cb10-2">  cover-background: {</span>
-<span id="cb10-3">    let name = "<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$cover.background$</span>"</span>
-<span id="cb10-4">    if name == "none" { none } else { brand-color.at(name) }</span>
-<span id="cb10-5">  },</span>
-<span id="cb10-6"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb10-7"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.image)$</span></span>
-<span id="cb10-8">  cover: image("<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$cover.image$</span>"<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.alt)$</span>, alt: "<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$cover.alt$</span>"<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span>),</span>
-<span id="cb10-9"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb10-10"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.copyright)$</span></span>
-<span id="cb10-11">  copyright: [<span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$cover.copyright$</span>],</span>
-<span id="cb10-12"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span></code></pre></div></div>
-</div>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>_quarto.yml</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="_quarto.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb11-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">format</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb11-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">typst</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb11-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">template-partials</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb11-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">- </span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">typst-show.typ</span></span>
-<span id="cb11-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cover</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span></span>
-<span id="cb11-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">background</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> secondary</span></span>
-<span id="cb11-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">image</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> cover.png</span></span>
-<span id="cb11-8"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">alt</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> A description of the image.</span></span>
-<span id="cb11-9"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">copyright</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Copyright 2026 Jane Smith.</span></span></code></pre></div></div>
-</div>
-<p><code>background</code> is the name of a colour of the brand file, because Pandoc escapes the <code>#</code> of a hex value. The name <code>none</code> drops the light box behind the title, which suits a cover that you decorate yourself. Without <code>alt</code>, <code>pdf-standard: ua-1</code> stops the build, so the image always has a description.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><a href="assets/book-nobox-p1.png" class="lightbox" data-gallery="typst-tricks" title="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/assets/book-nobox-p1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="237" alt="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"></a></p>
-</figure>
-</div>
-<figcaption>A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom</figcaption>
-</figure>
-</div>
-<p>This cover combines <code>background: none</code> with <code>book-cover.typ</code>.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>The full <code>typst-show.typ</code>
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>This is the file of Quarto 1.11.9 with the lines above added.</p>
-<div class="code-with-filename">
-<div class="code-with-filename-file">
-<pre><strong>typst-show.typ</strong></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#</span><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"@preview/orange-book:0.7.1"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> book<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> part<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> chapter<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> appendices</span>
-<span id="cb12-2"></span>
-<span id="cb12-3"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> book<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>with<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span></span>
-<span id="cb12-4"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(title)$</span></span>
-<span id="cb12-5">  title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$title$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">],</span></span>
-<span id="cb12-6"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-7"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(subtitle)$</span></span>
-<span id="cb12-8">  subtitle<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$subtitle$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">],</span></span>
-<span id="cb12-9"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-10"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(by-author)$</span></span>
-<span id="cb12-11">  author<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$for(by-author)$$it.name.literal$$sep$, $endfor$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-12"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-13"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(date)$</span></span>
-<span id="cb12-14">  date<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$date$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-15"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-16"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(lang)$</span></span>
-<span id="cb12-17">  lang<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$lang$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-18"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-19">  main-color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> brand-color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"primary"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> blue<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">),</span></span>
-<span id="cb12-20"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.background)$</span></span>
-<span id="cb12-21">  cover-background<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span></span>
-<span id="cb12-22">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">let</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">name</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$cover.background$"</span></span>
-<span id="cb12-23">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> name <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">==</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"none"</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span> brand-color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span>name<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">}</span></span>
-<span id="cb12-24">  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">},</span></span>
-<span id="cb12-25"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-26"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.image)$</span></span>
-<span id="cb12-27">  cover<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> image<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$cover.image$"</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.alt)$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> alt<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$cover.alt$"</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">),</span></span>
-<span id="cb12-28"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-29"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(cover.copyright)$</span></span>
-<span id="cb12-30">  copyright<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">[</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$cover.copyright$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">],</span></span>
-<span id="cb12-31"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-32">  logo<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span></span>
-<span id="cb12-33">    <span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">let</span> <span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">logo-info</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> brand-logo<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"medium"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb12-34">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">if</span> logo-info <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">!=</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">{</span> image<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span>logo-info<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>path<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> alt<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> logo-info<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"alt"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">))</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">}</span></span>
-<span id="cb12-35">  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">},</span></span>
-<span id="cb12-36"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(toc-depth)$</span></span>
-<span id="cb12-37">  outline-depth<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$toc-depth$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-38"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-39"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(lof)$</span></span>
-<span id="cb12-40"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(crossref.lof-title)$</span></span>
-<span id="cb12-41">  list-of-figure-title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$crossref.lof-title$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-42"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$else$</span></span>
-<span id="cb12-43"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(quarto.language.crossref-lof-title)$</span></span>
-<span id="cb12-44">  list-of-figure-title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$quarto.language.crossref-lof-title$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-45"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-46"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-47"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-48"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(lot)$</span></span>
-<span id="cb12-49"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(crossref.lot-title)$</span></span>
-<span id="cb12-50">  list-of-table-title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$crossref.lot-title$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-51"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$else$</span></span>
-<span id="cb12-52"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(quarto.language.crossref-lot-title)$</span></span>
-<span id="cb12-53">  list-of-table-title<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$quarto.language.crossref-lot-title$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-54"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-55"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-56"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-57"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(quarto.language.crossref-ch-prefix)$</span></span>
-<span id="cb12-58">  supplement-chapter<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"$quarto.language.crossref-ch-prefix$"</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-59"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-60"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(margin-geometry)$</span></span>
-<span id="cb12-61">  padded-heading-number<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">false</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-62"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span>
-<span id="cb12-63"><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb12-64"></span>
-<span id="cb12-65"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(margin-geometry)$</span></span>
-<span id="cb12-66"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Configure marginalia page geometry for book context</span></span>
-<span id="cb12-67"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// Geometry computed by Quarto's meta.lua filter (typstGeometryFromPaperWidth)</span></span>
-<span id="cb12-68"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// IMPORTANT: This must come AFTER book.with() to override the book format's margin settings</span></span>
-<span id="cb12-69"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#</span><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"@preview/marginalia:0.3.1"</span> as marginalia</span>
-<span id="cb12-70"></span>
-<span id="cb12-71"><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> marginalia<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>setup<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">.</span>with<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span></span>
-<span id="cb12-72">  inner<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span></span>
-<span id="cb12-73">    far: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.inner.far$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-74">    width: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.inner.width$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-75">    sep: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.inner.separation$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-76">  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">),</span></span>
-<span id="cb12-77">  outer<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">(</span></span>
-<span id="cb12-78">    far: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.outer.far$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-79">    width: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.outer.width$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-80">    sep: <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.outer.separation$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-81">  <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">),</span></span>
-<span id="cb12-82">  top<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(margin.top)$$margin.top$$else$</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.25in</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-83">  bottom<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$if(margin.bottom)$$margin.bottom$$else$</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.25in</span><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-84">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">// CRITICAL: Enable book mode for recto/verso awareness</span></span>
-<span id="cb12-85">  book<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">true</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-86">  clearance<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$margin-geometry.clearance$</span><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">,</span></span>
-<span id="cb12-87"><span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">)</span></span>
-<span id="cb12-88"><span class="ss" style="color: #20794D;
-background-color: null;
-font-style: inherit;">$endif$</span></span></code></pre></div></div>
-</div>
-</div>
-</div>
-</div>
-<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
+<p>The tricks style the pages of a book, but not its cover. Four routes reach the cover, from the lightest to the heaviest.</p>
+<section id="book-brand" class="level3" data-number="14.1">
+<h3 data-number="14.1" class="anchored" data-anchor-id="book-brand"><span class="header-section-number">14.1</span> Change the Cover with a Brand File</h3>
+<p>The supported way to change the cover is a <a href="https://quarto.org/docs/authoring/brand.html">brand file</a>, written in the <a href="https://posit-dev.github.io/brand-yml/">brand.yml</a> format. The extension passes <code>color.primary</code> as the main colour, and the title box uses it lightened by 70%. It also passes <code>logo.medium</code>, which the package puts at the top of the cover, 3 cm wide.</p>
+</section>
+<section id="book-decorate" class="level3" data-number="14.2">
+<h3 data-number="14.2" class="anchored" data-anchor-id="book-decorate"><span class="header-section-number">14.2</span> Decorate the Cover Page</h3>
+<p>The tricks cannot reach the cover, because orange-book draws it as the first page. The decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo. It overrides nothing, so it is the lighter option.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>book-cover.typ</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="book-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-filename="book-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
-<span id="cb13-2"><span class="kw" style="color: #003B4F;
+<span id="cb10-2"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#let</span> <span class="va" style="color: #111111;
@@ -2935,7 +2281,7 @@ background-color: null;
 font-style: inherit;">135</span>deg<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">)</span></span>
-<span id="cb13-3"><span class="kw" style="color: #003B4F;
+<span id="cb10-3"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">#set</span> <span class="va" style="color: #111111;
@@ -2958,12 +2304,12 @@ background-color: null;
 font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">{</span></span>
-<span id="cb13-4">  pdf<span class="op" style="color: #5E5E5E;
+<span id="cb10-4">  pdf<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">({</span></span>
-<span id="cb13-5">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-5">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>bottom<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -2992,7 +2338,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-6">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-6">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -3027,7 +2373,7 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-7">    place<span class="op" style="color: #5E5E5E;
+<span id="cb10-7">    place<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -3062,10 +2408,10 @@ background-color: null;
 font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">))</span></span>
-<span id="cb13-8">  <span class="op" style="color: #5E5E5E;
+<span id="cb10-8">  <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span>
-<span id="cb13-9"><span class="op" style="color: #5E5E5E;
+<span id="cb10-9"><span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">})</span></span></code></pre></div></div>
 </div>
@@ -3101,7 +2447,675 @@ font-style: inherit;">})</span></span></code></pre></div></div>
 <p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
 </div>
 </div>
-<p>If the book needs more than that, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
+</section>
+<section id="book-override" class="level3" data-number="14.3">
+<h3 data-number="14.3" class="anchored" data-anchor-id="book-override"><span class="header-section-number">14.3</span> Add Cover Options with a <code>typst-show.typ</code> Override</h3>
+<p>The package has other cover options, such as <code>cover</code>, <code>cover-background</code> and <code>copyright</code>, but the extension does not read them from the YAML. I proposed a <code>cover</code> key for them in a <a href="https://github.com/quarto-ext/orange-book/pull/7">pull request</a>. The wider request, to expose more options of the package in the YAML, is <a href="https://github.com/quarto-dev/quarto-cli/issues/14270">quarto-cli issue 14270</a>. Until it is merged, you can add the keys yourself. Copy the <code>typst-show.typ</code> of the extension, add these lines after its <code>main-color</code> line, and list the file under <code>template-partials</code>. You then maintain that copy at every Quarto release.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>added to typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-filename="added to typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb11-1"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.background)$</span></span>
+<span id="cb11-2">  cover-background: {</span>
+<span id="cb11-3">    let name = "<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cover.background$</span>"</span>
+<span id="cb11-4">    if name == "none" { none } else { brand-color.at(name) }</span>
+<span id="cb11-5">  },</span>
+<span id="cb11-6"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb11-7"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.image)$</span></span>
+<span id="cb11-8">  cover: image("<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cover.image$</span>"<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.alt)$</span>, alt: "<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cover.alt$</span>"<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span>),</span>
+<span id="cb11-9"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb11-10"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.copyright)$</span></span>
+<span id="cb11-11">  copyright: [<span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cover.copyright$</span>],</span>
+<span id="cb11-12"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span></code></pre></div></div>
+</div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="_quarto.yml" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">format</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb12-2"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">typst</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb12-3"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">template-partials</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb12-4"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">- </span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">typst-show.typ</span></span>
+<span id="cb12-5"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cover</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span></span>
+<span id="cb12-6"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">background</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> secondary</span></span>
+<span id="cb12-7"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">image</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> cover.png</span></span>
+<span id="cb12-8"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">alt</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> A description of the image.</span></span>
+<span id="cb12-9"><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">      </span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copyright</span><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">:</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;"> Copyright 2026 Jane Smith.</span></span></code></pre></div></div>
+</div>
+<p><code>background</code> is the name of a colour of the brand file, because Pandoc escapes the <code>#</code> of a hex value. The name <code>none</code> drops the light box behind the title, which suits a cover that you decorate yourself. Without <code>alt</code>, <code>pdf-standard: ua-1</code> stops the build, so the image always has a description.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="assets/book-nobox-p1.png" class="lightbox" data-gallery="typst-tricks" title="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/assets/book-nobox-p1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="237" alt="A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom"></a></p>
+</figure>
+</div>
+<figcaption>A book cover with no box behind the title: the title and the author sit on a white page between gradient stripes at the top and a gradient band at the bottom</figcaption>
+</figure>
+</div>
+<p>This cover combines <code>background: none</code> with <code>book-cover.typ</code>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The full <code>typst-show.typ</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is the file of Quarto 1.11.9 with the lines above added.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>typst-show.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13" data-filename="typst-show.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb13-1"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"@preview/orange-book:0.7.1"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> book<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> part<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> chapter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> appendices</span>
+<span id="cb13-2"></span>
+<span id="cb13-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> book<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>with<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-4"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(title)$</span></span>
+<span id="cb13-5">  title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$title$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="cb13-6"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-7"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(subtitle)$</span></span>
+<span id="cb13-8">  subtitle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$subtitle$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="cb13-9"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-10"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(by-author)$</span></span>
+<span id="cb13-11">  author<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$for(by-author)$$it.name.literal$$sep$, $endfor$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-12"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-13"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(date)$</span></span>
+<span id="cb13-14">  date<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$date$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-15"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-16"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(lang)$</span></span>
+<span id="cb13-17">  lang<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$lang$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-18"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-19">  main-color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> brand-color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"primary"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> blue<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-20"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.background)$</span></span>
+<span id="cb13-21">  cover-background<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb13-22">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">name</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$cover.background$"</span></span>
+<span id="cb13-23">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> name <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"none"</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> brand-color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>name<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb13-24">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">},</span></span>
+<span id="cb13-25"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-26"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.image)$</span></span>
+<span id="cb13-27">  cover<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> image<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$cover.image$"</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.alt)$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alt<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$cover.alt$"</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-28"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-29"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(cover.copyright)$</span></span>
+<span id="cb13-30">  copyright<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">[</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$cover.copyright$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">],</span></span>
+<span id="cb13-31"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-32">  logo<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb13-33">    <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">logo-info</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> brand-logo<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"medium"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb13-34">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> logo-info <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span> image<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>logo-info<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>path<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> alt<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> logo-info<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>at<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"alt"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> default<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">}</span></span>
+<span id="cb13-35">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">},</span></span>
+<span id="cb13-36"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(toc-depth)$</span></span>
+<span id="cb13-37">  outline-depth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$toc-depth$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-38"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-39"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(lof)$</span></span>
+<span id="cb13-40"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(crossref.lof-title)$</span></span>
+<span id="cb13-41">  list-of-figure-title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$crossref.lof-title$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-42"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$else$</span></span>
+<span id="cb13-43"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(quarto.language.crossref-lof-title)$</span></span>
+<span id="cb13-44">  list-of-figure-title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$quarto.language.crossref-lof-title$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-45"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-46"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-47"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-48"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(lot)$</span></span>
+<span id="cb13-49"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(crossref.lot-title)$</span></span>
+<span id="cb13-50">  list-of-table-title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$crossref.lot-title$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-51"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$else$</span></span>
+<span id="cb13-52"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(quarto.language.crossref-lot-title)$</span></span>
+<span id="cb13-53">  list-of-table-title<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$quarto.language.crossref-lot-title$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-54"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-55"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-56"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-57"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(quarto.language.crossref-ch-prefix)$</span></span>
+<span id="cb13-58">  supplement-chapter<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"$quarto.language.crossref-ch-prefix$"</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-59"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-60"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(margin-geometry)$</span></span>
+<span id="cb13-61">  padded-heading-number<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">false</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-62"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span>
+<span id="cb13-63"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb13-64"></span>
+<span id="cb13-65"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(margin-geometry)$</span></span>
+<span id="cb13-66"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Configure marginalia page geometry for book context</span></span>
+<span id="cb13-67"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Geometry computed by Quarto's meta.lua filter (typstGeometryFromPaperWidth)</span></span>
+<span id="cb13-68"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// IMPORTANT: This must come AFTER book.with() to override the book format's margin settings</span></span>
+<span id="cb13-69"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#</span><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"@preview/marginalia:0.3.1"</span> as marginalia</span>
+<span id="cb13-70"></span>
+<span id="cb13-71"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#show</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> marginalia<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>setup<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>with<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-72">  inner<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-73">    far: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.inner.far$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-74">    width: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.inner.width$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-75">    sep: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.inner.separation$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-76">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-77">  outer<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span></span>
+<span id="cb13-78">    far: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.outer.far$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-79">    width: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.outer.width$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-80">    sep: <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.outer.separation$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-81">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span></span>
+<span id="cb13-82">  top<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(margin.top)$$margin.top$$else$</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.25in</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-83">  bottom<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$if(margin.bottom)$$margin.bottom$$else$</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.25in</span><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-84">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// CRITICAL: Enable book mode for recto/verso awareness</span></span>
+<span id="cb13-85">  book<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">true</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-86">  clearance<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$margin-geometry.clearance$</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span></span>
+<span id="cb13-87"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb13-88"><span class="ss" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$endif$</span></span></code></pre></div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="book-format" class="level3" data-number="14.4">
+<h3 data-number="14.4" class="anchored" data-anchor-id="book-format"><span class="header-section-number">14.4</span> Write Your Own Format</h3>
+<p>When the book needs more, write your own Typst format and use it for books. My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them. It is described in <a href="../../posts/2026-08-17-quarto-clinical-report/index.html">A Clinical Study Report in Quarto, End to End</a>.</p>
+</section>
 </section>
 <section id="where-to-go-next" class="level2" data-number="15">
 <h2 data-number="15" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">15</span> Where to Go Next</h2>
@@ -3289,7 +3303,7 @@ font-style: inherit;">#&gt; 3   pass       0   &lt;NA&gt;</span></span></code></
 <section id="a-new-app" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-app">A New App</h2>
 <p>The two screenshots below show the same page, the quality-control metrics, in NACHO 2.0 and in NACHO 3.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
@@ -3422,7 +3436,7 @@ in R card holding an R script.
 </section>
 <section id="responsiveness" class="level3">
 <h3 class="anchored" data-anchor-id="responsiveness">Responsiveness</h3>
-<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
+<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
 <ul>
 <li>Importing: reading the RCC files no longer freezes the page, and the line under <strong>Import</strong> shows the current stage.</li>
 <li>Reporting: the Export page renders the HTML or PDF report in the background.</li>
@@ -3455,7 +3469,7 @@ font-style: inherit;">visualise</span>(GSE74821)</span></code></pre></div></div>
 <section id="a-new-website" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-website">A New Website</h2>
 <p>The website got the same treatment as the app. Here is the home page in NACHO 2.0 and in NACHO 3.0.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="hero-art" style="display: block; max-height: 480px; overflow-y: auto; padding: 0;">
@@ -3525,7 +3539,7 @@ background-color: null;
 font-style: inherit;">"typst"</span>)</span></code></pre></div></div>
 </div>
 <p>The report is now a quality-control record. Here are the tops of the NACHO 2.0 and the NACHO 3.0 HTML reports.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
@@ -5050,7 +5064,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-10;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-glightbox="description: .lightbox-desc-10;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
 </div>
 </div>
 </div>
@@ -5062,7 +5076,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-11;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-glightbox="description: .lightbox-desc-11;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
 </div>
 </div>
 </div>
@@ -5074,7 +5088,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-12;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-glightbox="description: .lightbox-desc-12;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
 </div>
 </div>
 </div>
@@ -5088,7 +5102,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-13;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-glightbox="description: .lightbox-desc-13;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -5100,7 +5114,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-14;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-glightbox="description: .lightbox-desc-14;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
 </div>
 </div>
 </div>
@@ -5112,7 +5126,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-15;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-glightbox="description: .lightbox-desc-15;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
 </div>
 </div>
 </div>
@@ -5126,7 +5140,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-16;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-glightbox="description: .lightbox-desc-16;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -5138,7 +5152,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-17;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-glightbox="description: .lightbox-desc-17;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
 </div>
 </div>
 </div>
@@ -5150,7 +5164,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-18;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-glightbox="description: .lightbox-desc-18;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
 </div>
 </div>
 </div>
@@ -5168,7 +5182,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-19;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-glightbox="description: .lightbox-desc-19;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
 </div>
 </div>
 </div>
@@ -5180,7 +5194,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-20;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-glightbox="description: .lightbox-desc-20;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
 </div>
 </div>
 </div>
@@ -5192,7 +5206,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-21;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-glightbox="description: .lightbox-desc-21;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
 </div>
 </div>
 </div>
@@ -5204,7 +5218,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-22;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-glightbox="description: .lightbox-desc-22;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
 </div>
 </div>
 </div>
@@ -10755,12 +10769,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
