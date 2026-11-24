@@ -26,9 +26,9 @@
 #place(top + left, dx: 0.5in, dy: 1.0in, block(width: 3.3in)[
   #text(size: 9pt, weight: "bold", tracking: 0.14em, fill: gold)[QUARTO AND TYPST]
   #v(0.6em)
-  #text(font: ("Source Serif 4", "Charter"), size: 27pt, weight: "bold")[Ten small partials for a better PDF]
+  #text(font: ("Source Serif 4", "Charter"), size: 27pt, weight: "bold")[Professional and accessible PDFs]
   #v(0.8em)
-  #text(size: 11pt, fill: muted)[One file per trick. Copy it, change it or delete it.]
+  #text(size: 11pt, fill: muted)[Ten small Typst partials. One file per trick.]
 ])
 
 #sheet(1, 4.2in, 0.55in, -4deg)
