@@ -1,6 +1,5 @@
-// 2. Header and footer: three slots, page number as "n / total". Replace `Finance` with your own label.
-// `footer-ink` is a slot for the footer text colour, so a band can change it.
-#let footer-ink = state("footer-ink", muted)
+// 2. Header and footer: three slots, page number as "n / total".
+#let footer-ink = state("footer-ink", muted)  // <1>
 
 #let slots(start, middle, end) = grid(
   columns: (1fr, auto, 1fr),
@@ -11,7 +10,7 @@
 #set page(
   header: context if counter(page).get().first() > 1 {
     set text(size: 0.85em, fill: muted)
-    slots([#document.title], [], [Finance])
+    slots([#document.title], [], [Finance])  // <2>
   },
   footer: context {
     set text(size: 0.85em, fill: footer-ink.get())

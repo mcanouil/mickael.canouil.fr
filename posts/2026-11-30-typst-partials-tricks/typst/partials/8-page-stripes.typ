@@ -1,7 +1,6 @@
 // 8. Recurring decoration: stripes at the top, a gradient band behind the footer.
-// Typst already treats page backgrounds as artifacts; the wrapper states the intent.
 #let band-gradient = gradient.linear(accent, accent.darken(55%), angle: 135deg)
-#footer-ink.update(white)
+#footer-ink.update(white)  // <1>
 
 #set page(background: pdf.artifact({
   place(top, dy: 8mm, rect(width: 100%, height: 4mm, fill: band-gradient, stroke: none))

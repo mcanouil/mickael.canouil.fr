@@ -10,6 +10,12 @@ image-alt: |
   Social card for the post.
   On the left, the title "Professional and accessible PDFs" with the line "Ten small Typst partials. One file per trick."
   On the right, two pages of a demo report: a cover with blue gradient stripes at the top and a gradient band at the bottom, and a body page with the same stripes, numbered headings, a striped table and a footer band.
+engine: markdown
+extensions:
+  typst-render:
+    output-directory: ./assets/typst-render
+    format: svg
+    cache: false
 ---
 
 A few weeks ago, I saw someone ask for resources to customise the cover page of a Quarto Typst book.
@@ -89,16 +95,51 @@ format:
 1. Ask Typst for a tagged PDF that follows PDF/UA-1, with the [`pdf-standard` option](https://quarto.org/docs/reference/formats/typst.html).
    The [Typst accessibility guide](https://typst.app/docs/guides/accessibility/) explains what the standard asks for.
    Typst checks the PDF against the standard and tags it, and `pdfinfo` reports `Tagged: yes` for the final demo.
-   In my tests, an image with no alt text stops the build with the error `PDF/UA-1 error: missing alt text`.
+   For example, an image with no alt text stops the build with the error `PDF/UA-1 error: missing alt text`.
 2. Load the partials in this order.
    Removing a line removes that trick, unless a later partial needs it.
 
 Some partials need an earlier one.
+In the diagram, an arrow points from a partial to the one it needs.
 
-- Every partial after the first reads the colours and fonts of `1-tokens.typ`.
-- `8-page-stripes.typ` needs `2-header-footer.typ`, and `10-cover-decoration.typ` needs `9-cover.typ`.
-- `9-cover.typ` and `typst-show.typ` need `7-title-block.typ`.
-- The others, such as `3-headings.typ` and `4-code.typ`, need only the first partial.
+```{typst}
+//| label: fig-partials-tree
+//| fig-cap: "The partials that need an earlier partial."
+//| echo: false
+//| output-filename: "partials-tree.svg"
+//| alt: "Dependency diagram. Tokens is needed by every other partial. Page stripes needs header and footer. Cover needs the title block, and cover decoration needs the cover. The typst-show file needs the title block."
+//| width: 16cm
+//| height: 6cm
+#import "@preview/fletcher:0.6.0": diagram, node, edge
+#set text(size: 9pt)
+#let part(pos, name, label) = node(pos, text(size: 8pt)[#label], name: name, shape: rect, corner-radius: 3pt, inset: 6pt, stroke: 0.7pt, fill: luma(200).transparentize(70%))
+#diagram(
+  node-stroke: 0.7pt,
+  edge-stroke: 0.7pt,
+  spacing: (5mm, 11mm),
+  part((3, 0), <t1>, [1 Tokens]),
+  part((0, 1), <t2>, [2 Header and footer]),
+  part((1, 1), <t3>, [3 Headings]),
+  part((2, 1), <t4>, [4 Code]),
+  part((3, 1), <t5>, [5 Tables]),
+  part((4, 1), <t6>, [6 Captions]),
+  part((5, 1), <t7>, [7 Title block]),
+  part((0, 2), <t8>, [8 Page stripes]),
+  part((5, 2), <t9>, [9 Cover]),
+  part((4, 2), <ts>, [typst-show.typ]),
+  part((5, 3), <t10>, [10 Cover decoration]),
+  edge(<t2>, <t1>, "-|>"),
+  edge(<t3>, <t1>, "-|>"),
+  edge(<t4>, <t1>, "-|>"),
+  edge(<t5>, <t1>, "-|>"),
+  edge(<t6>, <t1>, "-|>"),
+  edge(<t7>, <t1>, "-|>"),
+  edge(<t8>, <t2>, "-|>"),
+  edge(<t9>, <t7>, "-|>"),
+  edge(<ts>, <t7>, "-|>"),
+  edge(<t10>, <t9>, "-|>"),
+)
+```
 
 The heading numbers come from `number-sections: true` in the front matter of `_report.qmd`, because Quarto sets the numbering after the partials run.
 The report, the ten partials and `typst-show.typ` are [in the post folder on GitHub](https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst).
@@ -122,7 +163,6 @@ format:
 ```{.typst include="typst/typst-show-partials.typ" filename="typst-show.typ"}
 ```
 
-I tested this with the first three partials, and the PDF came out tagged.
 Put each call on its own line and leave a blank line between two calls.
 Without the blank line, Pandoc glues the end of one partial to the start of the next, and Typst stops with an error.
 
@@ -134,17 +174,22 @@ Without the blank line, Pandoc glues the end of one partial to the start of the 
 | What it replaces | Nothing. | The default partial that you override, here `typst-show.typ`. |
 | In a book | Works, as the book section shows. | Overriding `typst-show.typ` removes the setup of orange-book. |
 | In an extension | The user has to list the files. | The extension lists them once, and the format gets them with it. |
+| Upkeep | None. Quarto's own partials keep working. | You own the partial that you override. Compare it with Quarto's default at every release, or you can miss its fixes and new features. |
 
-I tested the variable row by putting `$kicker$` in each kind of file.
-The partial printed the value of `kicker` in the header, and the `include-in-header` file kept the literal text.
+::: {.callout-tip}
 
-My rule is simple.
-Use `include-in-header` for small tweaks that do not read the metadata, because nothing else changes.
-Use `template-partials` when a partial needs the YAML, or when you package the partials in a format extension.
+## Decision
+
+Start with `include-in-header`, because it replaces nothing.
+Switch to `template-partials` when a partial must read the YAML, or when you ship the partials with a format extension.
+Every Quarto partial that you override becomes yours to maintain, so keep those overrides few and small.
+
+:::
 
 ## Tokens {#tokens}
 
 Keep every colour and font in one place, so changing a value changes the whole document.
+This principle holds in every programming language, from CSS variables to constants in R, so it applies to Typst too.
 
 ```{.typst include="typst/partials/1-tokens.typ" filename="partials/1-tokens.typ"}
 ```
@@ -166,6 +211,10 @@ I computed the [WCAG 2.x](https://www.w3.org/TR/WCAG21/#contrast-minimum) contra
 Body text needs at least 4.5:1, so every pair passes.
 Links are underlined, so they do not rely on colour alone.
 
+To compute a ratio, use the [WebAIM contrast checker](https://webaim.org/resources/contrastchecker/) or the [Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/) from TPGi.
+To pick a palette that stays readable for colour-blind people, try [ColorBrewer](https://colorbrewer2.org/) and [Viz Palette](https://projects.susielu.com/viz-palette).
+The [WCAG explanation of contrast](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html) gives the thresholds.
+
 :::
 
 ## Header and Footer {#header-footer}
@@ -174,6 +223,10 @@ Add a quiet running header and a page number in the form `n / total`.
 
 ```{.typst include="typst/partials/2-header-footer.typ" filename="partials/2-header-footer.typ"}
 ```
+
+1. A slot for the footer text colour, so that [Page Stripes](#page-stripes) can turn it white on a dark band.
+2. `Finance` is the label of the demo.
+   If you load this partial with `template-partials`, as in [Two Ways to Load a Partial](#loading), write `[$kicker$]` and the label comes from the `kicker` key of the YAML.
 
 | Before | After |
 | --- | --- |
@@ -185,7 +238,6 @@ Add a quiet running header and a page number in the form `n / total`.
 
 The text is `0.85em` of the 11 pt body, which is about 9.35 pt, so it stays above 9 pt.
 The page counter needs `context`, because its value is only known once Typst lays out the page.
-The right slot of the header says `Finance`, which is the label of the demo, so replace it with your own.
 
 :::
 
@@ -230,6 +282,7 @@ Code that looks different from what you typed is hard to read.
 With only `ligatures: false`, Fira Code still drew `|>` as a triangle, so I also turn off the `calt` feature with `features: ("calt": 0)`.
 The symbols `!=`, `<-` and `>=` then show as typed.
 The `breakable: false` setting keeps a block on one page.
+This matters most in teaching materials, where learners must see exactly the characters they have to type.
 Code text is `0.8em` of the body, which is 8.8 pt, so it is a little under 9 pt.
 You can enlarge it with `#show raw: set text(size: 9.5pt)`, and I use points there because an `em` value would apply to the already reduced size.
 
@@ -238,6 +291,8 @@ You can enlarge it with `#show raw: set text(size: 9.5pt)`, and I use points the
 ## Tables {#tables}
 
 Give tables a filled header and light stripes.
+These rules are plain Typst and need no library such as `gt` or `great_tables`, so every table gets the style, including a simple Markdown table in Quarto, and not only the tables that R or Python produce.
+My post on [branded figures and tables](/posts/2026-04-15-quarto-brand-figures-tables/index.qmd) covers those libraries.
 
 ```{.typst include="typst/partials/5-tables.typ" filename="partials/5-tables.typ"}
 ```
@@ -260,6 +315,8 @@ The stripes only help the eye, because the header carries the meaning and colour
 ## Captions {#captions}
 
 Make captions small and muted, with the label in bold.
+This one is a matter of taste.
+I find it easier to read when "Table 1" and the caption text look different, so the label stays bold and the caption is smaller and muted.
 
 ```{.typst include="typst/partials/6-captions.typ" filename="partials/6-captions.typ"}
 ```
@@ -315,10 +372,14 @@ Typst already treats a line as an artifact, so the wrapper is optional here.
 
 ## Page Stripes {#page-stripes}
 
-Echo the cover on every page with a thick and a thin stripe at the top, and a gradient band behind the footer.
+The decoration of this demo is a thick and a thin stripe at the top and a gradient band at the bottom, all in the accent colour.
+This trick puts them on every page, with the band behind the footer.
+The [cover](#cover-page) reuses the same style later in the post.
 
 ```{.typst include="typst/partials/8-page-stripes.typ" filename="partials/8-page-stripes.typ"}
 ```
+
+1. Turns the footer text white, through the slot of [Header and Footer](#header-footer).
 
 | Before | After |
 | --- | --- |
@@ -328,16 +389,10 @@ Echo the cover on every page with a thick and a thin stripe at the top, and a gr
 
 ## Accessibility: Decoration and contrast
 
-Screen readers should skip the stripes and the band.
-Typst already marks page backgrounds, headers and footers as [artifacts](https://typst.app/docs/reference/pdf/artifact/), and it marks paths and shapes as artifacts too.
-I removed `pdf.artifact()` from a copy of the decorative partials and rendered with `pdf-standard: ua-1`.
-Neither Typst nor Quarto reported an error, and [veraPDF](https://verapdf.org/) still passed it.
-Quarto runs veraPDF on the PDF when you have installed it with `quarto install verapdf`, as the [1.9 changelog](https://quarto.org/docs/download/changelog/1.9/) describes.
-So the experiment confirms it: the stripes, the band and the title rule are artifacts without the wrapper.
-I keep `pdf.artifact()` because it states the intent, and because content that Typst does not mark itself, such as a decorative image or text, needs it.
-
-The band is dark, so trick 2 holds a `footer-ink` state for the footer text colour, and this partial sets it to white.
-White on the lightest end of the gradient, which is the accent colour, is 5.67:1.
+Screen readers should skip decoration.
+Typst already marks page backgrounds and shapes as [artifacts](https://typst.app/docs/reference/pdf/artifact/), so it skips the stripes and the band.
+I still wrap them in `pdf.artifact()` to say so.
+The band is dark, so the footer text turns white, which is 5.67:1 on the lightest end of the gradient.
 Text on a band needs its contrast checked again.
 
 :::
@@ -349,6 +404,9 @@ Give the title block a page of its own, centred vertically, with no header or fo
 ```{.typst include="typst/partials/9-cover.typ" filename="partials/9-cover.typ"}
 ```
 
+1. A slot for the cover decoration.
+   It stays empty until [Cover Decoration](#cover-decoration) fills it.
+
 | Before | After |
 | --- | --- |
 | ![The first page with the title block above the first section and stripes at the top and bottom](assets/step8-p1.png){.lightbox group="typst-tricks"} | ![A cover page with only the kicker, title, subtitle and date, centred vertically on a white page](assets/step9-p1.png){.lightbox group="typst-tricks"} |
@@ -359,7 +417,7 @@ Give the title block a page of its own, centred vertically, with no header or fo
 
 A Typst closure captures the variables it uses when you define it.
 A later `#let` cannot change a function that already exists.
-A `state` is read when the page is built, so trick 10 can fill the slot after this partial has run.
+A `state` is read when the page is built, so [Cover Decoration](#cover-decoration) can fill the slot after this partial has run.
 
 :::
 
@@ -369,6 +427,8 @@ Fill the cover slot with a gradient band at the bottom and two stripes at the to
 
 ```{.typst include="typst/partials/10-cover-decoration.typ" filename="partials/10-cover-decoration.typ"}
 ```
+
+1. Fills the slot of [Cover Page](#cover-page).
 
 | Before | After |
 | --- | --- |
@@ -401,10 +461,12 @@ The supported way to change the cover is a [brand file](https://quarto.org/docs/
 The extension passes `color.primary` as the main colour, and the title box uses it lightened by 70%.
 It also passes `logo.medium`, which the package puts at the top of the cover, 3 cm wide.
 The package has other cover options, such as `cover`, `cover-background` and `copyright`, but the extension does not read them from the YAML.
+To reach them, you would override the `typst-show.typ` of the extension, and then you maintain that copy at every Quarto release.
 
 The cover is the one thing you cannot reach with those partials.
 orange-book draws it as the first page, so the decoration has to target that page.
 This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.
+It overrides nothing, so it is the lighter option.
 
 ```{.typst include="typst/book-cover.typ" filename="book-cover.typ"}
 ```
@@ -424,6 +486,10 @@ If you move the band under the box, check the contrast again, as for any text on
 
 :::
 
+If the book needs more than that, write your own Typst format and use it for books.
+My clinical study report does this: one format extension renders both a Quarto book and a single document, and a profile picks between them.
+It is described in [A Clinical Study Report in Quarto, End to End](/posts/2026-08-17-quarto-clinical-report/index.qmd).
+
 ## Where to Go Next
 
 - To package partials like these in a format extension, follow the tutorial in [Part 1](/posts/2026-02-27-typst-template-tutorial-part1/index.qmd) and in [Part 2](/posts/2026-03-05-typst-template-tutorial-part2/index.qmd).
@@ -435,4 +501,4 @@ If you move the band under the box, check the contrast again, as for any text on
 - To see a full example, look at [quarto-mcanouil](https://m.canouil.dev/quarto-mcanouil/).
 
 If you try these partials, I would like to hear how it goes.
-Questions are welcome in the [discussions](https://github.com/mcanouil/mickael.canouil.fr/discussions), and problems in the [issues](https://github.com/mcanouil/mickael.canouil.fr/issues).
+Drop a comment in the form below.
