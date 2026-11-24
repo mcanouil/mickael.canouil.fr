@@ -29,7 +29,8 @@
 
 
 
-<p>This post shows ten small Typst partials that change how a Quarto PDF looks. Each one is a separate file, so you can copy it, edit it or remove it without touching the others.</p>
+<p>A few weeks ago, I saw someone ask for resources to customise the cover page of a Quarto Typst book. Since Quarto 1.9, a Typst book uses the orange-book template by default, so the question is a fair one. I use a handful of Typst tricks in my Quarto Typst format extensions, so I thought I would share them.</p>
+<p>This post shows ten of them as small partials. Each one is a separate file, so you can copy it and edit it without touching the others. A few build on an earlier one, and the demo section says which. They work on any Quarto Typst document, and one section covers what changes in a book.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Social card for the post. On the left, the title &quot;Ten small partials for
@@ -66,12 +67,12 @@ Note
 <p>I made the screenshots and ran every test in this post with Quarto 1.11.9, which ships Typst 0.15.1. The demo also builds with Quarto 1.10.19. I did not test older versions. The demo uses <code>pdf-standard</code> and <code>pdf.artifact()</code>, so it needs a recent Quarto and Typst 0.14 or newer.</p>
 </div>
 </div>
-<p>The demo has no <code>_quarto.yml</code>. Here is the front matter that <code>typst/render-steps.sh</code> gives each step, as it stands after the last trick.</p>
+<p>The demo has no <code>_quarto.yml</code>. Here is the <code>format</code> block that <code>typst/render-steps.sh</code> adds to each step, as it stands after the last trick. The script puts it on top of the front matter of <code>_report.qmd</code>, which holds the <code>title</code>, <code>subtitle</code>, <code>kicker</code>, <code>date</code>, <code>lang</code> and <code>number-sections</code> keys.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>front matter</strong></pre>
+<pre><strong>format block of each step</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="front matter" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="format block of each step" style="background: #f1f3f5;"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">format</span><span class="kw" style="color: #003B4F;
 background-color: null;
@@ -198,17 +199,7 @@ background-color: null;
 font-weight: bold;
 font-style: inherit;">- </span><span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">typst-show.typ</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-17" class="code-annotation-target"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">number-sections</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">true</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
+font-style: inherit;">typst-show.typ</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div></div>
 </div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
@@ -217,14 +208,17 @@ font-style: inherit;">true</span></span><div class="code-annotation-gutter-bg"><
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="3">Number the headings through Quarto, which sets the numbering after the partials run.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick, unless a later partial needs it.</span>
 </dd>
 </dl>
-<p>The demo and the script that builds it are in the post folder, under <code>typst/</code>. To build the PDF after each trick, run <code>typst/render-steps.sh</code> from that folder.</p>
+<p>Some partials need an earlier one.</p>
+<ul>
+<li>Every partial after the first reads the colours and fonts of <code>1-tokens.typ</code>.</li>
+<li><code>8-page-stripes.typ</code> needs <code>2-header-footer.typ</code>, and <code>10-cover-decoration.typ</code> needs <code>9-cover.typ</code>.</li>
+<li><code>9-cover.typ</code> and <code>typst-show.typ</code> need <code>7-title-block.typ</code>.</li>
+<li>The others, such as <code>3-headings.typ</code> and <code>4-code.typ</code>, need only the first partial.</li>
+</ul>
+<p>The heading numbers come from <code>number-sections: true</code> in the front matter of <code>_report.qmd</code>, because Quarto sets the numbering after the partials run. The demo and the script that builds it are <a href="https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst">in the post folder on GitHub</a>. To build the PDF after each trick, run <code>typst/render-steps.sh</code> from that folder.</p>
 </section>
 <section id="tokens" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="tokens"><span class="header-section-number">3</span> Tokens</h2>
@@ -2031,8 +2025,244 @@ font-style: inherit;">}))</span></span></code></pre></div></div>
 </div>
 </div>
 </section>
-<section id="where-to-go-next" class="level2" data-number="13">
-<h2 data-number="13" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">13</span> Where to Go Next</h2>
+<section id="book" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="book"><span class="header-section-number">13</span> Using the Tricks in a Quarto Book</h2>
+<p>A Quarto book project with <code>format: typst</code> uses the <a href="https://typst.app/universe/package/orange-book">orange-book</a> template. It draws the cover and the chapter headings itself, and its own <code>typst-show.typ</code> sets it up. I tested the partials in a book made with <code>quarto create project book</code>, with Quarto 1.11.9 and orange-book 0.7.1, and <code>pdf-standard: ua-1</code> still gave a tagged PDF.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Trick</th>
+<th>In a book</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tokens, Headings, Code, Tables, Captions</td>
+<td>Work as in a document, and the caption number follows the chapter, as in “Table 1.1”.</td>
+</tr>
+<tr class="even">
+<td>Header and Footer</td>
+<td>The footer works. The orange-book header stays, because the template sets it after your partial.</td>
+</tr>
+<tr class="odd">
+<td>Page Stripes</td>
+<td>Works on every page, cover included. Load the footer partial before it, because that one holds the <code>footer-ink</code> state. Without it, the build stops with <code>unknown variable: footer-ink</code>.</td>
+</tr>
+<tr class="even">
+<td>Title Block, Cover Page, Cover Decoration</td>
+<td>Do not use them. They replace <code>typst-show.typ</code>, which holds the setup of orange-book, and the book then renders as a single page.</td>
+</tr>
+</tbody>
+</table>
+<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>book-cover.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="book-cover.typ" style="background: #f1f3f5;"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
+<span id="cb12-2"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#let</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">band</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> gradient<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>linear<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>accent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> accent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>darken<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">55%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">),</span> angle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">135</span>deg<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">)</span></span>
+<span id="cb12-3"><span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">#set</span> <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">page</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>background<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> context <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> here<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">().</span>page<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">()</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{</span></span>
+<span id="cb12-4">  pdf<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">.</span>artifact<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">({</span></span>
+<span id="cb12-5">    place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>bottom<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> rect<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">35%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> band<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="cb12-6">    place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> dy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12mm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> rect<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10mm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> band<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="cb12-7">    place<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>top<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> dy<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">26mm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> rect<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">(</span>width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100%</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2mm</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> fill<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> band<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">,</span> stroke<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">none</span><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">))</span></span>
+<span id="cb12-8">  <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">})</span></span>
+<span id="cb12-9"><span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">})</span></span></code></pre></div></div>
+</div>
+<p>Load it after <code>1-tokens.typ</code>, because it reads <code>accent</code> from there.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Before</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="assets/book-before-p1.png" class="lightbox" data-gallery="typst-tricks" title="The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page"><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/assets/book-before-p1.png" class="img-fluid" alt="The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page"></a></td>
+<td><a href="assets/book-after-p1.png" class="lightbox" data-gallery="typst-tricks" title="The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom"><img src="https://mickael.canouil.fr/posts/2026-11-30-typst-partials-tricks/assets/book-after-p1.png" class="img-fluid" alt="The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom"></a></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Check the cover contrast
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
+</div>
+</div>
+</section>
+<section id="where-to-go-next" class="level2" data-number="14">
+<h2 data-number="14" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">14</span> Where to Go Next</h2>
 <ul>
 <li>To package partials like these in an extension, read my post on the <a href="../../posts/2026-01-19-typst-document-dispatcher/index.html">document dispatcher</a>.</li>
 <li>To build a Typst template with Lua and Typst working together, follow the tutorial in <a href="../../posts/2026-02-27-typst-template-tutorial-part1/index.html">Part 1</a> and in <a href="../../posts/2026-03-05-typst-template-tutorial-part2/index.html">Part 2</a>.</li>
@@ -2214,7 +2444,7 @@ font-style: inherit;">#&gt; 3   pass       0   &lt;NA&gt;</span></span></code></
 <section id="a-new-app" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-app">A New App</h2>
 <p>The two screenshots below show the same page, the quality-control metrics, in NACHO 2.0 and in NACHO 3.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
@@ -2347,7 +2577,7 @@ in R card holding an R script.
 </section>
 <section id="responsiveness" class="level3">
 <h3 class="anchored" data-anchor-id="responsiveness">Responsiveness</h3>
-<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" style="background-color: #c3c3c3; color: #000000;" title="GitHub" aria-label="GitHub platform">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
+<p>The app stays responsive while it computes, thanks to <a href="https://mirai.r-lib.org/">mirai</a>, the asynchronous framework of Charlie Gao (<span><a href="https://github.com/shikokuchuo" title="GitHub">@shikokuchuo</a><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span>). NACHO 3.0 suggests <code>mirai</code> and does not require it, so the app runs without it. When <code>mirai</code> is installed, the app hands three jobs to background R processes, and the page keeps answering you.</p>
 <ul>
 <li>Importing: reading the RCC files no longer freezes the page, and the line under <strong>Import</strong> shows the current stage.</li>
 <li>Reporting: the Export page renders the HTML or PDF report in the background.</li>
@@ -2380,7 +2610,7 @@ font-style: inherit;">visualise</span>(GSE74821)</span></code></pre></div></div>
 <section id="a-new-website" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-website">A New Website</h2>
 <p>The website got the same treatment as the app. Here is the home page in NACHO 2.0 and in NACHO 3.0.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="hero-art" style="display: block; max-height: 480px; overflow-y: auto; padding: 0;">
@@ -2450,7 +2680,7 @@ background-color: null;
 font-style: inherit;">"typst"</span>)</span></code></pre></div></div>
 </div>
 <p>The report is now a quality-control record. Here are the tops of the NACHO 2.0 and the NACHO 3.0 HTML reports.</p>
-<div class="quarto-layout-panel" style="text-align:center;" data-layout-ncol="2">
+<div class="quarto-layout-panel" data-layout-ncol="2" style="text-align:center;">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
 <div class="quarto-figure quarto-figure-center">
@@ -3975,7 +4205,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-glightbox="description: .lightbox-desc-10;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/themes.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-10;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/themes.svg" class="img-fluid" alt="The same three-row fuel consumption table drawn four times, once per theme: theme-default with rules around the header and body, theme-booktabs with three rules, theme-compact with tighter rows, and theme-minimal with a single thin rule under the labels."></a></p>
 </div>
 </div>
 </div>
@@ -3987,7 +4217,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-glightbox="description: .lightbox-desc-11;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/styled.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-11;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/styled.svg" class="img-fluid" alt="A regional sales table with the Units column shaded from pale to dark blue by value, a margin below 5% in bold red, a missing margin shown as a dash, and two numbered footnotes."></a></p>
 </div>
 </div>
 </div>
@@ -3999,7 +4229,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-glightbox="description: .lightbox-desc-12;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/summaries.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-12;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/summaries.svg" class="img-fluid" alt="Two tables. The first, 'Regional sales', groups products under North and South with a shaded subtotal row per region, and a grand total whose revenue is in blue with a footnote mark. The second has no stub, its first column at the end edge, and a total row."></a></p>
 </div>
 </div>
 </div>
@@ -4013,7 +4243,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-glightbox="description: .lightbox-desc-13;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/combined.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-13;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/combined.svg" class="img-fluid" alt="An 'Association results' table for four genes, with the effect and its standard error in one column, the 95% confidence interval as a range, and p-values in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -4025,7 +4255,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-glightbox="description: .lightbox-desc-14;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-14;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots.svg" class="img-fluid" alt="A portfolio table with a sparkline and a bar plot per row, the asset name and the weight centred against the plots beside them: equities rising, bonds falling, and cash nearly flat."></a></p>
 </div>
 </div>
 </div>
@@ -4037,7 +4267,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-glightbox="description: .lightbox-desc-15;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/nanoplots-inline.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-15;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/nanoplots-inline.svg" class="img-fluid" alt="A sentence about revenue with a small line plot, a dot plot, and a bar plot set inline at the height of the text, then the same line plot again at a larger text size."></a></p>
 </div>
 </div>
 </div>
@@ -4051,7 +4281,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-glightbox="description: .lightbox-desc-16;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/conventions.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-16;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/conventions.svg" class="img-fluid" alt="A table titled 'Dépenses' written the French way: amounts with a comma as the decimal mark, a thin space between thousands, and the euro sign after the number, an infinity sign for an unbounded ratio, and charges in scientific notation."></a></p>
 </div>
 </div>
 </div>
@@ -4063,7 +4293,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-glightbox="description: .lightbox-desc-17;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/formatters.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-17;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/formatters.svg" class="img-fluid" alt="A 'Bill of materials' table with prices aligned under their currency symbols, charges in scientific notation with the exponents aligned, and firmware sizes with their units aligned. Below it, the same figures with the symbol trailing, the exponent written with an e, and sizes counted in thousands."></a></p>
 </div>
 </div>
 </div>
@@ -4075,7 +4305,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-glightbox="description: .lightbox-desc-18;" data-gallery="features"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/direction.svg" class="lightbox" data-gallery="features" data-glightbox="description: .lightbox-desc-18;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/direction.svg" class="img-fluid" alt="The same grouped 'Readings' table twice, once left to right and once right to left, with the stub, the columns, and the alignment mirrored in the second one."></a></p>
 </div>
 </div>
 </div>
@@ -4093,7 +4323,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-glightbox="description: .lightbox-desc-19;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-income-statement.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-19;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-income-statement.svg" class="img-fluid" alt="An income statement in pounds sterling for 2025 and 2026, with revenue and operating cost lines, a subtotal per section, and an operating profit row on a grey background."></a></p>
 </div>
 </div>
 </div>
@@ -4105,7 +4335,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-glightbox="description: .lightbox-desc-20;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-population.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-20;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-population.svg" class="img-fluid" alt="A 'Population by region' table of 2025 mid-year estimates for the regions of England, with the population, the share of England, a small age-profile bar plot per row, and the median age."></a></p>
 </div>
 </div>
 </div>
@@ -4117,7 +4347,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-glightbox="description: .lightbox-desc-21;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-standings.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-21;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-standings.svg" class="img-fluid" alt="A league table after 14 rounds, with the top two teams shaded green and the bottom team shaded red, the goal difference shaded on a diverging scale, and a small line of the last five results per team."></a></p>
 </div>
 </div>
 </div>
@@ -4129,7 +4359,7 @@ font-style: inherit;">#</span>high],</span>
 </div>
 <div class="card-body d-flex align-items-center justify-content-center">
 <div style="text-align: center;">
-<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-glightbox="description: .lightbox-desc-22;" data-gallery="gallery"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
+<p><a href="../../posts/2026-10-22-keisen-0-1/./assets/typst-render/gallery-assay.svg" class="lightbox" data-gallery="gallery" data-glightbox="description: .lightbox-desc-22;"><img src="https://mickael.canouil.fr/posts/2026-10-22-keisen-0-1/assets/typst-render/gallery-assay.svg" class="img-fluid" alt="A 'Drinking water assay' table for eight sites, with lead, cadmium, and gross alpha readings, lead values above the regulatory limit in bold red, and 'n.d.' for readings not detected."></a></p>
 </div>
 </div>
 </div>
@@ -7868,7 +8098,7 @@ font-style: inherit;">]</span></span><div class="code-annotation-gutter-bg"></di
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
+<p>The title of the table of contents comes from <code>quarto.language</code>, which is why the extension asks for Quarto 1.10.18 or later. Everything else the template writes is English in the source: “Signature”, “Date”, “Draft”, “Confidential”, and “Page N of M”. A key under <code>language</code> that Quarto does not ship passes validation and is merged over the defaults. It is then dropped before templates see it, so it reads back as an empty string, with no warning. I reported that as <a href="https://github.com/quarto-dev/quarto-cli/issues/14772"><span><span title="GitHub">quarto-dev/quarto-cli#14772</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a>, and the fix proposed in <a href="https://github.com/quarto-dev/quarto-cli/pull/14773"><span><span title="GitHub">quarto-dev/quarto-cli#14773</span><span class="gitlink-badge badge" title="GitHub" style="background-color: #c3c3c3; color: #000000;" aria-label="GitHub platform">GitHub</span></span></a> which might land only in Quarto 1.11.</p>
 </div>
 </div>
 <p>Two more pieces of furniture come from the same metadata. The running footer numbers the pages as X of Y, which Typst gives you with the final value of the page counter.</p>
@@ -9680,12 +9910,12 @@ font-style: inherit;">)</span></span><div class="code-annotation-gutter-bg"></di
 <section id="label-alignment-fix" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="label-alignment-fix"><span class="header-section-number">5</span> Label Alignment Fix</h2>
 <p>The usual share of fixes rides along.</p>
-<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
+<p>The one you are most likely to notice is vertical alignment of labels (<span><a href="https://github.com/mcanouil/gribouille/issues/208" title="GitHub">#208</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). Legend entries, vertical colourbar tick labels, and y-axis tick labels now centre on the cap-height and baseline band instead of the glyph bounds. A label carrying a descender, <code>Chinstrap</code> next to <code>Adelie</code>, no longer sits a little higher than its neighbours.</p>
 </section>
 <section id="filling-the-documentation-gaps" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="filling-the-documentation-gaps"><span class="header-section-number">6</span> Filling the documentation gaps</h2>
 <p>A good share of this release was writing down what was already there.</p>
-<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" aria-label="GitHub platform" title="GitHub" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
+<p>The reference pages had a real hole in them (<span><a href="https://github.com/mcanouil/gribouille/issues/211" title="GitHub">#211</a><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span>). A <code>scale-*</code> constructor takes <code>..args</code>, and the page described a few of those keys in prose, which left the rest to be found by reading the source. Every <code>scale-*</code> page now lists each key it accepts, with its type, its accepted values, and its default. That includes <code>oob</code>, the out-of-range handling, which no page documented at all.</p>
 <p>Cross-references are links again. A reference that closed a parenthetical printed as a bare <code>@geom-line</code> instead of a link, and a link sometimes ran into the word or the comma before it.</p>
 <p>Two guides changed. The <a href="https://m.canouil.dev/gribouille/guides/wrangle.html">Wrangling data</a> guide is new, and it starts where the data does: coercion, then grouped aggregation, reshaping, joining, and the plot at the end. It also lists the tasks that need no verb at all, because <code>filter</code>, <code>map</code>, and <code>sorted</code> already do them. The <a href="https://m.canouil.dev/gribouille/guides/theming.html">theming guide</a> gains a “Ticks and their labels” section covering <code>element-tick</code>, ratio lengths, minor marks, and hiding labels per side.</p>
 <p>The site itself got a pass for legibility. The GitHub icon in the navbar is a widget now. It shows the live star and fork counts and opens a project menu: repository, issues, pull requests, releases, star, fork, Typst Universe, and sponsoring. It replaces the separate links that used to sit in the navbar, and it shares one pill button style with the version switcher, the search button, and the scheme toggle.</p>
@@ -10388,7 +10618,7 @@ Warning
 <div class="callout-body-container callout-body">
 <p>Three things caught me out while writing real modules with these filters.</p>
 <ul>
-<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;" title="GitHub">GitHub</span></span></a>). Put it on an inner div instead.</li>
+<li>Quarto’s own conditional-content filter rewrites <code>.content-visible</code> and <code>.content-hidden</code> divs and strips custom attributes from them, so a <code>prism</code> attribute placed on that fence disappears without a word (<a href="https://github.com/quarto-dev/quarto-cli/issues/14289"><span><span title="GitHub">quarto-dev/quarto-cli#14289</span><span class="gitlink-badge badge" title="GitHub" aria-label="GitHub platform" style="background-color: #c3c3c3; color: #000000;">GitHub</span></span></a>). Put it on an inner div instead.</li>
 <li><code>cascade</code> does not hoist a <code>---</code> that sits inside a <code>.panel-tabset</code> div, so a slide break there is left alone rather than split into a continuation slide.</li>
 <li>The first child of a section heading should be a heading, not prose. Otherwise <code>cascade</code> reads the slide level wrongly and repeats the wrong heading on the continuation slides.</li>
 </ul>

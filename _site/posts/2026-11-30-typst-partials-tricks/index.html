@@ -524,7 +524,8 @@ On the right, two pages of a demo report: a cover with blue gradient stripes at 
   <li><a href="#page-stripes" id="toc-page-stripes" class="nav-link" data-scroll-target="#page-stripes"><span class="header-section-number">10</span> Page Stripes</a></li>
   <li><a href="#cover-page" id="toc-cover-page" class="nav-link" data-scroll-target="#cover-page"><span class="header-section-number">11</span> Cover Page</a></li>
   <li><a href="#cover-decoration" id="toc-cover-decoration" class="nav-link" data-scroll-target="#cover-decoration"><span class="header-section-number">12</span> Cover Decoration</a></li>
-  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next"><span class="header-section-number">13</span> Where to Go Next</a></li>
+  <li><a href="#book" id="toc-book" class="nav-link" data-scroll-target="#book"><span class="header-section-number">13</span> Using the Tricks in a Quarto Book</a></li>
+  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next"><span class="header-section-number">14</span> Where to Go Next</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mcanouil/mickael.canouil.fr/edit/main/posts/2026-11-30-typst-partials-tricks/index.qmd" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mcanouil/mickael.canouil.fr/issues/new" target="_blank" rel="noopener noreferrer" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -536,7 +537,8 @@ On the right, two pages of a demo report: a cover with blue gradient stripes at 
 
 
 
-<p>This post shows ten small Typst partials that change how a Quarto PDF looks. Each one is a separate file, so you can copy it, edit it or remove it without touching the others.</p>
+<p>A few weeks ago, I saw someone ask for resources to customise the cover page of a Quarto Typst book. Since Quarto 1.9, a Typst book uses the orange-book template by default, so the question is a fair one. I use a handful of Typst tricks in my Quarto Typst format extensions, so I thought I would share them.</p>
+<p>This post shows ten of them as small partials. Each one is a separate file, so you can copy it and edit it without touching the others. A few build on an earlier one, and the demo section says which. They work on any Quarto Typst document, and <a href="#book">one section</a> covers what changes in a book.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><a href="featured.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="featured.png" class="img-featured img-fluid quarto-figure quarto-figure-center figure-img" alt="Social card for the post. On the left, the title &quot;Ten small partials for
@@ -573,12 +575,12 @@ Note
 <p>I made the screenshots and ran every test in this post with Quarto 1.11.9, which ships Typst 0.15.1. The demo also builds with Quarto 1.10.19. I did not test older versions. The demo uses <code>pdf-standard</code> and <code>pdf.artifact()</code>, so it needs a recent Quarto and Typst 0.14 or newer.</p>
 </div>
 </div>
-<p>The demo has no <code>_quarto.yml</code>. Here is the front matter that <code>typst/render-steps.sh</code> gives each step, as it stands after the last trick.</p>
+<p>The demo has no <code>_quarto.yml</code>. Here is the <code>format</code> block that <code>typst/render-steps.sh</code> adds to each step, as it stands after the last trick. The script puts it on top of the front matter of <code>_report.qmd</code>, which holds the <code>title</code>, <code>subtitle</code>, <code>kicker</code>, <code>date</code>, <code>lang</code> and <code>number-sections</code> keys.</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>front matter</strong></pre>
+<pre><strong>format block of each step</strong></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="front matter"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="annotated-cell-1" data-filename="format block of each step"><pre class="sourceCode yaml code-annotation-code code-with-copy code-annotated"><code class="sourceCode yaml"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">format</span><span class="kw">:</span></span>
 <span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">typst</span><span class="kw">:</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();">1</a><span id="annotated-cell-1-3" class="code-annotation-target"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pdf-standard</span><span class="kw">:</span><span class="at"> ua-1</span></span>
 <a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();">2</a><span id="annotated-cell-1-4" class="code-annotation-target"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">include-in-header</span><span class="kw">:</span></span>
@@ -593,8 +595,7 @@ Note
 <span id="annotated-cell-1-13"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">partials/9-cover.typ</span></span>
 <span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">partials/10-cover-decoration.typ</span></span>
 <span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">template-partials</span><span class="kw">:</span></span>
-<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">typst-show.typ</span></span>
-<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();">3</a><span id="annotated-cell-1-17" class="code-annotation-target"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">number-sections</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">- </span><span class="at">typst-show.typ</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
@@ -603,14 +604,17 @@ Note
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick.</span>
-</dd>
-<dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
-<dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="17" data-code-annotation="3">Number the headings through Quarto, which sets the numbering after the partials run.</span>
+<span data-code-cell="annotated-cell-1" data-code-lines="4" data-code-annotation="2">Load the partials in this order. Removing a line removes that trick, unless a later partial needs it.</span>
 </dd>
 </dl>
-<p>The demo and the script that builds it are in the post folder, under <code>typst/</code>. To build the PDF after each trick, run <code>typst/render-steps.sh</code> from that folder.</p>
+<p>Some partials need an earlier one.</p>
+<ul>
+<li>Every partial after the first reads the colours and fonts of <code>1-tokens.typ</code>.</li>
+<li><code>8-page-stripes.typ</code> needs <code>2-header-footer.typ</code>, and <code>10-cover-decoration.typ</code> needs <code>9-cover.typ</code>.</li>
+<li><code>9-cover.typ</code> and <code>typst-show.typ</code> need <code>7-title-block.typ</code>.</li>
+<li>The others, such as <code>3-headings.typ</code> and <code>4-code.typ</code>, need only the first partial.</li>
+</ul>
+<p>The heading numbers come from <code>number-sections: true</code> in the front matter of <code>_report.qmd</code>, because Quarto sets the numbering after the partials run. The demo and the script that builds it are <a href="https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst">in the post folder on GitHub</a>. To build the PDF after each trick, run <code>typst/render-steps.sh</code> from that folder.</p>
 </section>
 <section id="tokens" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="tokens"><span class="header-section-number">3</span> Tokens</h2>
@@ -1146,8 +1150,89 @@ Note
 </div>
 </div>
 </section>
-<section id="where-to-go-next" class="level2" data-number="13">
-<h2 data-number="13" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">13</span> Where to Go Next</h2>
+<section id="book" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="book"><span class="header-section-number">13</span> Using the Tricks in a Quarto Book</h2>
+<p>A Quarto book project with <code>format: typst</code> uses the <a href="https://typst.app/universe/package/orange-book">orange-book</a> template. It draws the cover and the chapter headings itself, and its own <code>typst-show.typ</code> sets it up. I tested the partials in a book made with <code>quarto create project book</code>, with Quarto 1.11.9 and orange-book 0.7.1, and <code>pdf-standard: ua-1</code> still gave a tagged PDF.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Trick</th>
+<th>In a book</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Tokens, Headings, Code, Tables, Captions</td>
+<td>Work as in a document, and the caption number follows the chapter, as in “Table 1.1”.</td>
+</tr>
+<tr class="even">
+<td>Header and Footer</td>
+<td>The footer works. The orange-book header stays, because the template sets it after your partial.</td>
+</tr>
+<tr class="odd">
+<td>Page Stripes</td>
+<td>Works on every page, cover included. Load the footer partial before it, because that one holds the <code>footer-ink</code> state. Without it, the build stops with <code>unknown variable: footer-ink</code>.</td>
+</tr>
+<tr class="even">
+<td>Title Block, Cover Page, Cover Decoration</td>
+<td>Do not use them. They replace <code>typst-show.typ</code>, which holds the setup of orange-book, and the book then renders as a single page.</td>
+</tr>
+</tbody>
+</table>
+<p>The cover is the one thing you cannot reach with those partials. orange-book draws it as the first page, so the decoration has to target that page. This partial paints the stripes and the band on page 1 only, in the same way as the cover of the demo.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>book-cover.typ</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12" data-filename="book-cover.typ"><pre class="sourceCode typst code-with-copy"><code class="sourceCode typst"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Book cover: decorate page 1 only, because orange-book draws the cover itself. Needs 1-tokens.typ for `accent`.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">#let</span> <span class="va">band</span> <span class="op">=</span> gradient<span class="op">.</span>linear<span class="op">(</span>accent<span class="op">,</span> accent<span class="op">.</span>darken<span class="op">(</span><span class="fl">55%</span><span class="op">),</span> angle<span class="op">:</span> <span class="dv">135</span>deg<span class="op">)</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">#set</span> <span class="va">page</span><span class="op">(</span>background<span class="op">:</span> context <span class="cf">if</span> here<span class="op">().</span>page<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span> <span class="op">{</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  pdf<span class="op">.</span>artifact<span class="op">({</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>bottom<span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">35%</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">12mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">10mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    place<span class="op">(</span>top<span class="op">,</span> dy<span class="op">:</span> <span class="fl">26mm</span><span class="op">,</span> rect<span class="op">(</span>width<span class="op">:</span> <span class="fl">100%</span><span class="op">,</span> height<span class="op">:</span> <span class="fl">2mm</span><span class="op">,</span> fill<span class="op">:</span> band<span class="op">,</span> stroke<span class="op">:</span> <span class="bu">none</span><span class="op">))</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">})</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Load it after <code>1-tokens.typ</code>, because it reads <code>accent</code> from there.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Before</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="assets/book-before-p1.png" class="lightbox" data-gallery="typst-tricks" title="The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page"><img src="assets/book-before-p1.png" class="img-fluid" alt="The cover of a default Quarto Typst book: a light blue box with the title and the author on a white page"></a></td>
+<td><a href="assets/book-after-p1.png" class="lightbox" data-gallery="typst-tricks" title="The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom"><img src="assets/book-after-p1.png" class="img-fluid" alt="The same cover with two gradient stripes at the top and a dark blue gradient band at the bottom"></a></td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Check the cover contrast
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The title box of orange-book stays in the middle of the page, away from the gradient, so its text keeps its contrast. If you move the band under the box, check the contrast again, as for any text on a band.</p>
+</div>
+</div>
+</section>
+<section id="where-to-go-next" class="level2" data-number="14">
+<h2 data-number="14" class="anchored" data-anchor-id="where-to-go-next"><span class="header-section-number">14</span> Where to Go Next</h2>
 <ul>
 <li>To package partials like these in an extension, read my post on the <a href="../../posts/2026-01-19-typst-document-dispatcher/index.html">document dispatcher</a>.</li>
 <li>To build a Typst template with Lua and Typst working together, follow the tutorial in <a href="../../posts/2026-02-27-typst-template-tutorial-part1/index.html">Part 1</a> and in <a href="../../posts/2026-03-05-typst-template-tutorial-part2/index.html">Part 2</a>.</li>
