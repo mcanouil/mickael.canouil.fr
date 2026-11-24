@@ -17,7 +17,8 @@ Since Quarto 1.9, a Typst book uses the orange-book template by default, so the 
 I use a handful of Typst tricks in my Quarto Typst format extensions, so I thought I would share them.
 
 This post shows ten of them as small partials.
-Each one is a separate file, so you can copy it, edit it or remove it without touching the others.
+Each one is a separate file, so you can copy it and edit it without touching the others.
+A few build on an earlier one, and the demo section says which.
 They work on any Quarto Typst document, and [one section](#book) covers what changes in a book.
 
 ![](featured.png){
@@ -62,9 +63,10 @@ The demo uses `pdf-standard` and `pdf.artifact()`, so it needs a recent Quarto a
 :::
 
 The demo has no `_quarto.yml`.
-Here is the front matter that `typst/render-steps.sh` gives each step, as it stands after the last trick.
+Here is the `format` block that `typst/render-steps.sh` adds to each step, as it stands after the last trick.
+The script puts it on top of the front matter of `_report.qmd`, which holds the `title`, `subtitle`, `kicker`, `date`, `lang` and `number-sections` keys.
 
-```{.yaml filename="front matter"}
+```{.yaml filename="format block of each step"}
 format:
   typst:
     pdf-standard: ua-1  # <1>
@@ -81,17 +83,23 @@ format:
       - partials/10-cover-decoration.typ
     template-partials:
       - typst-show.typ
-number-sections: true  # <3>
 ```
 
 1. Ask Typst for a tagged PDF that follows PDF/UA-1.
    Typst checks the PDF against the standard and tags it, and `pdfinfo` reports `Tagged: yes` for the final demo.
    In my tests, an image with no alt text stops the build with the error `PDF/UA-1 error: missing alt text`.
 2. Load the partials in this order.
-   Removing a line removes that trick.
-3. Number the headings through Quarto, which sets the numbering after the partials run.
+   Removing a line removes that trick, unless a later partial needs it.
 
-The demo and the script that builds it are in the post folder, under `typst/`.
+Some partials need an earlier one.
+
+- Every partial after the first reads the colours and fonts of `1-tokens.typ`.
+- `8-page-stripes.typ` needs `2-header-footer.typ`, and `10-cover-decoration.typ` needs `9-cover.typ`.
+- `9-cover.typ` and `typst-show.typ` need `7-title-block.typ`.
+- The others, such as `3-headings.typ` and `4-code.typ`, need only the first partial.
+
+The heading numbers come from `number-sections: true` in the front matter of `_report.qmd`, because Quarto sets the numbering after the partials run.
+The demo and the script that builds it are [in the post folder on GitHub](https://github.com/mcanouil/mickael.canouil.fr/tree/main/posts/2026-11-30-typst-partials-tricks/typst).
 To build the PDF after each trick, run `typst/render-steps.sh` from that folder.
 
 ## Tokens {#tokens}
